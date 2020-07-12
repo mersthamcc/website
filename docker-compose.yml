@@ -1,0 +1,556 @@
+version: '3.8'
+services:
+  loki:
+    image: grafana/loki:1.5.0
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.loki.rule=Host(`loki.${DEVDOMAIN}`)
+      - traefik.http.services.loki.loadbalancer.server.port=3100
+      - traefik.http.routers.loki.entrypoints=web
+      - traefik.http.routers.loki.middlewares=forcehttps
+      - traefik.http.routers.loki-tls.tls=true
+      - traefik.http.routers.loki-tls.rule=Host(`loki.${DEVDOMAIN}`)
+      - traefik.http.routers.loki-tls.entrypoints=websecure
+      - traefik.http.routers.loki-tls.tls.certresolver=le
+      - traefik.http.routers.loki-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=loki
+      - tls-cert-host-check=loki.${DEVDOMAIN}
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - backendnetwork
+
+  traefik:
+    image: traefik:latest
+    command: [
+      "--providers.docker=true",
+      "--providers.docker.endpoint=unix:///var/run/docker.sock",
+      "--providers.docker.swarmMode=false",
+      "--providers.docker.exposedByDefault=false",
+      "--entryPoints.web.address=:80",
+      "--entryPoints.websecure.address=:443",
+      "--entryPoints.api.address=:8080",
+      "--entryPoints.ping.address=:8082",
+      "--entryPoints.metrics.address=:9090",
+      "--certificatesResolvers.le.acme.email=${LETSENCRYPT_EMAILADDRESS}",
+      "--certificatesResolvers.le.acme.storage=/acme/acme.json",
+      "--certificatesResolvers.le.acme.httpChallenge=false",
+      "--certificatesResolvers.le.acme.tlsChallenge=false",
+      "--certificatesResolvers.le.acme.dnsChallenge=true",
+      "--certificatesResolvers.le.acme.dnsChallenge.provider=digitalocean",
+      "--certificatesResolvers.le.acme.dnsChallenge.delayBeforeCheck=1",
+      "--certificatesResolvers.le.acme.dnsChallenge.resolvers=8.8.8.8:53, 8.8.4.4:53",
+      "--metrics.prometheus=true",
+      "--metrics.prometheus.addEntryPointsLabels=true",
+      "--metrics.prometheus.addServicesLabels=true",
+      "--metrics.prometheus.entryPoint=metrics",
+      "--ping=true",
+      "--ping.entryPoint=ping",
+      "--api=true",
+      "--api.dashboard=true",
+      "--api.debug=true",
+      "--log.filePath=/dev/stdout",
+      "--log.level=DEBUG",
+      "--accesslog=true",
+      "--accesslog.filepath=/dev/stderr",
+    ]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`traefik.${DEVDOMAIN}`)
+      - traefik.http.services.api.loadbalancer.server.port=8080
+      - traefik.http.routers.api.service=api@internal
+      - traefik.http.routers.api.tls.certresolver=le
+      - traefik.http.routers.api.tls.domains[0].main=*.${DEVDOMAIN}
+      - traefik.http.middlewares.forcehttps.redirectscheme.scheme=https
+      - com_docker_swarm_service_name=traefik
+      - tls-cert-host-check=traefik.${DEVDOMAIN}
+    environment:
+      DO_AUTH_TOKEN: ${DO_AUTH_TOKEN}
+    ports:
+      - 80:80
+      - 443:443
+      - 8082:8082
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/acme
+    networks:
+      - dmz
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  web:
+    image: nginx:latest
+    volumes:
+      - ./web:/var/www
+      - ./dev-config/nginx.conf:/etc/nginx/conf.d/www.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.www.rule=Host(`www.${DEVDOMAIN}`)
+      - traefik.http.services.www.loadbalancer.server.port=80
+      - traefik.http.routers.www.entrypoints=web
+      - traefik.http.routers.www.middlewares=forcehttps
+      - traefik.http.routers.www-tls.tls=true
+      - traefik.http.routers.www-tls.rule=Host(`www.${DEVDOMAIN}`)
+      - traefik.http.routers.www-tls.entrypoints=websecure
+      - traefik.http.routers.www-tls.tls.certresolver=le
+      - traefik.http.routers.www-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=www
+      - tls-cert-host-check=www.${DEVDOMAIN}
+    networks:
+      - dmz
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - php
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  php:
+    build:
+      dockerfile: dev.Dockerfile
+      context: .
+    extra_hosts:
+      - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
+    labels:
+      - traefik.enable=false
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
+      KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      DEVDOMAIN: ${DEVDOMAIN}
+    volumes:
+      - ./web:/var/www
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - postgres
+    networks:
+      - backendnetwork
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  postgres:
+    image: postgres:11
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      POSTGRES_USER: ${DATABASE_ROOT_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    labels:
+      - traefik.enable=false
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  redis:
+    image: redis:alpine
+    command: /usr/local/etc/redis/redis.conf
+    labels:
+      - com_docker_swarm_service_name=redis
+    volumes:
+      - ./dev-config/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  prometheus:
+    image: prom/prometheus
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.${DEVDOMAIN}`)
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090
+      - traefik.http.routers.prometheus.entrypoints=web
+      - traefik.http.routers.prometheus.middlewares=forcehttps
+      - traefik.http.routers.prometheus-tls.tls=true
+      - traefik.http.routers.prometheus-tls.rule=Host(`prometheus.${DEVDOMAIN}`)
+      - traefik.http.routers.prometheus-tls.entrypoints=websecure
+      - traefik.http.routers.prometheus-tls.tls.certresolver=le
+      - traefik.http.routers.prometheus-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=prometheus
+      - tls-cert-host-check=prometheus.${DEVDOMAIN}
+    ports:
+      - 9090:9090
+    volumes:
+      - ./dev-config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  node-exporter:
+    image: prom/node-exporter
+    command: --path.rootfs=/host
+    volumes:
+      - /:/host:ro
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - 8080:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  prisma:
+    image: grahql:local
+    build:
+      context: graphql
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prisma.rule=Host(`prisma.${DEVDOMAIN}`)
+      - traefik.http.services.prisma.loadbalancer.server.port=4000
+      - traefik.http.routers.prisma.entrypoints=web
+      - traefik.http.routers.prisma.middlewares=forcehttps
+      - traefik.http.routers.prisma-tls.tls=true
+      - traefik.http.routers.prisma-tls.rule=Host(`prisma.${DEVDOMAIN}`)
+      - traefik.http.routers.prisma-tls.entrypoints=websecure
+      - traefik.http.routers.prisma-tls.tls.certresolver=le
+      - traefik.http.routers.prisma-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=prisma
+      - tls-cert-host-check=prisma.${DEVDOMAIN}
+    entrypoint: npm run dev
+    ports:
+      - 4000:4000
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      LISTEN_PORT: 4000
+    networks:
+      - dmz
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - postgres
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  smtp:
+    image: rnwood/smtp4dev:linux-amd64-v3
+    hostname: smtp
+    command: ["--db" ,"/data/messages.db"]
+    networks:
+      - backendnetwork
+    volumes:
+      - smtp-data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mail.rule=Host(`mail.${DEVDOMAIN}`)
+      - traefik.http.services.mail.loadbalancer.server.port=80
+      - traefik.http.routers.mail.entrypoints=web
+      - traefik.http.routers.mail.middlewares=forcehttps
+      - traefik.http.routers.mail-tls.tls=true
+      - traefik.http.routers.mail-tls.rule=Host(`mail.${DEVDOMAIN}`)
+      - traefik.http.routers.mail-tls.entrypoints=websecure
+      - traefik.http.routers.mail-tls.tls.certresolver=le
+      - traefik.http.routers.mail-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=mail
+      - tls-cert-host-check=mail.${DEVDOMAIN}
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  flyway:
+    build:
+      context: sql/
+      dockerfile: Dockerfile
+    image: mersthamcc/flyway:latest
+    command: ["migrate"]
+    volumes:
+      - ./sql/dev-migrations:/flyway/dev-migrations
+    environment:
+      FLYWAY_URL: ${DATABASE_BASE_URL}/${DATABASE_NAME}
+      FLYWAY_USER: ${DATABASE_ROOT_USER}
+      FLYWAY_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      FLYWAY_LOCATIONS: "filesystem:/flyway/sql,filesystem:/flyway/dev-migrations"
+      FLYWAY_PLACEHOLDERS_SITENAME: www.${DEVDOMAIN}
+      FLYWAY_PLACEHOLDERS_ADMIN_USER: ${ADMIN_EMAILADDRESS}
+      FLYWAY_PLACEHOLDERS_CONTENT_USER: ${DATABASE_USER}
+      FLYWAY_PLACEHOLDERS_CONTENT_USER_PASSWORD: ${DATABASE_PASSWORD}
+      FLYWAY_PLACEHOLDERS_DATABASE_NAME: ${DATABASE_NAME}
+      FLYWAY_PLACEHOLDERS_APPS_DATABASE_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      FLYWAY_MIXED: "true"
+    networks:
+      - backendnetwork
+    restart: on-failure
+    depends_on:
+      - postgres
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  grafana:
+    image: grafana/grafana:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.${DEVDOMAIN}`)
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.http.routers.grafana.entrypoints=web
+      - traefik.http.routers.grafana.middlewares=forcehttps
+      - traefik.http.routers.grafana-tls.tls=true
+      - traefik.http.routers.grafana-tls.rule=Host(`grafana.${DEVDOMAIN}`)
+      - traefik.http.routers.grafana-tls.entrypoints=websecure
+      - traefik.http.routers.grafana-tls.tls.certresolver=le
+      - traefik.http.routers.grafana-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=grafana
+      - tls-cert-host-check=grafana.${DEVDOMAIN}
+    environment:
+      GF_SERVER_ROOT_URL: http://grafana.${DEVDOMAIN}
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_AUTH_DISABLE_LOGIN_FORM: "false"
+      GF_SECURITY_AUTO_ASSIGN_ORG: "true"
+      GF_AUTH_GENERIC_OAUTH_ENABLED: ${GF_AUTH_GENERIC_OAUTH_ENABLED}
+      GF_AUTH_GENERIC_OAUTH_NAME: ${DEVDOMAIN}
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://login.${DEVDOMAIN}/oauth2/authorize
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://login.${DEVDOMAIN}/oauth2/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://login.${DEVDOMAIN}/oauth2/userinfo"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: ${GF_AUTH_GENERIC_OAUTH_ENABLED}
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: ${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: ${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
+      GF_PATHS_PROVISIONING: /provision
+      MCC_CONTENT_SERVER: postgres
+      MCC_CONTENT_USER: ${DATABASE_ROOT_USER}
+      MCC_CONTENT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MCC_CONTENT_DATABASE: ${DATABASE_NAME}
+    volumes:
+      - ${MCC_INFRASTRUCTURE_REPO}/terraform/data/grafana-provisioning/dashboards:/provision/dashboards:ro
+      - ./dev-config/grafana/datasources.yaml:/provision/datasources/datasources.yaml:ro
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    ports:
+      - 3000:3000
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  promtail:
+    image: grafana/promtail:1.5.0
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/docker-config.yaml
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.8.0
+    command: -nginx.scrape-uri http://web:8080/stub_status
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - web
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.postgres.rule=Host(`postgres.${DEVDOMAIN}`)
+      - traefik.http.services.postgres.loadbalancer.server.port=80
+      - traefik.http.routers.postgres.entrypoints=web
+      - traefik.http.routers.postgres.middlewares=forcehttps
+      - traefik.http.routers.postgres-tls.tls=true
+      - traefik.http.routers.postgres-tls.rule=Host(`postgres.${DEVDOMAIN}`)
+      - traefik.http.routers.postgres-tls.entrypoints=websecure
+      - traefik.http.routers.postgres-tls.tls.certresolver=le
+      - traefik.http.routers.postgres-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=postgres
+      - tls-cert-host-check=postgres.${DEVDOMAIN}
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_DEFAULT_EMAIL: notused
+      PGADMIN_DEFAULT_PASSWORD: notused
+    volumes:
+      - ./dev-config/pgadmin4/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - postgres
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  rediscommander:
+    image: rediscommander/redis-commander
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.redis.rule=Host(`redis.${DEVDOMAIN}`)
+      - traefik.http.services.redis.loadbalancer.server.port=80
+      - traefik.http.routers.redis.entrypoints=web
+      - traefik.http.routers.redis.middlewares=forcehttps
+      - traefik.http.routers.redis-tls.tls=true
+      - traefik.http.routers.redis-tls.rule=Host(`redis.${DEVDOMAIN}`)
+      - traefik.http.routers.redis-tls.entrypoints=websecure
+      - traefik.http.routers.redis-tls.tls.certresolver=le
+      - traefik.http.routers.redis-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=redis
+      - tls-cert-host-check=redis.${DEVDOMAIN}
+    ports:
+      - 8081:8081
+    environment:
+      REDIS_HOST: redis
+      REDIS_TLS: "false"
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - redis
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:10.0.2
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.login.rule=Host(`login.${DEVDOMAIN}`)
+      - traefik.http.services.login.loadbalancer.server.port=8080
+      - traefik.http.routers.login.entrypoints=web
+      - traefik.http.routers.login.middlewares=forcehttps
+      - traefik.http.routers.login-tls.tls=true
+      - traefik.http.routers.login-tls.rule=Host(`login.${DEVDOMAIN}`)
+      - traefik.http.routers.login-tls.entrypoints=websecure
+      - traefik.http.routers.login-tls.tls.certresolver=le
+      - traefik.http.routers.login-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=login
+      - tls-cert-host-check=login.${DEVDOMAIN}
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_FRONTEND_URL: https://login.${DEVDOMAIN}/auth
+      PROXY_ADDRESS_FORWARDING: "true"
+    volumes:
+      - ./dev-config/keycloak:/tmp/import
+    depends_on:
+      - postgres
+      - loki
+    networks:
+      - backendnetwork
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  terraform-keycloak:
+    image: chrisclayson/terraform-toolbox:latest
+    working_dir: /src
+    command: ./deploy.sh --validate
+    extra_hosts:
+      - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
+    volumes:
+      - ./dev-config/keycloak:/src
+    environment:
+      TF_VAR_keycloack_administrator_username: admin
+      TF_VAR_keycloack_administrator_password: ${KEYCLOAK_PASSWORD}
+      TF_VAR_keycloak_url: http://keycloak:8080
+      TF_VAR_realm_name: ${DEVDOMAIN}
+      TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
+      TF_VAR_base_url: https://www.${DEVDOMAIN}
+    networks:
+      - backendnetwork
+
+volumes:
+  pg-data:
+  redis-config:
+  redis-data:
+  jupyterhub-data:
+  jupyter-notebook-data:
+  jupyter-notebook-settings:
+  smtp-data:
+
+networks:
+  backendnetwork:
+  dmz:

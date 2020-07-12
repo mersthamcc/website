@@ -1,0 +1,98 @@
+{% extends 'bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-horizontal')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+
+{% block form_widget_simple -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' c-square c-theme')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{%- block form_rows -%}
+    {% for child in form %}
+        {{- form_row(child) -}}
+    {% endfor %}
+{%- endblock form_rows -%}
+
+{% block form_row -%}
+    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+        {{- form_label(form) -}}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+
+            {{- form_errors(form) -}}
+        </div>
+{##}</div>
+{%- endblock form_row %}
+
+{% block button_row -%}
+    <div class="form-group">
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock button_row %}
+
+{% block button_widget -%}
+
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' btn c-btn-square btn-lg c-btn-uppercase c-btn-bold')|trim}) -%}
+    {% if type is defined and type =='submit' %}
+	    {%- set attr = attr|merge({class: (attr.class ~ ' c-theme-btn')|trim}) -%}
+    {% endif %}
+    {% if type is defined and type =='reset' %}
+	    {%- set attr = attr|merge({class: (attr.class ~ ' btn-default')|trim}) -%}
+    {% endif %}
+
+    {%- if label is not same as(false) and label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+{%- endblock button_widget %}
+
+{%- block form_section_row -%}
+	<div class="c-content-title-1 c-title-md c-margin-b-20 clearfix">
+		<h3 class="c-center c-font-uppercase c-font-bold">{{ label }}</h3>
+		<div class="c-line-center c-theme-bg"></div>
+	</div>
+    {% for child in form %}
+        {{- form_row(child) -}}
+    {% endfor %}
+{%- endblock form_section_row -%}
+
+{%- block button_section_row -%}
+	<div class="form-group c-margin-t-40">
+	   	<div class="col-sm-offset-4 col-md-8">
+            {% for child in form %}
+                {{- form_widget(child) -}}
+            {% endfor %}
+	  	</div>
+	</div>
+{%- endblock button_section_row -%}
+
+{% block submit_row -%}
+    {{- form_widget(form) -}}
+{%- endblock submit_row %}
+
+{% block reset_row -%}
+    {{- form_widget(form) -}}
+{%- endblock reset_row %}
+
+{%- block recaptcha_widget -%}
+	<div class="g-recaptcha" data-sitekey="{{ sitekey }}"></div>
+{%- endblock recaptcha_widget -%}
+
+{%- block recaptcha_row -%}
+	<div class="form-group">
+	   	<div class="col-md-offset-2 col-md-10">
+            {{- form_widget(form) -}}
+	  	</div>
+	</div>
+{%- endblock recaptcha_row -%}

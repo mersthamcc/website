@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "MCC Database",
+      "Group": "MCC Local",
+      "Port": 5432,
+      "Username": "postgres",
+      "Host": "postgres",
+      "SSLMode": "disable",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}

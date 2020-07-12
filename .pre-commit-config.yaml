@@ -1,0 +1,39 @@
+repos:
+  - repo: git@github.com:Yelp/detect-secrets
+    rev: v0.13.1
+    hooks:
+      - id: detect-secrets
+        args: ['--use-all-plugins', '--baseline', '.secrets.baseline']
+        exclude: web/public/assets/(admin|base|plugins)/.*|Brewfile.lock.json|web/composer.lock|.*/installed.json|.*/package-lock.json
+  - repo: https://github.com/prettier/prettier
+    rev: ""
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - "@prettier/plugin-xml"
+          - "@prettier/plugin-php"
+        args:
+          - --plugin=@prettier/plugin-xml
+          - --plugin=@prettier/plugin-php
+        files: web/(templates|src|public|config|tests|translations)/.*
+  - repo: local
+    hooks:
+      - id: build-local-docker
+        name: docker-build
+        language: script
+        always_run: true
+        entry: Dockerfiles/build-pre-commits.sh
+      - id: dockerfile-php-linter
+        name: php-linter
+        language: docker_image
+        files: .*.php
+        entry: php-linter:local
+        args:
+          - -f
+#  - repo: local
+#    hooks:
+#      - id: dockerfile-deploy-build
+#        name: build-all-images
+#        language: script
+#        files: .*Dockerfile
+#        entry: build-images.sh

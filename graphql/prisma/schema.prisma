@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource postgresql {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model news {
+  body           String
+  created_date   DateTime
+  id             Int              @default(autoincrement()) @id
+  publish_date   DateTime
+  title          String
+  news_attribute news_attribute[]
+  news_comment   news_comment[]
+}
+
+model news_attribute {
+  id      Int     @default(autoincrement()) @id
+  name    String
+  news_id Int
+  value   String? @default("NULL")
+  news    news    @relation(fields: [news_id], references: [id])
+
+  @@index([news_id], name: "idx_e65fb03ab5a459a0")
+}
+
+model news_comment {
+  author  String? @default("NULL")
+  body    String
+  id      Int     @default(autoincrement()) @id
+  news_id Int
+  news    news    @relation(fields: [news_id], references: [id])
+
+  @@index([news_id], name: "idx_c3904e8ab5a459a0")
+}
+
+model page {
+  body  String
+  id    Int    @default(autoincrement()) @id
+  slug  String
+  title String
+}
