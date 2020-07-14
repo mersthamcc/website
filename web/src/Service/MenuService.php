@@ -3,65 +3,84 @@
 
 namespace App\Service;
 
-
+use App\Controller\ContactController;
+use App\Controller\CricketController;
 use App\Controller\HomeController;
 use App\Controller\NewsController;
 use App\Data\MenuEntry;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use ReflectionClass;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class MenuService
+class MenuService implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var string[]
      */
     private $controllers = [
         HomeController::class,
-        NewsController::class
+        NewsController::class,
+        CricketController::class,
+        ContactController::class,
     ];
 
     /**
-     * @var $container;
+     * @var FactoryInterface
      */
-    private $container;
+    private $factory;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(FactoryInterface $factory)
     {
-        $this->container = $container;
+        $this->factory = $factory;
     }
 
     /**
-     * @return MenuEntry[]
+     * @param array $options
+     * @param array|null $topLevelOrder
+     * @return \Knp\Menu\ItemInterface
      * @throws \ReflectionException
      */
-    public function getFrontendMenuItems() {
-        return $this->getMenuItems(FrontEndMenuProvider::class, 'getFrontEndMenuItems');
+    public function getFrontendMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
+        $menu = $this->factory->createItem('root');
+        $this->addItemsToMenu($menu, FrontEndMenuProvider::class, 'getFrontEndMenuItems');
+        if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
+        return $menu;
     }
 
     /**
-     * @return MenuEntry[]
+     * @param array $options
+     * @param array|null $topLevelOrder
+     * @return \Knp\Menu\ItemInterface
      * @throws \ReflectionException
      */
-    public function getAdministrationMenuItems() {
-        return $this->getMenuItems(AdministrationMenuProvider::class, 'getAdminMenuItems');
+    public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
+        $menu = $this->factory->createItem('root');
+        $this->addItemsToMenu($menu, AdministrationMenuProvider::class, 'getAdminMenuItems');
+        if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
+        return $menu;
+
     }
 
     /**
      * @param $interface string
      * @param $methodName string
-     * @return MenuEntry[]
+     * @return ItemInterface
      * @throws \ReflectionException
      */
-    private function getMenuItems($interface, $methodName) {
-        $menuItems = [];
+    private function addItemsToMenu(ItemInterface $root, $interface, $methodName) {
         foreach ($this->getClassesThatImplement($interface) as $class) {
             $method = $class->getMethod($methodName);
-            $menuItems = array_merge($menuItems, $method->invoke(null));
+            foreach ($method->invoke(null, $this->factory) as $item) {
+                $root->addChild($item);
+            }
         }
-        $this->sortMenuItems($menuItems);
-        return $menuItems;
+        return $root;
     }
 
     /**
@@ -76,18 +95,5 @@ class MenuService
                 $implementations[] = $reflect;
         }
         return $implementations;
-    }
-
-    /**
-     * @param $menuItems MenuEntry[]
-     */
-    private function sortMenuItems($menuItems) {
-        foreach ($menuItems as $menuItem) {
-            $this->sortMenuItems($menuItem->getChildren());
-        }
-        usort($menuItems, function (MenuEntry $a, MenuEntry $b) {
-            if ( $a->getSortorder() == $b->getSortorder() ) return strcmp($a->getTitle(), $b->getTitle());
-            return $a->getSortorder() - $b->getSortorder();
-        });
     }
 }

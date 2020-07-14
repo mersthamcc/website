@@ -25,3 +25,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    app.menu_builder:
+        class: App\Service\MenuService
+        arguments: ["@knp_menu.factory"]
+        tags:
+            - { name: knp_menu.menu_builder, method: getFrontendMenuItems, alias: main }
+            - { name: knp_menu.menu_builder, method: getAdministrationMenuItems, alias: admin }
+

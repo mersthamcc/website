@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
-use App\Data\MenuEntry;
 use App\Menus\FrontEndMenuProvider;
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -29,10 +30,17 @@ class HomeController extends AbstractController implements FrontEndMenuProvider
         ]);
     }
 
-    public static function getFrontEndMenuItems()
+    /**
+     * @param FactoryInterface $factory
+     * @return ItemInterface[]
+     */
+    public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            MenuEntry::createMenuEntry("Home")->setRoute("home")->setSortorder(10)
+            $factory->createItem("Home", [
+                'route' => 'home',
+                'sortorder' => 10,
+            ]),
         ];
     }
 }

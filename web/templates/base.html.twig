@@ -104,10 +104,10 @@
     </div>
     <div class="c-navbar">
         <div class="container">
-            <!-- BEGIN: BRAND -->
             <div class="c-navbar-wrapper clearfix">
+                <!-- BEGIN: BRAND -->
                 <div class="c-brand c-pull-left">
-                    <a href="index.html" class="c-logo">
+                    <a href="{{ path("home") }}" class="c-logo">
                         <h1>
                         <img src="{{ asset('/assets/mcc/img/header_logo.png') }}" alt="JANGO" class="c-desktop-logo">
                         <img src="{{ asset('/assets/mcc/img/header_logo.png') }}" alt="JANGO" class="c-desktop-logo-inverse">
@@ -140,54 +140,12 @@
                 <!-- BEGIN: LAYOUT/HEADERS/MEGA-MENU -->
                 <!-- BEGIN: MEGA MENU -->
                 <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
-                <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
-                    <ul class="nav navbar-nav c-theme-nav">
-                        {% for menuEntry in menu.getFrontendMenuItems() %}
-                        <li class="c-active c-menu-type-classic">
-                            <a href="{{ menuEntry.route ? path(menuEntry.route) : 'javascript:;' }}" class="c-link dropdown-toggle">{{ menuEntry.title }}<span class="c-arrow c-toggler"></span></a>
-                            {% if menuEntry.children %}
-                            <div class="dropdown-menu c-menu-type-mega c-menu-type-fullwidth" style="min-width: auto">
-                                <div class="row">
-                                    {% for subMenuEntry in menuEntry.children %}
-                                    <div class="col-md-3">
-                                        <ul class="dropdown-menu c-menu-type-inline">
-                                            <li>
-                                                <h3>{{ subMenuEntry.title }}</h3>
-                                            </li>
-                                            {% for leafEntry in subMenuEntry.children %}
-                                            <li>
-                                                <a href="../corporate_1/index.html">NEW Corporate Demo 1</a>
-                                            </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% endif %}
-                        </li>
-                        {% endfor %}
-                        <li class="c-search-toggler-wrapper">
-                            <a  href="#" class="c-btn-icon c-search-toggler"><i class="fa fa-search"></i></a>
-                        </li>
-
-                        {% if false %}
-                        <li class="c-cart-toggler-wrapper">
-                            <a  href="#" class="c-btn-icon c-cart-toggler"><i class="icon-handbag c-cart-icon"></i> <span class="c-cart-number c-theme-bg">2</span></a>
-                        </li>
-                        {% endif %}
-
-{#                        {% if app.user %}#}
-{#                            <li>#}
-{#                                <a href="{{ path('logout') }}" class="c-btn-border-opacity-04 c-btn btn-no-focus c-btn-header btn btn-sm c-btn-border-1x c-btn-dark c-btn-circle c-btn-uppercase c-btn-sbold"><i class="icon-user"></i> Logout</a>#}
-{#                            </li>#}
-{#                        {% else %}#}
-{#                        <li>#}
-{#                            <a href="{{ path('login') }}" class="c-btn-border-opacity-04 c-btn btn-no-focus c-btn-header btn btn-sm c-btn-border-1x c-btn-dark c-btn-circle c-btn-uppercase c-btn-sbold"><i class="icon-user"></i> Login</a>#}
-{#                        </li>#}
-{#                        {% endif %}#}
-                    </ul>
-                </nav>
+                {{ knp_menu_render('main', {
+                    "template": "menu-frontend.html.twig",
+                    "currentClass": "c-active",
+                    "ancestorClass": "c-active",
+                    "compressed": true,
+                }) }}
                 <!-- END: MEGA MENU --><!-- END: LAYOUT/HEADERS/MEGA-MENU -->
                 <!-- END: HOR NAV -->
             </div>

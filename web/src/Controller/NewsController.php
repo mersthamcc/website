@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-use App\Data\MenuEntry;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -40,20 +41,31 @@ class NewsController extends AbstractController implements AdministrationMenuPro
         ]);
     }
 
-    public static function getAdminMenuItems()
+    /**
+     * @param FactoryInterface $factory
+     * @return ItemInterface[]
+     */
+    public static function getAdminMenuItems(FactoryInterface $factory): array
     {
         return [
-            MenuEntry::createMenuEntry("News")->setRoute(null)->setSortorder(10)->setChildren([
-                MenuEntry::createMenuEntry("List News Items")->setRoute("news_admin")->setSortorder(10),
-                MenuEntry::createMenuEntry("Create News Item")->setRoute("create_news")->setSortorder(20)
-            ])
+            $factory->createItem("News", [])
+                ->setChildren([
+                    $factory->createItem("news_admin", [ 'route' => 'news_admin'])->setLabel("List News Stories")
+                ]),
         ];
     }
 
-    public static function getFrontEndMenuItems()
+    /**
+     * @param FactoryInterface $factory
+     * @return ItemInterface[]
+     */
+    public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            MenuEntry::createMenuEntry("News")->setRoute("news")->setSortorder(20)
+            $factory->createItem("News", [
+                'route' => 'news',
+                'sortorder' => 10,
+            ]),
         ];
     }
 }
