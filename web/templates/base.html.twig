@@ -205,36 +205,6 @@
     </div>
 </div>
 
-<div class="modal fade c-content-login-form" id="signup-form" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content c-square">
-            <div class="modal-header c-no-border">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-            </div>
-            <div class="modal-body">
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade c-content-login-form" id="login-form" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content c-square">
-            <div class="modal-header c-no-border">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-            </div>
-            <div class="modal-body">
-
-            </div>
-            <div class="modal-footer c-no-border">
-                <span class="c-text-account">Don't Have An Account Yet ?</span>
-                <a href="javascript:;" data-toggle="modal" data-target="#signup-form" data-dismiss="modal" class="btn c-btn-dark-1 btn c-btn-uppercase c-btn-bold c-btn-slim c-btn-border-2x c-btn-square c-btn-signup">Signup!</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="c-layout-page">
     <div class="c-layout-breadcrumbs-1 c-bordered c-bordered-both c-fonts-uppercase c-fonts-bold">
         <div class="container">
@@ -243,9 +213,17 @@
             </div>
             <ul class="c-page-breadcrumbs c-theme-nav c-pull-right c-fonts-regular">
                 {% block breadcrumbs %}
-
+                    {% for breadcrumb_item in knp_menu_get_breadcrumbs_array(knp_menu_get_current_item('main')) %}
+                        {% if loop.first %}
+                            <!-- Root Breadcrube -->
+                        {% elseif loop.last %}
+                            <li class="c-state_active">{{ breadcrumb_item.label }}</li>
+                        {% else %}
+                            <li><a href="{{ breadcrumb_item.uri }}">{{ breadcrumb_item.label }}</a></li>
+                            <li>/</li>
+                        {% endif %}
+                    {% endfor %}
                 {% endblock %}
-
             </ul>
         </div>
     </div>

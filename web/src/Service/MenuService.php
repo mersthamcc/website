@@ -47,10 +47,10 @@ class MenuService implements ContainerAwareInterface
      * @throws \ReflectionException
      */
     public function getFrontendMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
-        $menu = $this->factory->createItem('root');
+        $menu = $this->factory->createItem('root')->setDisplay(false);
         $this->addItemsToMenu($menu, FrontEndMenuProvider::class, 'getFrontEndMenuItems');
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
-        return $menu;
+        return $this->setParents($menu);
     }
 
     /**
@@ -60,11 +60,10 @@ class MenuService implements ContainerAwareInterface
      * @throws \ReflectionException
      */
     public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
-        $menu = $this->factory->createItem('root');
+        $menu = $this->factory->createItem('root')->setDisplay(false);
         $this->addItemsToMenu($menu, AdministrationMenuProvider::class, 'getAdminMenuItems');
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
-        return $menu;
-
+        return $this->setParents($menu);
     }
 
     /**
@@ -95,5 +94,19 @@ class MenuService implements ContainerAwareInterface
                 $implementations[] = $reflect;
         }
         return $implementations;
+    }
+
+    /**
+     * @param ItemInterface $item
+     * @return ItemInterface
+     */
+    private function setParents(ItemInterface $item): ItemInterface {
+        if ($item->hasChildren()) {
+            foreach ($item->getChildren() as $child) {
+                $child->setParent($item);
+                if ($child->hasChildren()) $this->setParents($child);
+            }
+        }
+        return $item;
     }
 }

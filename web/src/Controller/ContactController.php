@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContactController extends AbstractController implements FrontEndMenuProvider
 {
     /**
-     * @Route("/contact", name="contacts")
+     * @Route("/contact/{category}", name="contacts", defaults={"category"="committee"})
      */
-    public function index()
+    public function index($category = null)
     {
         return $this->render('contact/index.html.twig', [
             'controller_name' => 'ContactController',
@@ -35,9 +35,14 @@ class ContactController extends AbstractController implements FrontEndMenuProvid
     {
         return [
             $factory->createItem("Contacts", [
+                'route' => 'contacts',
                 'sortorder' => 20,
             ])->setLabel("Contacts")->setChildren([
                 $factory->createItem("Committee", [
+                    'route' => 'contacts',
+                    'routeParameters' => [
+                        'category' => 'commmittee',
+                    ],
                     'sortorder' => 10,
                 ])->setLabel("Selection")->setChildren([
                     $factory->createItem('chairman', [
@@ -56,6 +61,10 @@ class ContactController extends AbstractController implements FrontEndMenuProvid
                     ])->setLabel('Treasurer'),
                 ]),
                 $factory->createItem("captains", [
+                    'route' => 'contacts',
+                    'routeParameters' => [
+                        'category' => 'captains',
+                    ],
                     'sortorder' => 20,
                 ])->setLabel("Adult Captains")->setChildren([
                     $factory->createItem('saturday_1st', [
