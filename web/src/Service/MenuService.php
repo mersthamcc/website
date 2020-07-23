@@ -60,8 +60,22 @@ class MenuService implements ContainerAwareInterface
      * @throws \ReflectionException
      */
     public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
-        $menu = $this->factory->createItem('root')->setDisplay(false);
-        $this->addItemsToMenu($menu, AdministrationMenuProvider::class, 'getAdminMenuItems');
+        $menu = $this->factory->createItem('home', [
+            'route' => 'admin_home'
+        ])->setDisplay(true)->setLabel("Dashboard");
+
+        $contentMenu = $this->factory->createItem('content')->setDisplay(true)->setLabel("Content");
+        $this->addItemsToMenu($contentMenu, AdministrationMenuProvider::class, 'getContentAdminMenuItems');
+        $menu->addChild($contentMenu);
+
+        $administrationMenu = $this->factory->createItem('administration')->setDisplay(true)->setLabel("Administration");
+        $this->addItemsToMenu($administrationMenu, AdministrationMenuProvider::class, 'getAdministrationMenuItems');
+        $menu->addChild($administrationMenu);
+
+        $configurationMenu = $this->factory->createItem('config')->setDisplay(true)->setLabel("Configuration");
+        $this->addItemsToMenu($configurationMenu, AdministrationMenuProvider::class, 'getConfigurationAdminMenuItems');
+        $menu->addChild($configurationMenu);
+
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
         return $this->setParents($menu);
     }

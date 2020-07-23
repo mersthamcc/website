@@ -9,5 +9,18 @@ interface AdministrationMenuProvider {
      * @param FactoryInterface $factory
      * @return ItemInterface[]
      */
-    public static function getFrontEndMenuItems(FactoryInterface $factory): array;
+    public static function getContentAdminMenuItems(FactoryInterface $factory): array;
+
+    /**
+     * @param FactoryInterface $factory
+     * @return ItemInterface[]
+     */
+    public static function getAdministrationMenuItems(FactoryInterface $factory): array;
+
+    /**
+     * @param FactoryInterface $factory
+     * @return ItemInterface[]
+     */
+    public static function getConfigurationAdminMenuItems(FactoryInterface $factory): array;
+
 }

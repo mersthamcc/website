@@ -24,10 +24,15 @@ resource "keycloak_realm" "dev_realm" {
   admin_theme   = "keycloak"
   email_theme   = "keycloak"
 
-  reset_password_allowed   = true
-  remember_me              = true
-  login_with_email_allowed = true
-  verify_email             = true
+  registration_allowed           = true
+  registration_email_as_username = true
+  edit_username_allowed          = true
+  reset_password_allowed         = true
+  remember_me                    = true
+  login_with_email_allowed       = true
+  verify_email                   = true
+  duplicate_emails_allowed       = false
+  ssl_required                   = "all"
 
   access_code_lifespan = "3h"
 
@@ -116,7 +121,7 @@ resource "keycloak_user" "keycloak_user_dev" {
   depends_on = [keycloak_realm.dev_realm]
 }
 
-resource "keycloak_group_memberships" "concourse_admin_group_members" {
+resource "keycloak_group_memberships" "test_group_members" {
   realm_id = keycloak_realm.dev_realm.id
   group_id = keycloak_group.test_group.id
 
@@ -131,7 +136,7 @@ resource "keycloak_group_memberships" "concourse_admin_group_members" {
   ]
 }
 
-resource "keycloak_openid_user_realm_role_protocol_mapper" "concourse_realm_role_mapper" {
+resource "keycloak_openid_user_realm_role_protocol_mapper" "dev_realm_role_mapper" {
   realm_id  = keycloak_realm.dev_realm.id
   client_id = keycloak_openid_client.website_client.id
   name      = "website-role-mapper"

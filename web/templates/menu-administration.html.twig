@@ -1,0 +1,181 @@
+{% extends 'knp_menu_base.html.twig' %}
+
+{% macro attributes(attributes) %}
+    {% for name, value in attributes %}
+        {%- if value is not none and value is not same as(false) -%}
+            {{- ' %s="%s"'|format(name, value is same as(true) ? name|e : value|e)|raw -}}
+        {%- endif -%}
+    {%- endfor -%}
+{% endmacro %}
+
+{% block compressed_root %}
+    {% apply spaceless %}
+        {{ block('root') }}
+    {% endapply %}
+{% endblock %}
+
+{% block root %}
+    {% set listAttributes = item.childrenAttributes %}
+    <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase c-fonts-bold">
+        {{ block('list') -}}
+    </nav>
+{% endblock %}
+
+{% block list %}
+    {% import _self as knp_menu %}
+
+    <ul class="menu-nav">
+        {%- set rootClasses = [] %}
+        {%- if matcher.isCurrent(item) %}
+            {%- set rootClasses = rootClasses|merge([options.currentClass]) %}
+        {%- endif %}
+
+        <li class="menu-item {{ rootClasses | join(' ') }}" aria-haspopup="true">
+            <a href="{{ item.uri }}" class="menu-link">
+                <span class="svg-icon menu-icon">
+                    <img src="{{ asset('assets/admin/media/svg/icons/Home/Home.svg') }}" />
+                </span>
+                <span class="menu-text">{{ item.label }}</span>
+            </a>
+        </li>
+        {% for category in item.children %}
+            <li class="menu-section">
+                <h4 class="menu-text">{{  category.label }}</h4>
+                <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+            </li>
+            {% for menuEntry in category.children %}
+                {% if menuEntry.displayed %}
+                    {%- set classes = [] %}
+                    {%- if matcher.isCurrent(menuEntry) %}
+                        {%- set classes = classes|merge([options.currentClass]) %}
+                    {%- elseif matcher.isAncestor(menuEntry, options.matchingDepth) %}
+                        {%- set classes = classes|merge([options.ancestorClass]) %}
+                    {%- endif %}
+
+                    <li class="menu-item menu-item-submenu {{ classes | join(' ') }}" aria-haspopup="true" data-menu-toggle="hover">
+                        <a href="javascript:;" class="menu-link menu-toggle">
+                            <span class="svg-icon menu-icon">
+                                {% if menuEntry.extra('icon') %}
+                                    <!--begin::Svg Icon-->
+                                    <img src="{{ asset(menuEntry.extra('icon')) }}" />
+                                    <!--end::Svg Icon-->
+                                {% endif %}
+                            </span>
+                            <span class="menu-text">{{ menuEntry.label }}</span>
+                            {% if menuEntry.children %}
+                                <i class="menu-arrow"></i>
+                            {% endif %}
+                        </a>
+                        {% if menuEntry.children %}
+                            <div class="menu-submenu">
+                                <i class="menu-arrow"></i>
+                                <ul class="menu-subnav">
+                                    {% for subMenuEntry in menuEntry.children %}
+                                        {%- set subMenuClasses = [] %}
+                                        {%- if matcher.isCurrent(subMenuEntry) %}
+                                            {%- set subMenuClasses = subMenuClasses|merge([options.currentClass]) %}
+                                        {%- elseif matcher.isAncestor(subMenuEntry, options.matchingDepth) %}
+                                            {%- set subMenuClasses = subMenuClasses|merge([options.ancestorClass]) %}
+                                        {%- endif %}
+
+                                        {% if subMenuEntry.uri %}
+                                            <li class="menu-item {{ subMenuClasses | join(' ') }}" aria-haspopup="true">
+                                                <a href="{{ subMenuEntry.uri ? subMenuEntry.uri : 'javascript:;' }}" class="menu-link">
+                                                    <i class="menu-bullet menu-bullet-dot">
+                                                        <span></span>
+                                                    </i>
+                                                    <span class="menu-text">{{ subMenuEntry.label }}</span>
+                                                    {% if subMenuEntry.extra('annotation') %}
+                                                        <span class="menu-label">
+                                                            <span class="label label-rounded">{{ subMenuEntry.extra('annotation') }}</span>
+                                                        </span>
+                                                    {% endif %}
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="menu-item menu-item-parent {{ subMenuClasses | join(' ') }}" aria-haspopup="true">
+                                                <span class="menu-link">
+                                                    <span class="menu-text">{{ menuEntry.label }}</span>
+                                                </span>
+                                            </li>
+                                            <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+                                                <a href="javascript:;" class="menu-link menu-toggle">
+                                                    <i class="menu-bullet menu-bullet-line">
+                                                        <span></span>
+                                                    </i>
+                                                    <span class="menu-text">{{ subMenuEntry.label }}</span>
+                                                    {% if subMenuEntry.extra('annotation') %}
+                                                        <span class="menu-label">
+                                                            <span class="label label-rounded">{{ subMenuEntry.extra('annotation')    }}</span>
+                                                        </span>
+                                                    {% endif %}
+                                                    <i class="menu-arrow"></i>
+                                                </a>
+                                                <div class="menu-submenu">
+                                                    <i class="menu-arrow"></i>
+                                                    <ul class="menu-subnav">
+                                                        {% for leafMenuEntry in subMenuEntry.children %}
+                                                            {%- set leafMenuClasses = [] %}
+                                                            {%- if matcher.isCurrent(leafMenuEntry) %}
+                                                                {%- set leafMenuClasses = leafMenuClasses|merge([options.currentClass]) %}
+                                                            {%- elseif matcher.isAncestor(leafMenuEntry, options.matchingDepth) %}
+                                                                {%- set leafMenuClasses = leafMenuClasses|merge([options.ancestorClass]) %}
+                                                            {%- endif %}
+
+                                                            <li class="menu-item {{ leafMenuClasses | join(' ') }}" aria-haspopup="true">
+                                                                <a href="{{ leafMenuEntry.uri }}" class="menu-link">
+                                                                    <i class="menu-bullet menu-bullet-dot">
+                                                                        <span></span>
+                                                                    </i>
+                                                                    <span class="menu-text">{{ leafMenuEntry.label }}</span>
+                                                                    {% if leafMenuEntry.extra('annotation') %}
+                                                                        <span class="menu-label">
+                                                                            <span class="label label-rounded">{{ leafMenuEntry.extra('annotation') }}</span>
+                                                                        </span>
+                                                                    {% endif %}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        <li class="menu-section">
+            <h4 class="menu-text">Exit</h4>
+            <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
+        </li>
+
+        <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+            <a href="{{ path("home") }}" class="menu-link menu-toggle">
+                <span class="svg-icon menu-icon">
+                    <!--begin::Svg Icon | path:assets/media/svg/icons/Layout/Layout-4-blocks.svg-->
+                    <img src="{{ asset('assets/admin/media/svg/icons/Home/Globe.svg') }}">
+                    <!--end::Svg Icon-->
+                </span>
+                <span class="menu-text">Back to website...</span>
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block leafEntries %}
+    {% for leafEntry in subMenuEntry.children %}
+        {%- set leafEntryClasses = [] %}
+        {%- if matcher.isCurrent(leafEntry) %}
+            {%- set leafEntryClasses = leafEntryClasses|merge([options.currentClass]) %}
+        {%- elseif matcher.isAncestor(leafEntry, options.matchingDepth) %}
+            {%- set leafEntryClasses = leafEntryClasses|merge([options.ancestorClass]) %}
+        {%- endif %}
+        <li class="{{ leafEntryClasses | join(' ') }}">
+            <a href="{{ leafEntry.uri }}">{{ leafEntry.label | raw }}</a>
+        </li>
+    {% endfor %}
+{% endblock %}
