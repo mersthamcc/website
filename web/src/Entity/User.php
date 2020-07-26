@@ -191,4 +191,15 @@ class User implements UserInterface
     {
         return md5(strtolower($this->getEmail()));
     }
+
+    /**
+     * @param array $validRoles
+     * @return boolean
+     */
+    public function hasValidRole(array $validRoles) {
+        if (count($validRoles) == 0) {
+            return true;
+        }
+        return (count(array_intersect($validRoles, $this->getRoles())) > 0);
+    }
 }

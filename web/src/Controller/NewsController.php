@@ -62,9 +62,9 @@ class NewsController extends AbstractController implements AdministrationMenuPro
     public static function getContentAdminMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("News", [])
+            $factory->createItem("News", [])->setExtra('icon', 'far fa-newspaper')
                 ->setChildren([
-                    $factory->createItem("news_admin", [ 'route' => 'news_admin'])->setLabel("List News Stories")
+                    $factory->createItem("news_admin", ['route' => 'news_admin'])->setLabel("List News Stories")->setExtra('roles', ['ROLE_NEWS'])
                 ]),
         ];
     }
