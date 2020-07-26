@@ -154,7 +154,7 @@ class User implements UserInterface
      */
     public function addRoles(array $roles): self
     {
-        $this->roles = array_merge($this->roles, $roles);
+        $this->roles = array_unique(array_merge($this->roles, $roles), SORT_STRING);
 
         return $this;
     }

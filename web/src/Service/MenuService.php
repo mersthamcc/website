@@ -119,7 +119,7 @@ class MenuService implements ContainerAwareInterface
             foreach ($item->getChildren() as $child) {
                 $child->setParent($item);
                 if ($child->hasChildren()) $this->setParents($child);
-                if ($child->getExtra("roles")) $item->setExtra('roles', array_merge($item->getExtra('roles', []), $child->getExtra('roles')));
+                if ($child->getExtra("roles")) $item->setExtra('roles', array_unique(array_merge($item->getExtra('roles', []), $child->getExtra('roles')), SORT_STRING));
             }
         }
         return $item;
