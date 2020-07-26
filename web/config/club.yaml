@@ -1,0 +1,12 @@
+name: Merstham Cricket Club
+logo: "/assets/mcc/img/header_logo.png"
+phone: "(01737) 645485"
+playcricket:
+  enabled: true
+  subsitePrefix: merstham
+social:
+  twitter:
+    handle: mersthammagics
+
+  facebook:
+    handle: MersthamCC

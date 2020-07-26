@@ -8,7 +8,7 @@
 <!-- BEGIN HEAD -->
 <head>
     <meta charset="utf-8"/>
-    <title> - {% block title %}--No Page Title --{% endblock %}</title>
+    <title> - {% block title %}{{ config.clubName }}{% endblock %}</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -56,10 +56,12 @@
             <!-- BEGIN: INLINE NAV -->
             <nav class="c-top-menu c-pull-left">
                 <ul class="c-icons c-theme-ul">
-                    <li><a href="//www.twitter.com/{{ "" }}"><i class="icon-social-twitter"></i></a></li>
-                    <li><a href="//www.facebook.com/{{ "" }}"><i class="icon-social-facebook"></i></a></li>
-                    <li><a href="tel:+{{ "+441737645485" }}"><i class="fa fa-phone"></i><span>&nbsp;&nbsp;{{ "01737645485" }}</span></a></li>
-                    <li><a href="{{ "" }}"><i class="fa fa-globe"></i><span>&nbsp;&nbsp;Play-Cricket</span></a></li>
+                    <li><a href="//www.twitter.com/{{ config.twitterHandle }}"><i class="icon-social-twitter"></i></a></li>
+                    <li><a href="//www.facebook.com/{{ config.facebookHandle }}"><i class="icon-social-facebook"></i></a></li>
+                    <li><a href="tel:{{ config.phoneNumber.dialableString }}"><i class="fa fa-phone"></i><span>&nbsp;&nbsp;{{ config.phoneNumber.raw }}</span></a></li>
+                    {%- if config.playCricketEnabled %}
+                        <li><a href="https://{{ config.playCricketSubsite }}.play-cricket.com"><i class="fa fa-globe"></i><span>&nbsp;&nbsp;Play-Cricket</span></a></li>
+                    {%- endif %}
                 </ul>
             </nav>
             <!-- END: INLINE NAV -->
@@ -109,10 +111,10 @@
                 <div class="c-brand c-pull-left">
                     <a href="{{ path("home") }}" class="c-logo">
                         <h1>
-                        <img src="{{ asset('/assets/mcc/img/header_logo.png') }}" alt="JANGO" class="c-desktop-logo">
-                        <img src="{{ asset('/assets/mcc/img/header_logo.png') }}" alt="JANGO" class="c-desktop-logo-inverse">
-                        <img src="{{ asset('/assets/mcc/img/header_logo.png') }}" alt="JANGO" class="c-mobile-logo">
-                        Merstham Cricket Club</h1>
+                        <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-desktop-logo">
+                        <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-desktop-logo-inverse">
+                        <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-mobile-logo">
+                        {{ config.clubName }}</h1>
                     </a>
                     <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
                         <span class="c-line"></span>
@@ -290,7 +292,7 @@
                             <div class="c-line-left hide"></div>
                         </div>
                         <div class="c-twitter">
-                            <a class="twitter-timeline" href="https://twitter.com/mersthammagics" data-theme="dark" data-widget-id="437554408700641280" data-tweet-limit="3" data-chrome="noheader nofooter noscrollbar noborders transparent">Latest Tweets by @mersthammagics...</a>
+                            <a class="twitter-timeline" href="https://twitter.com/{{ config.twitterHandle }}" data-theme="dark" data-widget-id="437554408700641280" data-tweet-limit="3" data-chrome="noheader nofooter noscrollbar noborders transparent">Latest Tweets by @{{ config.twitterHandle }}...</a>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 col-xs-12">
