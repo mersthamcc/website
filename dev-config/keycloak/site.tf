@@ -14,15 +14,16 @@ resource "random_password" "user_password" {
   min_numeric = 5
   min_special = 5
 }
+
 resource "keycloak_realm" "dev_realm" {
   realm        = var.realm_name
   enabled      = true
-  display_name = var.realm_name
+  display_name = var.clubname
 
-  login_theme   = "keycloak"
-  account_theme = "keycloak"
-  admin_theme   = "keycloak"
-  email_theme   = "keycloak"
+  login_theme   = var.theme
+  account_theme = var.theme
+  admin_theme   = var.theme
+  email_theme   = var.theme
 
   registration_allowed           = true
   registration_email_as_username = true
@@ -149,3 +150,4 @@ resource "keycloak_openid_user_realm_role_protocol_mapper" "dev_realm_role_mappe
     keycloak_openid_client.website_client,
   ]
 }
+

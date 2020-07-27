@@ -514,6 +514,7 @@ services:
       PROXY_ADDRESS_FORWARDING: "true"
     volumes:
       - ./dev-config/keycloak:/tmp/import
+      - ./keycloak/theme:/opt/jboss/keycloak/themes/mcc
     depends_on:
       - postgres
       - loki

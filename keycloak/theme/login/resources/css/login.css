@@ -1,5 +1,9 @@
+div.clubname {
+    margin-top: 15px;
+}
+
 .login-pf body {
-    background: url("../img/keycloak-bg.png") no-repeat center center fixed;
+    background: radial-gradient(#40404b, #111118) rgba(34, 34, 40, .94);
     background-size: cover;
     height: 100%;
 }
@@ -445,6 +449,7 @@ a.zocial  {
   max-width: 500px;
   border-top: 0;
   box-shadow: 0 0 0;
+  border-radius: 8px;
 }
 
 /*tablet*/

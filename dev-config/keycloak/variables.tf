@@ -33,3 +33,12 @@ variable "keycloak_given_name" {
 variable "base_url" {
   description = "The base URL for your application"
 }
+
+variable "clubname" {
+  description = "The club name; ths will be display name for the realm"
+}
+
+variable "theme" {
+  description = "The theme to use for the realm"
+  default = "mcc"
+}
