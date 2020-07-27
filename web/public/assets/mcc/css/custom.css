@@ -12,3 +12,10 @@
     }
 }
 
+p.c-text > a {
+    color: #b1c4d0;
+}
+
+p.c-text > a:hover {
+    color: #5893dd !important;
+}
