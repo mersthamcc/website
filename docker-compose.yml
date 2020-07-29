@@ -30,7 +30,7 @@ services:
       "--providers.docker.exposedByDefault=false",
       "--entryPoints.web.address=:80",
       "--entryPoints.websecure.address=:443",
-      "--entryPoints.api.address=:8080",
+      "--entryPoints.traefik.address=:8080",
       "--entryPoints.ping.address=:8082",
       "--entryPoints.metrics.address=:9090",
       "--certificatesResolvers.le.acme.email=${LETSENCRYPT_EMAILADDRESS}",
@@ -48,6 +48,7 @@ services:
       "--ping=true",
       "--ping.entryPoint=ping",
       "--api=true",
+      "--api.insecure=true",
       "--api.dashboard=true",
       "--api.debug=true",
       "--log.filePath=/dev/stdout",
@@ -56,13 +57,18 @@ services:
       "--accesslog.filepath=/dev/stderr",
     ]
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.api.rule=Host(`traefik.${DEVDOMAIN}`)
-      - traefik.http.services.api.loadbalancer.server.port=8080
-      - traefik.http.routers.api.service=api@internal
-      - traefik.http.routers.api.tls.certresolver=le
-      - traefik.http.routers.api.tls.domains[0].main=*.${DEVDOMAIN}
       - traefik.http.middlewares.forcehttps.redirectscheme.scheme=https
+      - traefik.http.middlewares.forcehttps.redirectscheme.permanent=true
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DEVDOMAIN}`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik.entrypoints=web
+      - traefik.http.routers.traefik.middlewares=forcehttps
+      - traefik.http.routers.traefik-tls.tls=true
+      - traefik.http.routers.traefik-tls.rule=Host(`traefik.${DEVDOMAIN}`)
+      - traefik.http.routers.traefik-tls.entrypoints=websecure
+      - traefik.http.routers.traefik-tls.tls.certresolver=le
+      - traefik.http.routers.traefik-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=traefik
       - tls-cert-host-check=traefik.${DEVDOMAIN}
     environment:
@@ -231,8 +237,19 @@ services:
   cadvisor:
     image: gcr.io/google-containers/cadvisor:latest
     container_name: cadvisor
-    ports:
-      - 8080:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cadvisor.rule=Host(`cadvisor.${DEVDOMAIN}`)
+      - traefik.http.services.cadvisor.loadbalancer.server.port=8080
+      - traefik.http.routers.cadvisor.entrypoints=web
+      - traefik.http.routers.cadvisor.middlewares=forcehttps
+      - traefik.http.routers.cadvisor-tls.tls=true
+      - traefik.http.routers.cadvisor-tls.rule=Host(`cadvisor.${DEVDOMAIN}`)
+      - traefik.http.routers.cadvisor-tls.entrypoints=websecure
+      - traefik.http.routers.cadvisor-tls.tls.certresolver=le
+      - traefik.http.routers.cadvisor-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=cadvisor
+      - tls-cert-host-check=cadvisor.${DEVDOMAIN}
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -540,6 +557,32 @@ services:
       TF_VAR_realm_name: ${DEVDOMAIN}
       TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
       TF_VAR_base_url: https://www.${DEVDOMAIN}
+    networks:
+      - backendnetwork
+
+  wireshark:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wireshark.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.services.wireshark.loadbalancer.server.port=3000
+      - traefik.http.routers.wireshark.entrypoints=web
+      - traefik.http.routers.wireshark.middlewares=forcehttps
+      - traefik.http.routers.wireshark-tls.tls=true
+      - traefik.http.routers.wireshark-tls.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.routers.wireshark-tls.entrypoints=websecure
+      - traefik.http.routers.wireshark-tls.tls.certresolver=le
+      - traefik.http.routers.wireshark-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=wireshark
+      - tls-cert-host-check=wireshark.${DEVDOMAIN}
+    image: linuxserver/wireshark:latest
+    container_name: wireshark
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    restart: unless-stopped
     networks:
       - backendnetwork
 
