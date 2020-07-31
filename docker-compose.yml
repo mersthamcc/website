@@ -477,7 +477,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.redis.rule=Host(`redis.${DEVDOMAIN}`)
-      - traefik.http.services.redis.loadbalancer.server.port=80
+      - traefik.http.services.redis.loadbalancer.server.port=8081
       - traefik.http.routers.redis.entrypoints=web
       - traefik.http.routers.redis.middlewares=forcehttps
       - traefik.http.routers.redis-tls.tls=true
@@ -586,6 +586,28 @@ services:
     networks:
       - backendnetwork
 
+  portainer:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DEVDOMAIN}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.entrypoints=web
+      - traefik.http.routers.portainer.middlewares=forcehttps
+      - traefik.http.routers.portainer-tls.tls=true
+      - traefik.http.routers.portainer-tls.rule=Host(`portainer.${DEVDOMAIN}`)
+      - traefik.http.routers.portainer-tls.entrypoints=websecure
+      - traefik.http.routers.portainer-tls.tls.certresolver=le
+      - traefik.http.routers.portainer-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=portainer
+      - tls-cert-host-check=portainer.${DEVDOMAIN}
+    image: portainer/portainer:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer-data:/data
+    restart: unless-stopped
+    networks:
+      - backendnetwork
+
 volumes:
   pg-data:
   redis-config:
@@ -594,6 +616,7 @@ volumes:
   jupyter-notebook-data:
   jupyter-notebook-settings:
   smtp-data:
+  portainer-data:
 
 networks:
   backendnetwork:
