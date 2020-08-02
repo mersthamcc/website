@@ -45,24 +45,24 @@ class CricketController extends AbstractController implements FrontEndMenuProvid
     public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("Cricket", [
+            $factory->createItem("cricket", [
                 'route' => 'cricket',
-            ])->setLabel("Cricket")->setChildren([
-                $factory->createItem("Selection", [
+            ])->setChildren([
+                $factory->createItem("selection", [
                     'route' => 'selection',
-                ])->setLabel("Selection")->setChildren([
+                ])->setChildren([
                     $factory->createItem('selection_saturday', [
                         'route' => 'selection',
                         'routeParameters' => [ 'day' => 'saturday'],
-                    ])->setLabel('Saturday'),
+                    ]),
                     $factory->createItem('selection_sunday', [
                         'route' => 'selection',
                         'routeParameters' => [ 'day' => 'sunday'],
-                    ])->setLabel('Sunday'),
+                    ]),
                 ]),
                 $factory->createItem("Fixtures", [
                     'route' => 'fixtures',
-                ])->setLabel("Fixtures"),
+                ]),
             ]),
         ];
     }

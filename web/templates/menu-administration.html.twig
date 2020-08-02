@@ -35,12 +35,20 @@
                 <span class="menu-icon">
                     <i class="fa {{ item.extra('icon') ? item.extra('icon') : 'fa-home' }}"></i>
                 </span>
-                <span class="menu-text">{{ item.label }}</span>
+                <span class="menu-text">
+                    {% with { item: item } %}
+                        {{ block('label') }}
+                    {% endwith %}
+                </span>
             </a>
         </li>
         {% for category in item.children %}
             <li class="menu-section">
-                <h4 class="menu-text">{{  category.label }}</h4>
+                <h4 class="menu-text">
+                    {% with { item: category } %}
+                        {{ block('label') }}
+                    {% endwith %}
+                </h4>
                 <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
             </li>
             {% for menuEntry in category.children %}
@@ -57,7 +65,11 @@
                             <span class="menu-icon">
                                 <i class="{{ menuEntry.extra('icon') ? menuEntry.extra('icon') : '' }}"></i>
                             </span>
-                            <span class="menu-text">{{ menuEntry.label }}</span>
+                            <span class="menu-text">
+                                {% with { item: menuEntry } %}
+                                    {{ block('label') }}
+                                {% endwith %}
+                            </span>
                             {% if menuEntry.children %}
                                 <i class="menu-arrow"></i>
                             {% endif %}
@@ -80,7 +92,11 @@
                                                         <i class="menu-bullet menu-bullet-dot">
                                                             <span></span>
                                                         </i>
-                                                        <span class="menu-text">{{ subMenuEntry.label }}</span>
+                                                        <span class="menu-text">
+                                                            {% with { item: subMenuEntry } %}
+                                                                {{ block('label') }}
+                                                            {% endwith %}
+                                                        </span>
                                                         {% if subMenuEntry.extra('annotation') %}
                                                             <span class="menu-label">
                                                                 <span class="label label-rounded">{{ subMenuEntry.extra('annotation') }}</span>
@@ -91,7 +107,11 @@
                                             {% else %}
                                                 <li class="menu-item menu-item-parent {{ subMenuClasses | join(' ') }}" aria-haspopup="true">
                                                     <span class="menu-link">
-                                                        <span class="menu-text">{{ menuEntry.label }}</span>
+                                                        <span class="menu-text">
+                                                            {% with { item: menuEntry } %}
+                                                                {{ block('label') }}
+                                                            {% endwith %}
+                                                        </span>
                                                     </span>
                                                 </li>
                                                 <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
@@ -99,7 +119,11 @@
                                                         <i class="menu-bullet menu-bullet-line">
                                                             <span></span>
                                                         </i>
-                                                        <span class="menu-text">{{ subMenuEntry.label }}</span>
+                                                        <span class="menu-text">
+                                                            {% with { item: subMenuEntry } %}
+                                                                {{ block('label') }}
+                                                            {% endwith %}
+                                                        </span>
                                                         {% if subMenuEntry.extra('annotation') %}
                                                             <span class="menu-label">
                                                                 <span class="label label-rounded">{{ subMenuEntry.extra('annotation')    }}</span>
@@ -123,7 +147,11 @@
                                                                             <i class="menu-bullet menu-bullet-dot">
                                                                                 <span></span>
                                                                             </i>
-                                                                            <span class="menu-text">{{ leafMenuEntry.label }}</span>
+                                                                            <span class="menu-text">
+                                                                                {% with { item: leafMenuEntry } %}
+                                                                                    {{ block('label') }}
+                                                                                {% endwith %}
+                                                                            </span>
                                                                             {% if leafMenuEntry.extra('annotation') %}
                                                                                 <span class="menu-label">
                                                                                     <span class="label label-rounded">{{ leafMenuEntry.extra('annotation') }}</span>
@@ -147,7 +175,7 @@
             {% endfor %}
         {% endfor %}
         <li class="menu-section">
-            <h4 class="menu-text">Exit</h4>
+            <h4 class="menu-text">{{ "exit" | trans({}, "administration") }}</h4>
             <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
         </li>
 
@@ -156,7 +184,7 @@
                 <span class="menu-icon">
                     <i class="fa fa-globe"></i>
                 </span>
-                <span class="menu-text">Back to website...</span>
+                <span class="menu-text">{{ "back" | trans({}, "administration") }}</span>
             </a>
         </li>
     </ul>
@@ -171,7 +199,20 @@
             {%- set leafEntryClasses = leafEntryClasses|merge([options.ancestorClass]) %}
         {%- endif %}
         <li class="{{ leafEntryClasses | join(' ') }}">
-            <a href="{{ leafEntry.uri }}">{{ leafEntry.label | raw }}</a>
+            <a href="{{ leafEntry.uri }}">
+                {% with { item: leafEntry } %}
+                    {{ block('label') }}
+                {% endwith %}
+            </a>
         </li>
     {% endfor %}
+{% endblock %}
+
+{% block label %}
+    {%- set translation_domain = item.extra('translation_domain', 'messages') -%}
+    {%- set label = item.label -%}
+    {%- if translation_domain is not same as(false) -%}
+        {%- set label = label|trans(item.extra('translation_params', {}), translation_domain) -%}
+    {%- endif -%}
+    {%- if options.allow_safe_labels and item.extra('safe_label', false) %}{{ label|raw }}{% else %}{{ label }}{% endif -%}
 {% endblock %}

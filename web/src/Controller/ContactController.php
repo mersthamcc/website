@@ -34,31 +34,31 @@ class ContactController extends AbstractController implements FrontEndMenuProvid
     public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("Contacts", [
+            $factory->createItem("contacts", [
                 'route' => 'contacts',
                 'sortorder' => 20,
-            ])->setLabel("Contacts")->setChildren([
-                $factory->createItem("Committee", [
+            ])->setChildren([
+                $factory->createItem("committee", [
                     'route' => 'contacts',
                     'routeParameters' => [
                         'category' => 'commmittee',
                     ],
                     'sortorder' => 10,
-                ])->setLabel("Selection")->setChildren([
+                ])->setChildren([
                     $factory->createItem('chairman', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'commmittee',
                             'slug' => 'chairman'
                         ]
-                    ])->setLabel('Chairman'),
+                    ]),
                     $factory->createItem('treasurer', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'commmittee',
                             'slug' => 'treasurer'
                         ]
-                    ])->setLabel('Treasurer'),
+                    ]),
                 ]),
                 $factory->createItem("captains", [
                     'route' => 'contacts',
@@ -66,35 +66,35 @@ class ContactController extends AbstractController implements FrontEndMenuProvid
                         'category' => 'captains',
                     ],
                     'sortorder' => 20,
-                ])->setLabel("Adult Captains")->setChildren([
+                ])->setChildren([
                     $factory->createItem('saturday_1st', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'captains',
                             'slug' => 'saturday_1st'
                         ]
-                    ])->setLabel('Saturday 1st XI'),
+                    ]),
                     $factory->createItem('saturday_2nd', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'captains',
                             'slug' => 'saturday_2nd'
                         ]
-                    ])->setLabel('Saturday 2nd XI'),
+                    ]),
                     $factory->createItem('saturday_3rd', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'captains',
                             'slug' => 'saturday_3rd'
                         ]
-                    ])->setLabel('Saturday 3rd XI'),
+                    ]),
                     $factory->createItem('saturday_4th', [
                         'route' => 'contact',
                         'routeParameters' => [
                             'category' => 'captains',
                             'slug' => 'saturday_4th'
                         ]
-                    ])->setLabel('Saturday 4th XI'),
+                    ]),
                 ]),
             ])->setExtra('megaMenu', true),
         ];

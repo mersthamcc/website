@@ -49,10 +49,12 @@ class MenuService implements ContainerAwareInterface
      * @throws \ReflectionException
      */
     public function getFrontendMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
-        $menu = $this->factory->createItem('root')->setDisplay(false);
+
+        $translationDomain = 'frontend';
+        $menu = $this->factory->createItem('root')->setDisplay(false)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($menu, FrontEndMenuProvider::class, 'getFrontEndMenuItems');
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
-        return $this->setParents($menu);
+        return $this->setDefaults($menu, $translationDomain);
     }
 
     /**
@@ -63,24 +65,27 @@ class MenuService implements ContainerAwareInterface
      */
     public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface
     {
+        $translationDomain = 'administration';
+        $menu = $this->factory->createItem('root')->setDisplay(false)->setExtra('translation_domain', $translationDomain);
+
         $menu = $this->factory->createItem('home', [
             'route' => 'admin_home'
-        ])->setDisplay(true)->setLabel("Dashboard");
+        ])->setDisplay(true)->setExtra('translation_domain', $translationDomain)->setExtra('translation_domain', $translationDomain);
 
-        $contentMenu = $this->factory->createItem('content')->setDisplay(true)->setLabel("Content");
+        $contentMenu = $this->factory->createItem('content')->setDisplay(true)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($contentMenu, AdministrationMenuProvider::class, 'getContentAdminMenuItems');
         $menu->addChild($contentMenu);
 
-        $administrationMenu = $this->factory->createItem('administration')->setDisplay(true)->setLabel("Administration");
+        $administrationMenu = $this->factory->createItem('administration')->setDisplay(true)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($administrationMenu, AdministrationMenuProvider::class, 'getAdministrationMenuItems');
         $menu->addChild($administrationMenu);
 
-        $configurationMenu = $this->factory->createItem('config')->setDisplay(true)->setLabel("Configuration");
+        $configurationMenu = $this->factory->createItem('config')->setDisplay(true)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($configurationMenu, AdministrationMenuProvider::class, 'getConfigurationAdminMenuItems');
         $menu->addChild($configurationMenu);
 
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
-        return $this->setParents($menu);
+        return $this->setDefaults($menu, $translationDomain);
     }
 
     /**
@@ -91,10 +96,11 @@ class MenuService implements ContainerAwareInterface
      */
     public function getTopMenuItems(array $options, array $topLevelOrder = null): ItemInterface
     {
-        $menu = $this->factory->createItem('root')->setDisplay(false);
+        $translationDomain = 'frontend';
+        $menu = $this->factory->createItem('root')->setDisplay(false)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($menu, TopMenuProvider::class, 'getTopMenuItems');
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
-        return $this->setParents($menu);
+        return $this->setDefaults($menu, $translationDomain);
     }
 
     /**
@@ -105,7 +111,8 @@ class MenuService implements ContainerAwareInterface
      */
     public function getUserMenuItems(array $options, array $topLevelOrder = null): ItemInterface
     {
-        $menu = $this->factory->createItem('root')->setDisplay(false);
+        $translationDomain = 'frontend';
+        $menu = $this->factory->createItem('root')->setDisplay(false)->setExtra('translation_domain', $translationDomain);
         $this->addItemsToMenu($menu, UserMenuProvider::class, 'getUserMenuItems');
 
         if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
@@ -113,8 +120,8 @@ class MenuService implements ContainerAwareInterface
         $menu->addChild($this->factory->createItem("logoutDivider")->setExtra('divider', true));
         $menu->addChild($this->factory->createItem("logout",[
             "route" => "logout"
-        ])->setLabel("Logout"));
-        return $this->setParents($menu);
+        ])->setExtra('translation_domain', $translationDomain));
+        return $this->setDefaults($menu, $translationDomain);
     }
 
     /**
@@ -149,14 +156,16 @@ class MenuService implements ContainerAwareInterface
 
     /**
      * @param ItemInterface $item
+     * @param string $translationDomain
      * @return ItemInterface
      */
-    private function setParents(ItemInterface $item): ItemInterface {
+    private function setDefaults(ItemInterface $item, string $translationDomain): ItemInterface {
         if ($item->hasChildren()) {
             foreach ($item->getChildren() as $child) {
                 $child->setParent($item);
-                if ($child->hasChildren()) $this->setParents($child);
+                if ($child->hasChildren()) $this->setDefaults($child, $translationDomain);
                 if ($child->getExtra("roles")) $item->setExtra('roles', array_unique(array_merge($item->getExtra('roles', []), $child->getExtra('roles')), SORT_STRING));
+                if (!($child->getExtra('translation_domain', false))) $child->setExtra('translation_domain', $translationDomain);
             }
         }
         return $item;

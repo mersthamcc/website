@@ -48,7 +48,7 @@ class NewsController extends AbstractController implements AdministrationMenuPro
     public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("News", [
+            $factory->createItem("news", [
                 'route' => 'news',
                 'sortorder' => 10,
             ]),
@@ -62,9 +62,9 @@ class NewsController extends AbstractController implements AdministrationMenuPro
     public static function getContentAdminMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("News", [])->setExtra('icon', 'far fa-newspaper')
+            $factory->createItem("news", [])->setExtra('icon', 'far fa-newspaper')
                 ->setChildren([
-                    $factory->createItem("news_admin", ['route' => 'news_admin'])->setLabel("List News Stories")->setExtra('roles', ['ROLE_NEWS'])
+                    $factory->createItem("news_admin", ['route' => 'news_admin'])->setExtra('roles', ['ROLE_NEWS'])
                 ]),
         ];
     }

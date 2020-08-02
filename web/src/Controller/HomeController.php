@@ -38,7 +38,7 @@ class HomeController extends AbstractController implements FrontEndMenuProvider,
     public static function getFrontEndMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("Home", [
+            $factory->createItem("home", [
                 'route' => 'home',
                 'sortorder' => 10,
             ]),
@@ -48,7 +48,7 @@ class HomeController extends AbstractController implements FrontEndMenuProvider,
     public static function getTopMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("Administration", [
+            $factory->createItem("administration", [
                 'route' => 'admin_home',
             ])->setExtra('roles', ["ROLE_ADMIN"]),
         ];

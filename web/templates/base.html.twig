@@ -84,13 +84,13 @@
                                     "compressed": true,
                                 }) }}
                             {% else %}
-                                <a href="{{ path("login") }}">Login</a>
+                                <a href="{{ path("login") }}">{{ "login" | trans({}, "frontend") }}</a>
                             {% endif %}
                         </li>
                         <li class="c-search hide">
                             <!-- BEGIN: QUICK SEARCH -->
                             <form action="#">
-                                <input type="text" name="query" placeholder="search..." value="" class="form-control" autocomplete="off">
+                                <input type="text" name="query" placeholder="{{ "search" | trans({}, "frontend") }}" value="" class="form-control" autocomplete="off">
                                 <i class="fa fa-search"></i>
                             </form>
                             <!-- END: QUICK SEARCH -->
@@ -130,7 +130,7 @@
                     <!-- END: BRAND -->
                     <!-- BEGIN: QUICK SEARCH -->
                     <form class="c-quick-search" action="#">
-                        <input type="text" name="query" placeholder="Type to search..." value="" class="form-control" autocomplete="off">
+                        <input type="text" name="query" placeholder="{{ "search" | trans({}, "frontend") }}" value="" class="form-control" autocomplete="off">
                         <span class="c-theme-link">&times;</span>
                     </form>
                     <!-- END: QUICK SEARCH -->
