@@ -212,7 +212,7 @@
                     {% block breadcrumbs %}
                         {% for breadcrumb_item in knp_menu_get_breadcrumbs_array(knp_menu_get_current_item('main')) %}
                             {% if loop.first %}
-                                <!-- Root Breadcrube -->
+                                <!-- Root Breadcrumb -->
                             {% elseif loop.last %}
                                 <li class="c-state_active">{{ breadcrumb_item.label }}</li>
                             {% else %}

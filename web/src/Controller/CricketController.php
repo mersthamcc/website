@@ -31,9 +31,11 @@ class CricketController extends AbstractController implements FrontEndMenuProvid
     }
 
     /**
-     * @Route("/cricket/selection", name="selection")
+     * @Route("/cricket/selection/{day}", name="selection")
+     * @param null|string $day
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function selection()
+    public function selection($day = null)
     {
         return $this->render('cricket/index.html.twig', [
             'controller_name' => 'CricketController',
@@ -45,22 +47,21 @@ class CricketController extends AbstractController implements FrontEndMenuProvid
         return [
             $factory->createItem("Cricket", [
                 'route' => 'cricket',
-                'sortorder' => 20,
             ])->setLabel("Cricket")->setChildren([
                 $factory->createItem("Selection", [
                     'route' => 'selection',
-                    'sortorder' => 10,
                 ])->setLabel("Selection")->setChildren([
                     $factory->createItem('selection_saturday', [
                         'route' => 'selection',
+                        'routeParameters' => [ 'day' => 'saturday'],
                     ])->setLabel('Saturday'),
                     $factory->createItem('selection_sunday', [
                         'route' => 'selection',
+                        'routeParameters' => [ 'day' => 'sunday'],
                     ])->setLabel('Sunday'),
                 ]),
                 $factory->createItem("Fixtures", [
                     'route' => 'fixtures',
-                    'sortorder' => 20,
                 ])->setLabel("Fixtures"),
             ]),
         ];
