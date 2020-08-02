@@ -68,17 +68,12 @@
                 <!-- BEGIN: INLINE NAV -->
                 <nav class="c-top-menu c-pull-right">
                     <ul class="c-links c-ext c-theme-ul">
-                        {% if is_granted("ROLE_USER") %}
-                            <li><a href="{{ path("home") }}">{{ app.user.givenName }} {{ app.user.familyName }}&apos;s Account</a></li>
-                            <li class="c-divider">|</li>
-                        {% else %}
-                            <li><a href="{{ path("home") }}">Members Area</a></li>
-                            <li class="c-divider">|</li>
-                        {% endif %}
-                        {% if is_granted("ROLE_ADMIN") %}
-                            <li><a href="{{ path("admin_home") }}">Administration</a></li>
-                            <li class="c-divider">|</li>
-                        {% endif %}
+                        {{ knp_menu_render('top', {
+                            "template": "menu-top-bar.html.twig",
+                            "currentClass": "",
+                            "ancestorClass": "",
+                            "compressed": true,
+                        }) }}
                         <li class="c-lang c-last">
                             {% if app.user %}
                                 <a href="#">{{ app.user.givenName }}</a>

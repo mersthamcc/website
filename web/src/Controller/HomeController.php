@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use App\Menus\FrontEndMenuProvider;
+use App\Menus\TopMenuProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomeController extends AbstractController implements FrontEndMenuProvider
+class HomeController extends AbstractController implements FrontEndMenuProvider, TopMenuProvider
 {
     /**
      * @Route("/", name="home")
@@ -41,6 +42,15 @@ class HomeController extends AbstractController implements FrontEndMenuProvider
                 'route' => 'home',
                 'sortorder' => 10,
             ]),
+        ];
+    }
+
+    public static function getTopMenuItems(FactoryInterface $factory): array
+    {
+        return [
+            $factory->createItem("Administration", [
+                'route' => 'admin_home',
+            ])->setExtra('roles', ["ROLE_ADMIN"]),
         ];
     }
 }

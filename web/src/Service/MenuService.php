@@ -10,6 +10,7 @@ use App\Controller\NewsController;
 use App\Data\MenuEntry;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
+use App\Menus\TopMenuProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use ReflectionClass;
@@ -59,7 +60,8 @@ class MenuService implements ContainerAwareInterface
      * @return \Knp\Menu\ItemInterface
      * @throws \ReflectionException
      */
-    public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface {
+    public function getAdministrationMenuItems(array $options, array $topLevelOrder = null): ItemInterface
+    {
         $menu = $this->factory->createItem('home', [
             'route' => 'admin_home'
         ])->setDisplay(true)->setLabel("Dashboard");
@@ -81,6 +83,20 @@ class MenuService implements ContainerAwareInterface
     }
 
     /**
+     * @param array $options
+     * @param array|null $topLevelOrder
+     * @return \Knp\Menu\ItemInterface
+     * @throws \ReflectionException
+     */
+    public function getTopMenuItems(array $options, array $topLevelOrder = null): ItemInterface
+    {
+        $menu = $this->factory->createItem('root')->setDisplay(false);
+        $this->addItemsToMenu($menu, TopMenuProvider::class, 'getTopMenuItems');
+        if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
+        return $this->setParents($menu);
+    }
+
+        /**
      * @param $interface string
      * @param $methodName string
      * @return ItemInterface
