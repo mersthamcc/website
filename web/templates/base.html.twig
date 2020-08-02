@@ -534,6 +534,21 @@
         <script src='//www.google.com/recaptcha/api.js'></script>
         <!--  GOOGLE reCAPTCHA -->
 
+        <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.x.min.js" type="text/javascript"></script>
+        <script>
+            var config = {
+                apiKey: 'f462c1a63422c4ca6ab426c399bf6ecead720cc2',
+                product: 'PRO',
+                mode: 'GDPR',
+                branding: {
+                    backgroundColor: '#64aed9',
+                },
+            };
+
+            CookieControl.load( config );
+        </script>
+
+
     {#    <!-- BEGIN JIRA ISSUE COLLECTOR -->#}
     {#    <script type="text/javascript" src="//jira.clayson.org.uk/s/08cbc20e1ccc03bbc0878819961464d6-T/15arcf/73011/b6b48b2829824b869586ac216d119363/2.0.23/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-UK&collectorId=8fbe03ba"></script>#}
     {#    <!-- END JIRA ISSUE COLLECTOR -->#}
