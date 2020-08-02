@@ -107,9 +107,9 @@
                     <div class="c-brand c-pull-left">
                         <a href="{{ path("home") }}" class="c-logo">
                             <h1>
-                            <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-desktop-logo">
-                            <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-desktop-logo-inverse">
-                            <img src="{{ asset(config.logo) }}" alt="JANGO" class="c-mobile-logo">
+                            <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}" class="c-desktop-logo">
+
+                            <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}" class="c-mobile-logo">
                             {{ config.clubName }}</h1>
                         </a>
                         <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
@@ -283,14 +283,16 @@
                             </div>
                         </div>
                         <div class="col-md-5 col-sm-6 col-xs-12">
+                            {% if config.twitterHandle %}
                             <div class="c-content-title-1 c-title-md">
-                                <h2 class="c-title c-font-uppercase">Latest Tweets</h2>
+                                <h2 class="c-title c-font-uppercase">{{ "latest_tweets" | trans({}, "frontend") }}</h2>
                                 <div class="c-line-left hide"></div>
                             </div>
                             <div class="c-twitter">
                                 <a class="twitter-timeline" href="https://twitter.com/{{ config.twitterHandle }}" data-theme="dark" data-widget-id="437554408700641280" data-tweet-limit="3" data-chrome="noheader nofooter noscrollbar noborders transparent">Latest Tweets by @{{ config.twitterHandle }}...</a>
     {#                            <a class="twitter-timeline" data-lang="en" data-dnt="true" data-theme="dark" href="https://twitter.com/mersthammagics?ref_src=twsrc%5Etfw">Tweets by mersthammagics</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>#}
                             </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-3 col-sm-12 col-xs-12">
                             <div class="c-content-title-1 c-title-md">
