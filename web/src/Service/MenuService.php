@@ -11,6 +11,7 @@ use App\Data\MenuEntry;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
 use App\Menus\TopMenuProvider;
+use App\Menus\UserMenuProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use ReflectionClass;
@@ -96,7 +97,27 @@ class MenuService implements ContainerAwareInterface
         return $this->setParents($menu);
     }
 
-        /**
+    /**
+     * @param array $options
+     * @param array|null $topLevelOrder
+     * @return \Knp\Menu\ItemInterface
+     * @throws \ReflectionException
+     */
+    public function getUserMenuItems(array $options, array $topLevelOrder = null): ItemInterface
+    {
+        $menu = $this->factory->createItem('root')->setDisplay(false);
+        $this->addItemsToMenu($menu, UserMenuProvider::class, 'getUserMenuItems');
+
+        if ( !is_null($topLevelOrder) ) $menu->reorderChildren($topLevelOrder);
+
+        $menu->addChild($this->factory->createItem("logoutDivider")->setExtra('divider', true));
+        $menu->addChild($this->factory->createItem("logout",[
+            "route" => "logout"
+        ])->setLabel("Logout"));
+        return $this->setParents($menu);
+    }
+
+    /**
      * @param $interface string
      * @param $methodName string
      * @return ItemInterface

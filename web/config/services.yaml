@@ -38,3 +38,4 @@ services:
             - { name: knp_menu.menu_builder, method: getFrontendMenuItems, alias: main }
             - { name: knp_menu.menu_builder, method: getAdministrationMenuItems, alias: admin }
             - { name: knp_menu.menu_builder, method: getTopMenuItems, alias: top }
+            - { name: knp_menu.menu_builder, method: getUserMenuItems, alias: user }

@@ -77,11 +77,12 @@
                         <li class="c-lang c-last">
                             {% if app.user %}
                                 <a href="#">{{ app.user.givenName }}</a>
-                                <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#">My Account</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="{{ path("logout") }}">Logout</a></li>
-                                </ul>
+                                {{ knp_menu_render('user', {
+                                    "template": "menu-user-dropdown.html.twig",
+                                    "currentClass": "",
+                                    "ancestorClass": "",
+                                    "compressed": true,
+                                }) }}
                             {% else %}
                                 <a href="{{ path("login") }}">Login</a>
                             {% endif %}
