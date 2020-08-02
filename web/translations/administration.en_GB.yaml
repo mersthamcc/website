@@ -1,11 +1,11 @@
-home: Dashboard
-content: Content
 administration: Administration
+back: Back to website...
 config: Configuration
+content: Content
+exit: Exit
+home: Dashboard
 news: News
 news_admin: List Posts
 selection: Selection
 selection_saturday: Saturday
 selection_sunday: Sunday
-exit: Exit
-back: Back to website...
