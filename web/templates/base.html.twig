@@ -221,9 +221,9 @@
                             {% if loop.first %}
                                 <!-- Root Breadcrumb -->
                             {% elseif loop.last %}
-                                <li class="c-state_active">{{ breadcrumb_item.label }}</li>
+                                <li class="c-state_active">{{ breadcrumb_item.label | trans({}, 'frontend') }}</li>
                             {% else %}
-                                <li><a href="{{ breadcrumb_item.uri }}">{{ breadcrumb_item.label }}</a></li>
+                                <li><a href="{{ breadcrumb_item.uri }}">{{ breadcrumb_item.label | trans({}, 'frontend') }}</a></li>
                                 <li>/</li>
                             {% endif %}
                         {% endfor %}
