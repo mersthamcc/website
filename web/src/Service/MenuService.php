@@ -7,7 +7,6 @@ use App\Controller\ContactController;
 use App\Controller\CricketController;
 use App\Controller\HomeController;
 use App\Controller\NewsController;
-use App\Data\MenuEntry;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
 use App\Menus\TopMenuProvider;

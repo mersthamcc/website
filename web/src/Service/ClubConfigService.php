@@ -20,48 +20,73 @@ class ClubConfigService implements ConfigurationInterface
         $this->configFile = $configFile;
     }
 
-    public function getClubName()
+    public function getClubName(): ?string
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['name'];
     }
 
-    public function getLogo(): string
+    public function getLogo(): ?string
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['logo'];
     }
 
-    public function getPhoneNumber(): PhoneNumber
+    public function getPhoneNumber(): ?PhoneNumber
     {
         if ( $this->config == null ) $this->loadConfig();
         return new PhoneNumber($this->config['phone']);
     }
 
-    public function isPlayCricketEnabled(): bool
+    public function isPlayCricketEnabled(): ?bool
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['playcricket']['enabled'];
     }
 
-    public function getPlayCricketSubsite(): string
+    public function getPlayCricketSubsite(): ?string
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['playcricket']['subsitePrefix'];
     }
 
-    public function getTwitterHandle(): string
+    public function getTwitterFeedEnabled(): bool
+    {
+        if ( $this->config == null ) $this->loadConfig();
+        return $this->config['social']['twitter']['feedEnabled'];
+    }
+
+    public function getTwitterHandle(): ?string
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['social']['twitter']['handle'];
     }
     
-    public function getFacebookHandle(): string
+    public function getFacebookHandle(): ?string
     {
         if ( $this->config == null ) $this->loadConfig();
         return $this->config['social']['facebook']['handle'];
     }
-    
+
+    public function getCookieConsentApiKey(): ?string
+    {
+        if ( $this->config == null ) $this->loadConfig();
+        return $this->config['cookies']['apiKey'];
+    }
+
+    public function getCookieConsentProductCode(): ?string
+    {
+        if ( $this->config == null ) $this->loadConfig();
+        return $this->config['cookies']['product'];
+    }
+
+    public function getGoogleAnalyticsKey(): ?string
+    {
+        if ( $this->config == null ) $this->loadConfig();
+        return $this->config['analytics']['googleAnalyticsKey'];
+    }
+
+
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder("club");
@@ -104,6 +129,10 @@ class ClubConfigService implements ConfigurationInterface
                         ->arrayNode("twitter")
                             ->info("The twitter account details")
                             ->children()
+                                ->booleanNode("feedEnabled")
+                                    ->info("The Latest Tweets feed is enabled in the footer")
+                                    ->defaultFalse()
+                                ->end()
                                 ->scalarNode("handle")
                                     ->info("The Twitter handle; used to provide the feed at the bottom of the page")
                                     ->isRequired()
@@ -131,7 +160,27 @@ class ClubConfigService implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
-                ->end();
+                ->end()
+                ->arrayNode("cookies")
+                    ->info("The cookie consent configuration")
+                    ->children()
+                        ->scalarNode("apiKey")
+                            ->info("The Cookie Consent API key")
+                        ->end()
+                        ->scalarNode("product")
+                            ->info("The cookie consent configuration")
+                            ->defaultValue("PRO")
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode("analytics")
+                    ->children()
+                        ->scalarNode("googleAnalyticsKey")
+                            ->info("The Google Analytics Key for this Property")
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
         return $treeBuilder;
     }
 

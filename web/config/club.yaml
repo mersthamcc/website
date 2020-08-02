@@ -10,3 +10,11 @@ social:
 
   facebook:
     handle: MersthamCC
+
+cookies:
+  apiKey: "f462c1a63422c4ca6ab426c399bf6ecead720cc2"
+  product: "PRO"
+
+analytics:
+  googleAnalyticsKey: ~
+

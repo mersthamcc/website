@@ -1,0 +1,46 @@
+{%- if config.cookieConsentApiKey %}
+var config = {
+    apiKey: '{{ config.cookieConsentApiKey }}',
+    product: '{{ config.cookieConsentProductCode }}',
+    mode: 'GDPR',
+    position: 'left',
+    theme: 'dark',
+    branding: {
+        backgroundColor: '#64aed9',
+        toggleBackground: '#64aed9',
+        toggleColor: '#64aed9',
+        removeAbout: true,
+        fontColor: '#fff',
+        {#acceptBackground: 'transparent',#}
+        {#acceptText: '#fff',#}
+        {#rejectBackground: '#fff',#}
+        {#rejectText: '#f7fafb',#}
+    },
+    necessaryCookies: [
+        "PHPSESSID",
+        "CookieControl",
+    ],
+    optionalCookies: [
+        {%- if config.googleAnalyticsKey %}
+        {
+            name : 'analytics',
+            label: 'Analytical Cookies',
+            description: 'Analytical cookies help us to improve our website by collecting and reporting information on its usage.',
+            cookies: ['_ga', '_gid', '_gat', '__utma', '__utmt', '__utmb', '__utmc', '__utmz', '__utmv'],
+            onAccept : function(){
+                // Add Google Analytics
+
+                // End Google Analytics
+            },
+            onRevoke: function(){
+                // Disable Google Analytics
+                window['ga-disable-UA-XXXXX-Y'] = true;
+                // End Google Analytics
+            }
+        },
+        {%- endif %}
+    ],
+};
+
+CookieControl.load( config );
+{%- endif %}
