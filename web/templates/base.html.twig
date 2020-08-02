@@ -8,7 +8,7 @@
     <!-- BEGIN HEAD -->
     <head>
         <meta charset="utf-8"/>
-        <title> - {% block title %}{{ config.clubName }}{% endblock %}</title>
+        <title> {{ config.clubName }} - {% block title %}unknown{% endblock %}</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -106,11 +106,17 @@
                     <!-- BEGIN: BRAND -->
                     <div class="c-brand c-pull-left">
                         <a href="{{ path("home") }}" class="c-logo">
-                            <h1>
-                            <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}" class="c-desktop-logo">
-
-                            <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}" class="c-mobile-logo">
-                            {{ config.clubName }}</h1>
+                            <h1 class="c-desktop-logo">
+                                <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}">
+                                {{ config.clubName }}
+                            </h1>
+                            <h1 class="c-desktop-logo-inverse" style="margin-top: 0px;">
+                                {{ config.clubName }}
+                            </h1>
+                            <h1 class="c-mobile-logo">
+                                <img src="{{ asset(config.logo) }}" alt="{{ config.clubName }}">
+                                {{ config.clubName }}
+                            </h1>
                         </a>
                         <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
                             <span class="c-line"></span>
