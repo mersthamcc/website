@@ -29,7 +29,7 @@ services:
     config:
         class: App\Service\ClubConfigService
         arguments:
-            $configFile: "%kernel.project_dir%/config/club.yaml"
+            $configEntries: "%
 
     app.menu_builder:
         class: App\Service\MenuService
