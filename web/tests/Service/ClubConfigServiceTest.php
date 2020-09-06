@@ -2,7 +2,7 @@
 
 namespace App\Tests\Service;
 
-use App\Service\ClubConfigService;
+use App\DependencyInjection\ClubConfigService;
 use PHPUnit\Framework\TestCase;
 
 class ClubConfigServiceTest extends TestCase
