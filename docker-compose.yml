@@ -550,8 +550,8 @@ services:
     volumes:
       - ./dev-config/keycloak:/src
     environment:
-      TF_VAR_keycloack_administrator_username: admin
-      TF_VAR_keycloack_administrator_password: ${KEYCLOAK_PASSWORD}
+      TF_VAR_keycloak_administrator_username: admin
+      TF_VAR_keycloak_administrator_password: ${KEYCLOAK_PASSWORD}
       TF_VAR_keycloak_url: http://keycloak:8080
       TF_VAR_realm_name: ${DEVDOMAIN}
       TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
