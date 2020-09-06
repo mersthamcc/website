@@ -1,92 +1,11 @@
 <?php
+namespace App\DependencyInjection;
 
-
-namespace App\Service;
-
-
-use App\Utils\PhoneNumber;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Yaml\Yaml;
 
-class ClubConfigService implements ConfigurationInterface
+class Configuration implements ConfigurationInterface
 {
-    private $config = null;
-    private $configFile;
-
-    public function __construct(string $configFile)
-    {
-        $this->configFile = $configFile;
-    }
-
-    public function getClubName(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['name'];
-    }
-
-    public function getLogo(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['logo'];
-    }
-
-    public function getPhoneNumber(): ?PhoneNumber
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return new PhoneNumber($this->config['phone']);
-    }
-
-    public function isPlayCricketEnabled(): ?bool
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['playcricket']['enabled'];
-    }
-
-    public function getPlayCricketSubsite(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['playcricket']['subsitePrefix'];
-    }
-
-    public function getTwitterFeedEnabled(): bool
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['social']['twitter']['feedEnabled'];
-    }
-
-    public function getTwitterHandle(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['social']['twitter']['handle'];
-    }
-    
-    public function getFacebookHandle(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['social']['facebook']['handle'];
-    }
-
-    public function getCookieConsentApiKey(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['cookies']['apiKey'];
-    }
-
-    public function getCookieConsentProductCode(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['cookies']['product'];
-    }
-
-    public function getGoogleAnalyticsKey(): ?string
-    {
-        if ( $this->config == null ) $this->loadConfig();
-        return $this->config['analytics']['googleAnalyticsKey'];
-    }
-
-
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder("club");
@@ -182,15 +101,5 @@ class ClubConfigService implements ConfigurationInterface
                 ->end()
             ->end();
         return $treeBuilder;
-    }
-
-    private function loadConfig()
-    {
-        $processor = new Processor();
-        $configFile = Yaml::parse(file_get_contents($this->configFile));
-        $this->config = $processor->processConfiguration(
-            $this,
-            [$configFile]
-        );
     }
 }

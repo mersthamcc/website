@@ -1,8 +1,8 @@
-variable "keycloack_administrator_username" {
+variable "keycloak_administrator_username" {
   default = "admin"
 }
 
-variable "keycloack_administrator_password" {
+variable "keycloak_administrator_password" {
   description = "The Keycloak Administrator password"
 }
 

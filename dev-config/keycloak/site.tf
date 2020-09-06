@@ -1,7 +1,7 @@
 provider "keycloak" {
   client_id = "admin-cli"
-  username  = var.keycloack_administrator_username
-  password  = var.keycloack_administrator_password
+  username  = var.keycloak_administrator_username
+  password  = var.keycloak_administrator_password
   url       = var.keycloak_url
 
   initial_login = false
@@ -109,6 +109,7 @@ resource "keycloak_user" "keycloak_user_dev" {
   realm_id = keycloak_realm.dev_realm.id
   username = var.keycloak_email_address
   enabled  = true
+  email_verified = true
 
   email      = var.keycloak_email_address
   first_name = var.keycloak_given_name
