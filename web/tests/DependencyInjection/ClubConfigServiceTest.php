@@ -41,7 +41,30 @@ class ClubConfigServiceTest extends TestCase
         ],
         'cookies' => [
             'apiKey' => self::COOKIE_CONTROL_API_KEY,
-            'product' => self::COOKIE_CONTROL_PRODUCT
+            'product' => self::COOKIE_CONTROL_PRODUCT,
+            'optionalCookiesCategories' => [
+                [
+                    'name' => 'category1',
+                    'description' => 'cookie category 1',
+                    'label' => 'category one',
+                    'enabled' => true,
+                    'cookieNames' => [ 'cookie1', 'cookie2' ],
+                ],
+                [
+                    'name' => 'category2',
+                    'description' => 'cookie category 2',
+                    'label' => 'category two',
+                    'enabled' => true,
+                    'cookieNames' => [ 'cookie3', 'cookie4' ],
+                ],
+                [
+                    'name' => 'category3',
+                    'description' => 'disabled cookie category 3',
+                    'label' => 'category three',
+                    'enabled' => false,
+                    'cookieNames' => [ 'cookie5' ],
+                ],
+            ]
         ],
         'analytics' => [
             'googleAnalyticsKey' => self::GOOGLE_ANALYTICS_KEY
@@ -108,5 +131,17 @@ class ClubConfigServiceTest extends TestCase
     public function testGoogleAnalyticsKeyReturnsCorrectValue()
     {
         $this->assertEquals(self::GOOGLE_ANALYTICS_KEY, $this->clubConfigService->getGoogleAnalyticsKey());
+    }
+
+    public function testOptionalCookieArray()
+    {
+        $this->assertEquals(3, sizeof($this->clubConfigService->getOptionalCookieCategories()));
+
+        $this->assertEquals("category1",$this->clubConfigService->getOptionalCookieCategories()[0]['name']);
+        $this->assertTrue($this->clubConfigService->getOptionalCookieCategories()[0]['enabled']);
+        $this->assertEquals("category2",$this->clubConfigService->getOptionalCookieCategories()[1]['name']);
+        $this->assertTrue($this->clubConfigService->getOptionalCookieCategories()[1]['enabled']);
+        $this->assertEquals("category3",$this->clubConfigService->getOptionalCookieCategories()[2]['name']);
+        $this->assertFalse($this->clubConfigService->getOptionalCookieCategories()[2]['enabled']);
     }
 }
