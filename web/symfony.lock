@@ -1,4 +1,10 @@
 {
+    "aws/aws-sdk-php": {
+        "version": "3.154.6"
+    },
+    "ckfinder/ckfinder-symfony-bundle": {
+        "version": "3.5.1.4"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -132,11 +138,26 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.4"
     },
+    "league/flysystem": {
+        "version": "1.1.3"
+    },
+    "league/flysystem-aws-s3-v3": {
+        "version": "1.0.28"
+    },
+    "league/flysystem-cached-adapter": {
+        "version": "1.1.0"
+    },
+    "league/mime-type-detection": {
+        "version": "1.4.0"
+    },
     "league/oauth2-client": {
         "version": "2.2.1"
     },
     "monolog/monolog": {
         "version": "2.1.0"
+    },
+    "mtdowling/jmespath.php": {
+        "version": "2.6.0"
     },
     "nikic/php-parser": {
         "version": "v4.5.0"
@@ -158,6 +179,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "1.2.0"
+    },
+    "pimple/pimple": {
+        "version": "v3.3.0"
     },
     "psr/cache": {
         "version": "1.0.1"
