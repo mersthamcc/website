@@ -64,6 +64,11 @@ class ClubConfigService
         return $this->config['cookies']['product'];
     }
 
+    public function getOptionalCookieCategories(): ?array
+    {
+        return $this->config['cookies']['optionalCookiesCategories'];
+    }
+
     public function getGoogleAnalyticsKey(): ?string
     {
         return $this->config['analytics']['googleAnalyticsKey'];
