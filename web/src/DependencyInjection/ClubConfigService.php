@@ -7,7 +7,7 @@ use App\Utils\PhoneNumber;
 
 class ClubConfigService
 {
-    private $config = null;
+    private $config;
 
     public function __construct($config)
     {
@@ -34,7 +34,7 @@ class ClubConfigService
         return $this->config['playcricket']['enabled'];
     }
 
-    public function getPlayCricketSubsite(): ?string
+    public function getPlayCricketSubSite(): ?string
     {
         return $this->config['playcricket']['subsitePrefix'];
     }
@@ -62,6 +62,11 @@ class ClubConfigService
     public function getCookieConsentProductCode(): ?string
     {
         return $this->config['cookies']['product'];
+    }
+
+    public function getOptionalCookieCategories(): ?array
+    {
+        return $this->config['cookies']['optionalCookiesCategories'];
     }
 
     public function getGoogleAnalyticsKey(): ?string

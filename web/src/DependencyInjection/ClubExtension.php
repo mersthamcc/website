@@ -3,10 +3,11 @@
 
 namespace App\DependencyInjection;
 
-
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 
-class ClubExtension extends \Symfony\Component\DependencyInjection\Extension\Extension
+class ClubExtension extends Extension
 {
     /**
      * @inheritDoc

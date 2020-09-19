@@ -47,7 +47,13 @@
         <link rel="shortcut icon" href="{{  asset('favicon.ico') }}"/>
     </head>
 
-    <body class="c-layout-header-fixed c-layout-header-mobile-fixed c-layout-header-topbar c-layout-header-topbar-collapse">
+    <body
+            class="c-layout-header-fixed c-layout-header-mobile-fixed c-layout-header-topbar c-layout-header-topbar-collapse"
+            data-google-analytics-key="{{ config.googleAnalyticsKey }}"
+            data-cookie-controller-optional-cookies="{{ config.optionalCookieCategories | json_encode() }}"
+            data-cookie-controller-api-key="{{ config.cookieConsentApiKey }}"
+            data-cookie-controller-product-code="{{ config.cookieConsentProductCode }}"
+    >
 
     <!-- BEGIN: HEADER -->
     <header class="c-layout-header c-layout-header-4 c-layout-header-default-mobile" data-minimize-offset="80">
@@ -534,15 +540,17 @@
         <!-- END: PAGE SCRIPTS -->
         <!-- END: LAYOUT/BASE/BOTTOM -->
 
-
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.googleAnalyticsKey }}"></script>
 
         <!--  GOOGLE reCAPTCHA -->
         <script src='//www.google.com/recaptcha/api.js'></script>
         <!--  GOOGLE reCAPTCHA -->
 
-        <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.2.1.min.js" type="text/javascript"></script>
+        <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.x.min.js" type="text/javascript"></script>
         <script src="{{ path("cookie_control") }}" type="text/javascript"></script>
 
+        <script src="https://tymxcm8ksmvn.statuspage.io/embed/script.js" type="text/javascript"></script>
 
     {#    <!-- BEGIN JIRA ISSUE COLLECTOR -->#}
     {#    <script type="text/javascript" src="//jira.clayson.org.uk/s/08cbc20e1ccc03bbc0878819961464d6-T/15arcf/73011/b6b48b2829824b869586ac216d119363/2.0.23/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-UK&collectorId=8fbe03ba"></script>#}

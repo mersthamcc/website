@@ -18,7 +18,7 @@ class JavaScriptController extends AbstractController
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/javascript');
-        return $this->render('java_script/cookie-control.js.twig', [
+        return $this->render('javascript/cookie-control.js.twig', [
 
         ], $response);
     }
