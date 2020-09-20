@@ -136,6 +136,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
       DEVDOMAIN: ${DEVDOMAIN}
+      CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
+      CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
     volumes:
       - ./web:/var/www
     restart: unless-stopped
