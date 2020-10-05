@@ -36,8 +36,9 @@ class NewsController extends AbstractController implements AdministrationMenuPro
      */
     public function createNews()
     {
-        return $this->render('news/news_admin.html.twig', [
-
+        $form = $this->createForm(\NewsForm::class);
+        return $this->render('news/new.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 

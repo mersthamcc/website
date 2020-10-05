@@ -1,0 +1,16 @@
+{% extends 'admin-area-form.html.twig' %}
+
+{% form_theme form 'jango.form.template.twig' %}
+
+{% block title %}
+    News Content - New
+{% endblock %}
+
+
+{% block areabody %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+{% endblock %}

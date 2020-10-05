@@ -1,11 +1,41 @@
 # Read the documentation: https://symfony.com/doc/current/bundles/FOSCKEditorBundle/index.html
 fos_ck_editor:
+    default_config: admin_config
     configs:
         admin_config:
-            toolbar: [ ["Source", "-", "Save"], "/", ["Anchor"], "/", ["Maximize"] ]
-            uiColor:                "#000000"
-            filebrowserUploadRoute: "my_route"
-            extraPlugins:           "wordcount"
+            contentsCss:
+                - https://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700&amp;subset=all
+                - assets/plugins/socicon/socicon.css
+                - assets/plugins/bootstrap-social/bootstrap-social.css
+                - assets/plugins/font-awesome/css/font-awesome.min.css
+                - assets/plugins/simple-line-icons/simple-line-icons.min.css
+                - assets/plugins/animate/animate.min.css
+                - assets/plugins/bootstrap/css/bootstrap.min.css
+                - assets/plugins/revo-slider/css/settings.css
+                - assets/plugins/revo-slider/css/layers.css
+                - assets/plugins/revo-slider/css/navigation.css
+                - assets/plugins/cubeportfolio/css/cubeportfolio.min.css
+                - assets/plugins/owl-carousel/assets/owl.carousel.css
+                - assets/plugins/fancybox/jquery.fancybox.css
+                - assets/plugins/slider-for-bootstrap/css/slider.css
+                - assets/mcc/css/plugins.css
+                - assets/mcc/css/components.css
+                - assets/mcc/css/themes/blue2.css
+                - assets/mcc/css/custom.css
+
+            toolbar:
+                - ["Preview"]
+                - ["Cut", "Copy", "Paste", "PasteText", "PasteFromWord"]
+                - ["Image", "HorizontalRule", "Table", "Emoji"]
+                - ["Link", "Unlink", "Anchor"]
+                - ["Source", "About"]
+                - "/"
+                - ["Format", "Styles"]
+                - ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"]
+                - ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock"]
+                - ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "CreateDiv"]
+
+
 
 twig:
     form_themes:
