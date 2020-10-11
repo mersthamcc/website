@@ -3,6 +3,7 @@ namespace App\Service;
 
 
 use App\Entity\BrowserCategory;
+use App\Security\SessionEncryptor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -10,11 +11,13 @@ class FinderService
 {
     private $requestStack;
     private $logger;
+    private $encryptor;
 
-    public function __construct(RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(RequestStack $requestStack, LoggerInterface $logger, SessionEncryptor $encryptor)
     {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->encryptor = $encryptor;
     }
 
     public function createParameterString($privateDirectory, $category, $readOnly = false)
@@ -146,7 +149,7 @@ class FinderService
         }
         $config['readOnly'] = $readOnly;
 
-        return base64_encode(json_encode($config));
+        return base64_encode($this->encryptor->encrypt(json_encode($config)));
     }
 
     public function decodeParameterString()
@@ -154,12 +157,9 @@ class FinderService
         $request = $this->requestStack->getCurrentRequest();
         $config = $request->get('finderConfig');
         if ($config) {
-            $this->logger->debug($config);
             $base64 = urldecode($config);
-            $this->logger->debug($base64);
             $json = base64_decode($base64, true);
-            $this->logger->debug($json);
-            return json_decode($json, true);
+            return json_decode($this->encryptor->decrypt($json), true);
         }
         return [];
     }
