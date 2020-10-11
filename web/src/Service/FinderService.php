@@ -3,39 +3,25 @@ namespace App\Service;
 
 
 use App\Entity\BrowserCategory;
-use App\Security\SessionEncryptor;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class FinderService
 {
     private $requestStack;
-    private $logger;
     private $encryptor;
 
-    public function __construct(RequestStack $requestStack, LoggerInterface $logger, SessionEncryptor $encryptor)
+    public function __construct(RequestStack $requestStack, SessionEncryptor $encryptor)
     {
         $this->requestStack = $requestStack;
-        $this->logger = $logger;
         $this->encryptor = $encryptor;
     }
 
     public function createParameterString($privateDirectory, $category, $readOnly = false)
     {
         $config = array();
-        $config['backends']["symfony_cache"] = [
-            "name" => "symfony_cache",
-            "adapter" => "local",
-            "root" => "/var/www/var/cache/dev"
-        ];
-        $config['backends']["symfony_logs"] = [
-            "name" => "symfony_logs",
-            "adapter" => "local",
-            "root" => "/var/www/var/log"
-        ];
 
-        $config['backends']['default'] = [
-            'name' => 'default',
+        $config['backends']['private'] = [
+            'name' => 'private',
             'adapter' => 'local',
             'baseUrl' => $privateDirectory,
             //  'root'         => '', // Can be used to explicitly set the CKFinder user files directory.
@@ -77,7 +63,7 @@ class FinderService
                 'maxSize' => 0,
                 'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
                 'deniedExtensions' => '',
-                'backend' => 'default',
+                'backend' => 'private',
             ];
             $index++;
             $name = $index . 'WebGlobalImages';
@@ -103,7 +89,7 @@ class FinderService
                 'allowedExtensions' =>
                     '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip',
                 'deniedExtensions' => '',
-                'backend' => 'default',
+                'backend' => 'private',
             ];
             $index++;
             $name = $index . 'WebsiteGlobalFiles';
@@ -130,12 +116,12 @@ class FinderService
                 'allowedExtensions' =>
                     '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip',
                 'deniedExtensions' => '',
-                'backend' => 'default',
+                'backend' => 'private',
             ];
             $index++;
         }
 
-        if ($category == BrowserCategory::File || $category == BrowserCategory::Document) {
+        if ($category == BrowserCategory::File || $category == BrowserCategory::Document || $category == BrowserCategory::Attachment) {
             $name = $index . 'ClubDocuments';
             $config['resourceTypes'][$name] = [
                 'name' => $name,
