@@ -138,6 +138,8 @@ services:
       DEVDOMAIN: ${DEVDOMAIN}
       CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
       CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
+      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
     volumes:
       - ./web:/var/www
     restart: unless-stopped

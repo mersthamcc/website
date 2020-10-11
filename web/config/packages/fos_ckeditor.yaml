@@ -35,7 +35,15 @@ fos_ck_editor:
                 - ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock"]
                 - ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "CreateDiv"]
 
+            filebrowserBrowseRoute: "filebrowser"
+            filebrowserBrowseRouteParameters: {}
+            filebrowserUploadRoute: "ckfinder_connector"
+            filebrowserUploadParameters: { command: "QuickUpload", type: "Files"}
 
+            filebrowserImageBrowseRoute: "filebrowser"
+            filebrowserImageBrowseRouteParameters: {}
+            filebrowserImageUploadRoute: "ckfinder_connector"
+            filebrowserImageUploadParameters: { command: "QuickUpload", type: "Images"}
 
 twig:
     form_themes:

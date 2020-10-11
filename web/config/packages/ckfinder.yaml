@@ -1,18 +1,10 @@
 ckfinder:
   connector:
-    licenseName: '%env(CKFINDER_LICENCE_NAME)'
-    licenseKey: '%env(CKFINDER_LICENCE_KEY)'
+    licenseName: '%env(CKFINDER_LICENCE_NAME)%'
+    licenseKey: '%env(CKFINDER_LICENCE_KEY)%'
     authenticationClass: App\Auth\CKFinderAuth
-    backends:
-      - name: global
-        adapter: local
-        chmodFiles: "0777"
-        chmodFolders: "0755"
-        filesystemEncoding: 'UTF-8'
-
     resourceTypes:
-      Images:
+      Global:
         name: Global
-        backend: global
-        directory: /resources/statics/
-
+        backend: default
+        directory: global
