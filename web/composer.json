@@ -5,6 +5,8 @@
         "php": "^7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ckfinder/ckfinder-symfony-bundle": "3.5.1.4",
+        "friendsofsymfony/ckeditor-bundle": "^2.2",
         "knplabs/knp-menu-bundle": "^3.0",
         "knpuniversity/oauth2-client-bundle": "^2.1",
         "league/oauth2-client": "2.2.1",
@@ -32,7 +34,9 @@
         "symfony/twig-pack": "^1.0",
         "symfony/validator": "5.1.*",
         "symfony/web-link": "5.1.*",
-        "symfony/yaml": "5.1.*"
+        "symfony/yaml": "5.1.*",
+        "ext-json": "*",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "symfony/debug-pack": "*",

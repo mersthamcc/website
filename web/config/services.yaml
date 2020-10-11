@@ -27,3 +27,12 @@ services:
             - { name: knp_menu.menu_builder, method: getAdministrationMenuItems, alias: admin }
             - { name: knp_menu.menu_builder, method: getTopMenuItems, alias: top }
             - { name: knp_menu.menu_builder, method: getUserMenuItems, alias: user }
+
+    ckfinder.connector.factory:
+        class: App\Factory\FinderFactory
+        public: true
+        arguments:
+            - '%ckfinder.connector.config%'
+            - '@ckfinder.connector.auth'
+            - '@App\Service\FinderService'
+            - '@logger'

@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\BrowserCategory;
 use App\Menus\AdministrationMenuProvider;
 use App\Menus\FrontEndMenuProvider;
+use App\Service\FinderService;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +13,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class NewsController extends AbstractController implements AdministrationMenuProvider, FrontEndMenuProvider
 {
+    private $finderService;
+
+    public function __construct(FinderService $finderService)
+    {
+        $this->finderService = $finderService;
+    }
+
     /**
      * @Route("/news", name="news")
      */
@@ -36,8 +45,13 @@ class NewsController extends AbstractController implements AdministrationMenuPro
      */
     public function createNews()
     {
-        return $this->render('news/news_admin.html.twig', [
+        $form = $this->createForm(\NewsForm::class, null, [
+            'imageFinderConfig' => $this->finderService->createParameterString("/resources/news/111111", BrowserCategory::Image, false),
+            'fileFinderConfig'  => $this->finderService->createParameterString("/resources/news/111111", BrowserCategory::File, false)
 
+        ]);
+        return $this->render('news/new.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 

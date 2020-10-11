@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title>{{ config.clubName }} - File Browser</title>
+</head>
+<body>
+    <script type="text/javascript" src="{{ asset('bundles/cksourceckfinder/ckfinder/ckfinder.js') }}"></script>
+    <script type="text/javascript">
+        var queryString = window.location.search || '';
+        var keyValPairs = [];
+        var params      = {};
+        queryString     = queryString.substr(1);
+
+        if (queryString.length)
+        {
+            keyValPairs = queryString.split('&');
+            for (var pairNum in keyValPairs)
+            {
+                var key = keyValPairs[pairNum].split('=')[0];
+                if (!key.length) continue;
+                if (typeof params[key] === 'undefined')
+                    params[key] = [];
+                params[key].push(keyValPairs[pairNum].split('=')[1]);
+            }
+        }
+        CKFinder.config( { connectorPath: '{{ path('ckfinder_connector') }}' } );
+        CKFinder.start( { finderConfig: params['finderConfig'], pass: 'finderConfig' });
+    </script>
+</body>
+</html>
