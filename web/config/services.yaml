@@ -35,4 +35,3 @@ services:
             - '%ckfinder.connector.config%'
             - '@ckfinder.connector.auth'
             - '@App\Service\FinderService'
-            - '@logger'
