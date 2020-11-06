@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    keycloak = {
+      source  = "mrparkers/keycloak"
+      version = "2.0.0"
+    }
+  }
+}
+
 provider "keycloak" {
   client_id = "admin-cli"
   username  = var.keycloak_administrator_username
@@ -46,6 +55,123 @@ resource "keycloak_realm" "dev_realm" {
   }
 }
 
+resource "keycloak_role" "mfa_role" {
+  realm_id    = keycloak_realm.dev_realm.id
+  name        = "ROLE_MEMBERSHIP"
+  description = "Users with this role have access to the Membership Database and require 2FA"
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+  ]
+}
+
+resource "keycloak_group" "mfa_group" {
+  realm_id = keycloak_realm.dev_realm.id
+  name     = "ROLE_MEMBERSHIP"
+
+  depends_on = [keycloak_realm.dev_realm]
+}
+
+resource "keycloak_group_roles" "mfa_group_roles" {
+  realm_id = keycloak_realm.dev_realm.id
+  group_id = keycloak_group.mfa_group.id
+
+  role_ids = [
+    keycloak_role.mfa_role.id,
+  ]
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+    keycloak_group.mfa_group,
+    keycloak_role.mfa_role,
+  ]
+}
+
+resource "keycloak_authentication_flow" "browser_mfa_flow" {
+  realm_id = keycloak_realm.dev_realm.id
+  alias    = "browser-mfa-flow"
+
+  depends_on = [
+    keycloak_realm.dev_realm
+  ]
+}
+
+resource "keycloak_authentication_execution" "cookies_execution" {
+  realm_id          = keycloak_realm.dev_realm.id
+  parent_flow_alias = keycloak_authentication_flow.browser_mfa_flow.alias
+  authenticator     = "auth-cookie"
+  requirement       = "ALTERNATIVE"
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow
+  ]
+}
+
+resource "keycloak_authentication_execution" "idp_execution" {
+  realm_id          = keycloak_realm.dev_realm.id
+  parent_flow_alias = keycloak_authentication_flow.browser_mfa_flow.alias
+  authenticator     = "identity-provider-redirector"
+  requirement       = "ALTERNATIVE"
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow,
+    keycloak_authentication_execution.cookies_execution,
+  ]
+}
+
+resource "keycloak_authentication_subflow" "otp_browser_flow" {
+  realm_id          = keycloak_realm.dev_realm.id
+  parent_flow_alias = keycloak_authentication_flow.browser_mfa_flow.alias
+  alias             = "otp-browser-flow"
+  requirement       = "ALTERNATIVE"
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow,
+    keycloak_authentication_execution.idp_execution,
+  ]
+}
+
+
+resource "keycloak_authentication_execution" "login_form_execution" {
+  realm_id          = keycloak_realm.dev_realm.id
+  parent_flow_alias = keycloak_authentication_subflow.otp_browser_flow.alias
+  authenticator     = "auth-username-password-form"
+  requirement       = "REQUIRED"
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow,
+    keycloak_authentication_subflow.otp_browser_flow,
+  ]
+}
+
+resource "keycloak_authentication_execution" "conditional_otp_execution" {
+  realm_id          = keycloak_realm.dev_realm.id
+  parent_flow_alias = keycloak_authentication_subflow.otp_browser_flow.alias
+  authenticator     = "auth-conditional-otp-form"
+  requirement       = "REQUIRED"
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow,
+    keycloak_authentication_subflow.otp_browser_flow,
+    keycloak_authentication_execution.login_form_execution,
+  ]
+}
+
+resource "keycloak_authentication_execution_config" "conditional_otp_config" {
+  realm_id     = keycloak_realm.dev_realm.id
+  execution_id = keycloak_authentication_execution.conditional_otp_execution.id
+  alias        = "MFA for ROLE_MEMBERSHIP"
+  config = {
+    forceOtpRole      = "ROLE_MEMBERSHIP",
+    defaultOtpOutcome = "skip"
+  }
+
+  depends_on = [
+    keycloak_authentication_flow.browser_mfa_flow,
+    keycloak_authentication_execution.conditional_otp_execution,
+  ]
+}
+
 resource "keycloak_openid_client" "website_client" {
   realm_id    = keycloak_realm.dev_realm.id
   client_id   = "website"
@@ -60,6 +186,10 @@ resource "keycloak_openid_client" "website_client" {
   implicit_flow_enabled        = false
   direct_access_grants_enabled = false
   service_accounts_enabled     = false
+
+  authentication_flow_binding_overrides {
+    browser_id = keycloak_authentication_flow.browser_mfa_flow.id
+  }
 
   valid_redirect_uris = [
     "${var.base_url}/login_check"
@@ -106,9 +236,9 @@ resource "keycloak_group_roles" "test_group_roles" {
 }
 
 resource "keycloak_user" "keycloak_user_dev" {
-  realm_id = keycloak_realm.dev_realm.id
-  username = var.keycloak_email_address
-  enabled  = true
+  realm_id       = keycloak_realm.dev_realm.id
+  username       = var.keycloak_email_address
+  enabled        = true
   email_verified = true
 
   email      = var.keycloak_email_address
@@ -121,6 +251,21 @@ resource "keycloak_user" "keycloak_user_dev" {
   }
 
   depends_on = [keycloak_realm.dev_realm]
+}
+
+resource "keycloak_group_memberships" "mfa_group_members" {
+  realm_id = keycloak_realm.dev_realm.id
+  group_id = keycloak_group.mfa_group.id
+
+  members = [
+    keycloak_user.keycloak_user_dev.username,
+  ]
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+    keycloak_group.mfa_group,
+    keycloak_user.keycloak_user_dev,
+  ]
 }
 
 resource "keycloak_group_memberships" "test_group_members" {

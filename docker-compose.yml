@@ -508,7 +508,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:10.0.2
+    image: quay.io/keycloak/keycloak:11.0.2
     labels:
       - traefik.enable=true
       - traefik.http.routers.login.rule=Host(`login.${DEVDOMAIN}`)
@@ -560,6 +560,10 @@ services:
       TF_VAR_realm_name: ${DEVDOMAIN}
       TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
       TF_VAR_base_url: https://www.${DEVDOMAIN}
+      TF_VAR_keycloak_family_name: ${FAMILYNAME}
+      TF_VAR_keycloak_given_name: ${FIRSTNAME}
+      TF_VAR_clubname: ${CLUBNAME}
+      TF_VAR_keycloak_email_address: ${ADMIN_EMAILADDRESS}
     networks:
       - backendnetwork
 
