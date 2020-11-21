@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group 'uk.co.mersthamcc.keycloak'
+version '1.0-SNAPSHOT'
+
+ext {
+    junit_version = '5.3.1'
+    keycloak_version = '11.0.2'
+    messagebird_version = '3.0.18'
+    jboss_version = '3.4.1.Final'
+}
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    compileOnly "org.keycloak:keycloak-core:$keycloak_version",
+                "org.keycloak:keycloak-server-spi:$keycloak_version",
+                "org.keycloak:keycloak-server-spi-private:$keycloak_version",
+                "org.keycloak:keycloak-services:$keycloak_version",
+                "org.jboss.logging:jboss-logging:$jboss_version",
+                "com.messagebird:messagebird-api:$messagebird_version"
+
+    runtime     "com.messagebird:messagebird-api:$messagebird_version"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from configurations.runtime
+}
+
+jar.dependsOn(copyToLib)

@@ -103,6 +103,7 @@ resource "keycloak_authentication_execution" "cookies_execution" {
   requirement       = "ALTERNATIVE"
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow
   ]
 }
@@ -114,6 +115,7 @@ resource "keycloak_authentication_execution" "idp_execution" {
   requirement       = "ALTERNATIVE"
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_execution.cookies_execution,
   ]
@@ -126,6 +128,7 @@ resource "keycloak_authentication_subflow" "otp_browser_flow" {
   requirement       = "ALTERNATIVE"
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_execution.idp_execution,
   ]
@@ -139,6 +142,7 @@ resource "keycloak_authentication_execution" "login_form_execution" {
   requirement       = "REQUIRED"
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_subflow.otp_browser_flow,
   ]
@@ -151,6 +155,7 @@ resource "keycloak_authentication_execution" "conditional_otp_execution" {
   requirement       = "REQUIRED"
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_subflow.otp_browser_flow,
     keycloak_authentication_execution.login_form_execution,
@@ -167,6 +172,7 @@ resource "keycloak_authentication_execution_config" "conditional_otp_config" {
   }
 
   depends_on = [
+    keycloak_realm.dev_realm,
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_execution.conditional_otp_execution,
   ]
@@ -296,4 +302,3 @@ resource "keycloak_openid_user_realm_role_protocol_mapper" "dev_realm_role_mappe
     keycloak_openid_client.website_client,
   ]
 }
-
