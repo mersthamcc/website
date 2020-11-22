@@ -1,19 +1,18 @@
 package uk.co.mersthamcc.keycloak.smsprovider.messagebird;
 
 import com.messagebird.MessageBirdClient;
+import com.messagebird.MessageBirdServiceImpl;
 import com.messagebird.exceptions.GeneralException;
 import com.messagebird.exceptions.NotFoundException;
 import com.messagebird.exceptions.UnauthorizedException;
-import com.messagebird.objects.Verify;
-import com.messagebird.objects.VerifyType;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 
 public class MessageBirdSmsProvider implements SmsProvider {
 
     private final MessageBirdClient client;
 
-    public MessageBirdSmsProvider(MessageBirdClient client) {
-        this.client = client;
+    public MessageBirdSmsProvider() {
+        client = new MessageBirdClient(new MessageBirdServiceImpl(System.getenv("MESSAGEBIRD_API_TOKEN")));
     }
 
     @Override

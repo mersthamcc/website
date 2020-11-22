@@ -1,7 +1,7 @@
-FROM adoptopenjdk:11-jdk AS extension-builder
+FROM gradle:jdk11 AS extension-builder
 COPY sms-2fa /src
 WORKDIR /src
-RUN ./gradlew build jar
+RUN gradle build jar
 
 
 FROM quay.io/keycloak/keycloak:11.0.3

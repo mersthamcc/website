@@ -24,18 +24,18 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-
+        UserModel user = context.getUser();
         if (otpRequired(context)) {
-            SmsProvider provider = getSmsProvider(context);
-
-            UserModel user = context.getUser();
             if (user.getAttributes().containsKey(MOBILE_PHONE_ATTR)) {
+                SmsProvider provider = getSmsProvider(context);
+
                 String token = provider.send(user.getFirstAttribute(MOBILE_PHONE_ATTR));
-                context.getUser().setAttribute(TOKEN_ATTR, List.of(token));
+                user.setAttribute(TOKEN_ATTR, List.of(token));
 
                 context.challenge(context.form().createLoginTotp());
             } else {
-                context.challenge(context.form().createForm(TEMPLATE_OTP_CONFIG));
+                setRequiredActions(context.getSession(), context.getRealm(), user);
+                context.success();
             }
         } else {
             context.success();
@@ -47,29 +47,14 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
         SmsProvider provider = getSmsProvider(context);
         UserModel user = context.getUser();
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
-        if (form.containsKey("otp")) {
-            String otp = form.getFirst("otp");
-            String token = user.getFirstAttribute(TOKEN_ATTR);
+        String otp = form.getFirst("otp");
+        String token = user.getFirstAttribute(TOKEN_ATTR);
 
-            user.removeAttribute(TOKEN_ATTR);
-            if (provider.validate(token, otp)) {
-                context.success();
-            } else {
-                context.failure(AuthenticationFlowError.EXPIRED_CODE);
-            }
-        } else if (form.containsKey("mobile_number")){
-            if (MccOtpSmsHelper.processUpdate(user, context.getHttpRequest().getDecodedFormParameters())) {
-                String token = provider.send(user.getFirstAttribute(MOBILE_PHONE_ATTR));
-                context.getUser().setAttribute(TOKEN_ATTR, List.of(token));
-                context.challenge(context.form().createLoginTotp());
-            } else {
-                Response challenge = context.form()
-                        .setError("mobile_number.no.valid")
-                        .createForm("sms-validation-mobile-number.ftl");
-                context.challenge(challenge);
-            }
+        user.removeAttribute(TOKEN_ATTR);
+        if (provider.validate(token, otp)) {
+            context.success();
         } else {
-            context.failure(AuthenticationFlowError.INTERNAL_ERROR);
+            context.failure(AuthenticationFlowError.EXPIRED_CODE);
         }
     }
 
@@ -85,7 +70,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-
+        user.addRequiredAction(MccOtpConfigureSmsAction.PROVIDER_ID);
     }
 
     @Override
@@ -94,8 +79,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
     }
 
     public SmsProvider getSmsProvider(AuthenticationFlowContext context) {
-        AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
-        return SmsProviderFactory.create(authenticatorConfig.getConfig());
+        return SmsProviderFactory.create();
     }
 
     private boolean otpRequired(AuthenticationFlowContext context) {

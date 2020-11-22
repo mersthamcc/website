@@ -8,14 +8,12 @@ import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
-import uk.co.mersthamcc.keycloak.smsprovider.SmsProviders;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.keycloak.authentication.authenticators.browser.ConditionalOtpFormAuthenticator.FORCE_OTP_ROLE;
 import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 
 public class KeycloakConfigurableTwoFactorAuthenticatorFactory implements AuthenticatorFactory {
@@ -38,24 +36,6 @@ public class KeycloakConfigurableTwoFactorAuthenticatorFactory implements Authen
 
     static {
         ProviderConfigProperty property;
-
-        property = new ProviderConfigProperty();
-        property.setName(CONFIG_PROPERTY_SMS_PROVIDER);
-        property.setLabel("SMS provider");
-        property.setHelpText("Select SMS provider");
-        property.setType(ProviderConfigProperty.LIST_TYPE);
-        property.setDefaultValue(SmsProviders.MESSAGEBIRD);
-        property.setOptions(Stream.of(SmsProviders.values())
-                .map(Enum::name)
-                .collect(Collectors.toList()));
-        configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(CONFIG_PROPERTY_API_KEY);
-        property.setLabel("SMS Provider API Key");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("The SMS Provider API Key.");
-        configProperties.add(property);
 
         property = new ProviderConfigProperty();
         property.setType(ROLE_TYPE);
