@@ -11,6 +11,7 @@ import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 
 public class MessageBirdSmsProvider implements SmsProvider {
 
+    private static final String PROVIDER_NAME = "MESSAGEBIRD";
     private final static String MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE = "MESSAGEBIRD_VERIFY_TOKEN";
     private final MessageBirdClient client;
     private final String originator;
@@ -18,6 +19,11 @@ public class MessageBirdSmsProvider implements SmsProvider {
     public MessageBirdSmsProvider() {
         client = new MessageBirdClient(new MessageBirdServiceImpl(System.getenv("MESSAGEBIRD_API_TOKEN")));
         originator = System.getenv().getOrDefault("SMS_OTP_ORIGINATOR", null);
+    }
+
+    @Override
+    public String getName() {
+        return PROVIDER_NAME;
     }
 
     @Override

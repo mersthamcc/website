@@ -537,6 +537,7 @@ services:
       PROXY_ADDRESS_FORWARDING: "true"
       MESSAGEBIRD_API_TOKEN: ${MESSAGEBIRD_API_TOKEN}
       SMS_OTP_ORIGINATOR: ${SMS_OTP_ORIGINATOR}
+      SMS_OTP_PROVIDER: ${SMS_OTP_PROVIDER}
     depends_on:
       - postgres
       - loki
