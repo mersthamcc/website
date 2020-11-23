@@ -29,9 +29,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
             if (user.getAttributes().containsKey(MOBILE_PHONE_ATTR)) {
                 SmsProvider provider = getSmsProvider(context);
 
-                String token = provider.send(user.getFirstAttribute(MOBILE_PHONE_ATTR));
-                user.setAttribute(TOKEN_ATTR, List.of(token));
-
+                provider.send(context.getAuthenticationSession(), user.getFirstAttribute(MOBILE_PHONE_ATTR));
                 context.challenge(context.form().createLoginTotp());
             } else {
                 setRequiredActions(context.getSession(), context.getRealm(), user);
@@ -48,10 +46,9 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
         UserModel user = context.getUser();
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
         String otp = form.getFirst("otp");
-        String token = user.getFirstAttribute(TOKEN_ATTR);
 
         user.removeAttribute(TOKEN_ATTR);
-        if (provider.validate(token, otp)) {
+        if (provider.validate(context.getAuthenticationSession(), otp)) {
             context.success();
         } else {
             context.failure(AuthenticationFlowError.EXPIRED_CODE);

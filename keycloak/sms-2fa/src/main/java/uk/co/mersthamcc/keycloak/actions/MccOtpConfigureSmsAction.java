@@ -43,16 +43,14 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
         UserModel user = context.getUser();
         if (form.containsKey("otp")) {
-            if (provider.validate(user.getFirstAttribute(TOKEN_ATTR), form.getFirst("otp"))) {
+            if (provider.validate(context.getAuthenticationSession(), form.getFirst("otp"))) {
                 context.success();
             } else {
                 context.failure();
             }
         } else if (form.containsKey("mobile_number")){
             if (MccOtpSmsHelper.processUpdate(context.getUser(), form)) {
-                String token = provider.send(user.getFirstAttribute(MOBILE_PHONE_ATTR));
-                context.getUser().setAttribute(TOKEN_ATTR, List.of(token));
-
+                provider.send(context.getAuthenticationSession(), user.getFirstAttribute(MOBILE_PHONE_ATTR));
                 context.challenge(context.form().createLoginTotp());
             } else {
                 Response challenge = context.form()

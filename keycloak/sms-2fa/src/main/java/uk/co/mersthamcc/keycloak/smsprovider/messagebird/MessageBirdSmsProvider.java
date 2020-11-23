@@ -5,10 +5,12 @@ import com.messagebird.MessageBirdServiceImpl;
 import com.messagebird.exceptions.GeneralException;
 import com.messagebird.exceptions.NotFoundException;
 import com.messagebird.exceptions.UnauthorizedException;
+import org.keycloak.sessions.AuthenticationSessionModel;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 
 public class MessageBirdSmsProvider implements SmsProvider {
 
+    private final static String MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE = "MESSAGEBIRD_VERIFY_TOKEN";
     private final MessageBirdClient client;
 
     public MessageBirdSmsProvider() {
@@ -16,9 +18,10 @@ public class MessageBirdSmsProvider implements SmsProvider {
     }
 
     @Override
-    public String send(String phoneNumber) {
+    public void send(AuthenticationSessionModel session, String phoneNumber) {
         try {
-            return client.sendVerifyToken(phoneNumber).getId();
+            String id = client.sendVerifyToken(phoneNumber).getId();
+            session.setUserSessionNote(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE, id);
         } catch (UnauthorizedException e) {
             e.printStackTrace();
             throw new RuntimeException("UnauthorizedException encountered while sending SMS code via MessageBird", e);
@@ -29,9 +32,10 @@ public class MessageBirdSmsProvider implements SmsProvider {
     }
 
     @Override
-    public boolean validate(String validationId, String code) {
+    public boolean validate(AuthenticationSessionModel session, String code) {
         try {
-            return client.verifyToken(validationId, code).getStatus().equals("verified");
+            String id = session.getUserSessionNotes().get(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE);
+            return client.verifyToken(id, code).getStatus().equals("verified");
         } catch (NotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException("NotFoundException encountered while validating code via MessageBird", e);
