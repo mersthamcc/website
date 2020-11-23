@@ -536,6 +536,7 @@ services:
       KEYCLOAK_FRONTEND_URL: https://login.${DEVDOMAIN}/auth
       PROXY_ADDRESS_FORWARDING: "true"
       MESSAGEBIRD_API_TOKEN: ${MESSAGEBIRD_API_TOKEN}
+      SMS_OTP_ORIGINATOR: ${SMS_OTP_ORIGINATOR}
     depends_on:
       - postgres
       - loki
