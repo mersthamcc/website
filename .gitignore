@@ -7,3 +7,5 @@ graphql/npm-debug.log
 dev-config/keycloak/.terraform
 dev-config/keycloak/terraform.tfstate*
 web/public/resources
+keycloak/sms-2fa/build
+keycloak/sms-2fa/.gradle

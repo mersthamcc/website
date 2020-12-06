@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Forms;
+
 use App\Form\Components\ButtonSectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;

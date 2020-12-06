@@ -1,5 +1,5 @@
 <?php
-namespace App\Form\Components;
+namespace App\Forms\Components;
 
 use Symfony\Component\Form\AbstractType;
 
