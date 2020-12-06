@@ -1,6 +1,16 @@
 plugins {
     id 'java'
     id "com.diffplug.spotless" version "5.8.2"
+    id 'jacoco'
+    id "org.sonarqube" version "3.0"
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mersthamcc_website"
+        property "sonar.organization", "mersthamcc"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 group 'uk.co.mersthamcc.keycloak'
