@@ -23,13 +23,14 @@ public class MccOtpConfigureSmsActionFactory implements RequiredActionFactory {
     }
 
     public void init(Config.Scope config) {
-
+        // Not used
     }
 
     public void postInit(KeycloakSessionFactory factory) {
+        // Not used
     }
 
     public void close() {
-
+        // Not used
     }
 }

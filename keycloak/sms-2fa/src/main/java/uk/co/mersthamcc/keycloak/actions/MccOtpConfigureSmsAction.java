@@ -1,8 +1,5 @@
 package uk.co.mersthamcc.keycloak.actions;
 
-import org.jboss.logging.Logger;
-import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.UserModel;
@@ -13,18 +10,16 @@ import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import java.util.List;
-
 import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR;
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator.TOKEN_ATTR;
 
 public class MccOtpConfigureSmsAction implements RequiredActionProvider {
 
-    private static Logger logger = Logger.getLogger(MccOtpConfigureSmsAction.class);
     public static final String PROVIDER_ID = "mcc-configure-otp-sms";
 
     @Override
-    public void evaluateTriggers(RequiredActionContext context) {}
+    public void evaluateTriggers(RequiredActionContext context) {
+        // Not used
+    }
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
@@ -64,7 +59,9 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        // Not used
+    }
 
     public SmsProvider getSmsProvider() {
         return SmsProviderFactory.create();

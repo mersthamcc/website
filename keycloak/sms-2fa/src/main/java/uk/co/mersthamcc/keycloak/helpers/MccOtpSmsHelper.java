@@ -13,6 +13,10 @@ public class MccOtpSmsHelper {
 
     private static Logger logger = Logger.getLogger(MccOtpSmsHelper.class);
 
+    private MccOtpSmsHelper() {
+        // Not used
+    }
+
     public static boolean processUpdate(UserModel user, MultivaluedMap<String, String> form) {
         String answer = (form.getFirst("mobile_number"));
         if (answer != null && answer.length() > 0) {
