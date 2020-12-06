@@ -9,7 +9,7 @@ jobs:
       - run:
           name: Analyze on SonarCloud
           working_directory: keycloak/sms-2fa
-          command: gradle build sonarqube"
+          command: gradle build sonarqube
 
 workflows:
   main:
