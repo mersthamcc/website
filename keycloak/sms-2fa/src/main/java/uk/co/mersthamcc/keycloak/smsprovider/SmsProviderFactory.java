@@ -11,6 +11,7 @@ import static java.lang.String.format;
 public class SmsProviderFactory {
 
     private static final Logger logger = Logger.getLogger(SmsProviderFactory.class);
+    public static final String SMS_PROVIDER_ENVIRONMENT_VARIABLE = "SMS_OTP_PROVIDER";
 
     private SmsProviderFactory() {
         // Not used
@@ -23,7 +24,7 @@ public class SmsProviderFactory {
             logger.info(format("Found SMS Provider %s", p.getClass().getName()));
         }
         logger.info(format("Found %d SMS Provider(s)", providerServiceLoader.stream().count()));
-        String providerName = System.getenv().getOrDefault("SMS_OTP_PROVIDER", DummySmsProvider.PROVIDER_NAME);
+        String providerName = System.getenv().getOrDefault(SMS_PROVIDER_ENVIRONMENT_VARIABLE, DummySmsProvider.PROVIDER_NAME);
         Optional<ServiceLoader.Provider<SmsProvider>> provider = providerServiceLoader.stream().filter(p -> p.get().getName().equals(providerName)).findFirst();
         return provider.isPresent() ? provider.get().get() : null;
     }

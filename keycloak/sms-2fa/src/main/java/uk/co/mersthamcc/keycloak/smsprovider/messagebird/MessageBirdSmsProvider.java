@@ -12,13 +12,13 @@ import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderException;
 
 public class MessageBirdSmsProvider implements SmsProvider {
 
-    private static final String PROVIDER_NAME = "MESSAGEBIRD";
-    private static final String MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE = "MESSAGEBIRD_VERIFY_TOKEN";
-    private final MessageBirdClient client;
+    public static final String MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE = "MESSAGEBIRD_VERIFY_TOKEN";
+    public static final String PROVIDER_NAME = "MESSAGEBIRD";
+    public static final String API_TOKEN_ENVIRONMENT_VARIABLE = "MESSAGEBIRD_API_TOKEN";
+    private MessageBirdClient client;
     private final String originator;
 
     public MessageBirdSmsProvider() {
-        client = new MessageBirdClient(new MessageBirdServiceImpl(System.getenv("MESSAGEBIRD_API_TOKEN")));
         originator = System.getenv().getOrDefault("SMS_OTP_ORIGINATOR", null);
     }
 
@@ -31,8 +31,8 @@ public class MessageBirdSmsProvider implements SmsProvider {
     public void send(AuthenticationSessionModel session, String phoneNumber) {
         try {
             VerifyRequest request = new VerifyRequest(phoneNumber);
-            request.setOriginator(originator);
-            String id = client.sendVerifyToken(request).getId();
+            if (originator != null ) request.setOriginator(originator);
+            String id = getClient().sendVerifyToken(request).getId();
             session.setUserSessionNote(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE, id);
         } catch (UnauthorizedException e) {
             throw new SmsProviderException("UnauthorizedException encountered while sending SMS code via MessageBird", e);
@@ -45,7 +45,7 @@ public class MessageBirdSmsProvider implements SmsProvider {
     public boolean validate(AuthenticationSessionModel session, String code) {
         try {
             String id = session.getUserSessionNotes().get(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE);
-            return client.verifyToken(id, code).getStatus().equals("verified");
+            return getClient().verifyToken(id, code).getStatus().equals("verified");
         } catch (NotFoundException e) {
             throw new SmsProviderException("NotFoundException encountered while validating code via MessageBird", e);
         } catch (GeneralException e) {
@@ -53,5 +53,12 @@ public class MessageBirdSmsProvider implements SmsProvider {
         } catch (UnauthorizedException e) {
             throw new SmsProviderException("UnauthorizedException encountered while validating code via MessageBird", e);
         }
+    }
+
+    protected MessageBirdClient getClient() {
+        if (client == null) {
+            client = new MessageBirdClient(new MessageBirdServiceImpl(System.getenv(API_TOKEN_ENVIRONMENT_VARIABLE)));
+        }
+        return client;
     }
 }
