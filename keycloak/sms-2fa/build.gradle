@@ -17,10 +17,13 @@ group 'uk.co.mersthamcc.keycloak'
 version '1.0-SNAPSHOT'
 
 ext {
-    junit_version = '5.3.1'
-    keycloak_version = '11.0.2'
+    junit_version = '5.7.0'
+    keycloak_version = '11.0.3'
     messagebird_version = '3.0.18'
     jboss_version = '3.4.1.Final'
+    hamcrest_version = '2.2'
+    pioneer_version = '1.1.0'
+    mockito_version = '3.6.0'
 }
 
 repositories {
@@ -41,8 +44,20 @@ dependencies {
 
     runtime     "com.messagebird:messagebird-api:$messagebird_version"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version",
+                       "org.junit.jupiter:junit-jupiter-engine:$junit_version",
+                       "org.hamcrest:hamcrest:$hamcrest_version",
+                       "org.keycloak:keycloak-server-spi:$keycloak_version",
+                       "org.junit-pioneer:junit-pioneer:$pioneer_version",
+                       "org.mockito:mockito-core:$mockito_version",
+                       "org.mockito:mockito-junit-jupiter:$mockito_version",
+                       "com.messagebird:messagebird-api:$messagebird_version"
+
+    testRuntimeOnly "org.keycloak:keycloak-core:$keycloak_version",
+                    "org.keycloak:keycloak-server-spi-private:$keycloak_version",
+                    "org.keycloak:keycloak-services:$keycloak_version",
+                    "org.jboss.logging:jboss-logging:$jboss_version"
+
 }
 
 task copyToLib(type: Copy) {
