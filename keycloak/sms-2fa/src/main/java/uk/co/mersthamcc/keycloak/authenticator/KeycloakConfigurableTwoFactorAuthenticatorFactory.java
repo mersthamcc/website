@@ -1,6 +1,5 @@
 package uk.co.mersthamcc.keycloak.authenticator;
 
-import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
@@ -11,28 +10,24 @@ import org.keycloak.provider.ProviderConfigProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 
 public class KeycloakConfigurableTwoFactorAuthenticatorFactory implements AuthenticatorFactory {
 
-    public static final String CONFIG_PROPERTY_API_KEY = "mcc.mcc-2fa.api-key";
-    public static final String CONFIG_PROPERTY_SMS_PROVIDER = "mcc.mcc-2fa.sms-provider";
     public static final String CONFIG_PROPERTY_FORCE_OTP_ROLE = "forceOtpRole";
 
 
     private static final String PROVIDER_ID = "mcc-two-factor-authentication";
-    private static KeycloakConfigurableTwoFactorAuthenticator SINGLETON_INSTANCE;
-    private static final Logger logger = Logger.getLogger(KeycloakConfigurableTwoFactorAuthenticatorFactory.class);
+    private static final KeycloakConfigurableTwoFactorAuthenticator SINGLETON_INSTANCE = new KeycloakConfigurableTwoFactorAuthenticator();
+
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED,
             AuthenticationExecutionModel.Requirement.ALTERNATIVE,
             AuthenticationExecutionModel.Requirement.DISABLED
     };
 
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+    private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     static {
         ProviderConfigProperty property;
@@ -82,25 +77,22 @@ public class KeycloakConfigurableTwoFactorAuthenticatorFactory implements Authen
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        if (SINGLETON_INSTANCE == null) {
-            SINGLETON_INSTANCE = new KeycloakConfigurableTwoFactorAuthenticator();
-        }
         return SINGLETON_INSTANCE;
     }
 
     @Override
     public void init(Config.Scope config) {
-
+        // Not used
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
+        // Not used
     }
 
     @Override
     public void close() {
-
+        // Not used
     }
 
     @Override

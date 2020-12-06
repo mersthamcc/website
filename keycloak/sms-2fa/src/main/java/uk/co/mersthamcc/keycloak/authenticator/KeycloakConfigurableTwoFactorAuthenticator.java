@@ -5,13 +5,10 @@ import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.models.*;
 import uk.co.mersthamcc.keycloak.actions.MccOtpConfigureSmsAction;
-import uk.co.mersthamcc.keycloak.helpers.MccOtpSmsHelper;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import java.util.List;
 
 import static org.keycloak.models.utils.KeycloakModelUtils.getRoleFromString;
 import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticatorFactory.CONFIG_PROPERTY_FORCE_OTP_ROLE;
@@ -20,14 +17,13 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     public static final String TOKEN_ATTR = "OTP_VERIFY_TOKEN";
     public static final String MOBILE_PHONE_ATTR = "OTP_MOBILE_PHONE_NUMBER";
-    public static final String TEMPLATE_OTP_CONFIG = "configure-sms.ftl";
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
         UserModel user = context.getUser();
         if (otpRequired(context)) {
             if (user.getAttributes().containsKey(MOBILE_PHONE_ATTR)) {
-                SmsProvider provider = getSmsProvider(context);
+                SmsProvider provider = getSmsProvider();
 
                 provider.send(context.getAuthenticationSession(), user.getFirstAttribute(MOBILE_PHONE_ATTR));
                 context.challenge(context.form().createLoginTotp());
@@ -42,7 +38,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     @Override
     public void action(AuthenticationFlowContext context) {
-        SmsProvider provider = getSmsProvider(context);
+        SmsProvider provider = getSmsProvider();
         UserModel user = context.getUser();
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
         String otp = form.getFirst("otp");
@@ -72,10 +68,10 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     @Override
     public void close() {
-
+        // Not used
     }
 
-    public SmsProvider getSmsProvider(AuthenticationFlowContext context) {
+    public SmsProvider getSmsProvider() {
         return SmsProviderFactory.create();
     }
 
