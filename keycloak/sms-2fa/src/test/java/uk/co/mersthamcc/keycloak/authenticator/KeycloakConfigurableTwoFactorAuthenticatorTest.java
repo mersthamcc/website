@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.co.mersthamcc.keycloak.TestHelpers.createSmsProviderFactoryStaticMock;
 import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticatorFactory.CONFIG_PROPERTY_FORCE_OTP_ROLE;
 
 class KeycloakConfigurableTwoFactorAuthenticatorTest {
@@ -75,15 +76,6 @@ class KeycloakConfigurableTwoFactorAuthenticatorTest {
         utilsMockedStatic.when( () -> { KeycloakModelUtils.getRoleFromString(any(), eq(OTP_ROLE)); }).thenReturn(role);
         return utilsMockedStatic;
     }
-
-    private MockedStatic<SmsProviderFactory> createSmsProviderFactoryStaticMock(boolean validateWillSucceed) {
-        MockedStatic<SmsProviderFactory> utilsMockedStatic = mockStatic(SmsProviderFactory.class);
-        SmsProvider provider = mock(SmsProvider.class);
-        when(provider.validate(any(AuthenticationSessionModel.class), anyString())).thenReturn(validateWillSucceed);
-        utilsMockedStatic.when(SmsProviderFactory::create).thenReturn(provider);
-        return utilsMockedStatic;
-    }
-
 
     @Test
     void authenticateDisplayOtpFormIfConfigured() {
