@@ -10,7 +10,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 
 class SmsProviderFactoryTest {
-
     @Test
     void createWithNoConfigProducesDummy() {
         SmsProvider provider = SmsProviderFactory.create();
@@ -18,7 +17,7 @@ class SmsProviderFactoryTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = SmsProviderFactory.SMS_PROVIDER_ENVIRONMENT_VARIABLE, value = "MESSAGEBIRD")
+    @SetEnvironmentVariable(key = SmsProviderFactory.SMS_PROVIDER_ENVIRONMENT_VARIABLE, value = MessageBirdSmsProvider.PROVIDER_NAME)
     void createWithMessageProvider() {
         SmsProvider provider = SmsProviderFactory.create();
         assertThat(MessageBirdSmsProvider.class, equalTo(provider.getClass()));
