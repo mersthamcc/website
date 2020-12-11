@@ -47,16 +47,17 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version",
                        "org.junit.jupiter:junit-jupiter-engine:$junit_version",
                        "org.hamcrest:hamcrest:$hamcrest_version",
-                       "org.keycloak:keycloak-server-spi:$keycloak_version",
                        "org.junit-pioneer:junit-pioneer:$pioneer_version",
-                       "org.mockito:mockito-core:$mockito_version",
+                       "org.mockito:mockito-inline:$mockito_version",
                        "org.mockito:mockito-junit-jupiter:$mockito_version",
+                       "org.keycloak:keycloak-core:$keycloak_version",
+                       "org.keycloak:keycloak-server-spi:$keycloak_version",
+                       "org.keycloak:keycloak-server-spi-private:$keycloak_version",
+                       "org.keycloak:keycloak-services:$keycloak_version",
+                       "org.jboss.logging:jboss-logging:$jboss_version",
                        "com.messagebird:messagebird-api:$messagebird_version"
 
-    testRuntimeOnly "org.keycloak:keycloak-core:$keycloak_version",
-                    "org.keycloak:keycloak-server-spi-private:$keycloak_version",
-                    "org.keycloak:keycloak-services:$keycloak_version",
-                    "org.jboss.logging:jboss-logging:$jboss_version"
+    testRuntimeOnly "org.jboss.logging:jboss-logging:$jboss_version"
 
 }
 

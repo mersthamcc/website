@@ -15,7 +15,6 @@ import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFac
 
 public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator {
 
-    public static final String TOKEN_ATTR = "OTP_VERIFY_TOKEN";
     public static final String MOBILE_PHONE_ATTR = "OTP_MOBILE_PHONE_NUMBER";
 
     @Override
@@ -39,11 +38,9 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
     @Override
     public void action(AuthenticationFlowContext context) {
         SmsProvider provider = getSmsProvider();
-        UserModel user = context.getUser();
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
         String otp = form.getFirst("otp");
 
-        user.removeAttribute(TOKEN_ATTR);
         if (provider.validate(context.getAuthenticationSession(), otp)) {
             context.success();
         } else {
@@ -71,7 +68,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
         // Not used
     }
 
-    public SmsProvider getSmsProvider() {
+    private SmsProvider getSmsProvider() {
         return SmsProviderFactory.create();
     }
 
