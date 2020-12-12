@@ -9,4 +9,5 @@ public class ConditionalOtpConstants {
     public static final String CONFIG_PROPERTY_FORCE_OTP_ROLE = "forceOtpRole";
     public static final String SMS_PROVIDER_ENVIRONMENT_VARIABLE = "SMS_OTP_PROVIDER";
 
+    private ConditionalOtpConstants() {}
 }

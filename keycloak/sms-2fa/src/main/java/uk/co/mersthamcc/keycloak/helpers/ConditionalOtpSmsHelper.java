@@ -4,7 +4,6 @@ import org.jboss.logging.Logger;
 import org.keycloak.models.UserModel;
 
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.ArrayList;
 import java.util.List;
 
 import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.MOBILE_PHONE_ATTR;
