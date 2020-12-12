@@ -15,11 +15,12 @@ public class MessageBirdSmsProvider implements SmsProvider {
     public static final String MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE = "MESSAGEBIRD_VERIFY_TOKEN";
     public static final String PROVIDER_NAME = "MESSAGEBIRD";
     public static final String API_TOKEN_ENVIRONMENT_VARIABLE = "MESSAGEBIRD_API_TOKEN";
-    private MessageBirdClient client;
+    public static final String ORIGINATOR_ENVIRONMENT_VARIABLE = "SMS_OTP_ORIGINATOR";
+    protected MessageBirdClient client;
     private final String originator;
 
     public MessageBirdSmsProvider() {
-        originator = System.getenv().getOrDefault("SMS_OTP_ORIGINATOR", null);
+        this.originator = System.getenv().getOrDefault(ORIGINATOR_ENVIRONMENT_VARIABLE, null);
     }
 
     @Override
