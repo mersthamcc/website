@@ -13,10 +13,11 @@ import static org.hamcrest.Matchers.*;
 import static org.keycloak.models.AuthenticationExecutionModel.Requirement.*;
 import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 import static org.mockito.Mockito.mock;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.CONFIG_PROPERTY_FORCE_OTP_ROLE;
 
-class KeycloakConfigurableTwoFactorAuthenticatorFactoryTest {
+class ConditionalTwoFactorAuthenticatorFactoryTest {
 
-    private final KeycloakConfigurableTwoFactorAuthenticatorFactory factory = new KeycloakConfigurableTwoFactorAuthenticatorFactory();
+    private final ConditionalTwoFactorAuthenticatorFactory factory = new ConditionalTwoFactorAuthenticatorFactory();
 
     @Test
     void getDisplayTypeReturnsExpectedValue() {
@@ -58,7 +59,7 @@ class KeycloakConfigurableTwoFactorAuthenticatorFactoryTest {
         List<ProviderConfigProperty> config = factory.getConfigProperties();
 
         assertThat(config.size(), equalTo(1));
-        assertThat(config.get(0).getName(), equalTo(KeycloakConfigurableTwoFactorAuthenticatorFactory.CONFIG_PROPERTY_FORCE_OTP_ROLE));
+        assertThat(config.get(0).getName(), equalTo(CONFIG_PROPERTY_FORCE_OTP_ROLE));
         assertThat(config.get(0).getType(), equalTo(ROLE_TYPE));
     }
 
@@ -66,13 +67,13 @@ class KeycloakConfigurableTwoFactorAuthenticatorFactoryTest {
     void create() {
         Authenticator authenticator = factory.create(mock(KeycloakSession.class));
 
-        assertThat(authenticator, instanceOf(KeycloakConfigurableTwoFactorAuthenticator.class));
+        assertThat(authenticator, instanceOf(ConditionalTwoFactorAuthenticator.class));
     }
 
     @Test
     void createsSingleton() {
         Authenticator authenticator = factory.create(mock(KeycloakSession.class));
-        assertThat(authenticator, instanceOf(KeycloakConfigurableTwoFactorAuthenticator.class));
+        assertThat(authenticator, instanceOf(ConditionalTwoFactorAuthenticator.class));
         assertThat(factory.create(mock(KeycloakSession.class)), sameInstance(authenticator));
     }
 }

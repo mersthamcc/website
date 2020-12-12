@@ -3,16 +3,16 @@ package uk.co.mersthamcc.keycloak.actions;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.UserModel;
-import uk.co.mersthamcc.keycloak.helpers.MccOtpSmsHelper;
+import uk.co.mersthamcc.keycloak.helpers.ConditionalOtpSmsHelper;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.*;
 
-public class MccOtpConfigureSmsAction implements RequiredActionProvider {
+public class ConditionalOtpConfigureOtpAction implements RequiredActionProvider {
 
     public static final String PROVIDER_ID = "mcc-configure-otp-sms";
 
@@ -27,8 +27,8 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
         String mobileNumber = user.getFirstAttribute(MOBILE_PHONE_ATTR);
 
         Response challenge = context.form()
-                .setAttribute("phoneNumber", mobileNumber)
-                .createForm("configure-sms.ftl");
+                .setAttribute(PHONE_NUMBER_TEMPLATE_ATTRIBUTE, mobileNumber)
+                .createForm(CONFIGURE_SMS_FORM);
         context.challenge(challenge);
     }
 
@@ -37,20 +37,20 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
         SmsProvider provider = getSmsProvider();
         MultivaluedMap<String, String> form = context.getHttpRequest().getDecodedFormParameters();
         UserModel user = context.getUser();
-        if (form.containsKey("otp")) {
-            if (provider.validate(context.getAuthenticationSession(), form.getFirst("otp"))) {
+        if (form.containsKey(OTP_FIELD)) {
+            if (provider.validate(context.getAuthenticationSession(), form.getFirst(OTP_FIELD))) {
                 context.success();
             } else {
                 context.failure();
             }
-        } else if (form.containsKey("mobile_number")){
-            if (MccOtpSmsHelper.processUpdate(context.getUser(), form)) {
+        } else if (form.containsKey(PHONE_NUMBER_FIELD)){
+            if (ConditionalOtpSmsHelper.processUpdate(context.getUser(), form)) {
                 provider.send(context.getAuthenticationSession(), user.getFirstAttribute(MOBILE_PHONE_ATTR));
                 context.challenge(context.form().createLoginTotp());
             } else {
                 Response challenge = context.form()
                         .setError("mobile_number.no.valid")
-                        .createForm("configure-sms.ftl");
+                        .createForm(CONFIGURE_SMS_FORM);
                 context.challenge(challenge);
             }
         } else {
@@ -63,7 +63,7 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
         // Not used
     }
 
-    public SmsProvider getSmsProvider() {
+    protected SmsProvider getSmsProvider() {
         return SmsProviderFactory.create();
     }
 }

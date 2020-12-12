@@ -6,16 +6,16 @@ import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public class MccOtpConfigureSmsActionFactory implements RequiredActionFactory {
+public class ConditionalOtpConfigureOtpActionFactory implements RequiredActionFactory {
 
-    private static final MccOtpConfigureSmsAction SINGLETON = new MccOtpConfigureSmsAction();
+    private static final ConditionalOtpConfigureOtpAction SINGLETON = new ConditionalOtpConfigureOtpAction();
 
     public RequiredActionProvider create(KeycloakSession session) {
         return SINGLETON;
     }
 
     public String getId() {
-        return MccOtpConfigureSmsAction.PROVIDER_ID;
+        return ConditionalOtpConfigureOtpAction.PROVIDER_ID;
     }
 
     public String getDisplayText() {

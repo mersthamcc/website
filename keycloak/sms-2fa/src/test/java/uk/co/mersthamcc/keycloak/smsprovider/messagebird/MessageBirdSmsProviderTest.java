@@ -21,13 +21,13 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.co.mersthamcc.keycloak.TestHelpers.MOBILE_NUMBER;
 import static uk.co.mersthamcc.keycloak.smsprovider.messagebird.MessageBirdSmsProvider.MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE;
 
 @ExtendWith(MockitoExtension.class)
 class MessageBirdSmsProviderTest {
 
     private static final String VERIFY_TOKEN_VALUE = "abcd1234";
-    private static final String PHONE_NUMBER = "+447777123456";
 
     private static final Verify VERIFY_RESPONSE = new Verify() {
         @Override
@@ -51,9 +51,9 @@ class MessageBirdSmsProviderTest {
 
     @Test
     void sendStoresTokenAsSessionNote() throws UnauthorizedException, GeneralException {
-        VerifyRequest request = new VerifyRequest(PHONE_NUMBER);
+        VerifyRequest request = new VerifyRequest(MOBILE_NUMBER);
         when(mockClient.sendVerifyToken(argThat(matchesRequest(request)))).thenReturn(VERIFY_RESPONSE);
-        provider.send(session, PHONE_NUMBER);
+        provider.send(session, MOBILE_NUMBER);
         verify(session).setUserSessionNote(eq(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE), eq(VERIFY_TOKEN_VALUE));
     }
 
@@ -62,7 +62,7 @@ class MessageBirdSmsProviderTest {
         Verify response = new Verify();
         response.setId(VERIFY_TOKEN_VALUE);
         response.setStatus("verified");
-        response.setRecipient(PHONE_NUMBER);
+        response.setRecipient(MOBILE_NUMBER);
         when(session.getUserSessionNotes()).thenReturn(Map.of(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE, VERIFY_TOKEN_VALUE));
         when(mockClient.verifyToken(eq(VERIFY_TOKEN_VALUE), eq("123456"))).thenReturn(response);
 
@@ -74,7 +74,7 @@ class MessageBirdSmsProviderTest {
         Verify response = new Verify();
         response.setId(VERIFY_TOKEN_VALUE);
         response.setStatus("failed");
-        response.setRecipient(PHONE_NUMBER);
+        response.setRecipient(MOBILE_NUMBER);
         when(session.getUserSessionNotes()).thenReturn(Map.of(MESSAGEBIRD_VERIFY_TOKEN_AUTH_NOTE, VERIFY_TOKEN_VALUE));
         when(mockClient.verifyToken(eq(VERIFY_TOKEN_VALUE), eq("123456"))).thenReturn(response);
 
