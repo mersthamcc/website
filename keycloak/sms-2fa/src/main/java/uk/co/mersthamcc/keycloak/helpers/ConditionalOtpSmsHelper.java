@@ -19,17 +19,29 @@ public class ConditionalOtpSmsHelper {
 
     public static boolean processUpdate(UserModel user, MultivaluedMap<String, String> form) {
         String answer = (form.getFirst("mobile_number"));
-        if (answer != null && answer.length() > 0) {
+        if (answer != null && answer.trim().length() > 0) {
             logger.debug("Valid matching mobile numbers supplied, save credential ...");
-            List<String> mobileNumber = new ArrayList<>();
-            mobileNumber.add(answer);
 
-            user.setAttribute(MOBILE_PHONE_ATTR, mobileNumber);
+            user.setAttribute(MOBILE_PHONE_ATTR, List.of(normalisePhoneNumber(answer)));
             return true;
 
         } else {
             logger.debug("The field wasn't complete or is an invalid number...");
             return false;
         }
+    }
+
+    public static String normalisePhoneNumber(String inputNumber) {
+        inputNumber = inputNumber.trim().replaceAll("[^+\\d]|(?<=.)\\+", "");
+        if (inputNumber.startsWith("00")) {
+            inputNumber = inputNumber.replaceFirst("00", "+");
+        }
+        if (inputNumber.startsWith("0")) {
+            inputNumber = inputNumber.replaceFirst("0", "+44");
+        }
+        if (inputNumber.startsWith("44")) {
+            inputNumber = inputNumber.replaceFirst("44", "+44");
+        }
+        return inputNumber;
     }
 }
