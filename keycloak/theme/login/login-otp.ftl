@@ -3,6 +3,10 @@
         <#if section="header">
             ${msg("doLogIn")}
         <#elseif section="form">
+            <div class="${properties.kcLabelWrapperClass!}">
+                <p>${msg("enterOtpCode")}</p>
+            </div>
+
             <form id="kc-otp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}"
                 method="post">
                 <#if otpLogin.userOtpCredentials?size gt 1>
@@ -43,9 +47,16 @@
                     <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                         <input
                             class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                            name="login" id="kc-login" type="submit" value="${msg("doLogIn")}" />
+                            name="login" id="kc-login" type="submit" value="${msg("doOtpLogIn")}" />
                     </div>
                 </div>
+                <a id="reset-login" href="${url.loginRestartFlowUrl}">
+                    <div class="kc-login-tooltip">
+                        <i class="${properties.kcResetFlowIcon!}"></i> Restart Login
+                        <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
+                    </div>
+                </a>
+
             </form>
             <script type="text/javascript" src="${url.resourcesPath}/node_modules/jquery/dist/jquery.min.js"></script>
             <script type="text/javascript">

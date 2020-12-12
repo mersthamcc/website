@@ -9,10 +9,10 @@
             <div class="${properties.kcLabelWrapperClass!}">
                 <p>${msg("updatePhoneNumberMessage")}</p>
             </div>
-            <form id="kc-totp-login-form" class="${properties.kcFormClass!} govuk-grid-column-two-thirds" action="${url.loginAction}" method="post">
+            <form id="kc-totp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
                 <div class="${properties.kcFormGroupClass!}">
                     <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="mobileNumber" class="govuk-label">${msg("phoneNumber")}</label>
+                        <label for="mobileNumber">${msg("phoneNumber")}</label>
                     </div>
 
                     <div class="${properties.kcInputWrapperClass!}">
@@ -29,7 +29,7 @@
                     <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                         <input
                             class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                            name="verify" id="kc-verify" type="submit" value="${msg("verify")}" />
+                            name="verify" id="kc-verify" type="submit" value="${msg("verify-button")}" />
                     </div>
                 </div>
             </form>

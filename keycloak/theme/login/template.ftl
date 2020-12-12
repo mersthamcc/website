@@ -77,6 +77,15 @@
         <#else>
             <#if displayRequiredFields>
                 <div class="${properties.kcContentWrapperClass!}">
+                    <div class="col-md-10">
+                        <h1 id="kc-page-title">
+                            <img src="${url.resourcesPath}/img/header_logo.png" />
+                            <div class="clubname">
+                                <p>${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}</p>
+                            </div>
+                        </h1>
+                    </div>
+
                     <div class="${properties.kcLabelWrapperClass!} subtitle">
                         <span class="subtitle"><span class="required">*</span> ${msg("requiredFields")}</span>
                     </div>
@@ -97,15 +106,16 @@
                 </div>
             <#else>
                 <#nested "show-username">
-                <div class="${properties.kcFormGroupClass!}">
-                    <div id="kc-username">
-                        <label id="kc-attempted-username">${auth.attemptedUsername}</label>
-                        <a id="reset-login" href="${url.loginRestartFlowUrl}">
-                            <div class="kc-login-tooltip">
-                                <i class="${properties.kcResetFlowIcon!}"></i>
-                                <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
-                            </div>
-                        </a>
+                <div class="${properties.kcContentWrapperClass!}">
+                    <div class="${properties.kcFormGroupClass!}">
+                        <div class="col-md-10">
+                            <h1 id="kc-page-title">
+                                <img src="${url.resourcesPath}/img/header_logo.png" />
+                                <div class="clubname">
+                                    <p>${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}</p>
+                                </div>
+                            </h1>
+                        </div>
                     </div>
                 </div>
             </#if>
