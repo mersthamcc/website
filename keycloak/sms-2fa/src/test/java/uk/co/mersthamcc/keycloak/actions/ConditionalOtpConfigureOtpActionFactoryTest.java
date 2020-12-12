@@ -9,20 +9,20 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.mock;
 
-class MccOtpConfigureSmsActionFactoryTest {
+class ConditionalOtpConfigureOtpActionFactoryTest {
 
-    private final MccOtpConfigureSmsActionFactory factory = new MccOtpConfigureSmsActionFactory();
+    private final ConditionalOtpConfigureOtpActionFactory factory = new ConditionalOtpConfigureOtpActionFactory();
 
     @Test
     void create() {
         RequiredActionProvider action = factory.create(mock(KeycloakSession.class));
 
-        assertThat(action, instanceOf(MccOtpConfigureSmsAction.class));
+        assertThat(action, instanceOf(ConditionalOtpConfigureOtpAction.class));
     }
 
     @Test
     void getId() {
-        assertThat(factory.getId(), equalTo(MccOtpConfigureSmsAction.PROVIDER_ID));
+        assertThat(factory.getId(), equalTo(ConditionalOtpConfigureOtpAction.PROVIDER_ID));
     }
 
     @Test

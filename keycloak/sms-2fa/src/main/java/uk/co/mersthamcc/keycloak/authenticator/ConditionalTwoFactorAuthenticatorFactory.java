@@ -12,14 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.CONFIG_PROPERTY_FORCE_OTP_ROLE;
 
-public class KeycloakConfigurableTwoFactorAuthenticatorFactory implements AuthenticatorFactory {
-
-    public static final String CONFIG_PROPERTY_FORCE_OTP_ROLE = "forceOtpRole";
-
+public class ConditionalTwoFactorAuthenticatorFactory implements AuthenticatorFactory {
 
     private static final String PROVIDER_ID = "mcc-two-factor-authentication";
-    private static final KeycloakConfigurableTwoFactorAuthenticator SINGLETON_INSTANCE = new KeycloakConfigurableTwoFactorAuthenticator();
+    private static final ConditionalTwoFactorAuthenticator SINGLETON_INSTANCE = new ConditionalTwoFactorAuthenticator();
 
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED,

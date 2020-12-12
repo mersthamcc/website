@@ -9,8 +9,7 @@ import org.keycloak.models.*;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.mockito.MockedStatic;
-import uk.co.mersthamcc.keycloak.actions.MccOtpConfigureSmsAction;
-import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
+import uk.co.mersthamcc.keycloak.actions.ConditionalOtpConfigureOtpAction;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -22,14 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.*;
+import static uk.co.mersthamcc.keycloak.TestHelpers.MOBILE_NUMBER;
 import static uk.co.mersthamcc.keycloak.TestHelpers.createSmsProviderFactoryStaticMock;
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticatorFactory.CONFIG_PROPERTY_FORCE_OTP_ROLE;
 
-class KeycloakConfigurableTwoFactorAuthenticatorTest {
+class ConditionalTwoFactorAuthenticatorTest {
 
     private static final String OTP_ROLE = "OTP_ROLE";
 
-    private KeycloakConfigurableTwoFactorAuthenticator authenticator = new KeycloakConfigurableTwoFactorAuthenticator();
+    private ConditionalTwoFactorAuthenticator authenticator = new ConditionalTwoFactorAuthenticator();
 
     AuthenticationFlowContext context;
     Response otpFormResponse;
@@ -47,7 +47,7 @@ class KeycloakConfigurableTwoFactorAuthenticatorTest {
 
         if (userHasPhoneNumber) {
             when(user.getAttributes()).thenReturn(Map.of(
-                    KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR, List.of("+447777123456")
+                    MOBILE_PHONE_ATTR, List.of(MOBILE_NUMBER)
             ));
         }
 
@@ -65,7 +65,7 @@ class KeycloakConfigurableTwoFactorAuthenticatorTest {
         context = mock(AuthenticationFlowContext.class);
         HttpRequest request = mock(HttpRequest.class);
         MultivaluedHashMap<String, String> form = new MultivaluedHashMap<>();
-        form.put("otp", List.of("123456"));
+        form.put(OTP_FIELD, List.of("123456"));
         when(request.getDecodedFormParameters()).thenReturn(form);
         when(context.getHttpRequest()).thenReturn(request);
         when(context.getAuthenticationSession()).thenReturn(mock(AuthenticationSessionModel.class));
@@ -102,7 +102,7 @@ class KeycloakConfigurableTwoFactorAuthenticatorTest {
         try(MockedStatic<KeycloakModelUtils> modelUtilsMockedStatic = createKeycloakUtilsStaticMock()) {
             authenticator.authenticate(context);
             verify(context).success();
-            verify(context.getUser()).addRequiredAction(eq(MccOtpConfigureSmsAction.PROVIDER_ID));
+            verify(context.getUser()).addRequiredAction(eq(ConditionalOtpConfigureOtpAction.PROVIDER_ID));
         }
     }
 

@@ -4,18 +4,17 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.models.*;
-import uk.co.mersthamcc.keycloak.actions.MccOtpConfigureSmsAction;
+import uk.co.mersthamcc.keycloak.actions.ConditionalOtpConfigureOtpAction;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import static org.keycloak.models.utils.KeycloakModelUtils.getRoleFromString;
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticatorFactory.CONFIG_PROPERTY_FORCE_OTP_ROLE;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.CONFIG_PROPERTY_FORCE_OTP_ROLE;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.MOBILE_PHONE_ATTR;
 
-public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator {
-
-    public static final String MOBILE_PHONE_ATTR = "OTP_MOBILE_PHONE_NUMBER";
+public class ConditionalTwoFactorAuthenticator implements Authenticator {
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
@@ -60,7 +59,7 @@ public class KeycloakConfigurableTwoFactorAuthenticator implements Authenticator
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        user.addRequiredAction(MccOtpConfigureSmsAction.PROVIDER_ID);
+        user.addRequiredAction(ConditionalOtpConfigureOtpAction.PROVIDER_ID);
     }
 
     @Override

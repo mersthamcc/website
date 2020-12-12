@@ -10,8 +10,7 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator;
-import uk.co.mersthamcc.keycloak.helpers.MccOtpSmsHelper;
+import uk.co.mersthamcc.keycloak.helpers.ConditionalOtpSmsHelper;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
@@ -23,15 +22,14 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.*;
 import static uk.co.mersthamcc.keycloak.TestHelpers.MOBILE_NUMBER;
 import static uk.co.mersthamcc.keycloak.TestHelpers.createSmsProviderFactoryStaticMock;
-import static uk.co.mersthamcc.keycloak.actions.MccOtpConfigureSmsAction.CONFIGURE_SMS_FORM;
-import static uk.co.mersthamcc.keycloak.actions.MccOtpConfigureSmsAction.OTP_FIELD;
 
 @ExtendWith(MockitoExtension.class)
-class MccOtpConfigureSmsActionTest {
+class ConditionalOtpConfigureOtpActionTest {
 
-    MccOtpConfigureSmsAction action = new MccOtpConfigureSmsAction();
+    ConditionalOtpConfigureOtpAction action = new ConditionalOtpConfigureOtpAction();
 
     @Mock
     RequiredActionContext context;
@@ -59,9 +57,9 @@ class MccOtpConfigureSmsActionTest {
     @Test
     void requiredActionChallengeWhenUserHasAPhoneNumberConfigured() {
         setupChallengeMocks();
-        when(user.getFirstAttribute(eq(KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR))).thenReturn(MOBILE_NUMBER);
-        when(provider.setAttribute(eq(MccOtpConfigureSmsAction.PHONE_NUMBER_TEMPLATE_ATTRIBUTE), eq(MOBILE_NUMBER))).thenReturn(provider);
-        when(provider.createForm(eq(MccOtpConfigureSmsAction.CONFIGURE_SMS_FORM))).thenReturn(smsConfigureForm);
+        when(user.getFirstAttribute(eq(MOBILE_PHONE_ATTR))).thenReturn(MOBILE_NUMBER);
+        when(provider.setAttribute(eq(PHONE_NUMBER_TEMPLATE_ATTRIBUTE), eq(MOBILE_NUMBER))).thenReturn(provider);
+        when(provider.createForm(eq(CONFIGURE_SMS_FORM))).thenReturn(smsConfigureForm);
 
         action.requiredActionChallenge(context);
         verify(context).challenge(eq(smsConfigureForm));
@@ -70,8 +68,8 @@ class MccOtpConfigureSmsActionTest {
     @Test
     void processActionUpdatePhoneNumberAndSendVerification() {
         setupChallengeMocks();
-        when(provider.setAttribute(eq(MccOtpConfigureSmsAction.PHONE_NUMBER_TEMPLATE_ATTRIBUTE), isNull())).thenReturn(provider);
-        when(provider.createForm(eq(MccOtpConfigureSmsAction.CONFIGURE_SMS_FORM))).thenReturn(smsConfigureForm);
+        when(provider.setAttribute(eq(PHONE_NUMBER_TEMPLATE_ATTRIBUTE), isNull())).thenReturn(provider);
+        when(provider.createForm(eq(CONFIGURE_SMS_FORM))).thenReturn(smsConfigureForm);
 
         action.requiredActionChallenge(context);
         verify(context).challenge(eq(smsConfigureForm));
@@ -106,11 +104,11 @@ class MccOtpConfigureSmsActionTest {
             SmsProvider smsProvider = mock(SmsProvider.class);
             utilsMockedStatic.when(SmsProviderFactory::create).thenReturn(smsProvider);
 
-            try (MockedStatic<MccOtpSmsHelper> helperMockedStatic = mockStatic(MccOtpSmsHelper.class)) {
+            try (MockedStatic<ConditionalOtpSmsHelper> helperMockedStatic = mockStatic(ConditionalOtpSmsHelper.class)) {
                 MultivaluedMap<String, String> form = new MultivaluedHashMap<>();
-                form.put(MccOtpConfigureSmsAction.PHONE_NUMBER_FIELD, List.of(MOBILE_NUMBER));
-                helperMockedStatic.when(() -> MccOtpSmsHelper.processUpdate(eq(user), eq(form))).thenReturn(true);
-                when(user.getFirstAttribute(eq(KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR))).thenReturn(MOBILE_NUMBER);
+                form.put(PHONE_NUMBER_FIELD, List.of(MOBILE_NUMBER));
+                helperMockedStatic.when(() -> ConditionalOtpSmsHelper.processUpdate(eq(user), eq(form))).thenReturn(true);
+                when(user.getFirstAttribute(eq(MOBILE_PHONE_ATTR))).thenReturn(MOBILE_NUMBER);
                 setupActionMocks(form, true);
                 Response verifyForm = mock(Response.class);
                 when(context.form()).thenReturn(provider);
@@ -130,10 +128,10 @@ class MccOtpConfigureSmsActionTest {
             SmsProvider smsProvider = mock(SmsProvider.class);
             utilsMockedStatic.when(SmsProviderFactory::create).thenReturn(smsProvider);
 
-            try (MockedStatic<MccOtpSmsHelper> helperMockedStatic = mockStatic(MccOtpSmsHelper.class)) {
+            try (MockedStatic<ConditionalOtpSmsHelper> helperMockedStatic = mockStatic(ConditionalOtpSmsHelper.class)) {
                 MultivaluedMap<String, String> form = new MultivaluedHashMap<>();
-                form.put(MccOtpConfigureSmsAction.PHONE_NUMBER_FIELD, List.of(MOBILE_NUMBER));
-                helperMockedStatic.when(() -> MccOtpSmsHelper.processUpdate(eq(user), eq(form))).thenReturn(false);
+                form.put(PHONE_NUMBER_FIELD, List.of(MOBILE_NUMBER));
+                helperMockedStatic.when(() -> ConditionalOtpSmsHelper.processUpdate(eq(user), eq(form))).thenReturn(false);
                 setupActionMocks(form, false);
                 when(context.form()).thenReturn(provider);
                 when(provider.setError(anyString(), any())).thenReturn(provider);

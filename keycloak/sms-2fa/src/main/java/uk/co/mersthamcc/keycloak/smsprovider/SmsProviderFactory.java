@@ -7,11 +7,11 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 import static java.lang.String.format;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.SMS_PROVIDER_ENVIRONMENT_VARIABLE;
 
 public class SmsProviderFactory {
 
     private static final Logger logger = Logger.getLogger(SmsProviderFactory.class);
-    public static final String SMS_PROVIDER_ENVIRONMENT_VARIABLE = "SMS_OTP_PROVIDER";
 
     private SmsProviderFactory() {
         // Not used

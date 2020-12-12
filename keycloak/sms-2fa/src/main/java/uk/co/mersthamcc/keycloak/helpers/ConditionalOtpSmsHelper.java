@@ -7,13 +7,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.MOBILE_PHONE_ATTR;
 
-public class MccOtpSmsHelper {
+public class ConditionalOtpSmsHelper {
 
-    private static Logger logger = Logger.getLogger(MccOtpSmsHelper.class);
+    private static Logger logger = Logger.getLogger(ConditionalOtpSmsHelper.class);
 
-    private MccOtpSmsHelper() {
+    private ConditionalOtpSmsHelper() {
         // Not used
     }
 

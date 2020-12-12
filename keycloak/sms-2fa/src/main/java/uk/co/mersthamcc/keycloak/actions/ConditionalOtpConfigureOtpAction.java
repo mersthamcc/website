@@ -3,21 +3,16 @@ package uk.co.mersthamcc.keycloak.actions;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.UserModel;
-import uk.co.mersthamcc.keycloak.helpers.MccOtpSmsHelper;
+import uk.co.mersthamcc.keycloak.helpers.ConditionalOtpSmsHelper;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProvider;
 import uk.co.mersthamcc.keycloak.smsprovider.SmsProviderFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import static uk.co.mersthamcc.keycloak.authenticator.KeycloakConfigurableTwoFactorAuthenticator.MOBILE_PHONE_ATTR;
+import static uk.co.mersthamcc.keycloak.ConditionalOtpConstants.*;
 
-public class MccOtpConfigureSmsAction implements RequiredActionProvider {
-
-    public static final String CONFIGURE_SMS_FORM = "configure-sms.ftl";
-    public static final String PHONE_NUMBER_FIELD = "mobile_number";
-    public static final String OTP_FIELD = "otp";
-    public static final String PHONE_NUMBER_TEMPLATE_ATTRIBUTE = "phoneNumber";
+public class ConditionalOtpConfigureOtpAction implements RequiredActionProvider {
 
     public static final String PROVIDER_ID = "mcc-configure-otp-sms";
 
@@ -49,7 +44,7 @@ public class MccOtpConfigureSmsAction implements RequiredActionProvider {
                 context.failure();
             }
         } else if (form.containsKey(PHONE_NUMBER_FIELD)){
-            if (MccOtpSmsHelper.processUpdate(context.getUser(), form)) {
+            if (ConditionalOtpSmsHelper.processUpdate(context.getUser(), form)) {
                 provider.send(context.getAuthenticationSession(), user.getFirstAttribute(MOBILE_PHONE_ATTR));
                 context.challenge(context.form().createLoginTotp());
             } else {
