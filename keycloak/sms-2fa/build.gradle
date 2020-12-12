@@ -10,6 +10,8 @@ sonarqube {
         property "sonar.projectKey", "mersthamcc_website"
         property "sonar.organization", "mersthamcc"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport.xml"
+        property "sonar.junit.reportsPath", "build/test-results/*/TEST-*.xml"
     }
 }
 
@@ -67,4 +69,12 @@ task copyToLib(type: Copy) {
     from configurations.runtime
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+test.finalizedBy jacocoTestReport
+
 jar.dependsOn(copyToLib)
+tasks['sonarqube'].dependsOn test
