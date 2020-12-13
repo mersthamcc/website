@@ -40,6 +40,7 @@
         "ext-openssl": "*"
     },
     "require-dev": {
+        "phpunit/php-code-coverage": "^9.2",
         "symfony/debug-pack": "*",
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^5.1",
