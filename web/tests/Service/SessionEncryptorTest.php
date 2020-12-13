@@ -2,8 +2,8 @@
 
 namespace App\Tests\Service;
 
-use \App\Service\SessionEncryptor;
-use \PHPUnit\Framework\TestCase;
+use App\Service\SessionEncryptor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -12,7 +12,7 @@ class SessionEncryptorTest extends TestCase
     private $session, $emptySession;
     private $key, $iv;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,8 +32,14 @@ class SessionEncryptorTest extends TestCase
         new SessionEncryptor($this->emptySession);
         $this->assertTrue($this->emptySession->has("encryptionKey"));
         $this->assertTrue($this->emptySession->has("encryptionIV"));
-        $this->assertNotEquals($this->key, $this->emptySession->get("encryptionKey"));
-        $this->assertNotEquals($this->iv, $this->emptySession->get("encryptionIV"));
+        $this->assertNotEquals(
+            $this->key,
+            $this->emptySession->get("encryptionKey")
+        );
+        $this->assertNotEquals(
+            $this->iv,
+            $this->emptySession->get("encryptionIV")
+        );
     }
 
     public function testEncryptionUseExistingSession()

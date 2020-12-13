@@ -13,10 +13,11 @@ class UserTest extends TestCase
 
     private $user;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->user = new User();
-        $this->user->setGivenName("Test")
+        $this->user
+            ->setGivenName("Test")
             ->setFamilyName("User")
             ->setExternalId(uniqid())
             ->setEmail("test@example.com");
@@ -25,7 +26,10 @@ class UserTest extends TestCase
     public function testDefaultRoles()
     {
         $this->assertCount(1, $this->user->getRoles());
-        $this->assertContainsEquals(self::DEFAULT_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::DEFAULT_ROLE,
+            $this->user->getRoles()
+        );
     }
 
     public function testAddRoles()
@@ -33,7 +37,10 @@ class UserTest extends TestCase
         $this->user->addRoles([self::TEST_ROLE]);
 
         $this->assertCount(2, $this->user->getRoles());
-        $this->assertContainsEquals(self::DEFAULT_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::DEFAULT_ROLE,
+            $this->user->getRoles()
+        );
         $this->assertContainsEquals(self::TEST_ROLE, $this->user->getRoles());
     }
 
@@ -43,7 +50,10 @@ class UserTest extends TestCase
         $this->user->addRoles([self::TEST_ROLE]);
 
         $this->assertCount(2, $this->user->getRoles());
-        $this->assertContainsEquals(self::DEFAULT_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::DEFAULT_ROLE,
+            $this->user->getRoles()
+        );
         $this->assertContainsEquals(self::TEST_ROLE, $this->user->getRoles());
     }
 
@@ -54,7 +64,10 @@ class UserTest extends TestCase
 
         $this->assertCount(3, $this->user->getRoles());
         $this->assertContainsEquals(self::TEST_ROLE, $this->user->getRoles());
-        $this->assertContainsEquals(self::SECONDARY_TEST_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::SECONDARY_TEST_ROLE,
+            $this->user->getRoles()
+        );
     }
 
     public function testAddMultipleRolesInOneGo()
@@ -63,7 +76,10 @@ class UserTest extends TestCase
 
         $this->assertCount(3, $this->user->getRoles());
         $this->assertContainsEquals(self::TEST_ROLE, $this->user->getRoles());
-        $this->assertContainsEquals(self::SECONDARY_TEST_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::SECONDARY_TEST_ROLE,
+            $this->user->getRoles()
+        );
     }
 
     public function testClearRoles()
@@ -74,7 +90,10 @@ class UserTest extends TestCase
 
         $this->user->setRoles([]);
         $this->assertCount(1, $this->user->getRoles());
-        $this->assertContainsEquals(self::DEFAULT_ROLE, $this->user->getRoles());
+        $this->assertContainsEquals(
+            self::DEFAULT_ROLE,
+            $this->user->getRoles()
+        );
     }
 
     public function testHasValidRoleWithSingleValidRole()
@@ -88,7 +107,12 @@ class UserTest extends TestCase
     {
         $this->user->addRoles([self::SECONDARY_TEST_ROLE]);
 
-        $this->assertTrue($this->user->hasValidRole([self::TEST_ROLE, self::SECONDARY_TEST_ROLE]));
+        $this->assertTrue(
+            $this->user->hasValidRole([
+                self::TEST_ROLE,
+                self::SECONDARY_TEST_ROLE,
+            ])
+        );
     }
 
     public function testHasValidRoleWithEmptyValidRole()
@@ -102,11 +126,16 @@ class UserTest extends TestCase
     {
         $this->user->addRoles([self::TEST_ROLE]);
 
-        $this->assertFalse($this->user->hasValidRole([self::SECONDARY_TEST_ROLE]));
+        $this->assertFalse(
+            $this->user->hasValidRole([self::SECONDARY_TEST_ROLE])
+        );
     }
 
     public function testGetGravatarHash()
     {
-        $this->assertEquals("55502f40dc8b7c769880b10874abc9d0", $this->user->getGravatarHash());
+        $this->assertEquals(
+            "55502f40dc8b7c769880b10874abc9d0", // pragma: allowlist secret
+            $this->user->getGravatarHash()
+        );
     }
 }
