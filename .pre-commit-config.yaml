@@ -4,8 +4,8 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--use-all-plugins', '--baseline', '.secrets.baseline']
-        exclude: web/public/assets/(admin|base|plugins)/.*|Brewfile.lock.json|web/composer.lock|.*/installed.json|.*/package-lock.json
-  - repo: https://github.com/prettier/prettier
+        exclude: web/public/assets/(admin|base|plugins)/.*|Brewfile.lock.json|web/composer.lock|.*/installed.json|.*/package-lock.json|web/symfony.lock
+  - repo: https://github.com/pre-commit/mirrors-prettier
     rev: ""
     hooks:
       - id: prettier

@@ -7,7 +7,7 @@ plugins {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "mersthamcc_website"
+        property "sonar.projectKey", "keycloak-mcc"
         property "sonar.organization", "mersthamcc"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport.xml"
