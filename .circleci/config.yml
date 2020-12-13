@@ -1,18 +1,47 @@
 version: 2.1
 
 jobs:
-  build:
+  build-keycloak-extension:
     docker:
-      - image: 'circleci/openjdk:11-jdk'
+      - image: 'cimg/openjdk:11.0'
     steps:
       - checkout
       - run:
-          name: Analyze on SonarCloud
+          name: Analyze on SonarCloud (Java)
           working_directory: keycloak/sms-2fa
           command: gradle build sonarqube
+  build-web:
+    docker:
+      - image: 'cimg/php:7.4-browsers'
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "web/composer.json" }}
+
+      - run: export COMPOSER_MEMORY_LIMIT=-1
+#      - run: echo -e "[Date]\ndate.timezone = UTC" | sudo tee /usr/local/etc/php/php.ini > /dev/null
+      - run:
+          name: Composer Install
+          working_directory: web
+          command: php composer.phar install -n --prefer-dist
+      - save_cache:
+          paths:
+            - ./web/vendor
+          key: v1-dependencies-{{ checksum "web/composer.json" }}
+      - run:
+          name: Run PHPUnit and Generate Test Reports
+          working_directory: web
+          command: bin/phpunit
+      - run:
+          name: Analyze on SonarCloud (PHP)
+          working_directory: web
+          command: vendor/bin/sonar-scanner
 
 workflows:
   main:
     jobs:
-      - build:
+      - build-keycloak-extension:
+          context: SonarCloud
+      - build-web:
           context: SonarCloud

@@ -1,4 +1,4 @@
-
+!.env
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -14,3 +14,7 @@
 .phpunit.result.cache
 /phpunit.xml.dist
 ###< symfony/phpunit-bridge ###
+
+test-report.xml
+clover-coverage.xml
+.scannerwork/
