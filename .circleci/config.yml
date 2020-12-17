@@ -9,30 +9,26 @@ jobs:
       - run:
           name: Analyze on SonarCloud (Java)
           working_directory: keycloak/sms-2fa
-          command: gradle build sonarqube -Dsonar.pullrequest.branch=${CIRCLE_BRANCH}
+          command: gradle build sonarqube -Dsonar.pullrequest.branch=${CIRCLE_BRANCH} -Dsonar.pullrequest.key=${CIRCLE_PULL_REQUEST##*/}
   build-web:
     docker:
       - image: 'cimg/php:7.4-browsers'
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "web/composer.json" }}
-
       - run: export COMPOSER_MEMORY_LIMIT=-1
 #      - run: echo -e "[Date]\ndate.timezone = UTC" | sudo tee /usr/local/etc/php/php.ini > /dev/null
+      - run:
+          name: Install xdebug
+          working_directory: web
+          command: sudo pecl channel-update pecl.php.net && sudo pecl install xdebug
       - run:
           name: Composer Install
           working_directory: web
           command: php composer.phar install -n --prefer-dist
-      - save_cache:
-          paths:
-            - ./web/vendor
-          key: v1-dependencies-{{ checksum "web/composer.json" }}
       - run:
           name: Run PHPUnit and Generate Test Reports
           working_directory: web
-          command: bin/phpunit
+          command: php  -dzend_extension=/usr/lib/php/20190902/xdebug.so -dxdebug.mode=coverage bin/phpunit
       - run:
           name: Analyze on SonarCloud (PHP)
           working_directory: web
