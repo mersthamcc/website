@@ -9,7 +9,12 @@ jobs:
       - run:
           name: Analyze on SonarCloud (Java)
           working_directory: keycloak/sms-2fa
-          command: gradle build sonarqube -Dsonar.pullrequest.branch=${CIRCLE_BRANCH} -Dsonar.pullrequest.key=${CIRCLE_PULL_REQUEST##*/}
+          command: |
+            if [[ -z ${CIRCLE_PULL_REQUEST} ]]; then
+              gradle build sonarqube
+            else
+              gradle build sonarqube -Dsonar.pullrequest.branch=${CIRCLE_BRANCH} -Dsonar.pullrequest.key=${CIRCLE_PULL_REQUEST##*/}
+            fi
   build-web:
     docker:
       - image: 'cimg/php:7.4-browsers'
