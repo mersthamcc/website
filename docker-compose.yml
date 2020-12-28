@@ -298,6 +298,7 @@ services:
       KEYCLOAK_CLIENT_ID: graphql
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
       GRAPHQL_PLAYGROUND: "true"
+      NODE_ENV: dev
     networks:
       - dmz
       - backendnetwork
