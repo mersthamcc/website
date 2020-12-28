@@ -1,50 +1,33 @@
-import { nexusPrismaPlugin } from 'nexus-prisma'
-import { intArg, makeSchema, objectType, stringArg } from '@nexus/schema'
+import {makeSchema, objectType} from 'nexus'
+import {nexusPrisma} from 'nexus-plugin-prisma'
+import {Context} from "./context";
 
-const News = objectType({
-  name: 'news',
-  definition(t) {
-    t.model.id()
-    t.model.title()
-    t.model.body()
-    t.model.publish_date()
-  },
-})
+import * as types from './types'
+import {applyMiddleware} from "graphql-middleware";
 
-const Query = objectType({
-  name: 'Query',
-  definition(t) {
-    t.crud.news
-    t.list.field('feed', {
-      type: 'news',
-      resolve: (_, args, ctx) => {
-        return ctx.prisma.news.findMany({
-          orderBy: { publish_date: "desc" },
-          take: 10
-        })
-      },
+export const schema = // applyMiddleware(
+    makeSchema({
+        types: types,
+        plugins: [
+            nexusPrisma({
+                experimentalCRUD: true,
+            }),
+        ],
+        outputs: {
+            schema: __dirname + '/../schema.graphql',
+            typegen: __dirname + '/generated/nexus.ts',
+        },
+        contextType: {
+            module: require.resolve('./context'),
+            export: 'Context',
+        },
+        sourceTypes: {
+            modules: [
+                {
+                    module: '@prisma/client',
+                    alias: 'prisma',
+                },
+            ],
+        },
     })
-  },
-})
-
-export const schema = makeSchema({
-  types: [Query, News],
-  plugins: [nexusPrismaPlugin()],
-  outputs: {
-    schema: __dirname + '/../schema.graphql',
-    typegen: __dirname + '/generated/nexus.ts',
-  },
-  typegenAutoConfig: {
-    contextType: 'Context.Context',
-    sources: [
-      {
-        source: '@prisma/client',
-        alias: 'prisma',
-      },
-      {
-        source: require.resolve('./context'),
-        alias: 'Context',
-      },
-    ],
-  },
-})
+// )

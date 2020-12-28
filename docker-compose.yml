@@ -154,7 +154,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   postgres:
-    image: postgres:11
+    image: postgres:12
     ports:
       - 5432:5432
     environment:
@@ -271,7 +271,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   prisma:
-    image: grahql:local
+    image: graphql:local
     build:
       context: graphql
     labels:
@@ -288,11 +288,16 @@ services:
       - com_docker_swarm_service_name=prisma
       - tls-cert-host-check=prisma.${DEVDOMAIN}
     entrypoint: npm run dev
-    ports:
-      - 4000:4000
+    extra_hosts:
+      - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
     environment:
       DATABASE_URL: ${DATABASE_URL}
       LISTEN_PORT: 4000
+      KEYCLOAK_URL: https://login.${DEVDOMAIN}/auth
+      KEYCLOAK_REALM: ${DEVDOMAIN}
+      KEYCLOAK_CLIENT_ID: graphql
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      GRAPHQL_PLAYGROUND: "true"
     networks:
       - dmz
       - backendnetwork
@@ -563,6 +568,7 @@ services:
       TF_VAR_realm_name: ${DEVDOMAIN}
       TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
       TF_VAR_base_url: https://www.${DEVDOMAIN}
+      TF_VAR_graphql_base_url: https://prisma.${DEVDOMAIN}
       TF_VAR_keycloak_family_name: ${FAMILYNAME}
       TF_VAR_keycloak_given_name: ${FIRSTNAME}
       TF_VAR_clubname: ${CLUBNAME}
@@ -570,31 +576,31 @@ services:
     networks:
       - backendnetwork
 
-#  wireshark:
-#    labels:
-#      - traefik.enable=true
-#      - traefik.http.routers.wireshark.rule=Host(`wireshark.${DEVDOMAIN}`)
-#      - traefik.http.services.wireshark.loadbalancer.server.port=3000
-#      - traefik.http.routers.wireshark.entrypoints=web
-#      - traefik.http.routers.wireshark.middlewares=forcehttps
-#      - traefik.http.routers.wireshark-tls.tls=true
-#      - traefik.http.routers.wireshark-tls.rule=Host(`wireshark.${DEVDOMAIN}`)
-#      - traefik.http.routers.wireshark-tls.entrypoints=websecure
-#      - traefik.http.routers.wireshark-tls.tls.certresolver=le
-#      - traefik.http.routers.wireshark-tls.tls.domains[0].main=*.${DEVDOMAIN}
-#      - com_docker_swarm_service_name=wireshark
-#      - tls-cert-host-check=wireshark.${DEVDOMAIN}
-#    image: linuxserver/wireshark:latest
-#    container_name: wireshark
-#    cap_add:
-#      - NET_ADMIN
-#    environment:
-#      - PUID=1000
-#      - PGID=1000
-#      - TZ=Europe/London
-#    restart: unless-stopped
-#    networks:
-#      - backendnetwork
+  wireshark:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wireshark.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.services.wireshark.loadbalancer.server.port=3000
+      - traefik.http.routers.wireshark.entrypoints=web
+      - traefik.http.routers.wireshark.middlewares=forcehttps
+      - traefik.http.routers.wireshark-tls.tls=true
+      - traefik.http.routers.wireshark-tls.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.routers.wireshark-tls.entrypoints=websecure
+      - traefik.http.routers.wireshark-tls.tls.certresolver=le
+      - traefik.http.routers.wireshark-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=wireshark
+      - tls-cert-host-check=wireshark.${DEVDOMAIN}
+    image: linuxserver/wireshark:latest
+    container_name: wireshark
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    restart: unless-stopped
+    networks:
+      - backendnetwork
 #
 #  portainer:
 #    labels:

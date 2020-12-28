@@ -42,7 +42,7 @@ resource "keycloak_realm" "dev_realm" {
   login_with_email_allowed       = true
   verify_email                   = true
   duplicate_emails_allowed       = false
-  ssl_required                   = "all"
+  ssl_required                   = "none"
 
   access_code_lifespan = "3h"
 
@@ -203,6 +203,32 @@ resource "keycloak_openid_client" "website_client" {
 
   web_origins = [
     var.base_url,
+  ]
+
+  depends_on = [keycloak_realm.dev_realm]
+}
+
+resource "keycloak_openid_client" "graphql_client" {
+  realm_id    = keycloak_realm.dev_realm.id
+  client_id   = "graphql"
+  name        = "graphql"
+  description = "graphql"
+  enabled     = true
+
+  access_type   = "CONFIDENTIAL"
+  client_secret = var.website_client_secret
+
+  standard_flow_enabled        = true
+  implicit_flow_enabled        = false
+  direct_access_grants_enabled = false
+  service_accounts_enabled     = false
+
+  valid_redirect_uris = [
+    "${var.graphql_base_url}/graphql"
+  ]
+
+  web_origins = [
+    var.graphql_base_url,
   ]
 
   depends_on = [keycloak_realm.dev_realm]

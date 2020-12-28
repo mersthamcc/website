@@ -34,6 +34,10 @@ variable "base_url" {
   description = "The base URL for your application"
 }
 
+variable "graphql_base_url" {
+  description = "The base URL for your GraphQL API application"
+}
+
 variable "clubname" {
   description = "The club name; ths will be display name for the realm"
 }

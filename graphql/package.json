@@ -1,5 +1,6 @@
 {
   "name": "typescript-graphql",
+  "license": "MIT",
   "scripts": {
     "start": "node dist/server",
     "clean": "rm -rf dist",
@@ -7,23 +8,27 @@
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
     "generate:prisma": "prisma generate",
     "generate:nexus": "ts-node --transpile-only src/schema",
-    "postinstall": "npm -s run generate",
-    "dev": "ts-node-dev --no-notify --respawn --transpileOnly src/server"
+    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/server"
   },
   "dependencies": {
-    "@nexus/schema": "0.14.0",
-    "@prisma/client": "2.1.3",
+    "@prisma/cli": "2.13.1",
+    "@prisma/client": "2.13.1",
     "@types/node-fetch": "2.5.7",
-    "apollo-server": "2.15.0",
-    "graphql": "14.6.0",
-    "nexus-prisma": "0.12.0"
+    "apollo-server-express": "^2.19.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "graphql": "^15.4.0",
+    "graphql-middleware": "^6.0.0",
+    "keycloak-connect": "^12.0.1",
+    "keycloak-connect-graphql": "^0.6.4",
+    "nexus": "1.0.0",
+    "nexus-plugin-prisma": "0.27.0"
   },
   "devDependencies": {
-    "@prisma/cli": "2.1.3",
-    "@types/node": "12.12.47",
-    "ts-node": "8.10.2",
-    "ts-node-dev": "1.0.0-pre.49",
-    "typescript": "3.9.5"
+    "@types/node": "12.19.9",
+    "ts-node": "9.1.1",
+    "ts-node-dev": "1.1.1",
+    "typescript": "4.1.3"
   },
   "prettier": {
     "singleQuote": true,

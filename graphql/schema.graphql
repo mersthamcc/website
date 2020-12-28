@@ -4,13 +4,29 @@
 
 scalar DateTime
 
+type member {
+  id: Int!
+}
+
 type news {
   body: String!
+  created_date: DateTime!
   id: Int!
+  news_comment(after: news_commentWhereUniqueInput, before: news_commentWhereUniqueInput, first: Int, last: Int): [news_comment!]!
   publish_date: DateTime!
   title: String!
 }
 
+type news_comment {
+  author: String
+  body: String!
+}
+
+input news_commentWhereUniqueInput {
+  id: Int
+}
+
 type Query {
-  feed: [news!]!
+  feed: [news]
+  members: [member]
 }
