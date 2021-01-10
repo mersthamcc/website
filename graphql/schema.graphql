@@ -4,13 +4,62 @@
 
 scalar DateTime
 
-type news {
-  body: String!
+scalar Json
+
+type Member {
   id: Int!
-  publish_date: DateTime!
+}
+
+type Mutation {
+  """Create a new user"""
+  signupUser(emailAddress: String!, externalId: String!, familyName: String, givenName: String): User
+
+  """Update user details and roles"""
+  updateUserDetails(email: String!, familyName: String, givenName: String, id: Int!, roles: [String!]!): User
+}
+
+type News {
+  attributes(after: NewsAttributeWhereUniqueInput, before: NewsAttributeWhereUniqueInput, first: Int, last: Int): [NewsAttribute!]!
+  body: String!
+  comments(after: NewsCommentWhereUniqueInput, before: NewsCommentWhereUniqueInput, first: Int, last: Int): [NewsComment!]!
+  createdDate: DateTime!
+  id: Int!
+  publishDate: DateTime!
   title: String!
 }
 
+type NewsAttribute {
+  name: String!
+  news: News!
+  value: String
+}
+
+input NewsAttributeWhereUniqueInput {
+  id: Int
+}
+
+type NewsComment {
+  author: String
+  body: String!
+  news: News!
+}
+
+input NewsCommentWhereUniqueInput {
+  id: Int
+}
+
 type Query {
-  feed: [news!]!
+  feed: [News]
+  members: [Member]
+  userByEmail(emailAddress: String!): User
+  userByExternalId(externalId: String!): User
+}
+
+type User {
+  email: String!
+  externalId: String
+  familyName: String
+  givenName: String
+  id: Int!
+  roles: Json!
 }

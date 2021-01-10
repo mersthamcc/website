@@ -1,0 +1,10 @@
+query($externalId: String!) {
+  userByExternalId(externalId: $externalId) {
+    id
+    email
+    givenName
+    familyName
+    externalId
+    roles
+  }
+}

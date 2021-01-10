@@ -3,45 +3,20 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ORM\Table(name="`user`")
- */
 class User implements UserInterface
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
-     */
-    private $external_id;
+    private $externalId;
 
-    /**
-     * @ORM\Column(type="string", length=64, unique=true)
-     */
     private $email;
 
-    /**
-     * @ORM\Column(type="string", length=180, nullable=true)
-     */
-    private $given_name;
+    private $givenName;
 
-    /**
-     * @ORM\Column(type="string", length=180, nullable=true)
-     */
-    private $family_name;
+    private $familyName;
 
-    /**
-     * @ORM\Column(type="json")
-     */
     private $roles = [];
 
     public function getId(): ?int
@@ -68,7 +43,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string) $this->externalId;
     }
 
     /**
@@ -78,7 +53,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = "ROLE_USER";
 
         return array_unique($roles, SORT_STRING);
     }
@@ -88,16 +63,16 @@ class User implements UserInterface
      */
     public function getExternalId()
     {
-        return $this->external_id;
+        return $this->externalId;
     }
 
     /**
-     * @param mixed $external_id
+     * @param mixed $externalId
      * @return User
      */
-    public function setExternalId($external_id)
+    public function setExternalId($externalId)
     {
-        $this->external_id = $external_id;
+        $this->externalId = $externalId;
         return $this;
     }
 
@@ -106,16 +81,16 @@ class User implements UserInterface
      */
     public function getGivenName()
     {
-        return $this->given_name;
+        return $this->givenName;
     }
 
     /**
-     * @param mixed $given_name
+     * @param mixed $givenName
      * @return User
      */
-    public function setGivenName($given_name)
+    public function setGivenName($givenName)
     {
-        $this->given_name = $given_name;
+        $this->givenName = $givenName;
         return $this;
     }
 
@@ -124,16 +99,16 @@ class User implements UserInterface
      */
     public function getFamilyName()
     {
-        return $this->family_name;
+        return $this->familyName;
     }
 
     /**
-     * @param mixed $family_name
+     * @param mixed $familyName
      * @return User
      */
-    public function setFamilyName($family_name)
+    public function setFamilyName($familyName)
     {
-        $this->family_name = $family_name;
+        $this->familyName = $familyName;
         return $this;
     }
 
@@ -154,7 +129,10 @@ class User implements UserInterface
      */
     public function addRoles(array $roles): self
     {
-        $this->roles = array_unique(array_merge($this->roles, $roles), SORT_STRING);
+        $this->roles = array_unique(
+            array_merge($this->roles, $roles),
+            SORT_STRING
+        );
 
         return $this;
     }
@@ -196,10 +174,11 @@ class User implements UserInterface
      * @param array $validRoles
      * @return boolean
      */
-    public function hasValidRole(array $validRoles) {
+    public function hasValidRole(array $validRoles)
+    {
         if (count($validRoles) == 0) {
             return true;
         }
-        return (count(array_intersect($validRoles, $this->getRoles())) > 0);
+        return count(array_intersect($validRoles, $this->getRoles())) > 0;
     }
 }

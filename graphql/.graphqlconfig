@@ -1,14 +1,14 @@
 {
-  "name": "Untitled GraphQL Schema",
+  "name": "Development GraphQL Schema",
   "schemaPath": "schema.graphql",
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
-        "url": "http://localhost:8080/graphql",
+        "url": "https://prisma.new.mersthamcc.co.uk/graphql",
         "headers": {
           "user-agent": "JS GraphQL"
         },
-        "introspect": false
+        "introspect": true
       }
     }
   }

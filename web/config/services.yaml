@@ -6,32 +6,44 @@
 parameters:
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    App\:
-        resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+  App\:
+    resource: "../src/*"
+    exclude: "../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}"
 
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+  App\Controller\:
+    resource: "../src/Controller"
+    tags: ["controller.service_arguments"]
 
-    app.menu_builder:
-        class: App\Service\MenuService
-        arguments: ["@knp_menu.factory"]
-        tags:
-            - { name: knp_menu.menu_builder, method: getFrontendMenuItems, alias: main }
-            - { name: knp_menu.menu_builder, method: getAdministrationMenuItems, alias: admin }
-            - { name: knp_menu.menu_builder, method: getTopMenuItems, alias: top }
-            - { name: knp_menu.menu_builder, method: getUserMenuItems, alias: user }
+  App\ApiClient\ApiClient:
+    class: App\ApiClient\ApiClient
+    arguments: ['@App\ApiClient\TokenService', "%env(API_SERVER_URL)%"]
 
-    ckfinder.connector.factory:
-        class: App\Factory\FinderFactory
-        public: true
-        arguments:
-            - '%ckfinder.connector.config%'
-            - '@ckfinder.connector.auth'
-            - '@App\Service\FinderService'
+  app.menu_builder:
+    class: App\Service\MenuService
+    arguments: ["@knp_menu.factory"]
+    tags:
+      - {
+          name: knp_menu.menu_builder,
+          method: getFrontendMenuItems,
+          alias: main,
+        }
+      - {
+          name: knp_menu.menu_builder,
+          method: getAdministrationMenuItems,
+          alias: admin,
+        }
+      - { name: knp_menu.menu_builder, method: getTopMenuItems, alias: top }
+      - { name: knp_menu.menu_builder, method: getUserMenuItems, alias: user }
+
+  ckfinder.connector.factory:
+    class: App\Factory\FinderFactory
+    public: true
+    arguments:
+      - "%ckfinder.connector.config%"
+      - "@ckfinder.connector.auth"
+      - '@App\Service\FinderService'

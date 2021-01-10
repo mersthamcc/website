@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      POSTGRES_USER: ${DATABASE_ROOT_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+
+  prisma-introspect:
+    image: node:14.4.0
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        npx prisma introspect
+        npx prisma generate
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      LISTEN_PORT: 4000
+      GRAPHQL_PLAYGROUND: "true"
+      NODE_ENV: dev
+    volumes:
+      - .:/src
+    working_dir: /src
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  flyway:
+    build:
+      context: ../sql/
+      dockerfile: Dockerfile
+    image: mersthamcc/flyway:latest
+    command: ["migrate"]
+    volumes:
+      - ../sql/dev-migrations:/flyway/dev-migrations
+    environment:
+      FLYWAY_URL: ${DATABASE_BASE_URL}/${DATABASE_NAME}
+      FLYWAY_USER: ${DATABASE_ROOT_USER}
+      FLYWAY_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      FLYWAY_LOCATIONS: "filesystem:/flyway/sql,filesystem:/flyway/dev-migrations"
+      FLYWAY_PLACEHOLDERS_SITENAME: www.${DEVDOMAIN}
+      FLYWAY_PLACEHOLDERS_ADMIN_USER: ${ADMIN_EMAILADDRESS}
+      FLYWAY_PLACEHOLDERS_CONTENT_USER: ${DATABASE_USER}
+      FLYWAY_PLACEHOLDERS_CONTENT_USER_PASSWORD: ${DATABASE_PASSWORD}
+      FLYWAY_PLACEHOLDERS_DATABASE_NAME: ${DATABASE_NAME}
+      FLYWAY_PLACEHOLDERS_APPS_DATABASE_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      FLYWAY_MIXED: "true"
+    networks:
+      - backendnetwork
+    restart: on-failure
+    depends_on:
+      - postgres
+
+networks:
+  backendnetwork:
