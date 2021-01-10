@@ -31,7 +31,7 @@ const server = new ApolloServer({
     typeDefs: [KeycloakTypeDefs],
     schemaDirectives: KeycloakSchemaDirectives,
     playground: (process.env["GRAPHQL_PLAYGROUND"] === "true"),
-    context: ({req}) => createContext({req: req}),
+    context: ({req}) => createContext({req}),
     debug: (process.env["GRAPHQL_DEBUG"] === "true"),
 });
 

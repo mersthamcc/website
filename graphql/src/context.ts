@@ -10,7 +10,7 @@ export interface Context {
 
 export function createContext({req}: { req: any }): Context {
   return {
-    prisma: prisma,
+    prisma,
     kauth: new KeycloakContext({req}),
   };
 }
