@@ -52,21 +52,16 @@ class UserService extends BaseService
         return $this->deserializeResult($result, "signupUser", User::class);
     }
 
-    public function updateUserDetails(
-        int $id,
-        array $roles,
-        string $familyName,
-        string $givenName,
-        string $email
-    ): User {
+    public function updateUserDetails(User $user): User
+    {
         $gql = $this->loadGraphQL("updateUserDetails.graphql");
 
         $result = $this->client->getClient(true)->runRawQuery($gql, false, [
-            "id" => $id,
-            "roles" => $roles,
-            "familyName" => $familyName,
-            "givenName" => $givenName,
-            "email" => $email,
+            "id" => $user,
+            "roles" => $user->getRoles(),
+            "familyName" => $user->getFamilyName(),
+            "givenName" => $user->getGivenName(),
+            "email" => $user->getEmail(),
         ]);
         return $this->deserializeResult(
             $result,

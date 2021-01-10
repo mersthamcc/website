@@ -163,12 +163,10 @@ class LoginServiceAuthenticator extends SocialAuthenticator
         KeycloakResourceOwner $keycloakUser
     ): User {
         $attributes = $keycloakUser->toArray();
-        return $this->userService->updateUserDetails(
-            $user->getId(),
-            $attributes["roles"],
-            $attributes["family_name"],
-            $attributes["given_name"],
-            $keycloakUser->getEmail()
-        );
+        $user->setEmail($keycloakUser->getEmail());
+        $user->setFamilyName($attributes["family_name"]);
+        $user->setGivenName($attributes["given_name"]);
+        $user->setRoles($attributes["roles"]);
+        return $this->userService->updateUserDetails($user);
     }
 }
