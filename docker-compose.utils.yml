@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  wireshark:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wireshark.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.services.wireshark.loadbalancer.server.port=3000
+      - traefik.http.routers.wireshark.entrypoints=web
+      - traefik.http.routers.wireshark.middlewares=forcehttps
+      - traefik.http.routers.wireshark-tls.tls=true
+      - traefik.http.routers.wireshark-tls.rule=Host(`wireshark.${DEVDOMAIN}`)
+      - traefik.http.routers.wireshark-tls.entrypoints=websecure
+      - traefik.http.routers.wireshark-tls.tls.certresolver=le
+      - traefik.http.routers.wireshark-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=wireshark
+      - tls-cert-host-check=wireshark.${DEVDOMAIN}
+    image: linuxserver/wireshark:latest
+    container_name: wireshark
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    restart: unless-stopped
+    networks:
+      - backendnetwork
+
+  portainer:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DEVDOMAIN}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.entrypoints=web
+      - traefik.http.routers.portainer.middlewares=forcehttps
+      - traefik.http.routers.portainer-tls.tls=true
+      - traefik.http.routers.portainer-tls.rule=Host(`portainer.${DEVDOMAIN}`)
+      - traefik.http.routers.portainer-tls.entrypoints=websecure
+      - traefik.http.routers.portainer-tls.tls.certresolver=le
+      - traefik.http.routers.portainer-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=portainer
+      - tls-cert-host-check=portainer.${DEVDOMAIN}
+    image: portainer/portainer:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer-data:/data
+    restart: unless-stopped
+    networks:
+      - backendnetwork
+
+volumes:
+  portainer-data:
