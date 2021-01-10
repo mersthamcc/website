@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7a68851347ee3cba332fd5b4ce328059",
+    "content-hash": "e6bd083716596ab59fb34b4d49eafe5e",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1735,6 +1735,66 @@
             "time": "2019-12-23T15:31:36+00:00"
         },
         {
+            "name": "gmostafa/php-graphql-client",
+            "version": "v1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mghoneimy/php-graphql-client.git",
+                "reference": "707f2f44fe8f0e9283024a32f8618b5cb23b99ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mghoneimy/php-graphql-client/zipball/707f2f44fe8f0e9283024a32f8618b5cb23b99ac",
+                "reference": "707f2f44fe8f0e9283024a32f8618b5cb23b99ac",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3|^7.0.1",
+                "php": "^7.1",
+                "psr/http-client": "^1.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "phpunit/phpunit": "^7.5|^8.0"
+            },
+            "suggest": {
+                "gmostafa/php-graphql-oqm": "To have object-to-query mapping support"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GraphQL\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mostafa Ghoneimy",
+                    "email": "emostafagh@gmail.com"
+                }
+            ],
+            "description": "GraphQL client and query builder.",
+            "keywords": [
+                "builder",
+                "client",
+                "graph-ql",
+                "graphql",
+                "php",
+                "query",
+                "query-builder"
+            ],
+            "support": {
+                "issues": "https://github.com/mghoneimy/php-graphql-client/issues",
+                "source": "https://github.com/mghoneimy/php-graphql-client/tree/v1.8"
+            },
+            "time": "2020-10-29T00:04:35+00:00"
+        },
+        {
             "name": "guzzlehttp/guzzle",
             "version": "6.5.5",
             "source": {
@@ -3263,6 +3323,58 @@
                 "source": "https://github.com/php-fig/event-dispatcher/tree/1.0.0"
             },
             "time": "2019-01-08T18:20:26+00:00"
+        },
+        {
+            "name": "psr/http-client",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0 || ^8.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-client/tree/master"
+            },
+            "time": "2020-06-29T06:28:15+00:00"
         },
         {
             "name": "psr/http-message",

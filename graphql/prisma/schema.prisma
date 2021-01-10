@@ -22,57 +22,58 @@ model flyway_schema_history {
   @@index([success], name: "flyway_schema_history_s_idx")
 }
 
-model member {
+model Member {
   id                Int       @id @default(autoincrement())
-  given_name        String?
-  family_name       String?
+  givenName         String?   @map("given_name")
+  familyName        String?   @map("family_name")
   gender            String?
   dob               DateTime?
   registration_date DateTime?
+
+  @@map("member")
 }
 
-model news {
-  id             Int              @id @default(autoincrement())
-  created_date   DateTime
-  publish_date   DateTime
-  title          String
-  body           String
-  news_attribute news_attribute[]
-  news_comment   news_comment[]
+model News {
+  id          Int             @id @default(autoincrement())
+  createdDate DateTime        @map("created_date")
+  publishDate DateTime        @map("publish_date")
+  title       String
+  body        String
+  attributes  NewsAttribute[]
+  comments    NewsComment[]
+
+  @@map("news")
 }
 
-model news_attribute {
-  id      Int     @id @default(autoincrement())
-  news_id Int
-  name    String
-  value   String?
-  news    news    @relation(fields: [news_id], references: [id])
+model NewsAttribute {
+  id     Int     @id @default(autoincrement())
+  newsId Int     @map("news_id")
+  name   String
+  value  String?
+  news   News    @relation(fields: [newsId], references: [id])
 
-  @@index([news_id], name: "idx_e65fb03ab5a459a0")
+  @@index([newsId], name: "idx_news_attribute_news_id")
+  @@map("news_attribute")
 }
 
-model news_comment {
-  id      Int     @id @default(autoincrement())
-  news_id Int
-  author  String?
-  body    String
-  news    news    @relation(fields: [news_id], references: [id])
+model NewsComment {
+  id     Int     @id @default(autoincrement())
+  newsId Int     @map("news_id")
+  author String?
+  body   String
+  news   News    @relation(fields: [newsId], references: [id])
 
-  @@index([news_id], name: "idx_c3904e8ab5a459a0")
+  @@index([newsId], name: "idx_news_comment_news_id")
+  @@map("news_comment")
 }
 
-model page {
-  id    Int    @id @default(autoincrement())
-  title String
-  slug  String
-  body  String
-}
+model User {
+  id         Int     @id @default(autoincrement())
+  externalId String? @unique @map("external_id")
+  email      String  @unique
+  givenName  String? @map("given_name")
+  familyName String? @map("family_name")
+  roles      Json
 
-model user {
-  id          Int     @id
-  external_id String? @unique
-  email       String  @unique
-  given_name  String?
-  family_name String?
-  roles       Json
+  @@map("user")
 }

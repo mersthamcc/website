@@ -4,29 +4,62 @@
 
 scalar DateTime
 
-type member {
+scalar Json
+
+type Member {
   id: Int!
 }
 
-type news {
+type Mutation {
+  """Create a new user"""
+  signupUser(emailAddress: String!, externalId: String!, familyName: String, givenName: String): User
+
+  """Update user details and roles"""
+  updateUserDetails(email: String!, familyName: String, givenName: String, id: Int!, roles: [String!]!): User
+}
+
+type News {
+  attributes(after: NewsAttributeWhereUniqueInput, before: NewsAttributeWhereUniqueInput, first: Int, last: Int): [NewsAttribute!]!
   body: String!
-  created_date: DateTime!
+  comments(after: NewsCommentWhereUniqueInput, before: NewsCommentWhereUniqueInput, first: Int, last: Int): [NewsComment!]!
+  createdDate: DateTime!
   id: Int!
-  news_comment(after: news_commentWhereUniqueInput, before: news_commentWhereUniqueInput, first: Int, last: Int): [news_comment!]!
-  publish_date: DateTime!
+  publishDate: DateTime!
   title: String!
 }
 
-type news_comment {
-  author: String
-  body: String!
+type NewsAttribute {
+  name: String!
+  news: News!
+  value: String
 }
 
-input news_commentWhereUniqueInput {
+input NewsAttributeWhereUniqueInput {
+  id: Int
+}
+
+type NewsComment {
+  author: String
+  body: String!
+  news: News!
+}
+
+input NewsCommentWhereUniqueInput {
   id: Int
 }
 
 type Query {
-  feed: [news]
-  members: [member]
+  feed: [News]
+  members: [Member]
+  userByEmail(emailAddress: String!): User
+  userByExternalId(externalId: String!): User
+}
+
+type User {
+  email: String!
+  externalId: String
+  familyName: String
+  givenName: String
+  id: Int!
+  roles: Json!
 }

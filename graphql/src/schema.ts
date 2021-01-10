@@ -1,11 +1,10 @@
-import {makeSchema, objectType} from 'nexus'
-import {nexusPrisma} from 'nexus-plugin-prisma'
+import {makeSchema} from "nexus";
+import {nexusPrisma} from "nexus-plugin-prisma";
 import {Context} from "./context";
 
-import * as types from './types'
-import {applyMiddleware} from "graphql-middleware";
+import * as types from "./types";
 
-export const schema = // applyMiddleware(
+export const schema =
     makeSchema({
         types: types,
         plugins: [
@@ -14,20 +13,19 @@ export const schema = // applyMiddleware(
             }),
         ],
         outputs: {
-            schema: __dirname + '/../schema.graphql',
-            typegen: __dirname + '/generated/nexus.ts',
+            schema: __dirname + "/../schema.graphql",
+            typegen: __dirname + "/generated/nexus.ts",
         },
         contextType: {
-            module: require.resolve('./context'),
-            export: 'Context',
+            module: require.resolve("./context"),
+            export: "Context",
         },
         sourceTypes: {
             modules: [
                 {
-                    module: '@prisma/client',
-                    alias: 'prisma',
+                    module: "@prisma/client",
+                    alias: "prisma",
                 },
             ],
         },
-    })
-// )
+    });

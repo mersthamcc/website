@@ -108,6 +108,9 @@
             "config/packages/fos_ckeditor.yaml"
         ]
     },
+    "gmostafa/php-graphql-client": {
+        "version": "v1.8"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.5.5"
     },
@@ -197,6 +200,9 @@
     },
     "psr/event-dispatcher": {
         "version": "1.0.0"
+    },
+    "psr/http-client": {
+        "version": "1.0.1"
     },
     "psr/http-message": {
         "version": "1.0.1"

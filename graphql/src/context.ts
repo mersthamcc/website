@@ -1,7 +1,7 @@
-import {PrismaClient} from '@prisma/client'
+import {PrismaClient} from "@prisma/client";
 import {KeycloakContext} from "keycloak-connect-graphql";
 
-export const prisma = new PrismaClient()
+export const prisma = new PrismaClient();
 
 export interface Context {
   prisma: PrismaClient,
@@ -12,5 +12,5 @@ export function createContext({req}: { req: any }): Context {
   return {
     prisma: prisma,
     kauth: new KeycloakContext({req}),
-  }
+  };
 }

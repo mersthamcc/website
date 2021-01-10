@@ -127,6 +127,7 @@ services:
       context: .
     extra_hosts:
       - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
+      - "prisma.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
     labels:
       - traefik.enable=false
     environment:
@@ -140,6 +141,7 @@ services:
       CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
       XDEBUG_CONFIG: ${XDEBUG_CONFIG}
+      API_SERVER_URL: "https://prisma.${DEVDOMAIN}/graphql"
     volumes:
       - ./web:/var/www
     restart: unless-stopped
@@ -168,6 +170,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: pg_onready
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     logging:
@@ -287,7 +293,7 @@ services:
       - traefik.http.routers.prisma-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=prisma
       - tls-cert-host-check=prisma.${DEVDOMAIN}
-    entrypoint: npm run dev
+    entrypoint: npm run start
     extra_hosts:
       - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
     environment:
@@ -299,6 +305,7 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
       GRAPHQL_PLAYGROUND: "true"
       NODE_ENV: dev
+      GRAPHQL_DEBUG: "true"
     networks:
       - dmz
       - backendnetwork

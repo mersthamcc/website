@@ -55,7 +55,17 @@ resource "keycloak_realm" "dev_realm" {
   }
 }
 
-resource "keycloak_role" "mfa_role" {
+resource "keycloak_role" "role_admin" {
+  realm_id    = keycloak_realm.dev_realm.id
+  name        = "ROLE_ADMIN"
+  description = "Users with this role have access to the admin area"
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+  ]
+}
+
+resource "keycloak_role" "role_membership" {
   realm_id    = keycloak_realm.dev_realm.id
   name        = "ROLE_MEMBERSHIP"
   description = "Users with this role have access to the Membership Database and require 2FA"
@@ -65,25 +75,38 @@ resource "keycloak_role" "mfa_role" {
   ]
 }
 
-resource "keycloak_group" "mfa_group" {
+resource "keycloak_role" "role_trusted_application" {
+  realm_id    = keycloak_realm.dev_realm.id
+  name        = "TRUSTED_APPLICATION"
+  description = "Role assigned to trusted clients to perform sensitive operations"
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+  ]
+}
+
+
+resource "keycloak_group" "role_membership_group" {
   realm_id = keycloak_realm.dev_realm.id
   name     = "ROLE_MEMBERSHIP"
 
   depends_on = [keycloak_realm.dev_realm]
 }
 
-resource "keycloak_group_roles" "mfa_group_roles" {
+resource "keycloak_group_roles" "role_membership_group_roles" {
   realm_id = keycloak_realm.dev_realm.id
-  group_id = keycloak_group.mfa_group.id
+  group_id = keycloak_group.role_membership_group.id
 
   role_ids = [
-    keycloak_role.mfa_role.id,
+    keycloak_role.role_admin.id,
+    keycloak_role.role_membership.id,
   ]
 
   depends_on = [
     keycloak_realm.dev_realm,
-    keycloak_group.mfa_group,
-    keycloak_role.mfa_role,
+    keycloak_group.role_membership_group,
+    keycloak_role.role_admin,
+    keycloak_role.role_membership,
   ]
 }
 
@@ -151,7 +174,7 @@ resource "keycloak_authentication_execution" "login_form_execution" {
 resource "keycloak_authentication_execution" "conditional_otp_execution" {
   realm_id          = keycloak_realm.dev_realm.id
   parent_flow_alias = keycloak_authentication_subflow.otp_browser_flow.alias
-  authenticator     = "auth-conditional-otp-form"
+  authenticator     = "mcc-two-factor-authentication"
   requirement       = "REQUIRED"
 
   depends_on = [
@@ -168,7 +191,6 @@ resource "keycloak_authentication_execution_config" "conditional_otp_config" {
   alias        = "MFA for ROLE_MEMBERSHIP"
   config = {
     forceOtpRole      = "ROLE_MEMBERSHIP",
-    defaultOtpOutcome = "skip"
   }
 
   depends_on = [
@@ -176,6 +198,16 @@ resource "keycloak_authentication_execution_config" "conditional_otp_config" {
     keycloak_authentication_flow.browser_mfa_flow,
     keycloak_authentication_execution.conditional_otp_execution,
   ]
+}
+
+resource "keycloak_required_action" "required_action" {
+  realm_id		= keycloak_realm.dev_realm.id
+  alias			= "mcc-configure-otp-sms"
+  name			= "Configure SMS for OTP"
+  priority		= 500
+
+  default_action 	= false
+  enabled			= true
 }
 
 resource "keycloak_openid_client" "website_client" {
@@ -191,7 +223,7 @@ resource "keycloak_openid_client" "website_client" {
   standard_flow_enabled        = true
   implicit_flow_enabled        = false
   direct_access_grants_enabled = false
-  service_accounts_enabled     = false
+  service_accounts_enabled     = true
 
   authentication_flow_binding_overrides {
     browser_id = keycloak_authentication_flow.browser_mfa_flow.id
@@ -234,39 +266,6 @@ resource "keycloak_openid_client" "graphql_client" {
   depends_on = [keycloak_realm.dev_realm]
 }
 
-resource "keycloak_role" "test_role" {
-  realm_id    = keycloak_realm.dev_realm.id
-  name        = "test-role"
-  description = "A test OIDC role"
-
-  depends_on = [
-    keycloak_realm.dev_realm,
-    keycloak_openid_client.website_client,
-  ]
-}
-
-resource "keycloak_group" "test_group" {
-  realm_id = keycloak_realm.dev_realm.id
-  name     = "test-role"
-
-  depends_on = [keycloak_realm.dev_realm]
-}
-
-resource "keycloak_group_roles" "test_group_roles" {
-  realm_id = keycloak_realm.dev_realm.id
-  group_id = keycloak_group.test_group.id
-
-  role_ids = [
-    keycloak_role.test_role.id,
-  ]
-
-  depends_on = [
-    keycloak_realm.dev_realm,
-    keycloak_group.test_group,
-    keycloak_role.test_role,
-  ]
-}
-
 resource "keycloak_user" "keycloak_user_dev" {
   realm_id       = keycloak_realm.dev_realm.id
   username       = var.keycloak_email_address
@@ -285,9 +284,9 @@ resource "keycloak_user" "keycloak_user_dev" {
   depends_on = [keycloak_realm.dev_realm]
 }
 
-resource "keycloak_group_memberships" "mfa_group_members" {
+resource "keycloak_group_memberships" "role_membership_members" {
   realm_id = keycloak_realm.dev_realm.id
-  group_id = keycloak_group.mfa_group.id
+  group_id = keycloak_group.role_membership_group.id
 
   members = [
     keycloak_user.keycloak_user_dev.username,
@@ -295,22 +294,7 @@ resource "keycloak_group_memberships" "mfa_group_members" {
 
   depends_on = [
     keycloak_realm.dev_realm,
-    keycloak_group.mfa_group,
-    keycloak_user.keycloak_user_dev,
-  ]
-}
-
-resource "keycloak_group_memberships" "test_group_members" {
-  realm_id = keycloak_realm.dev_realm.id
-  group_id = keycloak_group.test_group.id
-
-  members = [
-    keycloak_user.keycloak_user_dev.username,
-  ]
-
-  depends_on = [
-    keycloak_realm.dev_realm,
-    keycloak_group.test_group,
+    keycloak_group.role_membership_group,
     keycloak_user.keycloak_user_dev,
   ]
 }
@@ -327,4 +311,10 @@ resource "keycloak_openid_user_realm_role_protocol_mapper" "dev_realm_role_mappe
     keycloak_realm.dev_realm,
     keycloak_openid_client.website_client,
   ]
+}
+
+resource "keycloak_openid_client_service_account_realm_role" "website_realm_roles" {
+  realm_id 				  = keycloak_realm.dev_realm.id
+  service_account_user_id = keycloak_openid_client.website_client.service_account_user_id
+  role 					  = keycloak_role.role_trusted_application.name
 }

@@ -10,6 +10,7 @@
         "ext-zip": "*",
         "ckfinder/ckfinder-symfony-bundle": "3.5.1.4",
         "friendsofsymfony/ckeditor-bundle": "^2.2",
+        "gmostafa/php-graphql-client": "^1.8",
         "knplabs/knp-menu-bundle": "^3.0",
         "knpuniversity/oauth2-client-bundle": "^2.1",
         "league/oauth2-client": "2.2.1",

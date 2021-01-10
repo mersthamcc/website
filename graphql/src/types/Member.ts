@@ -1,8 +1,8 @@
 import {objectType} from "nexus";
 
 export const Member = objectType({
-    name: 'member',
+    name: "Member",
     definition(t) {
-        t.model.id()
+        t.model.id();
     },
-})
+});

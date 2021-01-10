@@ -1,13 +1,13 @@
-import express from 'express';
-import { ApolloServer } from 'apollo-server-express'
-import { schema } from './schema'
-import { createContext } from './context'
+import express from "express";
+import {ApolloServer} from "apollo-server-express";
+import {schema} from "./schema";
+import {createContext} from "./context";
 import {KeycloakSchemaDirectives, KeycloakTypeDefs} from "keycloak-connect-graphql";
 
-const Keycloak = require('keycloak-connect')
-const GRAPHQL_PATH = '/graphql'
+const Keycloak = require("keycloak-connect");
+const GRAPHQL_PATH = "/graphql";
 
-const app = express()
+const app = express();
 
 const keycloak = new Keycloak({}, {
     "realm": process.env["KEYCLOAK_REALM"],
@@ -19,26 +19,27 @@ const keycloak = new Keycloak({}, {
     "credentials": {
         "secret": process.env["KEYCLOAK_CLIENT_SECRET"]
     }
-})
-app.use(keycloak.middleware())
+});
+app.use(keycloak.middleware());
 
-app.get('/', function (req, res) {
-    res.redirect(GRAPHQL_PATH)
-})
+app.get("/", function (req, res) {
+    res.redirect(GRAPHQL_PATH);
+});
 
 const server = new ApolloServer({
     schema,
     typeDefs: [KeycloakTypeDefs],
     schemaDirectives: KeycloakSchemaDirectives,
-    playground: (process.env["GRAPHQL_PLAYGROUND"] == "true"),
+    playground: (process.env["GRAPHQL_PLAYGROUND"] === "true"),
     context: ({req}) => createContext({req: req}),
-})
+    debug: (process.env["GRAPHQL_DEBUG"] === "true"),
+});
 
-server.applyMiddleware({app})
+server.applyMiddleware({app});
 app.listen(
     { port: 4000 },
     () =>
         console.log(
-            `🚀 Server ready at: http://localhost:4000 ⭐️`,
+            "🚀 Server ready at: http://localhost:4000 ⭐️",
         ),
-)
+);
