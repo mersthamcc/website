@@ -44,7 +44,11 @@ resource "keycloak_realm" "dev_realm" {
   duplicate_emails_allowed       = false
   ssl_required                   = "none"
 
-  access_code_lifespan = "3h"
+  sso_session_idle_timeout = "6h"
+  sso_session_idle_timeout_remember_me = "90d"
+  access_token_lifespan = "24h"
+  access_code_lifespan = "1m"
+
 
   smtp_server {
     host = "smtp"

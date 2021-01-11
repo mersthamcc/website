@@ -57,7 +57,7 @@ class UserService extends BaseService
         $gql = $this->loadGraphQL("updateUserDetails.graphql");
 
         $result = $this->client->getClient(true)->runRawQuery($gql, false, [
-            "id" => $user,
+            "id" => $user->getId(),
             "roles" => $user->getRoles(),
             "familyName" => $user->getFamilyName(),
             "givenName" => $user->getGivenName(),
