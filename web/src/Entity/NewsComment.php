@@ -5,32 +5,11 @@ namespace App\Entity;
 use App\Repository\NewsCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NewsCommentRepository::class)
- */
 class NewsComment
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $author;
-
-    /**
-     * @ORM\Column(type="text")
-     */
     private $body;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=News::class, inversedBy="newsComments")
-     * @ORM\JoinColumn(nullable=false)
-     */
     private $news;
 
     public function getId(): ?int

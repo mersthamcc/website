@@ -6,6 +6,7 @@ config: Configuration
 contacts: Contacts
 content: Content
 cricket: Cricket
+fixtures: Fixtures
 home: Home
 latest_tweets: Latest Tweets
 login: Login

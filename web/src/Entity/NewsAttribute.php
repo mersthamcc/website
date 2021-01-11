@@ -5,32 +5,11 @@ namespace App\Entity;
 use App\Repository\NewsAttributeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NewsAttributeRepository::class)
- */
 class NewsAttribute
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=64)
-     */
     private $name;
-
-    /**
-     * @ORM\Column(type="string", length=1024, nullable=true)
-     */
     private $value;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=News::class, inversedBy="newsAttributes")
-     * @ORM\JoinColumn(nullable=false)
-     */
     private $news;
 
     public function getId(): ?int

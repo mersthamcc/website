@@ -8,15 +8,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     private $id;
-
     private $externalId;
-
     private $email;
-
     private $givenName;
-
     private $familyName;
-
     private $roles = [];
 
     public function getId(): ?int
@@ -58,64 +53,39 @@ class User implements UserInterface
         return array_unique($roles, SORT_STRING);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getExternalId()
+    public function getExternalId(): string
     {
         return $this->externalId;
     }
 
-    /**
-     * @param mixed $externalId
-     * @return User
-     */
-    public function setExternalId($externalId)
+    public function setExternalId(string $externalId): self
     {
         $this->externalId = $externalId;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getGivenName()
+    public function getGivenName(): string
     {
         return $this->givenName;
     }
 
-    /**
-     * @param mixed $givenName
-     * @return User
-     */
-    public function setGivenName($givenName)
+    public function setGivenName(string $givenName): self
     {
         $this->givenName = $givenName;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFamilyName()
+    public function getFamilyName(): string
     {
         return $this->familyName;
     }
 
-    /**
-     * @param mixed $familyName
-     * @return User
-     */
-    public function setFamilyName($familyName)
+    public function setFamilyName(string $familyName): self
     {
         $this->familyName = $familyName;
         return $this;
     }
 
-    /**
-     * @param array $roles
-     * @return $this
-     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -123,10 +93,6 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @param array $roles
-     * @return $this
-     */
     public function addRoles(array $roles): self
     {
         $this->roles = array_unique(
@@ -162,19 +128,12 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return string
-     */
     public function getGravatarHash(): string
     {
         return md5(strtolower($this->getEmail()));
     }
 
-    /**
-     * @param array $validRoles
-     * @return boolean
-     */
-    public function hasValidRole(array $validRoles)
+    public function hasValidRole(array $validRoles): bool
     {
         if (count($validRoles) == 0) {
             return true;

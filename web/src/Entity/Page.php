@@ -10,26 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Page
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
     private $title;
-
-    /**
-     * @ORM\Column(type="string", length=128)
-     */
     private $slug;
-
-    /**
-     * @ORM\Column(type="text")
-     */
     private $body;
 
     public function getId(): ?int
