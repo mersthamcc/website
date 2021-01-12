@@ -2,12 +2,44 @@
 ### Do not make changes to this file directly
 
 
+type AttributeDefinition {
+  id: Int!
+  key: String!
+  type: AttributeType!
+}
+
+enum AttributeType {
+  Boolean
+  Date
+  Number
+  String
+  Time
+  Timestamp
+}
+
 scalar DateTime
 
 scalar Json
 
 type Member {
+  attributes(after: MemberAttributeWhereUniqueInput, before: MemberAttributeWhereUniqueInput, first: Int, last: Int): [MemberAttribute!]!
+  dob: DateTime
+  familyName: String!
+  gender: String!
+  givenName: String!
   id: Int!
+  registrationDate: DateTime!
+}
+
+type MemberAttribute {
+  createdDate: DateTime!
+  definition: AttributeDefinition!
+  id: Int!
+  value: Json
+}
+
+input MemberAttributeWhereUniqueInput {
+  id: Int
 }
 
 type Mutation {

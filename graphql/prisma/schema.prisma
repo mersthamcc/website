@@ -23,13 +23,17 @@ model flyway_schema_history {
 }
 
 model Member {
-  id                Int       @id @default(autoincrement())
-  givenName         String?   @map("given_name")
-  familyName        String?   @map("family_name")
-  gender            String?
-  dob               DateTime?
-  registration_date DateTime?
+  id               Int               @id @default(autoincrement())
+  givenName        String            @map("given_name")
+  familyName       String            @map("family_name")
+  gender           String
+  dob              DateTime?
+  registrationDate DateTime          @map("registration_date")
+  categoryId       Int               @map("category_id")
+  category         MemberCategory    @relation(fields: [categoryId], references: [id])
+  attributes       MemberAttribute[]
 
+  @@index([categoryId], name: "idx_member_category_id")
   @@map("member")
 }
 
@@ -76,4 +80,48 @@ model User {
   roles      Json
 
   @@map("user")
+}
+
+model AttributeDefinition {
+  id               Int               @id @default(autoincrement())
+  key              String
+  type             AttributeType
+  encrypt          Boolean?          @default(false)
+  choices          Json?
+  memberAttributes MemberAttribute[]
+
+  @@map("attribute_definition")
+}
+
+model MemberAttribute {
+  id          Int                 @id @default(autoincrement())
+  createdDate DateTime            @map("created_date")
+  attributeId Int                 @map("attribute_id")
+  memberId    Int                 @map("member_id")
+  value       Json?
+  definition  AttributeDefinition @relation(fields: [attributeId], references: [id])
+  member      Member              @relation(fields: [memberId], references: [id])
+
+  @@index([attributeId], name: "idx_member_attribute_attribute_id")
+  @@index([memberId], name: "idx_member_attribute_member_id")
+  @@map("member_attribute")
+}
+
+model MemberCategory {
+  id     Int      @id @default(autoincrement())
+  key    String
+  member Member[]
+
+  @@map("member_category")
+}
+
+enum AttributeType {
+  String
+  Number
+  Boolean
+  Date
+  Time
+  Timestamp
+
+   @@map("attribute_type")
 }
