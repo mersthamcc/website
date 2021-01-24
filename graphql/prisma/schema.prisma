@@ -23,13 +23,16 @@ model flyway_schema_history {
 }
 
 model Member {
-  id                Int       @id @default(autoincrement())
-  givenName         String?   @map("given_name")
-  familyName        String?   @map("family_name")
-  gender            String?
-  dob               DateTime?
-  registration_date DateTime?
+  id               Int               @id @default(autoincrement())
+  givenName        String            @map("given_name")
+  familyName       String            @map("family_name")
+  gender           String
+  registrationDate DateTime          @map("registration_date")
+  ownerUserId      Int               @map("owner_user_id")
+  owner            User              @relation(fields: [ownerUserId], references: [id])
+  attributes       MemberAttribute[]
 
+  @@index([ownerUserId], name: "idx_member_owner_user_id")
   @@map("member")
 }
 
@@ -68,12 +71,94 @@ model NewsComment {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  externalId String? @unique @map("external_id")
-  email      String  @unique
-  givenName  String? @map("given_name")
-  familyName String? @map("family_name")
+  id         Int      @id @default(autoincrement())
+  externalId String?  @unique @map("external_id")
+  email      String   @unique
+  givenName  String?  @map("given_name")
+  familyName String?  @map("family_name")
   roles      Json
+  members    Member[]
 
   @@map("user")
+}
+
+model AttributeDefinition {
+  id                         Int                          @id @default(autoincrement())
+  key                        String                       @unique
+  type                       AttributeType
+  choices                    Json?
+  memberAttributes           MemberAttribute[]
+  memberFormSectionAttribute MemberFormSectionAttribute[]
+
+  @@map("attribute_definition")
+}
+
+model MemberAttribute {
+  memberId    Int                 @map("member_id")
+  attributeId Int                 @map("attribute_id")
+  createdDate DateTime            @map("created_date")
+  updatedDate DateTime            @map("updated_date")
+  value       Json?
+  definition  AttributeDefinition @relation(fields: [attributeId], references: [id])
+  member      Member              @relation(fields: [memberId], references: [id])
+
+  @@id([memberId, attributeId])
+  @@index([attributeId], name: "idx_member_attribute_attribute_id")
+  @@index([memberId], name: "idx_member_attribute_member_id")
+  @@map("member_attribute")
+}
+
+model MemberCategory {
+  id               Int                         @id @default(autoincrement())
+  key              String                      @unique
+  registrationCode String?                     @map("registration_code")
+  form             MemberCategoryFormSection[]
+
+  @@map("member_category")
+}
+
+model MemberCategoryFormSection {
+  memberCategoryId    Int               @map("member_category_id")
+  memberFormSectionId Int               @map("member_form_section_id")
+  sortOrder           Int               @map("sort_order")
+  category            MemberCategory    @relation(fields: [memberCategoryId], references: [id])
+  section             MemberFormSection @relation(fields: [memberFormSectionId], references: [id])
+
+  @@id([memberCategoryId, memberFormSectionId])
+  @@map("member_category_form_section")
+}
+
+model MemberFormSection {
+  id        Int                          @id @default(autoincrement())
+  key       String                       @unique
+  form      MemberCategoryFormSection[]
+  attribute MemberFormSectionAttribute[]
+
+  @@map("member_form_section")
+}
+
+model MemberFormSectionAttribute {
+  memberFormSectionId   Int                 @map("member_form_section_id")
+  attributeDefinitionId Int                 @map("attribute_definition_id")
+  sortOrder             Int                 @map("sort_order")
+  mandatory             Boolean             @default(false)
+  definition            AttributeDefinition @relation(fields: [attributeDefinitionId], references: [id])
+  section               MemberFormSection   @relation(fields: [memberFormSectionId], references: [id])
+
+  @@id([memberFormSectionId, attributeDefinitionId])
+  @@map("member_form_section_attribute")
+}
+
+enum AttributeType {
+  String
+  Number
+  Boolean
+  Date
+  Time
+  Timestamp
+  List
+  Option
+  Email
+
+   @@map("attribute_type")
 }

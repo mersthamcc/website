@@ -2,17 +2,137 @@
 ### Do not make changes to this file directly
 
 
+type AttributeDefinition {
+  choices: Json
+  key: String!
+  type: AttributeType!
+}
+
+""""""
+input AttributeInput {
+  key: String
+  value: Json
+}
+
+enum AttributeType {
+  Boolean
+  Date
+  Email
+  List
+  Number
+  Option
+  String
+  Time
+  Timestamp
+}
+
+"""Date custom scalar type"""
+scalar Date
+
 scalar DateTime
+
+"""Gender (M/F/N)"""
+enum Gender {
+  F
+  M
+  N
+}
 
 scalar Json
 
 type Member {
+  attributes(after: MemberAttributeWhereUniqueInput, before: MemberAttributeWhereUniqueInput, first: Int, last: Int): [MemberAttribute!]!
+  familyName: String!
+  gender: String!
+  givenName: String!
   id: Int!
+  owner: User!
+  registrationDate: DateTime!
+}
+
+type MemberAttribute {
+  createdDate: DateTime!
+  definition: AttributeDefinition!
+  member: Member!
+  updatedDate: DateTime!
+  value: Json
+}
+
+input MemberAttributeWhereUniqueInput {
+  memberId_attributeId: MemberIdAttributeIdCompoundUniqueInput
+}
+
+""""""
+type MemberCategory {
+  form(after: MemberCategoryFormSectionWhereUniqueInput, before: MemberCategoryFormSectionWhereUniqueInput, first: Int, last: Int): [MemberCategoryFormSection!]!
+  key: String!
+  registrationCode: String
+}
+
+type MemberCategoryFormSection {
+  category: MemberCategory!
+  section: MemberFormSection!
+  sortOrder: Int!
+}
+
+input MemberCategoryFormSectionWhereUniqueInput {
+  memberCategoryId_memberFormSectionId: MemberCategoryIdMemberFormSectionIdCompoundUniqueInput
+}
+
+input MemberCategoryIdMemberFormSectionIdCompoundUniqueInput {
+  memberCategoryId: Int!
+  memberFormSectionId: Int!
+}
+
+""""""
+type MemberFormSection {
+  attribute(after: MemberFormSectionAttributeWhereUniqueInput, before: MemberFormSectionAttributeWhereUniqueInput, first: Int, last: Int): [MemberFormSectionAttribute!]!
+  key: String!
+}
+
+type MemberFormSectionAttribute {
+  definition: AttributeDefinition!
+  section: MemberFormSection!
+  sortOrder: Int!
+}
+
+input MemberFormSectionAttributeWhereUniqueInput {
+  memberFormSectionId_attributeDefinitionId: MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput
+}
+
+input MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput {
+  attributeDefinitionId: Int!
+  memberFormSectionId: Int!
+}
+
+input MemberIdAttributeIdCompoundUniqueInput {
+  attributeId: Int!
+  memberId: Int!
+}
+
+"""A definition of a member"""
+input MemberInput {
+  attributes: [AttributeInput]
+  category: String
+  familyName: String
+  gender: Gender
+  givenName: String
+  registrationDate: DateTime
+}
+
+input MemberWhereUniqueInput {
+  id: Int
 }
 
 type Mutation {
+  """Add a new member to the register"""
+  createMember(data: MemberInput!): Member
+
   """Create a new user"""
   signupUser(emailAddress: String!, externalId: String!, familyName: String, givenName: String): User
+
+  """Update an existing member"""
+  updateMember(data: MemberInput!, id: Int!): Member
 
   """Update user details and roles"""
   updateUserDetails(email: String!, familyName: String, givenName: String, id: Int!, roles: [String!]!): User
@@ -51,6 +171,7 @@ input NewsCommentWhereUniqueInput {
 type Query {
   feed: [News]
   members: [Member]
+  membershipCategories: [MemberCategory]
   userByEmail(emailAddress: String!): User
   userByExternalId(externalId: String!): User
 }
@@ -61,5 +182,6 @@ type User {
   familyName: String
   givenName: String
   id: Int!
+  members(after: MemberWhereUniqueInput, before: MemberWhereUniqueInput, first: Int, last: Int): [Member!]!
   roles: Json!
 }

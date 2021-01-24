@@ -3,35 +3,40 @@
 namespace App\ApiClient;
 
 use App\Entity\User;
+use Psr\Log\LoggerInterface;
 
-class UserService extends BaseService
+class UserService
 {
+    /**
+     * @var ApiClient
+     */
+    private $client;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(ApiClient $client, LoggerInterface $logger)
+    {
+        $this->client = $client;
+        $this->logger = $logger;
+    }
+
     public function getUserByEmailAddress(string $emailAddress)
     {
         $this->logger->debug("Looking up user $emailAddress");
-
-        $gql = $this->loadGraphQL("userByEmail.graphql");
-
-        $result = $this->client->getClient(true)->runRawQuery($gql, false, [
+        return $this->client->userByEmail(User::class, [
             "emailAddress" => $emailAddress,
         ]);
-        return $this->deserializeResult($result, "userByEmail", User::class);
     }
 
     public function getUserByExternalId(string $externalId)
     {
         $this->logger->debug("Looking up user $externalId");
-
-        $gql = $this->loadGraphQL("userByExternalId.graphql");
-
-        $result = $this->client->getClient(true)->runRawQuery($gql, false, [
+        return $this->client->userByExternalId(User::class, [
             "externalId" => $externalId,
         ]);
-        return $this->deserializeResult(
-            $result,
-            "userByExternalId",
-            User::class
-        );
     }
 
     public function createUser(
@@ -41,32 +46,22 @@ class UserService extends BaseService
         string $givenName
     ) {
         $this->logger->debug("Creating user $emailAddress");
-
-        $gql = $this->loadGraphQL("signupUser.graphql");
-        $result = $this->client->getClient(true)->runRawQuery($gql, false, [
+        return $this->client->signupUser(User::class, [
             "externalId" => $externalId,
             "emailAddress" => $emailAddress,
             "familyName" => $familyName,
             "givenName" => $givenName,
         ]);
-        return $this->deserializeResult($result, "signupUser", User::class);
     }
 
     public function updateUserDetails(User $user): User
     {
-        $gql = $this->loadGraphQL("updateUserDetails.graphql");
-
-        $result = $this->client->getClient(true)->runRawQuery($gql, false, [
+        return $this->client->updateUserDetails(User::class, [
             "id" => $user->getId(),
             "roles" => $user->getRoles(),
             "familyName" => $user->getFamilyName(),
             "givenName" => $user->getGivenName(),
             "email" => $user->getEmail(),
         ]);
-        return $this->deserializeResult(
-            $result,
-            "updateUserDetails",
-            User::class
-        );
     }
 }

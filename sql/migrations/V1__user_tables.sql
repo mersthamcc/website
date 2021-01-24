@@ -5,7 +5,7 @@ CREATE TABLE "user"
     email       VARCHAR(64) NOT NULL,
     given_name  VARCHAR(180) DEFAULT NULL,
     family_name VARCHAR(180) DEFAULT NULL,
-    roles       JSON        NOT NULL,
+    roles       JSONB       NOT NULL,
     PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX UNIQ_USER_EXTERNAL_ID ON "user" (external_id);

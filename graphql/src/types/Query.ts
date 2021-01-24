@@ -8,8 +8,8 @@ export const Query = objectType({
 
         t.list.field("feed", {
             type: "News",
-            resolve: auth((_: any, args: {}, ctx: Context) => {
-                return ctx.prisma.news.findMany({
+            resolve: auth((_: any, args: {}, context: Context) => {
+                return context.prisma.news.findMany({
                     orderBy: {publishDate: "desc"},
                     take: 10
                 });
@@ -59,6 +59,17 @@ export const Query = objectType({
                     }
                 });
             })
+        });
+
+        t.list.field("membershipCategories", {
+           type: "MemberCategory",
+           resolve: auth((_: any, args: any, context: Context) => {
+               return context.prisma.memberCategory.findMany({
+                   orderBy: {
+                       key: "asc"
+                   }
+               });
+           })
         });
     },
 });

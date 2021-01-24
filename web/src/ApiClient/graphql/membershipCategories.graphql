@@ -1,0 +1,21 @@
+query {
+  membershipCategories {
+    key
+    registrationCode
+    form {
+      sortOrder
+      section {
+        key
+        attribute {
+          sortOrder
+          mandatory
+          definition {
+            key
+            type
+            choices
+          }
+        }
+      }
+    }
+  }
+}
