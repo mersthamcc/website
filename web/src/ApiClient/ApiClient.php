@@ -2,13 +2,8 @@
 
 namespace App\ApiClient;
 
-use App\Entity\User;
 use GraphQL\Client;
 use GraphQL\Results;
-use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use League\OAuth2\Client\Grant\ClientCredentials;
-use League\OAuth2\Client\Token\AccessToken;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
