@@ -8,7 +8,7 @@ export const encrypt = async function(data: string) {
     });
     const buffer = Buffer.from(message.packets.write());
     return buffer.toString("base64");
-}
+};
 
 export const decrypt = async function(cypherText: string) {
     const buffer = new Buffer(cypherText, "base64");
@@ -17,4 +17,4 @@ export const decrypt = async function(cypherText: string) {
         passwords: [process.env["DATABASE_SECRET"]]
     });
     return decrypted;
-}
+};
