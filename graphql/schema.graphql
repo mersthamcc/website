@@ -3,7 +3,7 @@
 
 
 type AttributeDefinition {
-  id: Int!
+  choices: Json
   key: String!
   type: AttributeType!
 }
@@ -60,6 +60,49 @@ type MemberAttribute {
 
 input MemberAttributeWhereUniqueInput {
   memberId_attributeId: MemberIdAttributeIdCompoundUniqueInput
+}
+
+""""""
+type MemberCategory {
+  form(after: MemberCategoryFormSectionWhereUniqueInput, before: MemberCategoryFormSectionWhereUniqueInput, first: Int, last: Int): [MemberCategoryFormSection!]!
+  key: String!
+  registrationCode: String
+}
+
+type MemberCategoryFormSection {
+  category: MemberCategory!
+  section: MemberFormSection!
+  sortOrder: Int!
+}
+
+input MemberCategoryFormSectionWhereUniqueInput {
+  memberCategoryId_memberFormSectionId: MemberCategoryIdMemberFormSectionIdCompoundUniqueInput
+}
+
+input MemberCategoryIdMemberFormSectionIdCompoundUniqueInput {
+  memberCategoryId: Int!
+  memberFormSectionId: Int!
+}
+
+""""""
+type MemberFormSection {
+  attribute(after: MemberFormSectionAttributeWhereUniqueInput, before: MemberFormSectionAttributeWhereUniqueInput, first: Int, last: Int): [MemberFormSectionAttribute!]!
+  key: String!
+}
+
+type MemberFormSectionAttribute {
+  definition: AttributeDefinition!
+  section: MemberFormSection!
+  sortOrder: Int!
+}
+
+input MemberFormSectionAttributeWhereUniqueInput {
+  memberFormSectionId_attributeDefinitionId: MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput
+}
+
+input MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput {
+  attributeDefinitionId: Int!
+  memberFormSectionId: Int!
 }
 
 input MemberIdAttributeIdCompoundUniqueInput {
@@ -128,6 +171,7 @@ input NewsCommentWhereUniqueInput {
 type Query {
   feed: [News]
   members: [Member]
+  membershipCategories: [MemberCategory]
   userByEmail(emailAddress: String!): User
   userByExternalId(externalId: String!): User
 }

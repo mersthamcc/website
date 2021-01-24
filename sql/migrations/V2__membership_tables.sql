@@ -22,6 +22,7 @@ CREATE TABLE member_form_section_attribute
     member_form_section_id BIGINT NOT NULL,
     attribute_definition_id BIGINT NOT NULL,
     sort_order INT NOT NULL,
+    mandatory BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (member_form_section_id, attribute_definition_id)
 );
 ALTER TABLE member_form_section_attribute

@@ -3,7 +3,6 @@ import {Context} from "../context";
 import {GraphQLResolveInfo} from "graphql";
 import {decrypt} from "../helpers/Encryption";
 
-
 export const Member = objectType({
     name: "Member",
     definition(t) {
@@ -34,14 +33,52 @@ export const MemberAttribute = objectType({
     },
 });
 
+export const MemberCategory = objectType({
+   name: "MemberCategory",
+   description: "",
+   definition(t) {
+       t.model.key();
+       t.model.registrationCode();
+       t.model.form();
+   }
+});
+
 export const AttributeDefinition = objectType({
     name: "AttributeDefinition",
     definition(t) {
-        t.model.id();
         t.model.key();
         t.model.type();
+        t.model.choices();
     }
-})
+});
+
+export const MemberFormSection = objectType({
+    name: "MemberFormSection",
+    description: "",
+    definition(t) {
+        t.model.key();
+        t.model.attribute();
+    }
+});
+
+export const MemberCategoryFormSection = objectType({
+    name: "MemberCategoryFormSection",
+    definition(t) {
+        t.model.sortOrder();
+        t.model.section();
+        t.model.category();
+    }
+});
+
+export const MemberFormSectionAttribute = objectType({
+   name: "MemberFormSectionAttribute",
+   definition(t) {
+       t.model.sortOrder();
+       t.model.mandatory();
+       t.model.definition();
+       t.model.section();
+   }
+});
 
 export const MemberInput = inputObjectType({
     name: "MemberInput",
@@ -54,7 +91,7 @@ export const MemberInput = inputObjectType({
         t.field("category", { type: "String" });
         t.list.field("attributes", { type: "AttributeInput" });
     }
-})
+});
 
 export const AttributeInput = inputObjectType({
     name: "AttributeInput",
