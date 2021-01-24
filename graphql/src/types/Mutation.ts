@@ -102,8 +102,25 @@ export const Mutation = objectType({
                 data: nonNull(arg({ type: "MemberInput" }))
             },
             resolve: auth(async (_:any, args: { id: number, data: any }, context: Context ) => {
-                const now = new Date();
 
+                const currentRecord = await context.prisma.member.findUnique({
+                    where: {
+                        id: args.id
+                    }
+                });
+                const me = await context.prisma.user.findUnique({
+                    where: {
+                        // @ts-ignore
+                        email: context.kauth.accessToken.content.email
+                    }
+                });
+
+                // @ts-ignore
+                if (!(currentRecord?.ownerUserId == me?.id || context.kauth.accessToken?.hasRole("realm:ROLE_MEMBERSHIP"))) {
+                    throw new Error("You are not authorised to update this member");
+                }
+
+                const now = new Date();
                 return context.prisma.member.update({
                     where: {
                         id: args.id,
