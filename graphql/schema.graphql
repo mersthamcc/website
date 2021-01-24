@@ -17,8 +17,10 @@ input AttributeInput {
 enum AttributeType {
   Boolean
   Date
+  Email
   List
   Number
+  Option
   String
   Time
   Timestamp

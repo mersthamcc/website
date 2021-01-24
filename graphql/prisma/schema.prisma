@@ -83,12 +83,12 @@ model User {
 }
 
 model AttributeDefinition {
-  id               Int               @id @default(autoincrement())
-  key              String            @unique
-  type             AttributeType
-  encrypt          Boolean?          @default(false)
-  choices          Json?
-  memberAttributes MemberAttribute[] @relation("definitionTomemberAttributes")
+  id                         Int                          @id @default(autoincrement())
+  key                        String                       @unique
+  type                       AttributeType
+  choices                    Json?
+  memberAttributes           MemberAttribute[]
+  memberFormSectionAttribute MemberFormSectionAttribute[]
 
   @@map("attribute_definition")
 }
@@ -99,7 +99,7 @@ model MemberAttribute {
   createdDate DateTime            @map("created_date")
   updatedDate DateTime            @map("updated_date")
   value       Json?
-  definition  AttributeDefinition @relation("definitionTomemberAttributes", fields: [attributeId], references: [id])
+  definition  AttributeDefinition @relation(fields: [attributeId], references: [id])
   member      Member              @relation(fields: [memberId], references: [id])
 
   @@id([memberId, attributeId])
@@ -109,11 +109,43 @@ model MemberAttribute {
 }
 
 model MemberCategory {
-  id                Int     @id @default(autoincrement())
-  key               String  @unique
-  registration_code String?
+  id                        Int                         @id @default(autoincrement())
+  key                       String                      @unique
+  registration_code         String?
+  memberCategoryFormSection MemberCategoryFormSection[]
 
   @@map("member_category")
+}
+
+model MemberCategoryFormSection {
+  memberCategoryId    Int               @map("member_category_id")
+  memberFormSectionId Int               @map("member_form_section_id")
+  sortOrder           Int               @map("sort_order")
+  memberCategory      MemberCategory    @relation(fields: [memberCategoryId], references: [id])
+  memberFormSection   MemberFormSection @relation(fields: [memberFormSectionId], references: [id])
+
+  @@id([memberCategoryId, memberFormSectionId])
+  @@map("member_category_form_section")
+}
+
+model MemberFormSection {
+  id                         Int                          @id @default(autoincrement())
+  key                        String                       @unique
+  memberCategoryFormSection  MemberCategoryFormSection[]
+  memberFormSectionAttribute MemberFormSectionAttribute[]
+
+  @@map("member_form_section")
+}
+
+model MemberFormSectionAttribute {
+  memberFormSectionId   Int                 @map("member_form_section_id")
+  attributeDefinitionId Int                 @map("attribute_definition_id")
+  sortOrder             Int                 @map("sort_order")
+  attributeDefinition   AttributeDefinition @relation(fields: [attributeDefinitionId], references: [id])
+  memberFormSection     MemberFormSection   @relation(fields: [memberFormSectionId], references: [id])
+
+  @@id([memberFormSectionId, attributeDefinitionId])
+  @@map("member_form_section_attribute")
 }
 
 enum AttributeType {
@@ -124,6 +156,8 @@ enum AttributeType {
   Time
   Timestamp
   List
+  Option
+  Email
 
    @@map("attribute_type")
 }

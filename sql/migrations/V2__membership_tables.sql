@@ -1,14 +1,33 @@
-CREATE TYPE attribute_type AS ENUM ('String', 'Number', 'Boolean', 'Date', 'Time', 'Timestamp', 'List');
+CREATE TYPE attribute_type AS ENUM ('String', 'Number', 'Boolean', 'Date', 'Time', 'Timestamp', 'List', 'Option', 'Email');
 CREATE TABLE attribute_definition
 (
     id      SERIAL,
     key     VARCHAR(64)    NOT NULL,
     type    attribute_type NOT NULL,
-    encrypt BOOLEAN DEFAULT FALSE,
     choices JSONB,
     PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX IDX_ATTRIBUTE_DEFINITION_KEY ON attribute_definition (key);
+
+CREATE TABLE member_form_section
+(
+    id SERIAL,
+    key VARCHAR(64) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX IDX_MEMBER_FORM_SECTION_KEY ON member_form_section (key);
+
+CREATE TABLE member_form_section_attribute
+(
+    member_form_section_id BIGINT NOT NULL,
+    attribute_definition_id BIGINT NOT NULL,
+    sort_order INT NOT NULL,
+    PRIMARY KEY (member_form_section_id, attribute_definition_id)
+);
+ALTER TABLE member_form_section_attribute
+    ADD CONSTRAINT FK_MEMBER_FORM_SECTION_ATTRIBUTE_MEMBER_FORM_SECTION_ID FOREIGN KEY (member_form_section_id) REFERENCES member_form_section (id) NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE member_form_section_attribute
+    ADD CONSTRAINT FK_MEMBER_FORM_SECTION_ATTRIBUTE_ATTRIBUTE_DEFINITION_ID FOREIGN KEY (attribute_definition_id) REFERENCES attribute_definition (id) NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE TABLE member_category
 (
@@ -18,6 +37,18 @@ CREATE TABLE member_category
     PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX IDX_USER_KEY ON member_category (key);
+
+CREATE TABLE member_category_form_section
+(
+  member_category_id    BIGINT NOT NULL,
+  member_form_section_id BIGINT NOT NULL,
+  sort_order INT NOT NULL,
+  PRIMARY KEY (member_category_id, member_form_section_id)
+);
+ALTER TABLE member_category_form_section
+    ADD CONSTRAINT FK_MEMBER_CATEGORY_FORM_SECTION_MEMBER_CATEGORY_ID FOREIGN KEY (member_category_id) REFERENCES member_category (id) NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE member_category_form_section
+    ADD CONSTRAINT FK_MEMBER_CATEGORY_FORM_SECTION_MEMBER_FORM_SECTION_ID FOREIGN KEY (member_form_section_id) REFERENCES member_form_section (id) NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE TABLE member
 (
