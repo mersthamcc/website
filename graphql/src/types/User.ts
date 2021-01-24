@@ -9,5 +9,6 @@ export const User = objectType({
         t.model.familyName();
         t.model.givenName();
         t.model.roles();
+        t.model.members();
     },
 });

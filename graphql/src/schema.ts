@@ -1,4 +1,4 @@
-import {makeSchema} from "nexus";
+import {makeSchema, scalarType} from "nexus";
 import {nexusPrisma} from "nexus-plugin-prisma";
 import {Context} from "./context";
 
@@ -9,7 +9,7 @@ export const schema =
         types,
         plugins: [
             nexusPrisma({
-                experimentalCRUD: true,
+                experimentalCRUD: false,
             }),
         ],
         outputs: {

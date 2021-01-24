@@ -27,13 +27,12 @@ model Member {
   givenName        String            @map("given_name")
   familyName       String            @map("family_name")
   gender           String
-  dob              DateTime?
   registrationDate DateTime          @map("registration_date")
-  categoryId       Int               @map("category_id")
-  category         MemberCategory    @relation(fields: [categoryId], references: [id])
+  ownerUserId      Int               @map("owner_user_id")
+  owner            User              @relation(fields: [ownerUserId], references: [id])
   attributes       MemberAttribute[]
 
-  @@index([categoryId], name: "idx_member_category_id")
+  @@index([ownerUserId], name: "idx_member_owner_user_id")
   @@map("member")
 }
 
@@ -72,45 +71,47 @@ model NewsComment {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  externalId String? @unique @map("external_id")
-  email      String  @unique
-  givenName  String? @map("given_name")
-  familyName String? @map("family_name")
+  id         Int      @id @default(autoincrement())
+  externalId String?  @unique @map("external_id")
+  email      String   @unique
+  givenName  String?  @map("given_name")
+  familyName String?  @map("family_name")
   roles      Json
+  members    Member[]
 
   @@map("user")
 }
 
 model AttributeDefinition {
   id               Int               @id @default(autoincrement())
-  key              String
+  key              String            @unique
   type             AttributeType
   encrypt          Boolean?          @default(false)
   choices          Json?
-  memberAttributes MemberAttribute[]
+  memberAttributes MemberAttribute[] @relation("definitionTomemberAttributes")
 
   @@map("attribute_definition")
 }
 
 model MemberAttribute {
-  id          Int                 @id @default(autoincrement())
-  createdDate DateTime            @map("created_date")
-  attributeId Int                 @map("attribute_id")
   memberId    Int                 @map("member_id")
+  attributeId Int                 @map("attribute_id")
+  createdDate DateTime            @map("created_date")
+  updatedDate DateTime            @map("updated_date")
   value       Json?
-  definition  AttributeDefinition @relation(fields: [attributeId], references: [id])
+  definition  AttributeDefinition @relation("definitionTomemberAttributes", fields: [attributeId], references: [id])
   member      Member              @relation(fields: [memberId], references: [id])
 
+  @@id([memberId, attributeId])
   @@index([attributeId], name: "idx_member_attribute_attribute_id")
   @@index([memberId], name: "idx_member_attribute_member_id")
   @@map("member_attribute")
 }
 
 model MemberCategory {
-  id     Int      @id @default(autoincrement())
-  key    String
-  member Member[]
+  id                Int     @id @default(autoincrement())
+  key               String  @unique
+  registration_code String?
 
   @@map("member_category")
 }
@@ -122,6 +123,7 @@ enum AttributeType {
   Date
   Time
   Timestamp
+  List
 
    @@map("attribute_type")
 }

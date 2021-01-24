@@ -11,9 +11,9 @@
     "dev": "ts-node-dev --no-notify --respawn --transpile-only src/server"
   },
   "dependencies": {
-    "@prisma/cli": "2.13.1",
     "@prisma/client": "2.13.1",
     "@types/node-fetch": "2.5.7",
+    "D": "^1.0.0",
     "apollo-server-express": "^2.19.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -22,9 +22,11 @@
     "keycloak-connect": "^12.0.1",
     "keycloak-connect-graphql": "^0.6.4",
     "nexus": "1.0.0",
-    "nexus-plugin-prisma": "0.27.0"
+    "nexus-plugin-prisma": "0.27.0",
+    "openpgp": "^4.10.9"
   },
   "devDependencies": {
+    "@prisma/cli": "^2.13.1",
     "@types/node": "12.19.9",
     "ts-node": "9.1.1",
     "ts-node-dev": "1.1.1",

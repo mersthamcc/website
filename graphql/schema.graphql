@@ -8,43 +8,86 @@ type AttributeDefinition {
   type: AttributeType!
 }
 
+""""""
+input AttributeInput {
+  key: String
+  value: Json
+}
+
 enum AttributeType {
   Boolean
   Date
+  List
   Number
   String
   Time
   Timestamp
 }
 
+"""Date custom scalar type"""
+scalar Date
+
 scalar DateTime
+
+"""Gender (M/F/N)"""
+enum Gender {
+  F
+  M
+  N
+}
 
 scalar Json
 
 type Member {
   attributes(after: MemberAttributeWhereUniqueInput, before: MemberAttributeWhereUniqueInput, first: Int, last: Int): [MemberAttribute!]!
-  dob: DateTime
   familyName: String!
   gender: String!
   givenName: String!
   id: Int!
+  owner: User!
   registrationDate: DateTime!
 }
 
 type MemberAttribute {
   createdDate: DateTime!
   definition: AttributeDefinition!
-  id: Int!
+  member: Member!
+  updatedDate: DateTime!
   value: Json
 }
 
 input MemberAttributeWhereUniqueInput {
+  memberId_attributeId: MemberIdAttributeIdCompoundUniqueInput
+}
+
+input MemberIdAttributeIdCompoundUniqueInput {
+  attributeId: Int!
+  memberId: Int!
+}
+
+"""A definition of a member"""
+input MemberInput {
+  attributes: [AttributeInput]
+  category: String
+  familyName: String
+  gender: Gender
+  givenName: String
+  registrationDate: DateTime
+}
+
+input MemberWhereUniqueInput {
   id: Int
 }
 
 type Mutation {
+  """Add a new member to the register"""
+  createMember(data: MemberInput!): Member
+
   """Create a new user"""
   signupUser(emailAddress: String!, externalId: String!, familyName: String, givenName: String): User
+
+  """Update an existing member"""
+  updateMember(data: MemberInput!, id: Int!): Member
 
   """Update user details and roles"""
   updateUserDetails(email: String!, familyName: String, givenName: String, id: Int!, roles: [String!]!): User
@@ -93,5 +136,6 @@ type User {
   familyName: String
   givenName: String
   id: Int!
+  members(after: MemberWhereUniqueInput, before: MemberWhereUniqueInput, first: Int, last: Int): [Member!]!
   roles: Json!
 }

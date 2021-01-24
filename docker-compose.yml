@@ -163,6 +163,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_ROOT_PASSWORD}
       POSTGRES_USER: ${DATABASE_ROOT_USER}
       POSTGRES_DB: ${DATABASE_NAME}
+      PGOPTIONS: "-c custom.primary_encryption_key=${DATABASE_SECRET}"
     volumes:
       - pg-data:/var/lib/postgresql/data
     labels:
@@ -306,6 +307,12 @@ services:
       GRAPHQL_PLAYGROUND: "true"
       NODE_ENV: dev
       GRAPHQL_DEBUG: "true"
+      APOLLO_KEY: "service:My-Graph-rw9emt:Vkk4Oij9mWtUL0ZmFnymKw"
+      APOLLO_GRAPH_VARIANT: current
+      APOLLO_SCHEMA_REPORTING: "true"
+      DATABASE_SECRET: ${DATABASE_SECRET}
+    ports:
+      - 4000:4000
     networks:
       - dmz
       - backendnetwork
