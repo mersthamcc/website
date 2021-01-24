@@ -25,7 +25,7 @@ export const MemberAttribute = objectType({
         t.model.updatedDate();
         t.model.value({
             resolve: async (root: any, args: any, ctx: Context, info: GraphQLResolveInfo, originalResolver: any) => {
-                const { encrypted: data } = await originalResolver(root, args, ctx, info)
+                const { encrypted: data } = await originalResolver(root, args, ctx, info);
                 const decrypted = await decrypt(data);
                 return JSON.parse(decrypted);
             }

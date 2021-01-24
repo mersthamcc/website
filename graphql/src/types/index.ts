@@ -1,4 +1,4 @@
-export * from "./Scalars"
+export * from "./Scalars";
 export * from "./Member";
 export * from "./News";
 export * from "./User";

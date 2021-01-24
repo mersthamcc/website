@@ -91,14 +91,13 @@ class ApiClient
             return array_map(function ($item) use ($class) {
                 return $this->deserializeObject($item, $class);
             });
-        } else {
-            $encoders = [new JsonEncoder()];
-            $normalizers = [new PropertyNormalizer()];
-
-            $serializer = new Serializer($normalizers, $encoders);
-            $json = json_encode($object);
-
-            return $serializer->deserialize($json, $class, "json");
         }
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new PropertyNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $json = json_encode($object);
+
+        return $serializer->deserialize($json, $class, "json");
     }
 }

@@ -2,7 +2,6 @@ import {arg, intArg, list, nonNull, objectType, stringArg} from "nexus";
 import {auth, hasRole} from "keycloak-connect-graphql";
 import {Context} from "../context";
 import {encrypt} from "../helpers/Encryption";
-const openpgp = require('openpgp');
 
 export const Mutation = objectType({
     name: "Mutation",
@@ -84,9 +83,9 @@ export const Mutation = objectType({
                                    updatedDate: now,
                                    createdDate: now,
                                    value: ({
-                                       encrypted: encrypted
+                                       encrypted
                                    })
-                               })
+                               });
                            }))
                        }
                    }
@@ -116,7 +115,7 @@ export const Mutation = objectType({
                 });
 
                 // @ts-ignore
-                if (!(currentRecord?.ownerUserId == me?.id || context.kauth.accessToken?.hasRole("realm:ROLE_MEMBERSHIP"))) {
+                if (!(currentRecord?.ownerUserId === me?.id || context.kauth.accessToken?.hasRole("realm:ROLE_MEMBERSHIP"))) {
                     throw new Error("You are not authorised to update this member");
                 }
 
@@ -146,13 +145,13 @@ export const Mutation = objectType({
                                     },
                                     update: {
                                         value: ({
-                                            encrypted: encrypted
+                                            encrypted
                                         }),
                                         updatedDate: now
                                     },
                                     create: {
                                         value: ({
-                                            encrypted: encrypted
+                                            encrypted
                                         }),
                                         createdDate: now,
                                         updatedDate: now,
