@@ -92,6 +92,7 @@ type MemberFormSection {
 
 type MemberFormSectionAttribute {
   definition: AttributeDefinition!
+  mandatory: Boolean!
   section: MemberFormSection!
   sortOrder: Int!
 }
@@ -170,6 +171,7 @@ input NewsCommentWhereUniqueInput {
 
 type Query {
   feed: [News]
+  me: User
   members: [Member]
   membershipCategories: [MemberCategory]
   userByEmail(emailAddress: String!): User

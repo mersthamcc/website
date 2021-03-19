@@ -20,10 +20,14 @@ export const Query = objectType({
             type: "Member",
             resolve: hasRole(["realm:ROLE_MEMBERSHIP"])((_: any, args: {}, context: Context) => {
                 return context.prisma.member.findMany({
-                    orderBy: {
-                        familyName: "asc",
-                        givenName: "asc"
-                    },
+                    orderBy: [
+                        {
+                            familyName: "asc"
+                        },
+                        {
+                            givenName: "asc"
+                        }
+                    ],
                     take: 10
                 });
             })
@@ -69,6 +73,18 @@ export const Query = objectType({
                        key: "asc"
                    }
                });
+           })
+        });
+
+        t.field("me", {
+           type: "User",
+           resolve: auth((_: any, args: any, context: Context) => {
+               return context.prisma.user.findUnique({
+                   where: {
+                       // @ts-ignore
+                       email: context.kauth.accessToken.content.email
+                   }
+               })
            })
         });
     },
