@@ -1,0 +1,39 @@
+adult: Adult Member
+junior: Junior Member
+
+Year: Year
+Month: Month
+Day: Day
+
+MALE: Male
+FEMALE: Female
+
+NON-BINARY: Non-binary
+NOT-SPECIFIED: Prefer not to say
+
+dob: Date of birth
+gender: Gender
+school: School
+
+skills: Are you?
+BAT: A batter
+BOWL: A bowler
+KEEPER: A wicket keeper
+
+preferred-days: Do you prefer to play cricket on?
+SATURDAY: Saturday
+SUNDAY: Sunday
+
+parent-name-1: Parent/Guardian Name
+parent-email-1: Parent/Guardian Email Address
+parent-number-1: Parent/Guardian Phone Number
+
+parent-name-2: Parent/Guardian Name
+parent-email-2: Parent/Guardian Email Address
+parent-number-2: Parent/Guardian Phone Number
+
+open-age-allowed: If you child is over the age of 13, do you allow them to play in open age (aka "adult") cricket?
+
+cancel: Cancel
+next: Next
+save: Save

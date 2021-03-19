@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class LoginServiceAuthenticator extends SocialAuthenticator
 {
+    private const REDIRECT_URI_SESSION_KEY = "_login_redirect_url";
     private $clientRegistry;
     private $router;
     private $logger;
@@ -97,8 +98,13 @@ class LoginServiceAuthenticator extends SocialAuthenticator
         TokenInterface $token,
         $providerKey
     ): RedirectResponse {
-        $targetUrl = $this->router->generate("home");
-
+        $targetUrl = $this->session->get(self::REDIRECT_URI_SESSION_KEY);
+        if ($targetUrl === null) {
+            $this->logger->info(
+                "Authentication succeeded but no URL saved in session, redirecting to home page"
+            );
+            $targetUrl = $this->router->generate("home");
+        }
         return new RedirectResponse($targetUrl);
     }
 
@@ -110,7 +116,7 @@ class LoginServiceAuthenticator extends SocialAuthenticator
             $exception->getMessageKey(),
             $exception->getMessageData()
         );
-
+        $this->logger->warning($message, ["exception" => $exception]);
         return new Response($message, Response::HTTP_FORBIDDEN);
     }
 
@@ -125,6 +131,10 @@ class LoginServiceAuthenticator extends SocialAuthenticator
         Request $request,
         AuthenticationException $authException = null
     ): RedirectResponse {
+        $this->session->set(
+            self::REDIRECT_URI_SESSION_KEY,
+            $request->getRequestUri()
+        );
         return new RedirectResponse(
             "/login", // might be the site, where users choose their oauth provider
             Response::HTTP_TEMPORARY_REDIRECT

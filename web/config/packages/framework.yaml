@@ -13,5 +13,7 @@ framework:
 
   #esi: true
   #fragments: true
+  property_info:
+    enabled: true
   php_errors:
     log: true

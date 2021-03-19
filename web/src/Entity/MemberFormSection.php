@@ -5,14 +5,14 @@ namespace App\Entity;
 class MemberFormSection
 {
     /**
-     * @var $key string
+     * @var string $key
      */
     private $key;
 
     /**
-     * @var $attributes MemberFormSectionAttribute[]
+     * @var MemberFormSectionAttribute[] $attribute
      */
-    private $attributes;
+    private $attribute;
 
     /**
      * @return string
@@ -25,8 +25,28 @@ class MemberFormSection
     /**
      * @return MemberFormSectionAttribute[]
      */
-    public function getAttributes(): array
+    public function getAttribute(): array
     {
-        return $this->attributes;
+        return $this->attribute;
+    }
+
+    /**
+     * @param string $key
+     * @return MemberFormSection
+     */
+    public function setKey(string $key): MemberFormSection
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * @param MemberFormSectionAttribute[] $attribute
+     * @return MemberFormSection
+     */
+    public function setAttribute(array $attribute): MemberFormSection
+    {
+        $this->attribute = $attribute;
+        return $this;
     }
 }

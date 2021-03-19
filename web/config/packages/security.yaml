@@ -35,4 +35,5 @@ security:
     - { path: ^/administration/members, roles: ROLE_MEMBERSHIP }
     - { path: ^/administration, roles: ROLE_ADMIN }
     - { path: ^/members, roles: ROLE_USER }
+    - { path: ^/register, roles: ROLE_USER }
 #        - { path: ^/security/authorize, roles: ROLE_MEMBER }

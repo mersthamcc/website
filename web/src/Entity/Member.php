@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-class Member
+use ArrayAccess;
+
+class Member implements ArrayAccess
 {
     /**
      * @var $id int
@@ -33,6 +35,11 @@ class Member
      * @var $attributes MemberAttribute[]
      */
     private $attributes;
+
+    public function __construct()
+    {
+        $this->attributes = [];
+    }
 
     /**
      * @return int
@@ -140,5 +147,64 @@ class Member
     {
         $this->attributes = $attributes;
         return $this;
+    }
+
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute->getKey() === $offset) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param mixed $offset
+     * @return mixed|null
+     */
+    public function offsetGet($offset)
+    {
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute->getKey() === $offset) {
+                return $attribute->getValue();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
+    public function offsetSet($offset, $value)
+    {
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute->getKey() === $offset) {
+                $attribute->setValue($value);
+                return;
+            }
+        }
+        $this->attributes[] = (new MemberAttribute())
+            ->setKey($offset)
+            ->setValue($value);
+    }
+
+    /**
+     * @param mixed $offset
+     */
+    public function offsetUnset($offset)
+    {
+        $new = [];
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute->getKey() != $offset) {
+                $new[] = $attribute;
+            }
+        }
+        $this->setAttributes($new);
     }
 }

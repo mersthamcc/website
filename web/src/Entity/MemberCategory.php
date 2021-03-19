@@ -5,19 +5,19 @@ namespace App\Entity;
 class MemberCategory
 {
     /**
-     * @var $key string
+     * @var string
      */
     private $key;
 
     /**
-     * @var $registrationCode string
+     * @var string|null
      */
     private $registrationCode;
 
     /**
-     * @var $form MemberCategoryFormSection[]
+     * @var MemberCategoryFormSection[]
      */
-    private $formSections;
+    private $form;
 
     /**
      * @return string
@@ -28,9 +28,9 @@ class MemberCategory
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRegistrationCode(): string
+    public function getRegistrationCode(): ?string
     {
         return $this->registrationCode;
     }
@@ -38,8 +38,39 @@ class MemberCategory
     /**
      * @return MemberCategoryFormSection[]
      */
-    public function getFormSections(): array
+    public function getForm(): array
     {
-        return $this->formSections;
+        return $this->form;
+    }
+
+    /**
+     * @param string $key
+     * @return MemberCategory
+     */
+    public function setKey(string $key): MemberCategory
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * @param string|null $registrationCode
+     * @return MemberCategory
+     */
+    public function setRegistrationCode(
+        ?string $registrationCode
+    ): MemberCategory {
+        $this->registrationCode = $registrationCode;
+        return $this;
+    }
+
+    /**
+     * @param MemberCategoryFormSection[] $form
+     * @return MemberCategory
+     */
+    public function setForm(array $form): MemberCategory
+    {
+        $this->form = $form;
+        return $this;
     }
 }

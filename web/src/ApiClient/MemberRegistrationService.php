@@ -29,10 +29,27 @@ class MemberRegistrationService
     }
 
     /**
-     * @return array
+     * @return MemberCategory[]
      */
     public function getMembershipCategories(): array
     {
         return $this->client->membershipCategories(MemberCategory::class, []);
+    }
+
+    /**
+     * @param string $categoryName
+     * @return MemberCategory
+     */
+    public function getCategory(string $categoryName): MemberCategory
+    {
+        $categories = $this->getMembershipCategories();
+        foreach ($categories as $category) {
+            if ($category->getKey() === $categoryName) {
+                $this->logger->debug("Category selected", [
+                    "category" => print_r($category, true),
+                ]);
+                return $category;
+            }
+        }
     }
 }
