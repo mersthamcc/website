@@ -31,3 +31,4 @@ RUN docker-php-ext-enable xdebug
 
 COPY dev-config/php.ini /usr/local/etc/php/php.ini
 
+WORKDIR /var/www
