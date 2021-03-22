@@ -8,6 +8,18 @@ type AttributeDefinition {
   type: AttributeType!
 }
 
+input AttributeDefinitionWhereInput {
+  AND: [AttributeDefinitionWhereInput!]
+  choices: JsonNullableFilter
+  id: IntFilter
+  key: StringFilter
+  memberAttributes: MemberAttributeListRelationFilter
+  memberFormSectionAttribute: MemberFormSectionAttributeListRelationFilter
+  NOT: [AttributeDefinitionWhereInput!]
+  OR: [AttributeDefinitionWhereInput!]
+  type: EnumAttributeTypeFilter
+}
+
 """"""
 input AttributeInput {
   key: String
@@ -26,10 +38,60 @@ enum AttributeType {
   Timestamp
 }
 
+input BoolFilter {
+  equals: Boolean
+  not: NestedBoolFilter
+}
+
+input BoolNullableFilter {
+  equals: Boolean
+  not: NestedBoolNullableFilter
+}
+
 """Date custom scalar type"""
 scalar Date
 
 scalar DateTime
+
+input DateTimeFilter {
+  equals: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  not: NestedDateTimeFilter
+  notIn: [DateTime!]
+}
+
+input EnumAttributeTypeFilter {
+  equals: AttributeType
+  in: [AttributeType!]
+  not: NestedEnumAttributeTypeFilter
+  notIn: [AttributeType!]
+}
+
+input FloatFilter {
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  not: NestedFloatFilter
+  notIn: [Float!]
+}
+
+input FloatNullableFilter {
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  not: NestedFloatNullableFilter
+  notIn: [Float!]
+}
 
 """Gender (M/F/N)"""
 enum Gender {
@@ -38,7 +100,34 @@ enum Gender {
   N
 }
 
+input IntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input IntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
 scalar Json
+
+input JsonNullableFilter {
+  equals: Json
+  not: Json
+}
 
 type Member {
   attributes(after: MemberAttributeWhereUniqueInput, before: MemberAttributeWhereUniqueInput, first: Int, last: Int): [MemberAttribute!]!
@@ -58,6 +147,25 @@ type MemberAttribute {
   value: Json
 }
 
+input MemberAttributeListRelationFilter {
+  every: MemberAttributeWhereInput
+  none: MemberAttributeWhereInput
+  some: MemberAttributeWhereInput
+}
+
+input MemberAttributeWhereInput {
+  AND: [MemberAttributeWhereInput!]
+  attributeId: IntFilter
+  createdDate: DateTimeFilter
+  definition: AttributeDefinitionWhereInput
+  member: MemberWhereInput
+  memberId: IntFilter
+  NOT: [MemberAttributeWhereInput!]
+  OR: [MemberAttributeWhereInput!]
+  updatedDate: DateTimeFilter
+  value: JsonNullableFilter
+}
+
 input MemberAttributeWhereUniqueInput {
   memberId_attributeId: MemberIdAttributeIdCompoundUniqueInput
 }
@@ -66,6 +174,7 @@ input MemberAttributeWhereUniqueInput {
 type MemberCategory {
   form(after: MemberCategoryFormSectionWhereUniqueInput, before: MemberCategoryFormSectionWhereUniqueInput, first: Int, last: Int): [MemberCategoryFormSection!]!
   key: String!
+  pricelist(after: PriceListWhereUniqueInput, before: PriceListWhereUniqueInput, first: Int, last: Int, orderBy: [PriceListOrderByInput!], where: PriceListWhereInput): [PriceList!]!
   registrationCode: String
 }
 
@@ -75,6 +184,23 @@ type MemberCategoryFormSection {
   sortOrder: Int!
 }
 
+input MemberCategoryFormSectionListRelationFilter {
+  every: MemberCategoryFormSectionWhereInput
+  none: MemberCategoryFormSectionWhereInput
+  some: MemberCategoryFormSectionWhereInput
+}
+
+input MemberCategoryFormSectionWhereInput {
+  AND: [MemberCategoryFormSectionWhereInput!]
+  category: MemberCategoryWhereInput
+  memberCategoryId: IntFilter
+  memberFormSectionId: IntFilter
+  NOT: [MemberCategoryFormSectionWhereInput!]
+  OR: [MemberCategoryFormSectionWhereInput!]
+  section: MemberFormSectionWhereInput
+  sortOrder: IntFilter
+}
+
 input MemberCategoryFormSectionWhereUniqueInput {
   memberCategoryId_memberFormSectionId: MemberCategoryIdMemberFormSectionIdCompoundUniqueInput
 }
@@ -82,6 +208,17 @@ input MemberCategoryFormSectionWhereUniqueInput {
 input MemberCategoryIdMemberFormSectionIdCompoundUniqueInput {
   memberCategoryId: Int!
   memberFormSectionId: Int!
+}
+
+input MemberCategoryWhereInput {
+  AND: [MemberCategoryWhereInput!]
+  form: MemberCategoryFormSectionListRelationFilter
+  id: IntFilter
+  key: StringFilter
+  NOT: [MemberCategoryWhereInput!]
+  OR: [MemberCategoryWhereInput!]
+  pricelist: PriceListListRelationFilter
+  registrationCode: StringNullableFilter
 }
 
 """"""
@@ -97,6 +234,24 @@ type MemberFormSectionAttribute {
   sortOrder: Int!
 }
 
+input MemberFormSectionAttributeListRelationFilter {
+  every: MemberFormSectionAttributeWhereInput
+  none: MemberFormSectionAttributeWhereInput
+  some: MemberFormSectionAttributeWhereInput
+}
+
+input MemberFormSectionAttributeWhereInput {
+  AND: [MemberFormSectionAttributeWhereInput!]
+  attributeDefinitionId: IntFilter
+  definition: AttributeDefinitionWhereInput
+  mandatory: BoolFilter
+  memberFormSectionId: IntFilter
+  NOT: [MemberFormSectionAttributeWhereInput!]
+  OR: [MemberFormSectionAttributeWhereInput!]
+  section: MemberFormSectionWhereInput
+  sortOrder: IntFilter
+}
+
 input MemberFormSectionAttributeWhereUniqueInput {
   memberFormSectionId_attributeDefinitionId: MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput
 }
@@ -104,6 +259,16 @@ input MemberFormSectionAttributeWhereUniqueInput {
 input MemberFormSectionIdAttributeDefinitionIdCompoundUniqueInput {
   attributeDefinitionId: Int!
   memberFormSectionId: Int!
+}
+
+input MemberFormSectionWhereInput {
+  AND: [MemberFormSectionWhereInput!]
+  attribute: MemberFormSectionAttributeListRelationFilter
+  form: MemberCategoryFormSectionListRelationFilter
+  id: IntFilter
+  key: StringFilter
+  NOT: [MemberFormSectionWhereInput!]
+  OR: [MemberFormSectionWhereInput!]
 }
 
 input MemberIdAttributeIdCompoundUniqueInput {
@@ -119,6 +284,26 @@ input MemberInput {
   gender: Gender
   givenName: String
   registrationDate: DateTime
+}
+
+input MemberListRelationFilter {
+  every: MemberWhereInput
+  none: MemberWhereInput
+  some: MemberWhereInput
+}
+
+input MemberWhereInput {
+  AND: [MemberWhereInput!]
+  attributes: MemberAttributeListRelationFilter
+  familyName: StringFilter
+  gender: StringFilter
+  givenName: StringFilter
+  id: IntFilter
+  NOT: [MemberWhereInput!]
+  OR: [MemberWhereInput!]
+  owner: UserWhereInput
+  ownerUserId: IntFilter
+  registrationDate: DateTimeFilter
 }
 
 input MemberWhereUniqueInput {
@@ -137,6 +322,106 @@ type Mutation {
 
   """Update user details and roles"""
   updateUserDetails(email: String!, familyName: String, givenName: String, id: Int!, roles: [String!]!): User
+}
+
+input NestedBoolFilter {
+  equals: Boolean
+  not: NestedBoolFilter
+}
+
+input NestedBoolNullableFilter {
+  equals: Boolean
+  not: NestedBoolNullableFilter
+}
+
+input NestedDateTimeFilter {
+  equals: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  not: NestedDateTimeFilter
+  notIn: [DateTime!]
+}
+
+input NestedEnumAttributeTypeFilter {
+  equals: AttributeType
+  in: [AttributeType!]
+  not: NestedEnumAttributeTypeFilter
+  notIn: [AttributeType!]
+}
+
+input NestedFloatFilter {
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  not: NestedFloatFilter
+  notIn: [Float!]
+}
+
+input NestedFloatNullableFilter {
+  equals: Float
+  gt: Float
+  gte: Float
+  in: [Float!]
+  lt: Float
+  lte: Float
+  not: NestedFloatNullableFilter
+  notIn: [Float!]
+}
+
+input NestedIntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input NestedIntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input NestedStringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input NestedStringNullableFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringNullableFilter
+  notIn: [String!]
+  startsWith: String
 }
 
 type News {
@@ -169,13 +454,105 @@ input NewsCommentWhereUniqueInput {
   id: Int
 }
 
+type PriceList {
+  additionalUnitPrice: Float
+  dateFrom: Date
+  dateTo: Date
+  description: String!
+  id: Int!
+  includesMatchFees: Boolean
+  maxAge: Int
+  minAge: Int!
+  price: Float!
+}
+
+input PriceListListRelationFilter {
+  every: PriceListWhereInput
+  none: PriceListWhereInput
+  some: PriceListWhereInput
+}
+
+input PriceListOrderByInput {
+  additionalUnitPrice: SortOrder
+  categoryId: SortOrder
+  dateFrom: SortOrder
+  dateTo: SortOrder
+  description: SortOrder
+  id: SortOrder
+  includesMatchFees: SortOrder
+  maxAge: SortOrder
+  minAge: SortOrder
+  price: SortOrder
+}
+
+input PriceListWhereInput {
+  additionalUnitPrice: FloatNullableFilter
+  AND: [PriceListWhereInput!]
+  categoryId: IntFilter
+  dateFrom: DateTimeFilter
+  dateTo: DateTimeFilter
+  description: StringFilter
+  id: IntFilter
+  includesMatchFees: BoolNullableFilter
+  maxAge: IntNullableFilter
+  memberCategory: MemberCategoryWhereInput
+  minAge: IntFilter
+  NOT: [PriceListWhereInput!]
+  OR: [PriceListWhereInput!]
+  price: FloatFilter
+}
+
+input PriceListWhereUniqueInput {
+  id: Int
+}
+
 type Query {
   feed: [News]
   me: User
   members: [Member]
-  membershipCategories: [MemberCategory]
+  membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
   userByEmail(emailAddress: String!): User
   userByExternalId(externalId: String!): User
+}
+
+enum QueryMode {
+  default
+  insensitive
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+input StringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  mode: QueryMode
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input StringNullableFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  mode: QueryMode
+  not: NestedStringNullableFilter
+  notIn: [String!]
+  startsWith: String
 }
 
 type User {
@@ -186,4 +563,16 @@ type User {
   id: Int!
   members(after: MemberWhereUniqueInput, before: MemberWhereUniqueInput, first: Int, last: Int): [Member!]!
   roles: Json!
+}
+
+input UserWhereInput {
+  AND: [UserWhereInput!]
+  email: StringFilter
+  externalId: StringNullableFilter
+  familyName: StringNullableFilter
+  givenName: StringNullableFilter
+  id: IntFilter
+  members: MemberListRelationFilter
+  NOT: [UserWhereInput!]
+  OR: [UserWhereInput!]
 }

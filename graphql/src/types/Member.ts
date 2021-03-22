@@ -40,6 +40,10 @@ export const MemberCategory = objectType({
        t.model.key();
        t.model.registrationCode();
        t.model.form();
+       t.model.pricelist({
+           filtering: true,
+           ordering: true
+       });
    }
 });
 
@@ -78,6 +82,21 @@ export const MemberFormSectionAttribute = objectType({
        t.model.definition();
        t.model.section();
    }
+});
+
+export const PriceList = objectType({
+    name: "PriceList",
+    definition(t) {
+        t.model.id();
+        t.date("dateFrom");
+        t.date("dateTo");
+        t.model.description();
+        t.model.minAge();
+        t.model.maxAge();
+        t.model.price();
+        t.model.additionalUnitPrice();
+        t.model.includesMatchFees();
+    }
 });
 
 export const MemberInput = inputObjectType({

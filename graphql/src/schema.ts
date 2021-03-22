@@ -1,4 +1,4 @@
-import {makeSchema, scalarType} from "nexus";
+import {makeSchema} from "nexus";
 import {nexusPrisma} from "nexus-plugin-prisma";
 import {Context} from "./context";
 

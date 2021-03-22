@@ -113,6 +113,7 @@ model MemberCategory {
   key              String                      @unique
   registrationCode String?                     @map("registration_code")
   form             MemberCategoryFormSection[]
+  pricelist        PriceList[]
 
   @@map("member_category")
 }
@@ -147,6 +148,24 @@ model MemberFormSectionAttribute {
 
   @@id([memberFormSectionId, attributeDefinitionId])
   @@map("member_form_section_attribute")
+}
+
+model PriceList {
+  id                  Int            @id @default(autoincrement())
+  categoryId          Int            @map("category_id")
+  dateFrom            DateTime       @map("date_from")
+  dateTo              DateTime       @map("date_to")
+  minAge              Int            @map("min_age")
+  maxAge              Int?           @map("max_age")
+  description         String
+  includesMatchFees   Boolean?       @map("includes_match_fees")
+  price               Float
+  additionalUnitPrice Float?         @map("additional_unit_price")
+  memberCategory      MemberCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId], name: "idx_pricelist_category_id")
+  @@index([dateFrom, dateTo], name: "idx_pricelist_date_from_date_to")
+  @@map("pricelist")
 }
 
 enum AttributeType {
