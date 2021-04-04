@@ -110,80 +110,82 @@ class AttributeDefinition
         FormBuilderInterface $builder,
         bool $required = false
     ): FormBuilderInterface {
+        $options = [
+            "property_path" => "[" . $this->getKey() . "]",
+            "label" => $this->getKey(),
+            "translation_domain" => "membership",
+            "required" => $required,
+            "help" => $this->getKey() . "-help",
+        ];
+
         switch ($this->getType()) {
             case self::NUMBER_TYPE:
-                return $builder->create($this->getKey(), NumberType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    NumberType::class,
+                    array_merge($options, [])
+                );
             case self::EMAIL_TYPE:
-                return $builder->create($this->getKey(), EmailType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    EmailType::class,
+                    array_merge($options, [])
+                );
             case self::BOOLEAN_TYPE:
-                return $builder->create($this->getKey(), CheckboxType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    CheckboxType::class,
+                    array_merge($options, [])
+                );
             case self::DATE_TYPE:
-                return $builder->create($this->getKey(), BirthdayType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    BirthdayType::class,
+                    array_merge($options, [])
+                );
             case self::TIME_TYPE:
-                return $builder->create($this->getKey(), TimeType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    TimeType::class,
+                    array_merge($options, [])
+                );
             case self::TIMESTAMP_TYPE:
-                return $builder->create($this->getKey(), DateTimeType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "label" => $this->getKey(),
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    DateTimeType::class,
+                    array_merge($options, [])
+                );
             case self::LIST_TYPE:
-                return $builder->create($this->getKey(), ChoiceType::class, [
-                    "choices" => $this->getChoices(),
-                    "label" => $this->getKey(),
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    ChoiceType::class,
+                    array_merge($options, [
+                        "choices" => $this->getChoices(),
+                        "multiple" => true,
+                        "expanded" => true,
+                        "placeholder" => false,
+                    ])
+                );
             case self::OPTION_TYPE:
-                return $builder->create($this->getKey(), ChoiceType::class, [
-                    "row_attr" => [
-                        "class" => "radio-inline",
-                    ],
-                    "label" => $this->getKey(),
-                    "choices" => $this->getChoices(),
-                    "multiple" => false,
-                    "expanded" => true,
-                    "placeholder" => false,
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "translation_domain" => "membership",
-                    "required" => $required,
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    ChoiceType::class,
+                    array_merge($options, [
+                        "row_attr" => [
+                            "class" => "radio-inline",
+                        ],
+                        "choices" => $this->getChoices(),
+                        "multiple" => false,
+                        "expanded" => true,
+                        "placeholder" => false,
+                    ])
+                );
             case self::STRING_TYPE:
-            default:
-                return $builder->create($this->getKey(), TextType::class, [
-                    "property_path" => "[" . $this->getKey() . "]",
-                    "translation_domain" => "membership",
-                    "label" => $this->getKey(),
-                    "required" => $required,
-                    "help" => $this->getKey() . "-help",
-                ]);
+                return $builder->create(
+                    $this->getKey(),
+                    TextType::class,
+                    array_merge($options, [])
+                );
         }
     }
 }

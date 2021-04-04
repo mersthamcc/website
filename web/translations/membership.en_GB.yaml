@@ -1,5 +1,15 @@
+choose-membership-type: Choose type of member to add
+member-details: Member Details
+member-btn-register: Save
+
+basics: Basics
+adult-personal: Personal Details
+adult-cricket: Cricket
+
 adult: Adult Member
 junior: Junior Member
+disability: Disability Squad Member
+social: Social Member
 
 Year: Year
 Month: Month

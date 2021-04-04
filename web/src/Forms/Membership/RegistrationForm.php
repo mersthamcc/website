@@ -6,6 +6,7 @@ use App\Entity\Member;
 use App\Entity\MemberCategory;
 use App\Forms\Components\ButtonSectionType;
 use App\Forms\Components\FormSectionType;
+use App\Forms\Components\PanelType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -19,9 +20,17 @@ class RegistrationForm extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
+        $panel = $builder->create("details-panel", PanelType::class, [
+            "title" => "member-details",
+            "translation_domain" => $options["translation_domain"],
+            "mapped" => false,
+        ]);
+
+        $panel->add(
             $builder
-                ->create("basics", FormSectionType::class, [])
+                ->create("basics", FormSectionType::class, [
+                    "label" => "basics",
+                ])
                 ->add("familyName", TextType::class, [])
                 ->add("givenName", TextType::class, [])
         );
@@ -34,7 +43,10 @@ class RegistrationForm extends AbstractType
         foreach ($category->getForm() as $section) {
             $formSection = $builder->create(
                 $section->getSection()->getKey(),
-                FormSectionType::class
+                FormSectionType::class,
+                [
+                    "label" => $section->getSection()->getKey(),
+                ]
             );
             foreach ($section->getSection()->getAttribute() as $attribute) {
                 $formSection->add(
@@ -46,17 +58,20 @@ class RegistrationForm extends AbstractType
                         )
                 );
             }
-            $builder->add($formSection);
+            $panel->add($formSection);
         }
 
-        $builder->add(
+        $panel->add(
             $builder
                 ->create("buttons", ButtonSectionType::class, [])
                 ->add("save", SubmitType::class, [
                     "label" => "member-btn-register",
                 ])
-                ->add("save", ResetType::class, ["label" => "cancel"])
+                ->add("reset", ResetType::class, [
+                    "label" => "cancel",
+                ])
         );
+        $builder->add($panel);
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -68,17 +83,17 @@ class RegistrationForm extends AbstractType
                 self::MEMBERSHIP_CATEGORY_OPTION,
                 MemberCategory::class
             )
-            ->setRequired(self::MEMBERSHIP_CATEGORY_OPTION);
-        $resolver->setDefaults([
-            "data_class" => Member::class,
-            // enable/disable CSRF protection for this form
-            "csrf_protection" => true,
-            // the name of the hidden HTML field that stores the token
-            "csrf_field_name" => "_token",
-            // an arbitrary string used to generate the value of the token
-            // using a different string for each form improves its security
-            "csrf_token_id" => self::class,
-            "allow_extra_fields" => true,
-        ]);
+            ->setRequired(self::MEMBERSHIP_CATEGORY_OPTION)
+            ->setDefaults([
+                "data_class" => Member::class,
+                // enable/disable CSRF protection for this form
+                "csrf_protection" => true,
+                // the name of the hidden HTML field that stores the token
+                "csrf_field_name" => "_token",
+                // an arbitrary string used to generate the value of the token
+                // using a different string for each form improves its security
+                "csrf_token_id" => self::class,
+                "allow_extra_fields" => true,
+            ]);
     }
 }

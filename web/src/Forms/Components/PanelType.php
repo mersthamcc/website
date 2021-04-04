@@ -2,19 +2,27 @@
 
 namespace App\Forms\Components;
 
-use CricketDataBundle\Constraints\ValidRecaptchaToken;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PanelType extends \Symfony\Component\Form\AbstractType
+class PanelType extends AbstractType
 {
-    public function getBlockPrefix()
+    /**
+     * @inheritDoc
+     */
+    public function getBlockPrefix(): string
     {
         return "panel";
     }
 
+    /**
+     * @inheritDoc
+     */
     public function buildView(
-        \Symfony\Component\Form\FormView $view,
-        \Symfony\Component\Form\FormInterface $form,
+        FormView $view,
+        FormInterface $form,
         array $options
     ) {
         $view->vars["title"] = $options["title"];
@@ -22,6 +30,9 @@ class PanelType extends \Symfony\Component\Form\AbstractType
         parent::buildView($view, $form, $options);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -30,6 +41,11 @@ class PanelType extends \Symfony\Component\Form\AbstractType
             ->setDefined(["title"])
             ->setDefault("type", "info")
             ->setAllowedTypes("title", "string")
-            ->setAllowedTypes("type", "string");
+            ->setAllowedTypes("type", "string")
+            ->setDefaults([
+                "mapped" => false,
+                "compound" => true,
+                "inherit_data" => true,
+            ]);
     }
 }

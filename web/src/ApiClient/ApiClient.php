@@ -104,9 +104,6 @@ class ApiClient
             return null;
         }
         $response = $this->serializer->deserialize($result->getResponseBody());
-        $this->logger->debug("Deserialised the result", [
-            '$data' => print_r($response, true),
-        ]);
         return $response->getData()->get($operationName);
     }
 }

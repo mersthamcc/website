@@ -20,6 +20,11 @@ class MemberCategory
     private $form;
 
     /**
+     * @var PriceListItem[]|null $priceList
+     */
+    private $priceList;
+
+    /**
      * @return string
      */
     public function getKey(): string
@@ -71,6 +76,24 @@ class MemberCategory
     public function setForm(array $form): MemberCategory
     {
         $this->form = $form;
+        return $this;
+    }
+
+    /**
+     * @return PriceListItem[]|null
+     */
+    public function getPriceList(): ?array
+    {
+        return $this->priceList;
+    }
+
+    /**
+     * @param PriceListItem[]|null $priceList
+     * @return MemberCategory
+     */
+    public function setPriceList(?array $priceList): MemberCategory
+    {
+        $this->priceList = $priceList;
         return $this;
     }
 }
