@@ -152,8 +152,6 @@ services:
       DEVDOMAIN: ${DEVDOMAIN}
       CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
       CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
-      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
-      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
       API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
     volumes:
       - ./web:/var/www
@@ -518,8 +516,8 @@ services:
     environment:
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-      PGADMIN_DEFAULT_EMAIL: notused
-      PGADMIN_DEFAULT_PASSWORD: notused
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAILADDRESS}
+      PGADMIN_DEFAULT_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
       - ./dev-config/pgadmin4/servers.json:/pgadmin4/servers.json:ro
     networks:
