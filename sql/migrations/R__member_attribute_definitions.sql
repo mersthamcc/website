@@ -132,26 +132,28 @@ VALUES ((SELECT id FROM member_category WHERE key = 'junior'),
         (SELECT id FROM member_form_section WHERE key = 'contact'), 20, true)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO pricelist (date_from, date_to, category_id, min_age, max_age, description, price, additional_unit_price,
-                       includes_match_fees)
-VALUES ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'junior'), 5, 7, 'Juniors (under 7)',
-        40.00, NULL, NULL),
-       ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'junior'), 8, 15, 'Juniors (U8 - U15)',
-        70.00, 60.00, NULL),
-       ('2021-01-01', '2021-05-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL,
-        'Students (16 years and older)', 50.00, NULL, FALSE),
-       ('2021-06-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL,
-        'Students (16 years and older)', 60.00, NULL, FALSE),
-       ('2021-01-01', '2021-05-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Adults', 90.00,
-        NULL, FALSE),
-       ('2021-06-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Adults', 100.00,
-        NULL, FALSE),
-       ('2021-01-01', '2021-05-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL,
-        'Adults (inclusive of match fees)', 300.00, NULL, TRUE),
-       ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 15, NULL,
-        'Ladies (15 years and older)', 40.00, NULL, NULL),
-       ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'disability'), 5, NULL,
-        'Disability (All Ages)', 40.00, NULL, NULL),
-       ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'social'), 16, NULL, 'Social', 25.00,
-        NULL, NULL)
+INSERT INTO pricelist_item (id, category_id, min_age, max_age, description, includes_match_fees)
+VALUES (1, (SELECT id FROM member_category WHERE key = 'junior'), 5, 7, 'Juniors (under 7)', NULL),
+       (2, (SELECT id FROM member_category WHERE key = 'junior'), 8, 15, 'Juniors (U8 - U15)', NULL),
+       (3, (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Students (U16 and older)', FALSE),
+       (4, (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Students (inclusive of match fees)', FALSE),
+       (5, (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Adults', FALSE),
+       (6, (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Adults (inclusive of match fees)',  TRUE),
+       (7, (SELECT id FROM member_category WHERE key = 'adult'), 15, NULL, 'Ladies (15 years and older)', NULL),
+       (8, (SELECT id FROM member_category WHERE key = 'disability'), 5, NULL, 'Disability (All Ages)', NULL),
+       (9, (SELECT id FROM member_category WHERE key = 'social'), 16, NULL, 'Social', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO pricelist (pricelist_item_id, date_from, date_to, price, additional_unit_price)
+VALUES (1, '2021-01-01', '2021-12-31', 40.00, NULL),
+       (2, '2021-01-01', '2021-12-31', 70.00, 60.00),
+       (3, '2021-01-01', '2021-05-31', 50.00, NULL),
+       (3, '2021-06-01', '2021-12-31', 60.00, NULL),
+       (4, '2021-01-01', '2021-05-31', 155.00, NULL),
+       (5, '2021-01-01', '2021-05-31', 90.00, NULL),
+       (5, '2021-06-01', '2021-12-31', 110.00, NULL),
+       (6, '2021-01-01', '2021-05-31', 300.00, NULL),
+       (7, '2021-01-01', '2021-12-31', 40.00, NULL),
+       (8, '2021-01-01', '2021-12-31', 40.00, NULL),
+       (9, '2021-01-01', '2021-12-31', 25.00, NULL)
 ON CONFLICT DO NOTHING;
