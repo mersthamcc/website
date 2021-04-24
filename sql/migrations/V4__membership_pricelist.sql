@@ -18,3 +18,4 @@ ALTER TABLE pricelist
 
 CREATE INDEX IDX_PRICELIST_DATE_FROM_DATE_TO ON pricelist (date_from, date_to);
 CREATE INDEX IDX_PRICELIST_CATEGORY_ID ON pricelist (category_id);
+CREATE UNIQUE INDEX IDX_PRICELIST_DATE_FROM_DATE_TO_CATEGORY_ID ON pricelist (date_from, date_to, category_id);

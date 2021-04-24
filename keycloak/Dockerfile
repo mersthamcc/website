@@ -1,4 +1,4 @@
-FROM gradle:jdk11 AS extension-builder
+FROM gradle:6.5-jdk11 AS extension-builder
 COPY sms-2fa /src
 WORKDIR /src
 RUN gradle build jar

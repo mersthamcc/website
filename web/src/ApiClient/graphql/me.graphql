@@ -6,9 +6,6 @@ query {
     roles
     members {
       id
-      givenName
-      familyName
-      gender
       registrationDate
       attributes {
         definition {

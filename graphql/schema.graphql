@@ -71,6 +71,13 @@ input EnumAttributeTypeFilter {
   notIn: [AttributeType!]
 }
 
+input EnumRelationshipTypeFilter {
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeFilter
+  notIn: [RelationshipType!]
+}
+
 input FloatFilter {
   equals: Float
   gt: Float
@@ -98,6 +105,12 @@ enum Gender {
   F
   M
   N
+}
+
+input Idx_pricelist_date_from_date_to_category_idCompoundUniqueInput {
+  categoryId: Int!
+  dateFrom: DateTime!
+  dateTo: DateTime!
 }
 
 input IntFilter {
@@ -131,9 +144,6 @@ input JsonNullableFilter {
 
 type Member {
   attributes(after: MemberAttributeWhereUniqueInput, before: MemberAttributeWhereUniqueInput, first: Int, last: Int): [MemberAttribute!]!
-  familyName: String!
-  gender: String!
-  givenName: String!
   id: Int!
   owner: User!
   registrationDate: DateTime!
@@ -198,6 +208,7 @@ input MemberCategoryFormSectionWhereInput {
   NOT: [MemberCategoryFormSectionWhereInput!]
   OR: [MemberCategoryFormSectionWhereInput!]
   section: MemberFormSectionWhereInput
+  show_on_registration: BoolFilter
   sortOrder: IntFilter
 }
 
@@ -292,18 +303,35 @@ input MemberListRelationFilter {
   some: MemberWhereInput
 }
 
+input MemberRelationshipListRelationFilter {
+  every: MemberRelationshipWhereInput
+  none: MemberRelationshipWhereInput
+  some: MemberRelationshipWhereInput
+}
+
+input MemberRelationshipWhereInput {
+  AND: [MemberRelationshipWhereInput!]
+  member: MemberWhereInput
+  memberId: IntFilter
+  NOT: [MemberRelationshipWhereInput!]
+  OR: [MemberRelationshipWhereInput!]
+  relatedMember: MemberWhereInput
+  relatedMemberId: IntFilter
+  relationshipType: EnumRelationshipTypeFilter
+}
+
 input MemberWhereInput {
   AND: [MemberWhereInput!]
   attributes: MemberAttributeListRelationFilter
-  familyName: StringFilter
-  gender: StringFilter
-  givenName: StringFilter
   id: IntFilter
+  membersRelatedToMe: MemberRelationshipListRelationFilter
   NOT: [MemberWhereInput!]
   OR: [MemberWhereInput!]
   owner: UserWhereInput
   ownerUserId: IntFilter
   registrationDate: DateTimeFilter
+  relatedMembers: MemberRelationshipListRelationFilter
+  type: StringFilter
 }
 
 input MemberWhereUniqueInput {
@@ -350,6 +378,13 @@ input NestedEnumAttributeTypeFilter {
   in: [AttributeType!]
   not: NestedEnumAttributeTypeFilter
   notIn: [AttributeType!]
+}
+
+input NestedEnumRelationshipTypeFilter {
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeFilter
+  notIn: [RelationshipType!]
 }
 
 input NestedFloatFilter {
@@ -504,6 +539,7 @@ input PriceListWhereInput {
 
 input PriceListWhereUniqueInput {
   id: Int
+  idx_pricelist_date_from_date_to_category_id: Idx_pricelist_date_from_date_to_category_idCompoundUniqueInput
 }
 
 type Query {
@@ -518,6 +554,12 @@ type Query {
 enum QueryMode {
   default
   insensitive
+}
+
+enum RelationshipType {
+  emergency
+  owner
+  parent
 }
 
 enum SortOrder {

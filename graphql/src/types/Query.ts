@@ -19,17 +19,7 @@ export const Query = objectType({
         t.list.field("members", {
             type: "Member",
             resolve: hasRole(["realm:ROLE_MEMBERSHIP"])((_: any, args: {}, context: Context) => {
-                return context.prisma.member.findMany({
-                    orderBy: [
-                        {
-                            familyName: "asc"
-                        },
-                        {
-                            givenName: "asc"
-                        }
-                    ],
-                    take: 10
-                });
+                return context.prisma.member.findMany();
             })
         });
 

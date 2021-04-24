@@ -7,13 +7,10 @@ export const Member = objectType({
     name: "Member",
     definition(t) {
         t.model.id();
-        t.model.givenName();
-        t.model.familyName();
-        t.model.gender();
         t.model.registrationDate();
         t.model.attributes();
         t.model.owner();
-    },
+    }
 });
 
 export const MemberAttribute = objectType({
