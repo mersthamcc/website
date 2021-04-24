@@ -19,13 +19,7 @@ export const Query = objectType({
         t.list.field("members", {
             type: "Member",
             resolve: hasRole(["realm:ROLE_MEMBERSHIP"])((_: any, args: {}, context: Context) => {
-                return context.prisma.member.findMany({
-                    orderBy: {
-                        familyName: "asc",
-                        givenName: "asc"
-                    },
-                    take: 10
-                });
+                return context.prisma.member.findMany();
             })
         });
 
@@ -34,7 +28,7 @@ export const Query = objectType({
             args: {
                 emailAddress: nonNull(stringArg())
             },
-            resolve: hasRole(["realm:TRUSTED_APPLICATION"])((_: any, args: {emailAddress: string}, context: Context) => {
+            resolve: hasRole(["realm:TRUSTED_APPLICATION"])((_: any, args: { emailAddress: string }, context: Context) => {
                 return context.prisma.user.findFirst({
                     where: {
                         email: {
@@ -50,7 +44,7 @@ export const Query = objectType({
             args: {
                 externalId: nonNull(stringArg())
             },
-            resolve: hasRole(["realm:TRUSTED_APPLICATION"])((_: any, args: {externalId: string}, context: Context) => {
+            resolve: hasRole(["realm:TRUSTED_APPLICATION"])((_: any, args: { externalId: string }, context: Context) => {
                 return context.prisma.user.findFirst({
                     where: {
                         externalId: {
@@ -62,14 +56,30 @@ export const Query = objectType({
         });
 
         t.list.field("membershipCategories", {
-           type: "MemberCategory",
-           resolve: auth((_: any, args: any, context: Context) => {
-               return context.prisma.memberCategory.findMany({
-                   orderBy: {
-                       key: "asc"
-                   }
-               });
-           })
+            type: "MemberCategory",
+            args: {
+                where: "MemberCategoryWhereInput"
+            },
+            resolve: auth((_: any, args: any, context: Context) => {
+                return context.prisma.memberCategory.findMany({
+                    orderBy: {
+                        key: "asc"
+                    },
+                    where: args.where || undefined
+                });
+            })
+        });
+
+        t.field("me", {
+            type: "User",
+            resolve: auth((_: any, args: any, context: Context) => {
+                return context.prisma.user.findUnique({
+                    where: {
+                        // @ts-ignore
+                        email: context.kauth.accessToken.content.email
+                    }
+                })
+            })
         });
     },
 });

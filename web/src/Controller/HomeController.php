@@ -9,15 +9,17 @@ use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomeController extends AbstractController implements FrontEndMenuProvider, TopMenuProvider
+class HomeController extends AbstractController implements
+    FrontEndMenuProvider,
+    TopMenuProvider
 {
     /**
      * @Route("/", name="home")
      */
     public function index()
     {
-        return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+        return $this->render("home/index.html.twig", [
+            "controller_name" => "HomeController",
         ]);
     }
 
@@ -26,8 +28,8 @@ class HomeController extends AbstractController implements FrontEndMenuProvider,
      */
     public function adminIndex()
     {
-        return $this->render('home/admin_index.html.twig', [
-            'controller_name' => 'HomeController',
+        return $this->render("home/admin_index.html.twig", [
+            "controller_name" => "HomeController",
         ]);
     }
 
@@ -35,12 +37,13 @@ class HomeController extends AbstractController implements FrontEndMenuProvider,
      * @param FactoryInterface $factory
      * @return ItemInterface[]
      */
-    public static function getFrontEndMenuItems(FactoryInterface $factory): array
-    {
+    public static function getFrontEndMenuItems(
+        FactoryInterface $factory
+    ): array {
         return [
             $factory->createItem("home", [
-                'route' => 'home',
-                'sortorder' => 10,
+                "route" => "home",
+                "sortorder" => 10,
             ]),
         ];
     }
@@ -48,9 +51,12 @@ class HomeController extends AbstractController implements FrontEndMenuProvider,
     public static function getTopMenuItems(FactoryInterface $factory): array
     {
         return [
-            $factory->createItem("administration", [
-                'route' => 'admin_home',
-            ])->setExtra('roles', ["ROLE_ADMIN"]),
+            $factory
+                ->createItem("administration", [
+                    "route" => "admin_home",
+                ])
+                ->setExtra("roles", ["ROLE_ADMIN"])
+                ->setAttribute("sortorder", 100),
         ];
     }
 }

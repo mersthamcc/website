@@ -59,8 +59,8 @@
 
 {%- block form_section_row -%}
 	<div class="c-content-title-1 c-title-md c-margin-b-20 clearfix">
-		<h3 class="c-center c-font-uppercase c-font-bold">{{ label }}</h3>
-		<div class="c-line-center c-theme-bg"></div>
+		<h3 class="c-font-thin">{{ label | trans({}, translation_domain )}}</h3>
+		<div class="c-line-left c-theme-bg"></div>
 	</div>
     {% for child in form %}
         {{- form_row(child) -}}
@@ -96,3 +96,173 @@
 	  	</div>
 	</div>
 {%- endblock recaptcha_row -%}
+
+{%- block table_form_widget -%}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                {% if selectable %}
+                    <th></th>
+                {% endif %}
+                {% for column in columns %}
+                    <th>{{ column.header }}</th>
+                {% endfor %}
+                {% if actions %}
+                    <th></th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr scope="row">
+                    {% if selectable %}
+                        <td>
+                            <input name="{{ id }}" value="{{ attribute(row, id) }}" type="checkbox" />
+                        </td>
+                    {% endif %}
+                    {% for column in columns %}
+                        {% set cell_value = column.field ? attribute(row, column.field) : " " %}
+                        <td>
+                            {% if column.form %}
+                                {{ form_widget(column.formview, { 'value': cell_value } ) }}
+                            {% else %}
+                                {{  cell_value }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    {% if actions %}
+                        <td>
+                            {% for action in actions %}
+                                <button type="submit" class="btn btn-{{ action.disposition }} btn-xs" name="{{ action.name }}" value="{{ attribute(row, id) }}"><i class="{{ action.icon }}"></i> {{ action.label }}</button>&nbsp;
+                            {% endfor %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                {% if selectable %}
+                    <td></td>
+                {% endif %}
+
+                {% for column in columns %}
+                    <td>{{ column.footer }}</td>
+                {% endfor %}
+                {% if actions %}
+                    <td></td>
+                {% endif %}
+            </tr>
+        </tfoot>
+    </table>
+{%- endblock table_form_widget -%}
+
+
+{%- block table_form_row -%}
+    <div>
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock table_form_row -%}
+
+{%- block panel_row -%}
+    {{- form_widget(form) -}}
+{%- endblock -%}
+
+{%- block panel_widget -%}
+    <div class="panel panel-{{ type }}">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {{ title | trans({}, translation_domain) }}
+            </h3>
+        </div>
+        <div class="panel-body">
+            {% for child in form %}
+                {{- form_row(child) -}}
+            {% endfor %}
+        </div>
+    </div>
+{%- endblock -%}
+
+{%- block membershipcategory_row -%}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{%- block membershipcategory_widget -%}
+    {%- for category in choices -%}
+        <div class="c-content-title-1 c-title-md c-margin-b-20 clearfix">
+            <h3 class="c-font-thin">{{ category.key | trans({}, translation_domain) }}</h3>
+            <div class="c-line-left c-theme-bg"></div>
+            {% set pricelist = category.pricelist %}
+            {{ block("pricelist_widget") }}
+        </div>
+    {%- endfor -%}
+{%- endblock -%}
+
+{%- block pricelist_row -%}
+    {{ form_widget(form) }}
+{%- endblock -%}
+
+{%- block pricelist_widget -%}
+    <div class="row">
+        <div class="c-content-pricing-1 c-opt-1">
+            <div class="col-md-2 c-sm-hidden">
+                <div class="c-content c-column-odd c-padding-adjustment">
+                    <div class="c-row c-type c-font-20 c-align-left">&nbsp;<br />&nbsp;</div>
+                    <div class="c-row c-title c-font-17">Age(s)</div>
+                    <div class="c-row c-title c-font-17">Gender</div>
+                    <div class="c-row c-title c-font-17"></div>
+                    <div class="c-row c-title c-font-17">Includes Match Fees</div>
+                    <div class="c-row c-empty">&nbsp;</div>
+                    <div class="c-row c-empty">&nbsp;</div>
+                </div>
+            </div>
+            {% set even = true %}
+            {%- for item in pricelist %}
+                <div class="col-md-3 col-sm-4">
+                    {% set parts = item.description | split(" ", 2) %}
+                    <div class="c-content c-column-{{ even ? "even" : "odd" }} c-padding-adjustment">
+                        <div class="c-row c-type c-font-20">
+                            {{ parts[0] }}
+                            <br />
+                            {%- if parts | length > 1 %}
+                                {{ parts[1] }}
+                            {% else %}
+                                &nbsp;
+                            {% endif -%}
+                        </div>
+                        <div class="c-row c-font-17">
+                            {{ item.minAge }}&nbsp;
+                            {%- if item.maxAge %}
+                                - {{ item.maxAge }}
+                            {%- else -%}
+                                and up
+                            {%- endif -%}
+                            <span class="c-sub-title">Age(s)</span>
+                        </div>
+                        <div class="c-row">
+                            All <span class="c-sub-title">Gender</span>
+                        </div>
+                        <div class="c-row">
+
+                        </div>
+                        <div class="c-row">
+                            {%- if item.includesMatchFee %}
+                                <i class="fa fa-check c-font-20"></i>
+                            {%- else -%}
+                                <i class="fa fa-times c-font-20"></i>
+                            {% endif -%}
+                            <span class="c-sub-title">Paid Issues</span>
+                        </div>
+                        <div class="c-row c-price">
+                            <span class="c-dollar c-font-20">&pound;</span> <span class="c-font-30 c-font-bold">{{ item.price }}</span>
+                        </div>
+                        <div class="c-row c-purchase">
+                            <button class="btn btn-md c-btn-square c-btn-green c-btn-uppercase c-btn-bold" value="{{ item.id }}" name="{{ full_name }}" id="{{ id }}" type="submit">{{ label|trans({}, translation_domain) }}</button>
+                        </div>
+                    </div>
+                </div>
+                {% set even = not even %}
+            {% endfor -%}
+        </div>
+    </div>
+{%- endblock -%}

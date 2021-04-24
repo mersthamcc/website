@@ -23,14 +23,14 @@ model flyway_schema_history {
 }
 
 model Member {
-  id               Int               @id @default(autoincrement())
-  givenName        String            @map("given_name")
-  familyName       String            @map("family_name")
-  gender           String
-  registrationDate DateTime          @map("registration_date")
-  ownerUserId      Int               @map("owner_user_id")
-  owner            User              @relation(fields: [ownerUserId], references: [id])
-  attributes       MemberAttribute[]
+  id                 Int                  @id @default(autoincrement())
+  type               String
+  registrationDate   DateTime             @map("registration_date")
+  ownerUserId        Int                  @map("owner_user_id")
+  owner              User                 @relation(fields: [ownerUserId], references: [id])
+  attributes         MemberAttribute[]
+  relatedMembers     MemberRelationship[] @relation("MemberToMemberRelationshipMemberId")
+  membersRelatedToMe MemberRelationship[] @relation("MemberToMemberRelationshipRelatedMemberId")
 
   @@index([ownerUserId], name: "idx_member_owner_user_id")
   @@map("member")
@@ -113,16 +113,18 @@ model MemberCategory {
   key              String                      @unique
   registrationCode String?                     @map("registration_code")
   form             MemberCategoryFormSection[]
+  pricelist        PriceList[]
 
   @@map("member_category")
 }
 
 model MemberCategoryFormSection {
-  memberCategoryId    Int               @map("member_category_id")
-  memberFormSectionId Int               @map("member_form_section_id")
-  sortOrder           Int               @map("sort_order")
-  category            MemberCategory    @relation(fields: [memberCategoryId], references: [id])
-  section             MemberFormSection @relation(fields: [memberFormSectionId], references: [id])
+  memberCategoryId     Int               @map("member_category_id")
+  memberFormSectionId  Int               @map("member_form_section_id")
+  sortOrder            Int               @map("sort_order")
+  show_on_registration Boolean
+  category             MemberCategory    @relation(fields: [memberCategoryId], references: [id])
+  section              MemberFormSection @relation(fields: [memberFormSectionId], references: [id])
 
   @@id([memberCategoryId, memberFormSectionId])
   @@map("member_category_form_section")
@@ -149,6 +151,38 @@ model MemberFormSectionAttribute {
   @@map("member_form_section_attribute")
 }
 
+model PriceList {
+  id                  Int            @id @default(autoincrement())
+  categoryId          Int            @map("category_id")
+  dateFrom            DateTime       @map("date_from")
+  dateTo              DateTime       @map("date_to")
+  minAge              Int            @map("min_age")
+  maxAge              Int?           @map("max_age")
+  description         String
+  includesMatchFees   Boolean?       @map("includes_match_fees")
+  price               Float
+  additionalUnitPrice Float?         @map("additional_unit_price")
+  memberCategory      MemberCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([dateFrom, dateTo, categoryId], name: "idx_pricelist_date_from_date_to_category_id")
+  @@index([categoryId], name: "idx_pricelist_category_id")
+  @@index([dateFrom, dateTo], name: "idx_pricelist_date_from_date_to")
+  @@map("pricelist")
+}
+
+model MemberRelationship {
+  memberId         Int              @map("member_id")
+  relatedMemberId  Int              @map("related_member_id")
+  relationshipType RelationshipType @map("relationship_type")
+  member           Member           @relation("MemberToMemberRelationshipMemberId", fields: [memberId], references: [id])
+  relatedMember    Member           @relation("MemberToMemberRelationshipRelatedMemberId", fields: [relatedMemberId], references: [id])
+
+  @@id([memberId, relatedMemberId, relationshipType])
+  @@index([memberId], name: "idx_member_relationship_member_id")
+  @@index([relatedMemberId], name: "idx_related_member_relationship_member_id")
+  @@map("member_relationship")
+}
+
 enum AttributeType {
   String
   Number
@@ -161,4 +195,12 @@ enum AttributeType {
   Email
 
    @@map("attribute_type")
+}
+
+enum RelationshipType {
+  owner
+  parent
+  emergency
+
+   @@map("relationship_type")
 }

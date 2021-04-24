@@ -18,6 +18,11 @@ services:
     ports:
       - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:3100/ready -S -O -
+      interval: 5s
+      retries: 30
     networks:
       - backendnetwork
 
@@ -84,6 +89,10 @@ services:
       - dmz
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:8082/ping -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     logging:
@@ -113,6 +122,10 @@ services:
       - dmz
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:8080/stub_status
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
       - php
@@ -139,8 +152,6 @@ services:
       DEVDOMAIN: ${DEVDOMAIN}
       CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
       CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
-      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
-      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
       API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
     volumes:
       - ./web:/var/www
@@ -172,7 +183,7 @@ services:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: pg_onready
+      test: pg_isready
       interval: 5s
       retries: 30
     depends_on:
@@ -193,6 +204,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test:  '[[ $$(redis-cli ping) == "PONG" ]] && echo UP'
+      retries: 30
+      interval: 5s
     depends_on:
       - loki
     logging:
@@ -222,6 +237,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:9090 -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     logging:
@@ -237,6 +256,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:9100/metrics -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - redis
       - loki
@@ -317,6 +340,10 @@ services:
       - dmz
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:4000
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
       - postgres
@@ -347,6 +374,10 @@ services:
       - com_docker_swarm_service_name=mail
       - tls-cert-host-check=mail.${DEVDOMAIN}
     restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:80
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     logging:
@@ -425,6 +456,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:3000 -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     ports:
@@ -481,13 +516,17 @@ services:
     environment:
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-      PGADMIN_DEFAULT_EMAIL: notused
-      PGADMIN_DEFAULT_PASSWORD: notused
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAILADDRESS}
+      PGADMIN_DEFAULT_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
       - ./dev-config/pgadmin4/servers.json:/pgadmin4/servers.json:ro
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:80 -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
       - postgres
@@ -519,6 +558,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:8081 -S -O -
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
       - redis
@@ -563,6 +606,10 @@ services:
       - loki
     networks:
       - backendnetwork
+    healthcheck:
+      test: curl http://localhost:8080
+      interval: 5s
+      retries: 30
     logging:
       driver: loki
       options:
@@ -592,6 +639,43 @@ services:
       - backendnetwork
     depends_on:
       - keycloak
+
+  vault:
+    image: vault:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vault.rule=Host(`vault.${DEVDOMAIN}`)
+      - traefik.http.services.vault.loadbalancer.server.port=8200
+      - traefik.http.routers.vault.entrypoints=web
+      - traefik.http.routers.vault.middlewares=forcehttps
+      - traefik.http.routers.vault-tls.tls=true
+      - traefik.http.routers.vault-tls.rule=Host(`vault.${DEVDOMAIN}`)
+      - traefik.http.routers.vault-tls.entrypoints=websecure
+      - traefik.http.routers.vault-tls.tls.certresolver=le
+      - traefik.http.routers.vault-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=vault
+      - tls-cert-host-check=vault.${DEVDOMAIN}
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
+    cap_add:
+      - IPC_LOCK
+    ports:
+    - 8200:8200
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    healthcheck:
+      test: wget http://localhost:8200/ui -S -O -
+      interval: 5s
+      retries: 30
+    depends_on:
+      - loki
+      - postgres
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
 
 volumes:
   pg-data:

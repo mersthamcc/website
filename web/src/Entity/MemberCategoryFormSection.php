@@ -5,12 +5,12 @@ namespace App\Entity;
 class MemberCategoryFormSection
 {
     /**
-     * @var $sortOrder int
+     * @var int
      */
     private $sortOrder;
 
     /**
-     * @var $section MemberFormSection
+     * @var MemberFormSection
      */
     private $section;
 
@@ -28,5 +28,26 @@ class MemberCategoryFormSection
     public function getSection(): MemberFormSection
     {
         return $this->section;
+    }
+
+    /**
+     * @param int $sortOrder
+     * @return MemberCategoryFormSection
+     */
+    public function setSortOrder(int $sortOrder): MemberCategoryFormSection
+    {
+        $this->sortOrder = $sortOrder;
+        return $this;
+    }
+
+    /**
+     * @param MemberFormSection $section
+     * @return MemberCategoryFormSection
+     */
+    public function setSection(
+        MemberFormSection $section
+    ): MemberCategoryFormSection {
+        $this->section = $section;
+        return $this;
     }
 }

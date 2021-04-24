@@ -2,6 +2,7 @@ import {arg, intArg, list, nonNull, objectType, stringArg} from "nexus";
 import {auth, hasRole} from "keycloak-connect-graphql";
 import {Context} from "../context";
 import {encrypt} from "../helpers/Encryption";
+import {keys} from "nexus-plugin-prisma/dist/utils";
 
 export const Mutation = objectType({
     name: "Mutation",
@@ -61,9 +62,7 @@ export const Mutation = objectType({
                 const now = new Date();
                 return context.prisma.member.create({
                    data: {
-                       familyName: args.data.familyName,
-                       givenName: args.data.givenName,
-                       gender: args.data.gender,
+                       type: "member",
                        registrationDate: now,
                        owner: {
                            connect: {
@@ -77,7 +76,7 @@ export const Mutation = objectType({
                                return({
                                    definition: {
                                        connect: {
-                                           key: "school"
+                                           key: attr.key
                                        }
                                    },
                                    updatedDate: now,
@@ -125,9 +124,6 @@ export const Mutation = objectType({
                         id: args.id,
                     },
                     data: {
-                        familyName: args.data.familyName,
-                        givenName: args.data.givenName,
-                        gender: args.data.gender,
                         attributes: {
                             upsert: await Promise.all(args.data.attributes.map(async (attr: { key: string; value: any; }) => {
                                 const encrypted = await encrypt(JSON.stringify(attr.value));

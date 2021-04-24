@@ -26,17 +26,25 @@ class UserService
     public function getUserByEmailAddress(string $emailAddress)
     {
         $this->logger->debug("Looking up user $emailAddress");
-        return $this->client->userByEmail(User::class, [
-            "emailAddress" => $emailAddress,
-        ]);
+        return $this->client->userByEmail(
+            User::class,
+            [
+                "emailAddress" => $emailAddress,
+            ],
+            true
+        );
     }
 
     public function getUserByExternalId(string $externalId)
     {
         $this->logger->debug("Looking up user $externalId");
-        return $this->client->userByExternalId(User::class, [
-            "externalId" => $externalId,
-        ]);
+        return $this->client->userByExternalId(
+            User::class,
+            [
+                "externalId" => $externalId,
+            ],
+            true
+        );
     }
 
     public function createUser(
@@ -46,22 +54,35 @@ class UserService
         string $givenName
     ) {
         $this->logger->debug("Creating user $emailAddress");
-        return $this->client->signupUser(User::class, [
-            "externalId" => $externalId,
-            "emailAddress" => $emailAddress,
-            "familyName" => $familyName,
-            "givenName" => $givenName,
-        ]);
+        return $this->client->signupUser(
+            User::class,
+            [
+                "externalId" => $externalId,
+                "emailAddress" => $emailAddress,
+                "familyName" => $familyName,
+                "givenName" => $givenName,
+            ],
+            true
+        );
     }
 
     public function updateUserDetails(User $user): User
     {
-        return $this->client->updateUserDetails(User::class, [
-            "id" => $user->getId(),
-            "roles" => $user->getRoles(),
-            "familyName" => $user->getFamilyName(),
-            "givenName" => $user->getGivenName(),
-            "email" => $user->getEmail(),
-        ]);
+        return $this->client->updateUserDetails(
+            User::class,
+            [
+                "id" => $user->getId(),
+                "roles" => $user->getRoles(),
+                "familyName" => $user->getFamilyName(),
+                "givenName" => $user->getGivenName(),
+                "email" => $user->getEmail(),
+            ],
+            true
+        );
+    }
+
+    public function me(): User
+    {
+        return $this->client->me(User::class, [], false);
     }
 }

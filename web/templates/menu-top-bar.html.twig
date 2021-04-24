@@ -40,6 +40,9 @@
 {% endblock %}
 
 {% block topMenuEntry %}
+    {% if not menuEntry.isFirst %}
+        <li class="c-divider">&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+    {% endif %}
     <li>
         <a href="{{ menuEntry.uri }}">
             {% with { item: menuEntry } %}
@@ -47,9 +50,6 @@
             {% endwith %}
         </a>
     </li>
-    {% if not menuEntry.isLast %}
-    <li class="c-divider">&nbsp;|</li>
-    {% endif %}
 {% endblock %}
 
 {% block label %}

@@ -21,7 +21,8 @@ services:
 
   App\ApiClient\ApiClient:
     class: App\ApiClient\ApiClient
-    arguments: ['@App\ApiClient\TokenService', "%env(API_SERVER_URL)%"]
+    arguments:
+      ['@App\ApiClient\TokenService', "%env(API_SERVER_URL)%", "@logger"]
 
   app.menu_builder:
     class: App\Service\MenuService

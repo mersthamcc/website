@@ -14,6 +14,11 @@ class User implements UserInterface
     private $familyName;
     private $roles = [];
 
+    /**
+     * @var $members Member[]
+     */
+    private $members = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +109,24 @@ class User implements UserInterface
     }
 
     /**
+     * @return Member[]
+     */
+    public function getMembers(): array
+    {
+        return $this->members;
+    }
+
+    /**
+     * @param Member[] $members
+     * @return User
+     */
+    public function setMembers(array $members): User
+    {
+        $this->members = $members;
+        return $this;
+    }
+
+    /**
      * @see UserInterface
      */
     public function getPassword()
@@ -139,5 +162,15 @@ class User implements UserInterface
             return true;
         }
         return count(array_intersect($validRoles, $this->getRoles())) > 0;
+    }
+
+    /**
+     * @param mixed $id
+     * @return User
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
     }
 }
