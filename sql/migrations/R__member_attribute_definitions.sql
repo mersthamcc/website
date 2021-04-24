@@ -146,7 +146,7 @@ VALUES ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 
         NULL, FALSE),
        ('2021-06-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL, 'Adults', 100.00,
         NULL, FALSE),
-       ('2021-06-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL,
+       ('2021-01-01', '2021-05-31', (SELECT id FROM member_category WHERE key = 'adult'), 16, NULL,
         'Adults (inclusive of match fees)', 300.00, NULL, TRUE),
        ('2021-01-01', '2021-12-31', (SELECT id FROM member_category WHERE key = 'adult'), 15, NULL,
         'Ladies (15 years and older)', 40.00, NULL, NULL),
