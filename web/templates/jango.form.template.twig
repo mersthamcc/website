@@ -192,7 +192,7 @@
         <div class="c-content-title-1 c-title-md c-margin-b-20 clearfix">
             <h3 class="c-font-thin">{{ category.key | trans({}, translation_domain) }}</h3>
             <div class="c-line-left c-theme-bg"></div>
-            {% set pricelist = category.pricelist %}
+            {% set pricelist = category.pricelistItem %}
             {{ block("pricelist_widget") }}
         </div>
     {%- endfor -%}
@@ -254,7 +254,7 @@
                             <span class="c-sub-title">Paid Issues</span>
                         </div>
                         <div class="c-row c-price">
-                            <span class="c-dollar c-font-20">&pound;</span> <span class="c-font-30 c-font-bold">{{ item.price }}</span>
+                            <span class="c-dollar c-font-20">&pound;</span> <span class="c-font-30 c-font-bold">{{ item.currentPrice }}</span>
                         </div>
                         <div class="c-row c-purchase">
                             <button class="btn btn-md c-btn-square c-btn-green c-btn-uppercase c-btn-bold" value="{{ item.id }}" name="{{ full_name }}" id="{{ id }}" type="submit">{{ label|trans({}, translation_domain) }}</button>

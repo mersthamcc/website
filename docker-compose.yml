@@ -610,6 +610,7 @@ services:
       test: curl http://localhost:8080
       interval: 5s
       retries: 30
+    restart: on-failure
     logging:
       driver: loki
       options:
@@ -619,6 +620,7 @@ services:
     image: chrisclayson/terraform-toolbox:latest
     working_dir: /src
     command: ./deploy.sh --validate
+    restart: on-failure
     extra_hosts:
       - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
     volumes:

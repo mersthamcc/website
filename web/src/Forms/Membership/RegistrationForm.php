@@ -10,7 +10,6 @@ use App\Forms\Components\PanelType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,15 +24,6 @@ class RegistrationForm extends AbstractType
             "translation_domain" => $options["translation_domain"],
             "mapped" => false,
         ]);
-
-        $panel->add(
-            $builder
-                ->create("basics", FormSectionType::class, [
-                    "label" => "basics",
-                ])
-                ->add("familyName", TextType::class, [])
-                ->add("givenName", TextType::class, [])
-        );
 
         /**
          * @var $category MemberCategory

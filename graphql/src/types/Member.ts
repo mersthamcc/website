@@ -37,9 +37,9 @@ export const MemberCategory = objectType({
        t.model.key();
        t.model.registrationCode();
        t.model.form();
-       t.model.pricelist({
+       t.model.pricelistItem({
            filtering: true,
-           ordering: true
+           ordering: true,
        });
    }
 });
@@ -81,18 +81,51 @@ export const MemberFormSectionAttribute = objectType({
    }
 });
 
-export const PriceList = objectType({
-    name: "PriceList",
+export const PricelistItem = objectType({
+    name: "PricelistItem",
     definition(t) {
         t.model.id();
-        t.date("dateFrom");
-        t.date("dateTo");
         t.model.description();
         t.model.minAge();
         t.model.maxAge();
-        t.model.price();
-        t.model.additionalUnitPrice();
         t.model.includesMatchFees();
+        t.model.memberCategory();
+        t.model.pricelist({
+            filtering: true,
+            ordering: true,
+        });
+        t.field("currentPrice", {
+            type: "Float",
+            description: "The current price of the item",
+            resolve: async (root: any, args: any, ctx: Context) => {
+                let now = new Date();
+                let result = await ctx.prisma.priceList.findFirst({
+                    where: {
+                        pricelistItemId: root.id,
+                        dateFrom: {
+                            lte: now
+                        },
+                        dateTo: {
+                            gte: now
+                        }
+                    },
+                    select: {
+                        price: true
+                    }
+                });
+                return result?.price == null ? 0.00 : result?.price;
+            }
+        })
+    }
+});
+
+export const Pricelist = objectType({
+    name: "PriceList",
+    definition(t) {
+        t.model.pricelistItem();
+        t.date("dateFrom");
+        t.date("dateTo");
+        t.model.price();
     }
 });
 
