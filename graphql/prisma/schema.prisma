@@ -113,7 +113,7 @@ model MemberCategory {
   key              String                      @unique
   registrationCode String?                     @map("registration_code")
   form             MemberCategoryFormSection[]
-  pricelist        PriceList[]
+  pricelistItem    PricelistItem[]             @relation("member_categoryTopricelist_item")
 
   @@map("member_category")
 }
@@ -152,21 +152,14 @@ model MemberFormSectionAttribute {
 }
 
 model PriceList {
-  id                  Int            @id @default(autoincrement())
-  categoryId          Int            @map("category_id")
-  dateFrom            DateTime       @map("date_from")
-  dateTo              DateTime       @map("date_to")
-  minAge              Int            @map("min_age")
-  maxAge              Int?           @map("max_age")
-  description         String
-  includesMatchFees   Boolean?       @map("includes_match_fees")
-  price               Float
-  additionalUnitPrice Float?         @map("additional_unit_price")
-  memberCategory      MemberCategory @relation(fields: [categoryId], references: [id])
+  pricelistItemId Int           @map("pricelist_item_id")
+  dateFrom        DateTime      @map("date_from")
+  dateTo          DateTime      @map("date_to")
+  price           Float
+  pricelistItem   PricelistItem @relation("pricelistTopricelist_item", fields: [pricelistItemId], references: [id])
 
-  @@unique([dateFrom, dateTo, categoryId], name: "idx_pricelist_date_from_date_to_category_id")
-  @@index([categoryId], name: "idx_pricelist_category_id")
-  @@index([dateFrom, dateTo], name: "idx_pricelist_date_from_date_to")
+  @@id([pricelistItemId, dateFrom, dateTo])
+  @@index([dateFrom, dateTo], name: "idx_pricelist_item_date_from_date_to")
   @@map("pricelist")
 }
 
@@ -181,6 +174,20 @@ model MemberRelationship {
   @@index([memberId], name: "idx_member_relationship_member_id")
   @@index([relatedMemberId], name: "idx_related_member_relationship_member_id")
   @@map("member_relationship")
+}
+
+model PricelistItem {
+  id                Int            @id @default(autoincrement())
+  categoryId        Int            @map("category_id")
+  minAge            Int            @map("min_age")
+  maxAge            Int?           @map("max_age")
+  description       String
+  includesMatchFees Boolean?       @map("includes_match_fees")
+  memberCategory    MemberCategory @relation("member_categoryTopricelist_item", fields: [categoryId], references: [id])
+  pricelist         PriceList[]    @relation("pricelistTopricelist_item")
+
+  @@index([categoryId], name: "idx_pricelist_item_category_id")
+  @@map("pricelist_item")
 }
 
 enum AttributeType {

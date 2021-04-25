@@ -89,28 +89,11 @@ input FloatFilter {
   notIn: [Float!]
 }
 
-input FloatNullableFilter {
-  equals: Float
-  gt: Float
-  gte: Float
-  in: [Float!]
-  lt: Float
-  lte: Float
-  not: NestedFloatNullableFilter
-  notIn: [Float!]
-}
-
 """Gender (M/F/N)"""
 enum Gender {
   F
   M
   N
-}
-
-input Idx_pricelist_date_from_date_to_category_idCompoundUniqueInput {
-  categoryId: Int!
-  dateFrom: DateTime!
-  dateTo: DateTime!
 }
 
 input IntFilter {
@@ -184,7 +167,7 @@ input MemberAttributeWhereUniqueInput {
 type MemberCategory {
   form(after: MemberCategoryFormSectionWhereUniqueInput, before: MemberCategoryFormSectionWhereUniqueInput, first: Int, last: Int): [MemberCategoryFormSection!]!
   key: String!
-  pricelist(after: PriceListWhereUniqueInput, before: PriceListWhereUniqueInput, first: Int, last: Int, orderBy: [PriceListOrderByInput!], where: PriceListWhereInput): [PriceList!]!
+  pricelistItem(after: PricelistItemWhereUniqueInput, before: PricelistItemWhereUniqueInput, first: Int, last: Int, orderBy: [PricelistItemOrderByInput!], where: PricelistItemWhereInput): [PricelistItem!]!
   registrationCode: String
 }
 
@@ -228,7 +211,7 @@ input MemberCategoryWhereInput {
   key: StringFilter
   NOT: [MemberCategoryWhereInput!]
   OR: [MemberCategoryWhereInput!]
-  pricelist: PriceListListRelationFilter
+  pricelistItem: PricelistItemListRelationFilter
   registrationCode: StringNullableFilter
 }
 
@@ -398,17 +381,6 @@ input NestedFloatFilter {
   notIn: [Float!]
 }
 
-input NestedFloatNullableFilter {
-  equals: Float
-  gt: Float
-  gte: Float
-  in: [Float!]
-  lt: Float
-  lte: Float
-  not: NestedFloatNullableFilter
-  notIn: [Float!]
-}
-
 input NestedIntFilter {
   equals: Int
   gt: Int
@@ -490,15 +462,61 @@ input NewsCommentWhereUniqueInput {
 }
 
 type PriceList {
-  additionalUnitPrice: Float
   dateFrom: Date
   dateTo: Date
+  price: Float!
+  pricelistItem: PricelistItem!
+}
+
+type PricelistItem {
+  """The current price of the item"""
+  currentPrice: Float
   description: String!
   id: Int!
   includesMatchFees: Boolean
   maxAge: Int
+  memberCategory: MemberCategory!
   minAge: Int!
-  price: Float!
+  pricelist(after: PriceListWhereUniqueInput, before: PriceListWhereUniqueInput, first: Int, last: Int, orderBy: [PriceListOrderByInput!], where: PriceListWhereInput): [PriceList!]!
+}
+
+input PricelistItemIdDateFromDateToCompoundUniqueInput {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  pricelistItemId: Int!
+}
+
+input PricelistItemListRelationFilter {
+  every: PricelistItemWhereInput
+  none: PricelistItemWhereInput
+  some: PricelistItemWhereInput
+}
+
+input PricelistItemOrderByInput {
+  categoryId: SortOrder
+  description: SortOrder
+  id: SortOrder
+  includesMatchFees: SortOrder
+  maxAge: SortOrder
+  minAge: SortOrder
+}
+
+input PricelistItemWhereInput {
+  AND: [PricelistItemWhereInput!]
+  categoryId: IntFilter
+  description: StringFilter
+  id: IntFilter
+  includesMatchFees: BoolNullableFilter
+  maxAge: IntNullableFilter
+  memberCategory: MemberCategoryWhereInput
+  minAge: IntFilter
+  NOT: [PricelistItemWhereInput!]
+  OR: [PricelistItemWhereInput!]
+  pricelist: PriceListListRelationFilter
+}
+
+input PricelistItemWhereUniqueInput {
+  id: Int
 }
 
 input PriceListListRelationFilter {
@@ -508,45 +526,32 @@ input PriceListListRelationFilter {
 }
 
 input PriceListOrderByInput {
-  additionalUnitPrice: SortOrder
-  categoryId: SortOrder
   dateFrom: SortOrder
   dateTo: SortOrder
-  description: SortOrder
-  id: SortOrder
-  includesMatchFees: SortOrder
-  maxAge: SortOrder
-  minAge: SortOrder
   price: SortOrder
+  pricelistItemId: SortOrder
 }
 
 input PriceListWhereInput {
-  additionalUnitPrice: FloatNullableFilter
   AND: [PriceListWhereInput!]
-  categoryId: IntFilter
   dateFrom: DateTimeFilter
   dateTo: DateTimeFilter
-  description: StringFilter
-  id: IntFilter
-  includesMatchFees: BoolNullableFilter
-  maxAge: IntNullableFilter
-  memberCategory: MemberCategoryWhereInput
-  minAge: IntFilter
   NOT: [PriceListWhereInput!]
   OR: [PriceListWhereInput!]
   price: FloatFilter
+  pricelistItem: PricelistItemWhereInput
+  pricelistItemId: IntFilter
 }
 
 input PriceListWhereUniqueInput {
-  id: Int
-  idx_pricelist_date_from_date_to_category_id: Idx_pricelist_date_from_date_to_category_idCompoundUniqueInput
+  pricelistItemId_dateFrom_dateTo: PricelistItemIdDateFromDateToCompoundUniqueInput
 }
 
 type Query {
   feed: [News]
   me: User
   members: [Member]
-  membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
+  membershipCategories: [MemberCategory]
   userByEmail(emailAddress: String!): User
   userByExternalId(externalId: String!): User
 }
