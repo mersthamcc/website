@@ -1,23 +1,14 @@
-query($where: MemberCategoryWhereInput, $priceListEffectiveDate: DateTime) {
+query($where: MemberCategoryWhereInput) {
   membershipCategories(where: $where) {
     key
     registrationCode
-    pricelist(
-      where: {
-        dateTo: { gte: $priceListEffectiveDate }
-        dateFrom: { lte: $priceListEffectiveDate }
-      }
-      orderBy: [{ description: asc }, { price: asc }]
-    ) {
+    pricelistItem {
       id
-      dateFrom
-      dateTo
       description
       minAge
       maxAge
-      price
-      additionalUnitPrice
       includesMatchFees
+      currentPrice
     }
     form {
       sortOrder

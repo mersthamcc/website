@@ -57,7 +57,9 @@ export const Query = objectType({
 
         t.list.field("membershipCategories", {
             type: "MemberCategory",
-
+            args: {
+                where: "MemberCategoryWhereInput"
+            },
             resolve: auth((_: any, args: any, context: Context) => {
                 return context.prisma.memberCategory.findMany({
                     orderBy: {

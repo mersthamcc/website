@@ -551,7 +551,7 @@ type Query {
   feed: [News]
   me: User
   members: [Member]
-  membershipCategories: [MemberCategory]
+  membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
   userByEmail(emailAddress: String!): User
   userByExternalId(externalId: String!): User
 }

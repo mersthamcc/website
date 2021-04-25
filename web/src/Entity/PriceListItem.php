@@ -2,24 +2,12 @@
 
 namespace App\Entity;
 
-use DateTime;
-
 class PriceListItem
 {
     /**
      * @var int $id
      */
     private $id;
-
-    /**
-     * @var DateTime|null $dateFrom
-     */
-    private $dateFrom;
-
-    /**
-     * @var DateTime|null $dateTo
-     */
-    private $dateTo;
 
     /**
      * @var string $description
@@ -37,14 +25,9 @@ class PriceListItem
     private $maxAge;
 
     /**
-     * @var float $price
+     * @var float $currentPrice
      */
-    private $price;
-
-    /**
-     * @var float|null $additionalUnitPrice
-     */
-    private $additionalUnitPrice;
+    private $currentPrice;
 
     /**
      * @var boolean|null $includesMatchFee
@@ -66,42 +49,6 @@ class PriceListItem
     public function setId(int $id): PriceListItem
     {
         $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getDateFrom(): ?DateTime
-    {
-        return $this->dateFrom;
-    }
-
-    /**
-     * @param DateTime|null $dateFrom
-     * @return PriceListItem
-     */
-    public function setDateFrom(?DateTime $dateFrom): PriceListItem
-    {
-        $this->dateFrom = $dateFrom;
-        return $this;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getDateTo(): ?DateTime
-    {
-        return $this->dateTo;
-    }
-
-    /**
-     * @param DateTime|null $dateTo
-     * @return PriceListItem
-     */
-    public function setDateTo(?DateTime $dateTo): PriceListItem
-    {
-        $this->dateTo = $dateTo;
         return $this;
     }
 
@@ -160,38 +107,20 @@ class PriceListItem
     }
 
     /**
-     * @return float|int|string
+     * @return float
      */
-    public function getPrice()
+    public function getCurrentPrice(): float
     {
-        return $this->price;
+        return $this->currentPrice;
     }
 
     /**
-     * @param float|int|string $price
+     * @param float $currentPrice
      * @return PriceListItem
      */
-    public function setPrice($price)
+    public function setCurrentPrice(float $currentPrice): PriceListItem
     {
-        $this->price = $price;
-        return $this;
-    }
-
-    /**
-     * @return float|int|string|null
-     */
-    public function getAdditionalUnitPrice()
-    {
-        return $this->additionalUnitPrice;
-    }
-
-    /**
-     * @param float|int|string|null $additionalUnitPrice
-     * @return PriceListItem
-     */
-    public function setAdditionalUnitPrice($additionalUnitPrice)
-    {
-        $this->additionalUnitPrice = $additionalUnitPrice;
+        $this->currentPrice = $currentPrice;
         return $this;
     }
 

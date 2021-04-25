@@ -20,9 +20,9 @@ class MemberCategory
     private $form;
 
     /**
-     * @var PriceListItem[]|null $priceList
+     * @var PriceListItem[]|null $priceListItem
      */
-    private $priceList;
+    private $priceListItem;
 
     /**
      * @return string
@@ -82,18 +82,18 @@ class MemberCategory
     /**
      * @return PriceListItem[]|null
      */
-    public function getPriceList(): ?array
+    public function getPriceListItem(): ?array
     {
-        return $this->priceList;
+        return $this->priceListItem;
     }
 
     /**
-     * @param PriceListItem[]|null $priceList
+     * @param PriceListItem[]|null $priceListItem
      * @return MemberCategory
      */
-    public function setPriceList(?array $priceList): MemberCategory
+    public function setPriceListItem(?array $priceListItem): MemberCategory
     {
-        $this->priceList = $priceList;
+        $this->priceListItem = $priceListItem;
         return $this;
     }
 }
