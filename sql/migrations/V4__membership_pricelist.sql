@@ -20,7 +20,6 @@ CREATE TABLE pricelist
     date_from             DATE    NOT NULL,
     date_to               DATE    NOT NULL,
     price                 DECIMAL(10, 2) NOT NULL,
-    additional_unit_price DECIMAL(10, 2),
     PRIMARY KEY (pricelist_item_id, date_from, date_to)
 );
 
