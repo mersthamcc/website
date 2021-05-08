@@ -2,12 +2,13 @@
 
 namespace App\Forms\Membership;
 
-use App\Entity\Member;
 use App\Entity\MemberCategory;
+use App\Entity\Subscription;
 use App\Forms\Components\ButtonSectionType;
 use App\Forms\Components\FormSectionType;
 use App\Forms\Components\PanelType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,6 +20,7 @@ class RegistrationForm extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add("priceListItemId", HiddenType::class);
         $panel = $builder->create("details-panel", PanelType::class, [
             "title" => "member-details",
             "translation_domain" => $options["translation_domain"],
@@ -75,7 +77,7 @@ class RegistrationForm extends AbstractType
             )
             ->setRequired(self::MEMBERSHIP_CATEGORY_OPTION)
             ->setDefaults([
-                "data_class" => Member::class,
+                "data_class" => Subscription::class,
                 // enable/disable CSRF protection for this form
                 "csrf_protection" => true,
                 // the name of the hidden HTML field that stores the token

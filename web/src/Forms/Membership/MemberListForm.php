@@ -28,22 +28,14 @@ class MemberListForm extends AbstractType
                     "label" => "my-members",
                 ])
                 ->add("Members", TableType::class, [
-                    "data" => $options["data"],
+                    "data" => $options["data"]->getItems(),
                     "selectable" => true,
+                    "id" => "registrationId",
+                    "mapped" => false,
                     "columns" => [
-                        new TableColumn("familyName", "familyName", ""),
-                        new TableColumn("givenName", "givenName", ""),
-                        new TableColumn(
-                            "category",
-                            null,
-                            null,
-                            $builder
-                                ->create(
-                                    "category",
-                                    SubsCategoryDropDownType::class
-                                )
-                                ->getForm()
-                        ),
+                        new TableColumn("family-name", "family-name", ""),
+                        new TableColumn("given-name", "given-name", ""),
+                        new TableColumn("category", null, null),
                         new TableColumn("age", null, null),
                         new TableColumn("renewalcost", null, null),
                     ],
@@ -60,7 +52,7 @@ class MemberListForm extends AbstractType
                 ->add(
                     $builder
                         ->create("buttons", ButtonSectionType::class)
-                        ->add("reset", ResetType::class, ["label" => "Clear"])
+                        ->add("reset", SubmitType::class, ["label" => "Clear"])
                         ->add("save", SubmitType::class, ["label" => "Next"])
                 )
         );

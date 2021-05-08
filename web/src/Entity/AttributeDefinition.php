@@ -111,7 +111,7 @@ class AttributeDefinition
         bool $required = false
     ): FormBuilderInterface {
         $options = [
-            "property_path" => "[" . $this->getKey() . "]",
+            "property_path" => "member[" . $this->getKey() . "]",
             "label" => $this->getKey(),
             "translation_domain" => "membership",
             "required" => $required,
