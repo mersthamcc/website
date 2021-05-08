@@ -1,8 +1,8 @@
 <#import "/spring.ftl" as spring />
 <#macro topMenuItem item hasNext>
     <li>
-        <a href="${item.destinationUrl()}">
-            <@spring.message code="menu.${item.name()}" />
+        <a href="${item.destinationUrl}">
+            <@spring.message code="menu.${item.name}" />
         </a>
     </li>
     <#if hasNext>
@@ -84,8 +84,8 @@
                 <nav class="c-top-menu c-pull-right">
                     <ul class="c-links c-ext c-theme-ul">
                         <#list topMenu as item>
-                            <#if item.roles()?? && item.roles()?size!=0>
-                                <#if user?? && user.roleCheck(item.roles())>
+                            <#if item.roles?? && item.roles?size!=0>
+                                <#if user?? && user.roleCheck(item.roles)>
                                     <@topMenuItem item=item hasNext=item?has_next />
                                 </#if>
                             <#else>
@@ -162,14 +162,14 @@
                     <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase-reset c-fonts-bold-reset">
                         <ul class="nav navbar-nav c-theme-nav">
                             <#list mainMenu as item>
-                                <#if item.active()>
+                                <#if item.active>
                                     <#assign classes>c-active</#assign>
                                 <#else>
                                     <#assign classes></#assign>
                                 </#if>
                                 <li class="c-menu-type-classic ${classes}">
-                                    <a href="${item.destinationUrl()}" class="c-link dropdown-toggle">
-                                        <@spring.message code="menu.${item.name()}" />
+                                    <a href="${item.destinationUrl}" class="c-link dropdown-toggle">
+                                        <@spring.message code="menu.${item.name}" />
                                         <span class="c-arrow c-toggler"></span>
                                     </a>
                                     <#if item.children??>
