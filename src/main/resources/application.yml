@@ -21,7 +21,7 @@ club:
     facebook:
       handle: ${FACEBOOK_HANDLE:MersthamCC}
   cookies:
-    api-key: ${COOKIE_CONTROL_COOKIE:f462c1a63422c4ca6ab426c399bf6ecead720cc2}
+    api-key: ${COOKIE_CONTROL_KEY:}
     product-code: ${COOKIE_CONTROL_PRODUCT:PRO}
     optional-cookie-categories:
       - name: social

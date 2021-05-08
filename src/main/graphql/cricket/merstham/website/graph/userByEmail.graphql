@@ -1,4 +1,4 @@
-query($emailAddress: String!) {
+query userByEmail($emailAddress: String!) {
   userByEmail(emailAddress: $emailAddress) {
     id
     email

@@ -1,4 +1,4 @@
-mutation(
+mutation signupUser(
   $externalId: String!
   $emailAddress: String!
   $givenName: String!
