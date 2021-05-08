@@ -1,13 +1,23 @@
 plugins {
     id 'org.springframework.boot' version '2.4.5'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'com.apollographql.apollo' version '2.5.6'
     id 'java'
+    id 'com.apollographql.apollo' version '2.5.6'
+    id 'jacoco'
+    id "org.sonarqube" version "3.2.0"
 }
 
 group = 'cricket.merstham.website'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '16'
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mersthamcc_frontend"
+        property "sonar.organization", "mersthamcc"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
 
 repositories {
     mavenCentral()
@@ -24,7 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'com.apollographql.apollo:apollo-api:2.5.6'
+    implementation 'com.apollographql.apollo:apollo-runtime:2.5.6'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -45,3 +55,11 @@ test {
 bootJar {
     archiveFileName = "frontend.jar"
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+test.finalizedBy jacocoTestReport
+tasks['sonarqube'].dependsOn test

@@ -1,4 +1,4 @@
-mutation($member: MemberInput!) {
+mutation createMember($member: MemberInput!) {
   createMember(data: $member) {
     id
     registrationDate

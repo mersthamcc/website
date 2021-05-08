@@ -1,4 +1,4 @@
-query($externalId: String!) {
+query userByExternalId($externalId: String!) {
   userByExternalId(externalId: $externalId) {
     id
     email

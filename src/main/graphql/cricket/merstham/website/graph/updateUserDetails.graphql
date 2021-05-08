@@ -1,4 +1,4 @@
-mutation(
+mutation updateUserDetails(
   $id: Int!
   $roles: [String!]!
   $familyName: String!
