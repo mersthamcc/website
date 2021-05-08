@@ -1,11 +1,10 @@
 .env
 letsencrypt/
 .idea/
-graphql/node_modules
-graphql/src/generated
-graphql/npm-debug.log
+frontend/
+keycloak/keycloak-theme/
+keycloak/keycloak-sms2fa/
+graphql/
 dev-config/keycloak/.terraform
 dev-config/keycloak/terraform.tfstate*
-web/public/resources
-keycloak/sms-2fa/build
-keycloak/sms-2fa/.gradle
+

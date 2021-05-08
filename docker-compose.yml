@@ -101,14 +101,14 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   web:
-    image: nginx:latest
-    volumes:
-      - ./web:/var/www
-      - ./dev-config/nginx.conf:/etc/nginx/conf.d/www.conf
+    image: mersthamcc/frontend:development
+    build:
+      dockerfile: Dockerfile
+      context: frontend
     labels:
       - traefik.enable=true
       - traefik.http.routers.www.rule=Host(`www.${DEVDOMAIN}`)
-      - traefik.http.services.www.loadbalancer.server.port=80
+      - traefik.http.services.www.loadbalancer.server.port=8080
       - traefik.http.routers.www.entrypoints=web
       - traefik.http.routers.www.middlewares=forcehttps
       - traefik.http.routers.www-tls.tls=true
@@ -118,6 +118,19 @@ services:
       - traefik.http.routers.www-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=www
       - tls-cert-host-check=www.${DEVDOMAIN}
+    extra_hosts:
+      - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
+      - "graph.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
+    environment:
+      KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      DEVDOMAIN: ${DEVDOMAIN}
+      CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
+      CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
+      API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
+      COOKIE_CONTROL_KEY: ${COOKIE_CONTROL_KEY}
+    ports:
+      - 8081:8081
+      - 8080:8080
     networks:
       - dmz
       - backendnetwork
@@ -128,39 +141,6 @@ services:
       retries: 30
     depends_on:
       - loki
-      - php
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
-
-  php:
-    build:
-      dockerfile: dev.Dockerfile
-      context: .
-    extra_hosts:
-      - "login.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
-      - "graph.${DEVDOMAIN}:${HOST_IP_ADDRESS}"
-    labels:
-      - traefik.enable=false
-    environment:
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_URL: ${DATABASE_URL}
-      KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
-      DEVDOMAIN: ${DEVDOMAIN}
-      CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
-      CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
-      API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
-    volumes:
-      - ./web:/var/www
-    restart: unless-stopped
-    depends_on:
-      - loki
-      - postgres
-    networks:
-      - backendnetwork
     logging:
       driver: loki
       options:
