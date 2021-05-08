@@ -1,0 +1,15 @@
+mutation($member: MemberInput!) {
+  createMember(data: $member) {
+    id
+    registrationDate
+    attributes {
+      definition {
+        key
+      }
+      value
+    }
+    owner {
+      email
+    }
+  }
+}

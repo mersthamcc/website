@@ -1,0 +1,33 @@
+spring:
+  freemarker:
+    template-loader-path: "classpath:/templates"
+    suffix: .ftl
+
+debug: false
+server:
+  port: 8080
+
+club:
+  club-name: ${CLUBNAME:Merstham Cricket Club}
+  logo: "/assets/mcc/img/header_logo.png"
+  phone-number: "(01737) 645485"
+  google-analytics-key: "UA-48714932-4"
+  play-cricket:
+    enabled: false
+    site: merstham
+  social:
+    twitter:
+      handle: ${TWITTER_HANDLE:mersthammagics}
+    facebook:
+      handle: ${FACEBOOK_HANDLE:MersthamCC}
+  cookies:
+    api-key: ${COOKIE_CONTROL_COOKIE:f462c1a63422c4ca6ab426c399bf6ecead720cc2}
+    product-code: ${COOKIE_CONTROL_PRODUCT:PRO}
+    optional-cookie-categories:
+      - name: social
+        label: Social Media
+        enabled: true
+        description: Blah
+        cookieNames:
+          - "_utma"
+          - "gid"
