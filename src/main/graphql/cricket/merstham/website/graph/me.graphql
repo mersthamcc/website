@@ -1,0 +1,18 @@
+query {
+  me {
+    id
+    externalId
+    email
+    roles
+    members {
+      id
+      registrationDate
+      attributes {
+        definition {
+          key
+        }
+        value
+      }
+    }
+  }
+}

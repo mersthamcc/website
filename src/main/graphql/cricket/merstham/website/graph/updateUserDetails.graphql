@@ -1,0 +1,22 @@
+mutation(
+  $id: Int!
+  $roles: [String!]!
+  $familyName: String!
+  $givenName: String!
+  $email: String!
+) {
+  updateUserDetails(
+    id: $id
+    roles: $roles
+    familyName: $familyName
+    givenName: $givenName
+    email: $email
+  ) {
+    id
+    email
+    externalId
+    familyName
+    givenName
+    roles
+  }
+}
