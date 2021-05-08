@@ -121,7 +121,11 @@
                         </td>
                     {% endif %}
                     {% for column in columns %}
-                        {% set cell_value = column.field ? attribute(row, column.field) : " " %}
+                        {% if column.field %}
+                            {% set cell_value = attribute(row, column.field) is defined ? attribute(row, column.field) : row[column.field] %}
+                        {% else %}
+                            {% set cell_value = " " %}
+                        {% endif %}
                         <td>
                             {% if column.form %}
                                 {{ form_widget(column.formview, { 'value': cell_value } ) }}
@@ -218,7 +222,7 @@
             </div>
             {% set even = true %}
             {%- for item in pricelist %}
-                <div class="col-md-3 col-sm-4">
+                <div class="col-md-2 col-sm-3">
                     {% set parts = item.description | split(" ", 2) %}
                     <div class="c-content c-column-{{ even ? "even" : "odd" }} c-padding-adjustment">
                         <div class="c-row c-type c-font-20">

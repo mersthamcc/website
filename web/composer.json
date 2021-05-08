@@ -37,6 +37,7 @@
         "symfony/string": "5.1.*",
         "symfony/translation": "5.1.*",
         "symfony/twig-pack": "^1.0",
+        "symfony/uid": "5.1.*",
         "symfony/validator": "5.1.*",
         "symfony/web-link": "5.1.*",
         "symfony/yaml": "5.1.*"

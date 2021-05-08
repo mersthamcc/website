@@ -2,6 +2,7 @@
 namespace App\Forms\Membership;
 
 use App\Entity\PriceListItem;
+use App\Entity\Subscription;
 use App\Utils\FormHelpers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -37,7 +38,8 @@ class PricelistType extends AbstractType
             )
             ->setDefault("mapped", true)
             ->setDefault("inherit_data", false)
-            ->setDefault("label", "select");
+            ->setDefault("label", "select")
+            ->setDefault("data_class", Subscription::class);
     }
 
     /**
