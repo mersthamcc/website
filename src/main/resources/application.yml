@@ -3,9 +3,18 @@ spring:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
 
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:https://login.new.mersthamcc.co.uk/auth}
+  realm: ${KEYCLOAK_REALM:new.mersthamcc.co.uk}
+  resource: ${KEYCLOAK_CLIENT_ID:dummy}
+  ssl-required: external
+  credentials:
+    secret: "${KEYCLOAK_CLIENT_SECRET:dummy}" #pragma: allowlist secret
+
 debug: false
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 club:
   club-name: ${CLUBNAME:Merstham Cricket Club}

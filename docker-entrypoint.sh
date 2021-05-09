@@ -1,7 +1,5 @@
 #!/bin/bash
-
-set -eu
-
+set -e
 DEBUG_OPTIONS=""
 if [[ ! -z ${DEBUG_PORT} ]]; then
     DEBUG_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
