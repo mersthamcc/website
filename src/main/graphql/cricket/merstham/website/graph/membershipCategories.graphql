@@ -1,4 +1,4 @@
-query membershipCategories($key: StringFilter) {
+query membershipCategories($key: StringFilter!) {
   membershipCategories(where: {
     key: $key
   }) {

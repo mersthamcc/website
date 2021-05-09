@@ -42,3 +42,5 @@ club:
         cookieNames:
           - "_utma"
           - "gid"
+graph:
+  graph-uri: ${GRAPH_URI}
