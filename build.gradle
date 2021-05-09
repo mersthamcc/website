@@ -35,6 +35,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-mail:${dependencyVersions.spring_boot}"
     implementation "org.keycloak:keycloak-spring-boot-starter:${dependencyVersions.keycloak}"
+    implementation "org.keycloak.bom:keycloak-adapter-bom:${dependencyVersions.keycloak}"
     implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-quartz:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"

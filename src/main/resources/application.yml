@@ -10,6 +10,8 @@ keycloak:
   ssl-required: external
   credentials:
     secret: "${KEYCLOAK_CLIENT_SECRET:dummy}" #pragma: allowlist secret
+  use-resource-role-mappings: false
+  principal-attribute: preferred_username
 
 debug: false
 server:

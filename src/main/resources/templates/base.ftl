@@ -85,7 +85,7 @@
                     <ul class="c-links c-ext c-theme-ul">
                         <#list topMenu as item>
                             <#if item.roles?? && item.roles?size!=0>
-                                <#if user?? && user.roleCheck(item.roles)>
+                                <#if user?? && user.hasOneOfRoles(item.roles)>
                                     <@topMenuItem item=item hasNext=item?has_next />
                                 </#if>
                             <#else>
@@ -95,8 +95,19 @@
                         <li class="c-lang c-last">
                             <#if user??>
                                 <a href="#">${user.givenName}</a>
-                                <ul>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <#list user.roles as role>
+                                        <li>${role}</li>
+                                    </#list>
+                                    <li class="divider"></li>
 
+                                    <#list userMenu as item>
+                                    <li>
+                                        <a href="${item.destinationUrl}">
+                                            <@spring.message code="menu.${item.name}" />
+                                        </a>
+                                    </li>
+                                    </#list>
                                 </ul>
                             <#else>
                                 <a href="/login"><@spring.message code="menu.login" /></a>
