@@ -1,14 +1,22 @@
-ARG JAVA_VERSION=16
+ARG JAVA_VERSION=11
+ARG GRADLE_VERSION=7
+FROM gradle:${GRADLE_VERSION}-jdk${JAVA_VERSION} AS frontend-builder
+RUN mkdir /app
+COPY build.gradle /app
+COPY settings.gradle /app
+COPY src /app/src
+WORKDIR /app
+RUN gradle build
+
+ARG JAVA_VERSION=11
 FROM adoptopenjdk:${JAVA_VERSION}
-ARG DEBUG_PORT=8081
-ARG DEBUG_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
 ARG JAR_FILE=build/libs/*.jar
 
 EXPOSE 8080
-EXPOSE ${DEBUG_PORT}
 RUN addgroup --system spring
 RUN adduser --system spring --ingroup spring
 USER spring:spring
 WORKDIR /app
-COPY ${JAR_FILE} /app
-ENTRYPOINT ["java", "${DEBUG_OPTIONS}", "-jar","frontend.jar"]
+COPY --from=frontend-builder /app/${JAR_FILE} /app
+COPY docker-entrypoint.sh /app
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

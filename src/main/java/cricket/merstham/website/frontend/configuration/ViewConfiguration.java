@@ -41,7 +41,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             Object handler,
             ModelAndView modelAndView) throws Exception {
 
-        if (handler instanceof HandlerMethod) {
+        if (handler instanceof HandlerMethod && modelAndView != null) {
             Map<String, Object> model = new HashMap<>();
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
