@@ -128,15 +128,16 @@ services:
       CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
       API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
       COOKIE_CONTROL_KEY: ${COOKIE_CONTROL_KEY}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      KEYCLOAK_CLIENT_ID: website
     ports:
       - 8081:8081
-      - 8080:8080
     networks:
       - dmz
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: curl http://localhost:8080/stub_status
+      test: curl http://localhost:8080/
       interval: 5s
       retries: 30
     depends_on:
@@ -530,8 +531,6 @@ services:
       - traefik.http.routers.redis-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=redis
       - tls-cert-host-check=redis.${DEVDOMAIN}
-    ports:
-      - 8081:8081
     environment:
       REDIS_HOST: redis
       REDIS_TLS: "false"

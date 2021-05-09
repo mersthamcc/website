@@ -234,7 +234,8 @@ resource "keycloak_openid_client" "website_client" {
   }
 
   valid_redirect_uris = [
-    "${var.base_url}/login_check"
+    "${var.base_url}/sso/login",
+    "http://localhost:8080/sso/login"
   ]
 
   web_origins = [
