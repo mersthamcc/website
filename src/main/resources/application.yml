@@ -2,6 +2,9 @@ spring:
   freemarker:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
 
 keycloak:
   auth-server-url: ${KEYCLOAK_URL:https://login.new.mersthamcc.co.uk/auth}
