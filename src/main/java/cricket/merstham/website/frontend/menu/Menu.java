@@ -1,5 +1,7 @@
 package cricket.merstham.website.frontend.menu;
 
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
 import java.net.URI;
 import java.util.List;
 
@@ -9,15 +11,13 @@ public class Menu {
     private URI destinationUrl;
     private List<String> roles;
     private List<Menu> children;
-    private boolean active;
 
-    public Menu(String name, String className, URI destinationUrl, List<String> roles, List<Menu> children, boolean active) {
+    public Menu(String name, String className, URI destinationUrl, List<String> roles, List<Menu> children) {
         this.name = name;
         this.className = className;
         this.destinationUrl = destinationUrl;
         this.roles = roles;
         this.children = children;
-        this.active = active;
     }
 
     public String getName() {
@@ -29,6 +29,9 @@ public class Menu {
     }
 
     public URI getDestinationUrl() {
+        if (destinationUrl==null) {
+            return URI.create(MvcUriComponentsBuilder.fromMappingName(name).build());
+        }
         return destinationUrl;
     }
 
@@ -40,7 +43,13 @@ public class Menu {
         return children;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean onActivePath(String currentRoute) {
+        if (currentRoute.equals(name)) return true;
+        if (children != null ) {
+            for (var child : children) {
+                if (child.onActivePath(currentRoute)) return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,14 +1,6 @@
 <#import "/spring.ftl" as spring />
-<#macro topMenuItem item hasNext>
-    <li>
-        <a href="${item.destinationUrl}">
-            <@spring.message code="menu.${item.name}" />
-        </a>
-    </li>
-    <#if hasNext>
-        <li class="c-divider">&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-    </#if>
-</#macro>
+<#import "components.ftl" as components />
+
 <#macro mainLayout>
 <!DOCTYPE html>
 <!--[if IE 9]>
@@ -81,48 +73,7 @@
                 </nav>
                 <!-- END: INLINE NAV -->
                 <!-- BEGIN: INLINE NAV -->
-                <nav class="c-top-menu c-pull-right">
-                    <ul class="c-links c-ext c-theme-ul">
-                        <#list topMenu as item>
-                            <#if item.roles?? && item.roles?size!=0>
-                                <#if user?? && user.hasOneOfRoles(item.roles)>
-                                    <@topMenuItem item=item hasNext=item?has_next />
-                                </#if>
-                            <#else>
-                                <@topMenuItem item=item hasNext=item?has_next />
-                            </#if>
-                        </#list>
-                        <li class="c-lang c-last">
-                            <#if user??>
-                                <a href="#">${user.givenName}</a>
-                                <ul class="dropdown-menu pull-right" role="menu">
-                                    <#list user.roles as role>
-                                        <li>${role}</li>
-                                    </#list>
-                                    <li class="divider"></li>
-
-                                    <#list userMenu as item>
-                                    <li>
-                                        <a href="${item.destinationUrl}">
-                                            <@spring.message code="menu.${item.name}" />
-                                        </a>
-                                    </li>
-                                    </#list>
-                                </ul>
-                            <#else>
-                                <a href="/login"><@spring.message code="menu.login" /></a>
-                            </#if>
-                        </li>
-                        <li class="c-search hide">
-                            <!-- BEGIN: QUICK SEARCH -->
-                            <form action="#">
-                                <input type="text" name="query" placeholder="Search..." value="" class="form-control" autocomplete="off">
-                                <i class="fa fa-search"></i>
-                            </form>
-                            <!-- END: QUICK SEARCH -->
-                        </li>
-                    </ul>
-                </nav>
+                <@components.topmenu topMenu=topMenu user=user userMenu=userMenu />
                 <!-- END: INLINE NAV -->
             </div>
         </div>
@@ -173,7 +124,7 @@
                     <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase-reset c-fonts-bold-reset">
                         <ul class="nav navbar-nav c-theme-nav">
                             <#list mainMenu as item>
-                                <#if item.active>
+                                <#if item.onActivePath(currentRoute)>
                                     <#assign classes>c-active</#assign>
                                 <#else>
                                     <#assign classes></#assign>

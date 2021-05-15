@@ -60,7 +60,8 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
             model.put("userMenu", menuBuilderProvider.getUserMenu());
-            model.put("mainMenu", menuBuilderProvider.getFrontEndMenu(getMappingName(request, handler)));
+            model.put("mainMenu", menuBuilderProvider.getFrontEndMenu());
+            model.put("currentRoute", getMappingName(request, handler));
 
             modelAndView.addAllObjects(model);
         }
@@ -81,7 +82,6 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         Method method = ((HandlerMethod) handler).getMethod();
         return method.getAnnotation(RequestMapping.class).name();
     }
-
 
     public static class UserView {
         private KeycloakSecurityContext session;

@@ -52,6 +52,6 @@ public class RegistrationController {
         MembershipCategoriesQuery query = new MembershipCategoriesQuery(StringFilter.builder().build());
         Response<MembershipCategoriesQuery.Data> result = membershipCategoryService.executeQuery(query);
 
-        return new ModelAndView("registration/register", Map.of("categories", result.getData().membershipCategories()));
+        return new ModelAndView("registration/select-membership", Map.of("categories", result.getData().membershipCategories()));
     }
 }
