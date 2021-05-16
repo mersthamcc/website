@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-public class HomeController {
+public class SelectionController {
 
-    @RequestMapping(value = "/", name = "home", method = RequestMethod.GET)
-    public String homepage() {
+    @RequestMapping(value = "/selection", name = "selection", method = RequestMethod.GET)
+    public String selection() {
         return "home/home";
     }
 }

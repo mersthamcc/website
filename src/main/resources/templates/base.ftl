@@ -131,11 +131,47 @@
                                 </#if>
                                 <li class="c-menu-type-classic ${classes}">
                                     <a href="${item.destinationUrl}" class="c-link dropdown-toggle">
-                                        <@spring.message code="menu.${item.name}" />
+                                        <@spring.messageArgs code="menu.${item.name}" args=item.argumentValues />
                                         <span class="c-arrow c-toggler"></span>
                                     </a>
                                     <#if item.children??>
-
+                                        <ul class="dropdown-menu c-menu-type-classic c-pull-left">
+                                            <#list item.children as subitem>
+                                                <#if subitem.onActivePath(currentRoute)>
+                                                    <#assign classes>c-active</#assign>
+                                                <#else>
+                                                    <#assign classes></#assign>
+                                                </#if>
+                                                <#if subitem.children??>
+                                                    <li class="dropdown-submenu ${classes}">
+                                                        <a href="javascript:;">
+                                                            <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
+                                                            <span class="c-arrow c-toggler"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu c-pull-right">
+                                                            <#list subitem.children as leafItem>
+                                                                <#if leafItem.onActivePath(currentRoute)>
+                                                                    <#assign classes>c-active</#assign>
+                                                                <#else>
+                                                                    <#assign classes></#assign>
+                                                                </#if>
+                                                                <li class="${classes}">
+                                                                    <a href="${leafItem.destinationUrl}">
+                                                                        <@spring.messageArgs code="menu.${leafItem.name}" args=leafItem.argumentValues />
+                                                                    </a>
+                                                                </li>
+                                                            </#list>
+                                                        </ul>
+                                                    </li>
+                                                <#else>
+                                                    <li class="${classes}">
+                                                        <a href="${subitem.destinationUrl}">
+                                                            <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
+                                                        </a>
+                                                    </li>
+                                                </#if>
+                                            </#list>
+                                        </ul>
                                     </#if>
                                 </li>
                             </#list>
@@ -147,42 +183,6 @@
                     <!-- END: MEGA MENU --><!-- END: LAYOUT/HEADERS/MEGA-MENU -->
                     <!-- END: HOR NAV -->
                 </div>
-                <!-- BEGIN: LAYOUT/HEADERS/QUICK-CART -->
-                <!-- BEGIN: CART MENU -->
-                <div class="c-cart-menu">
-                    <div class="c-cart-menu-title">
-                        <p class="c-cart-menu-float-l c-font-sbold">2 item(s)</p>
-                        <p class="c-cart-menu-float-r c-theme-font c-font-sbold">$79.00</p>
-                    </div>
-                    <ul class="c-cart-menu-items">
-                        <li>
-                            <div class="c-cart-menu-close">
-                                <a href="#" class="c-theme-link">×</a>
-                            </div>
-                            <img src="../../assets/base/img/content/shop2/24.jpg"/>
-                            <div class="c-cart-menu-content">
-                                <p>1 x <span class="c-item-price c-theme-font">$30</span></p>
-                                <a href="shop-product-details-2.html" class="c-item-name c-font-sbold">Winter Coat</a>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="c-cart-menu-close">
-                                <a href="#" class="c-theme-link">×</a>
-                            </div>
-                            <img src="../../assets/base/img/content/shop2/12.jpg"/>
-                            <div class="c-cart-menu-content">
-                                <p>1 x <span class="c-item-price c-theme-font">$30</span></p>
-                                <a href="shop-product-details.html" class="c-item-name c-font-sbold">Sports Wear</a>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="c-cart-menu-footer">
-                        <a href="shop-cart.html" class="btn btn-md c-btn c-btn-square c-btn-grey-3 c-font-white c-font-bold c-center c-font-uppercase">View Cart</a>
-                        <a href="shop-checkout.html" class="btn btn-md c-btn c-btn-square c-theme-btn c-font-white c-font-bold c-center c-font-uppercase">Checkout</a>
-                    </div>
-                </div>
-                <!-- END: CART MENU -->
-                <!-- END: LAYOUT/HEADERS/QUICK-CART -->
             </div>
         </div>
     </header>
@@ -207,21 +207,29 @@
         <div class="c-layout-breadcrumbs-1 c-bordered c-bordered-both c-fonts-uppercase-reset c-fonts-bold-reset">
             <div class="container">
                 <div class="c-page-title c-pull-left">
-                    <h3 class="c-font-sbold c-font-uppercase"></h3>
+                    <h3 class="c-font-sbold c-font-uppercase">
+                        <#if pageTitle??>
+                            ${pageTitle}
+                        <#else>
+                            <@spring.messageArgs code="menu.${currentRoute.name}" args=currentRoute.argumentValues />
+                        </#if>
+                    </h3>
                 </div>
                 <ul class="c-page-breadcrumbs c-theme-nav c-pull-right c-fonts-regular">
-<#--                    {% block breadcrumbs %}-->
-<#--                        {% for breadcrumb_item in knp_menu_get_breadcrumbs_array(knp_menu_get_current_item('main')) %}-->
-<#--                            {% if loop.first %}-->
-<#--                                <!-- Root Breadcrumb &ndash;&gt;-->
-<#--                            {% elseif loop.last %}-->
-<#--                                <li class="c-state_active">{{ breadcrumb_item.label | trans({}, 'frontend</li>-->
-<#--                            {% else %}-->
-<#--                                <li><a href="{{ breadcrumb_item.uri }}">{{ breadcrumb_item.label | trans({}, 'frontend</a></li>-->
-<#--                                <li>/</li>-->
-<#--                            {% endif %}-->
-<#--                        {% endfor %}-->
-<#--                    {% endblock %}-->
+                    <#if breadcrumbs??>
+                        <#list breadcrumbs as breadcrumb>
+                            <#if breadcrumb?has_next>
+                                <li>
+                                    <a href="${breadcrumb.destinationUrl}">
+                                        <@spring.messageArgs code="menu.${breadcrumb.name}" args=breadcrumb.argumentValues />
+                                    </a>
+                                </li>
+                                <li>/</li>
+                            <#else>
+                                <li class="c-state_active"><@spring.messageArgs code="menu.${breadcrumb.name}" args=breadcrumb.argumentValues /></li>
+                            </#if>
+                        </#list>
+                    </#if>
                 </ul>
             </div>
         </div>
