@@ -2,6 +2,9 @@ spring:
   freemarker:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
 
 keycloak:
   auth-server-url: ${KEYCLOAK_URL:https://login.new.mersthamcc.co.uk/auth}
@@ -10,6 +13,8 @@ keycloak:
   ssl-required: external
   credentials:
     secret: "${KEYCLOAK_CLIENT_SECRET:dummy}" #pragma: allowlist secret
+  use-resource-role-mappings: false
+  principal-attribute: preferred_username
 
 debug: false
 server:
@@ -40,3 +45,5 @@ club:
         cookieNames:
           - "_utma"
           - "gid"
+graph:
+  graph-uri: ${GRAPH_URI}
