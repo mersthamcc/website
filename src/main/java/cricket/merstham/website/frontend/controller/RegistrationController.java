@@ -5,6 +5,7 @@ import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
+import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +38,13 @@ public class RegistrationController {
 
     private GraphService graphService;
     private MembershipService membershipService;
+    private PaymentServiceManager paymentServiceManager;
 
     @Autowired
-    public RegistrationController(GraphService graphService, MembershipService membershipService) {
+    public RegistrationController(GraphService graphService, MembershipService membershipService, PaymentServiceManager paymentServiceManager) {
         this.graphService = graphService;
         this.membershipService = membershipService;
+        this.paymentServiceManager = paymentServiceManager;
     }
 
     @ModelAttribute("basket")
@@ -149,7 +152,8 @@ public class RegistrationController {
                 "registration/confirmation",
                 Map.of(
                         "basket", basket,
-                        "order", format("WEB-%1$6s", orderId).replace(' ', '0')
+                        "order", format("WEB-%1$6s", orderId).replace(' ', '0'),
+                        "paymentTypes", paymentServiceManager.getAvailableServices()
                 )
         );
     }
