@@ -10,36 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 class MenuTest {
 
-    private static final List<Menu> menuTree = List.of(
-            new Menu("test-item-1",
-                    null,
-                    null,
-                    null,
-                    null
-            ),
-            new Menu("test-item-2",
-                    new LinkedHashMap<>(),
-                    null,
-                    null,
-                    List.of(
-                            new Menu("sub-item-1",
-                                    null,
-                                    null,
-                                    null,
-                                    null
-                            ),
-                            new Menu("sub-item-2",
-                                    null,
-                                    null,
-                                    null,
-                                    null
-                            )
-                    )
-            )
-    );
+    private static final List<Menu> menuTree =
+            List.of(
+                    new Menu("test-item-1", null, null, null, null),
+                    new Menu(
+                            "test-item-2",
+                            new LinkedHashMap<>(),
+                            null,
+                            null,
+                            List.of(
+                                    new Menu("sub-item-1", null, null, null, null),
+                                    new Menu("sub-item-2", null, null, null, null))));
 
     @Test
     void getArgumentValuesWhenNoPathVariables() {
@@ -52,12 +35,7 @@ class MenuTest {
     void getArgumentValuesWithOnePathVariable() {
         var params = new LinkedHashMap<String, String>();
         params.put("id", "1");
-        Menu menuItem = new Menu("test-item",
-                params,
-                null,
-                null,
-                null
-        );
+        Menu menuItem = new Menu("test-item", params, null, null, null);
 
         assertThat(menuItem.getArgumentValues()).isEqualTo(new String[] {"1"});
     }
@@ -67,12 +45,7 @@ class MenuTest {
         var params = new LinkedHashMap<String, String>();
         params.put("id", "1");
         params.put("foo", "bar");
-        Menu menuItem = new Menu("test-item",
-                params,
-                null,
-                null,
-                null
-        );
+        Menu menuItem = new Menu("test-item", params, null, null, null);
 
         assertThat(menuItem.getArgumentValues()).isEqualTo(new String[] {"1", "bar"});
     }
@@ -115,10 +88,8 @@ class MenuTest {
         ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("sub-item-1");
 
         assertThat(menuTree.get(1).getBreadcrumbs(currentRoute).size()).isEqualTo(2);
-        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute)).contains(
-                menuTree.get(1).getChildren().get(0),
-                menuTree.get(1)
-            );
+        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute))
+                .contains(menuTree.get(1).getChildren().get(0), menuTree.get(1));
     }
 
     @Test
@@ -126,10 +97,8 @@ class MenuTest {
         ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("sub-item-2");
 
         assertThat(menuTree.get(1).getBreadcrumbs(currentRoute).size()).isEqualTo(2);
-        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute)).contains(
-                menuTree.get(1).getChildren().get(1),
-                menuTree.get(1)
-        );
+        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute))
+                .contains(menuTree.get(1).getChildren().get(1), menuTree.get(1));
     }
 
     @Test
@@ -152,56 +121,108 @@ class MenuTest {
 
     @Test
     void isActiveNodeReturnTrueForValidNodeWithOneParameter() {
-        ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-        }});
+        ViewConfiguration.CurrentRoute currentRoute =
+                createMockCurrentRoute(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                            }
+                        });
 
-        Menu menuItem = new Menu("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-        }}, null, null, null);
+        Menu menuItem =
+                new Menu(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                            }
+                        },
+                        null,
+                        null,
+                        null);
 
         assertThat(menuItem.isActiveNode(currentRoute)).isTrue();
     }
 
     @Test
     void isActiveNodeReturnFalseForValidNodeWithOneInvalidParameter() {
-        ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("test-item", new LinkedHashMap<>() {{
-            put("foo", "foo");
-        }});
+        ViewConfiguration.CurrentRoute currentRoute =
+                createMockCurrentRoute(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "foo");
+                            }
+                        });
 
-        Menu menuItem = new Menu("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-        }}, null, null, null);
+        Menu menuItem =
+                new Menu(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                            }
+                        },
+                        null,
+                        null,
+                        null);
 
         assertThat(menuItem.isActiveNode(currentRoute)).isFalse();
     }
 
     @Test
     void isActiveNodeReturnTrueForValidNodeWithMultipleParameters() {
-        ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-            put("second-foo", "bar-bar");
-        }});
+        ViewConfiguration.CurrentRoute currentRoute =
+                createMockCurrentRoute(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                                put("second-foo", "bar-bar");
+                            }
+                        });
 
-        Menu menuItem = new Menu("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-            put("second-foo", "bar-bar");
-        }}, null, null, null);
+        Menu menuItem =
+                new Menu(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                                put("second-foo", "bar-bar");
+                            }
+                        },
+                        null,
+                        null,
+                        null);
 
         assertThat(menuItem.isActiveNode(currentRoute)).isTrue();
     }
 
     @Test
     void isActiveNodeReturnFalseForValidNodeWithMultipleInvalidParameters() {
-        ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("test-item", new LinkedHashMap<>() {{
-            put("foo", "foo");
-            put("second-foo", "bar-bar");
-        }});
+        ViewConfiguration.CurrentRoute currentRoute =
+                createMockCurrentRoute(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "foo");
+                                put("second-foo", "bar-bar");
+                            }
+                        });
 
-        Menu menuItem = new Menu("test-item", new LinkedHashMap<>() {{
-            put("foo", "bar");
-            put("second-foo", "not-valid");
-        }}, null, null, null);
+        Menu menuItem =
+                new Menu(
+                        "test-item",
+                        new LinkedHashMap<>() {
+                            {
+                                put("foo", "bar");
+                                put("second-foo", "not-valid");
+                            }
+                        },
+                        null,
+                        null,
+                        null);
 
         assertThat(menuItem.isActiveNode(currentRoute)).isFalse();
     }
@@ -210,7 +231,8 @@ class MenuTest {
         return createMockCurrentRoute(name, new LinkedHashMap<>());
     }
 
-    private ViewConfiguration.CurrentRoute createMockCurrentRoute(String name, LinkedHashMap<String, String> pathVariables) {
+    private ViewConfiguration.CurrentRoute createMockCurrentRoute(
+            String name, LinkedHashMap<String, String> pathVariables) {
         ViewConfiguration.CurrentRoute currentRoute = mock(ViewConfiguration.CurrentRoute.class);
         when(currentRoute.getName()).thenReturn(name);
         when(currentRoute.getPathVariables()).thenReturn(pathVariables);

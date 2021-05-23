@@ -16,6 +16,7 @@ import javax.ws.rs.client.*;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -33,11 +34,12 @@ public class AccessTokenManager {
     private String clientSecret;
 
     @Autowired
-    public AccessTokenManager(TokenCache tokenCache,
-                              @Value("${keycloak.realm}") String realm,
-                              @Value("${keycloak.auth-server-url}") String authServerUrl,
-                              @Value("${keycloak.resource}") String clientId,
-                              @Value("${keycloak.credentials.secret}") String clientSecret) {
+    public AccessTokenManager(
+            TokenCache tokenCache,
+            @Value("${keycloak.realm}") String realm,
+            @Value("${keycloak.auth-server-url}") String authServerUrl,
+            @Value("${keycloak.resource}") String clientId,
+            @Value("${keycloak.credentials.secret}") String clientSecret) {
         this.tokenCache = tokenCache;
         this.realm = realm;
         this.authServerUrl = authServerUrl;
@@ -46,13 +48,20 @@ public class AccessTokenManager {
     }
 
     public String getAccessToken() {
-        return tokenCache.getAccessToken().orElseGet(() -> {
-            AccessTokenResponse accessTokenResponse = requestAccessToken();
-            return tokenCache.updateToken(
-                    accessTokenResponse.getToken(),
-                    Duration.of(accessTokenResponse.getExpiresIn() - 60, SECONDS))
-                            .getAccessToken().get();
-        });
+        return tokenCache
+                .getAccessToken()
+                .orElseGet(
+                        () -> {
+                            AccessTokenResponse accessTokenResponse = requestAccessToken();
+                            return tokenCache
+                                    .updateToken(
+                                            accessTokenResponse.getToken(),
+                                            Duration.of(
+                                                    accessTokenResponse.getExpiresIn() - 60,
+                                                    SECONDS))
+                                    .getAccessToken()
+                                    .get();
+                        });
     }
 
     private AccessTokenResponse requestAccessToken() {
@@ -79,7 +88,12 @@ public class AccessTokenManager {
     }
 
     private ServerConfiguration getServerConfiguration() {
-        String configurationUrl = KeycloakUriBuilder.fromUri(authServerUrl).clone().path(AUTHZ_DISCOVERY_URL).build(realm).toString();
+        String configurationUrl =
+                KeycloakUriBuilder.fromUri(authServerUrl)
+                        .clone()
+                        .path(AUTHZ_DISCOVERY_URL)
+                        .build(realm)
+                        .toString();
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(configurationUrl);
         Invocation.Builder requestBuilder = target.request(MediaType.APPLICATION_JSON_TYPE);

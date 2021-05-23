@@ -9,17 +9,13 @@ public class AttributeDefinition implements Serializable {
 
     private static final long serialVersionUID = 20210522173300L;
 
-    @JsonProperty
-    private String section;
+    @JsonProperty private String section;
 
-    @JsonProperty
-    private String type;
+    @JsonProperty private String type;
 
-    @JsonProperty
-    private boolean mandatory;
+    @JsonProperty private boolean mandatory;
 
-    @JsonProperty
-    private List<String> choices;
+    @JsonProperty private List<String> choices;
 
     public String getSection() {
         return section;

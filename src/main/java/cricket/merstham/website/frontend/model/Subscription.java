@@ -18,26 +18,19 @@ public class Subscription implements Serializable {
 
     private static final long serialVersionUID = 20210522173123L;
 
-    @JsonProperty
-    private UUID uuid;
+    @JsonProperty private UUID uuid;
 
-    @JsonProperty
-    private String category;
+    @JsonProperty private String category;
 
-    @JsonProperty
-    private int pricelistItemId = 0;
+    @JsonProperty private int pricelistItemId = 0;
 
-    @JsonProperty
-    private Map<String, Object> member;
+    @JsonProperty private Map<String, Object> member;
 
-    @JsonProperty
-    private Map<String, AttributeDefinition> attributes = new HashMap<>();
+    @JsonProperty private Map<String, AttributeDefinition> attributes = new HashMap<>();
 
-    @JsonProperty
-    private BigDecimal price;
+    @JsonProperty private BigDecimal price;
 
-    @JsonProperty
-    private RegistrationAction action = RegistrationAction.NEW;
+    @JsonProperty private RegistrationAction action = RegistrationAction.NEW;
 
     public UUID getUuid() {
         return uuid;
@@ -103,16 +96,18 @@ public class Subscription implements Serializable {
     }
 
     public Subscription updateFrom(Subscription subscription) {
-        if (subscription.member!=null) {
-            subscription.member.forEach((key, value) -> {
-                Object convertedValue = convert(key, value);
-                member.put(key, convertedValue);
-            });
+        if (subscription.member != null) {
+            subscription.member.forEach(
+                    (key, value) -> {
+                        Object convertedValue = convert(key, value);
+                        member.put(key, convertedValue);
+                    });
         }
-        if (subscription.getPrice()!=null) this.setPrice(subscription.getPrice());
-        if (subscription.getCategory()!=null) this.setCategory(subscription.getCategory());
-        if (subscription.getAttributes()!=null) this.setAttributes(subscription.getAttributes());
-        if (subscription.getPricelistItemId()>0) this.setPricelistItemId(subscription.getPricelistItemId());
+        if (subscription.getPrice() != null) this.setPrice(subscription.getPrice());
+        if (subscription.getCategory() != null) this.setCategory(subscription.getCategory());
+        if (subscription.getAttributes() != null) this.setAttributes(subscription.getAttributes());
+        if (subscription.getPricelistItemId() > 0)
+            this.setPricelistItemId(subscription.getPricelistItemId());
         return this;
     }
 
@@ -126,15 +121,14 @@ public class Subscription implements Serializable {
                                 .setSection(section.section().key())
                                 .setMandatory(attr.mandatory())
                                 .setType(attr.definition().type().rawValue())
-                                .setChoices((List<String>) attr.definition().choices())
-                );
+                                .setChoices((List<String>) attr.definition().choices()));
             }
         }
         return this.setCategory(category.key()).setAttributes(attrs);
     }
 
     private Object convert(String key, Object value) {
-        for(var attr: attributes.entrySet()) {
+        for (var attr : attributes.entrySet()) {
             if (key.equals(attr.getKey())) {
                 if (attr.getValue().getType().equals(AttributeType.DATE.rawValue())) {
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -148,7 +142,7 @@ public class Subscription implements Serializable {
                 } else if (attr.getValue().getType().equals(AttributeType.NUMBER.rawValue())) {
                     return Long.parseLong((String) value);
                 } else if (attr.getValue().getType().equals(AttributeType.LIST.rawValue())) {
-                    if (value instanceof String) return new String[] {(String)value};
+                    if (value instanceof String) return new String[] {(String) value};
                 }
                 return value;
             }
@@ -156,4 +150,3 @@ public class Subscription implements Serializable {
         return null;
     }
 }
-

@@ -21,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.*;
@@ -51,12 +52,13 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler,
-            ModelAndView modelAndView) throws Exception {
+            ModelAndView modelAndView)
+            throws Exception {
 
         if (handler instanceof HandlerMethod && modelAndView != null) {
             Map<String, Object> model = new HashMap<>();
             Principal principal = request.getUserPrincipal();
-            if (principal!= null) {
+            if (principal != null) {
                 model.put("user", createUserView(principal));
             }
             model.put("config", clubConfiguration);
@@ -73,12 +75,13 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
     private UserView createUserView(Principal principal) {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        KeycloakPrincipal keycloakPrincipal=(KeycloakPrincipal)token.getPrincipal();
-        List<String> roles = ((Collection<SimpleGrantedAuthority>) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getAuthorities())
-                .stream().map(r -> r.getAuthority()).collect(Collectors.toList());
+        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+        List<String> roles =
+                ((Collection<SimpleGrantedAuthority>)
+                                SecurityContextHolder.getContext()
+                                        .getAuthentication()
+                                        .getAuthorities())
+                        .stream().map(r -> r.getAuthority()).collect(Collectors.toList());
         return new UserView(keycloakPrincipal, roles);
     }
 
@@ -87,12 +90,20 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         Method method = ((HandlerMethod) handler).getMethod();
         route.setMethod(method).setRequestMapping(method.getAnnotation(RequestMapping.class));
         try {
-            route.setPathVariables((LinkedHashMap<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
+            route.setPathVariables(
+                    (LinkedHashMap<String, String>)
+                            request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
         } catch (Exception ignored) {
 
         }
-        LOG.info("Matched route = {}, parameters = {}", route.getName(),
-                String.join(", ", route.getPathVariables().entrySet().stream().map( e -> e.getKey() + "=" + e.getValue()).collect(Collectors.toList())));
+        LOG.info(
+                "Matched route = {}, parameters = {}",
+                route.getName(),
+                String.join(
+                        ", ",
+                        route.getPathVariables().entrySet().stream()
+                                .map(e -> e.getKey() + "=" + e.getValue())
+                                .collect(Collectors.toList())));
         return route;
     }
 
@@ -126,7 +137,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         }
 
         public boolean hasOneOfRoles(List<String> roles) {
-            for (var role: roles) {
+            for (var role : roles) {
                 if (this.roles.contains(role)) return true;
             }
             return false;
@@ -166,7 +177,10 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         }
 
         public CurrentRoute setPathVariables(Map<String, String> pathVariables) {
-            this.pathVariables = pathVariables == null ? new LinkedHashMap<>() : new LinkedHashMap<>(pathVariables);
+            this.pathVariables =
+                    pathVariables == null
+                            ? new LinkedHashMap<>()
+                            : new LinkedHashMap<>(pathVariables);
             return this;
         }
 

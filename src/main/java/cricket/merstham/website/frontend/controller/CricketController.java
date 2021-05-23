@@ -17,7 +17,10 @@ public class CricketController {
         return "home/home";
     }
 
-    @RequestMapping(path = "/results/{year:[\\d]{4}}", name = "results-for-year", method = RequestMethod.GET)
+    @RequestMapping(
+            path = "/results/{year:[\\d]{4}}",
+            name = "results-for-year",
+            method = RequestMethod.GET)
     public String resultsForYear(@PathVariable int year) {
         return "home/home";
     }

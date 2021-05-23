@@ -1,12 +1,10 @@
 package cricket.merstham.website.frontend.controller;
 
-import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
-import cricket.merstham.website.graph.type.StringFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,24 +44,17 @@ public class RegistrationController {
     }
 
     @RequestMapping(value = "/register", name = "register", method = RequestMethod.GET)
-    public ModelAndView register(
-            @ModelAttribute("basket") RegistrationBasket basket) {
-        return new ModelAndView(
-                "registration/register",
-                Map.of("basket", basket)
-        );
+    public ModelAndView register(@ModelAttribute("basket") RegistrationBasket basket) {
+        return new ModelAndView("registration/register", Map.of("basket", basket));
     }
 
-    @RequestMapping(
-            value = "/register",
-            name = "registration-actions",
-            method = RequestMethod.POST)
+    @RequestMapping(value = "/register", name = "registration-actions", method = RequestMethod.POST)
     public Object actionProcessor(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
-            @ModelAttribute("edit-member") String editMember
-    ) throws IOException {
+            @ModelAttribute("edit-member") String editMember)
+            throws IOException {
         if (!deleteMember.isBlank()) {
             basket.removeSuscription(UUID.fromString(deleteMember));
         } else if (!editMember.isBlank()) {
@@ -71,9 +62,10 @@ public class RegistrationController {
             return new ModelAndView(
                     "registration/select-membership",
                     Map.of(
-                            "categories", graphService.getMembershipCategories(),
-                            "subscription", subscription)
-            );
+                            "categories",
+                            graphService.getMembershipCategories(),
+                            "subscription",
+                            subscription));
         } else {
             switch (action) {
                 case "add-member":
@@ -86,25 +78,29 @@ public class RegistrationController {
                     return new ModelAndView(
                             "registration/select-membership",
                             Map.of(
-                                    "categories", graphService.getMembershipCategories(),
-                                    "subscription", subscription)
-                    );
+                                    "categories",
+                                    graphService.getMembershipCategories(),
+                                    "subscription",
+                                    subscription));
             }
         }
         return new RedirectView("/register");
     }
 
-    @RequestMapping(value = "/register/select-membership", name = "member-details", method = RequestMethod.POST)
+    @RequestMapping(
+            value = "/register/select-membership",
+            name = "member-details",
+            method = RequestMethod.POST)
     public ModelAndView membershipForm(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @ModelAttribute("subscription") Subscription subscription
-    ) {
-        MembershipCategoriesQuery.MembershipCategory membershipCategory = graphService.getMembershipCategory(subscription.getCategory());
-        MembershipCategoriesQuery.PricelistItem pricelistItem = membershipCategory
-                .pricelistItem()
-                .stream().filter(p -> p.id() == subscription.getPricelistItemId())
-                .findFirst()
-                .orElseThrow();
+            @ModelAttribute("subscription") Subscription subscription) {
+        MembershipCategoriesQuery.MembershipCategory membershipCategory =
+                graphService.getMembershipCategory(subscription.getCategory());
+        MembershipCategoriesQuery.PricelistItem pricelistItem =
+                membershipCategory.pricelistItem().stream()
+                        .filter(p -> p.id() == subscription.getPricelistItemId())
+                        .findFirst()
+                        .orElseThrow();
 
         subscription
                 .setPricelistItemId(pricelistItem.id())
@@ -115,16 +111,16 @@ public class RegistrationController {
                 "registration/membership-form",
                 Map.of(
                         "form", membershipCategory.form(),
-                        "subscription", basket.updateSubscription(subscription)
-                )
-        );
+                        "subscription", basket.updateSubscription(subscription)));
     }
 
-    @RequestMapping(value = "/register/add-member", name = "member-details", method = RequestMethod.POST)
+    @RequestMapping(
+            value = "/register/add-member",
+            name = "member-details",
+            method = RequestMethod.POST)
     public View membershipFormProcess(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @ModelAttribute("subscription") Subscription subscription
-    ) {
+            @ModelAttribute("subscription") Subscription subscription) {
         basket.updateSubscription(subscription);
 
         return new RedirectView("/register");

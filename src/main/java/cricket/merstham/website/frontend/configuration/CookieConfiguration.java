@@ -29,7 +29,8 @@ public class CookieConfiguration {
         return optionalCookiesCategories;
     }
 
-    public CookieConfiguration setOptionalCookiesCategories(List<CookieCategory> optionalCookiesCategories) {
+    public CookieConfiguration setOptionalCookiesCategories(
+            List<CookieCategory> optionalCookiesCategories) {
         this.optionalCookiesCategories = optionalCookiesCategories;
         return this;
     }

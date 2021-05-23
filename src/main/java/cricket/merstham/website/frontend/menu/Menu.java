@@ -14,12 +14,17 @@ public class Menu {
     private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
 
     private String name;
-    private LinkedHashMap<String,String> arguments;
+    private LinkedHashMap<String, String> arguments;
     private URI destinationUrl;
     private List<String> roles;
     private List<Menu> children;
 
-    public Menu(String name, LinkedHashMap<String,String> arguments, URI destinationUrl, List<String> roles, List<Menu> children) {
+    public Menu(
+            String name,
+            LinkedHashMap<String, String> arguments,
+            URI destinationUrl,
+            List<String> roles,
+            List<Menu> children) {
         this.name = name;
         this.arguments = arguments;
         this.destinationUrl = destinationUrl;
@@ -31,21 +36,22 @@ public class Menu {
         return name;
     }
 
-    public LinkedHashMap<String,String> getArguments() {
+    public LinkedHashMap<String, String> getArguments() {
         return arguments;
     }
 
     public String[] getArgumentValues() {
-        if (arguments==null) return new String[] {};
+        if (arguments == null) return new String[] {};
         return arguments.values().toArray(new String[0]);
     }
 
     public URI getDestinationUrl() {
-        if (destinationUrl==null) {
-            MvcUriComponentsBuilder.MethodArgumentBuilder builder = MvcUriComponentsBuilder.fromMappingName(name);
+        if (destinationUrl == null) {
+            MvcUriComponentsBuilder.MethodArgumentBuilder builder =
+                    MvcUriComponentsBuilder.fromMappingName(name);
             if (arguments != null) {
                 int i = 0;
-                for (var key: arguments.keySet()) {
+                for (var key : arguments.keySet()) {
                     builder.arg(i, arguments.get(key));
                     i++;
                 }
@@ -64,12 +70,12 @@ public class Menu {
     }
 
     public boolean onActivePath(ViewConfiguration.CurrentRoute currentRoute) {
-        LOG.debug("onActivePath(name = {}, params = {}) called on name = {}, params = {}",
+        LOG.debug(
+                "onActivePath(name = {}, params = {}) called on name = {}, params = {}",
                 currentRoute.getName(),
                 currentRoute.getPathVariables(),
                 this.name,
-                this.getArguments()
-        );
+                this.getArguments());
         if (isActiveNode(currentRoute)) return true;
         if (children != null) {
             for (var child : children) {
@@ -81,7 +87,8 @@ public class Menu {
 
     public boolean isActiveNode(ViewConfiguration.CurrentRoute currentRoute) {
         if (currentRoute.getName().equals(name)) {
-            if ((currentRoute.getPathVariables() == null || currentRoute.getPathVariables().isEmpty())
+            if ((currentRoute.getPathVariables() == null
+                            || currentRoute.getPathVariables().isEmpty())
                     && (arguments == null || arguments.isEmpty())) {
                 return true;
             }
@@ -93,7 +100,7 @@ public class Menu {
 
     public List<Menu> getBreadcrumbs(ViewConfiguration.CurrentRoute currentRoute) {
         if (isActiveNode(currentRoute)) return new ArrayList<>(List.of(this));
-        if (children != null ) {
+        if (children != null) {
             for (var child : children) {
                 List<Menu> breadcrumbs = child.getBreadcrumbs(currentRoute);
                 if (!breadcrumbs.isEmpty()) {

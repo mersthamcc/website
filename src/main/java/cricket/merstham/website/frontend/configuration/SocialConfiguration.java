@@ -22,7 +22,7 @@ public class SocialConfiguration {
         return this;
     }
 
-    public static abstract class BaseConfiguration {
+    public abstract static class BaseConfiguration {
         protected String handle;
 
         public String getHandle() {
@@ -35,9 +35,7 @@ public class SocialConfiguration {
         }
     }
 
-    public static class TwitterConfiguration extends BaseConfiguration {
-    }
+    public static class TwitterConfiguration extends BaseConfiguration {}
 
-    public static class FacebookConfiguration extends BaseConfiguration {
-    }
+    public static class FacebookConfiguration extends BaseConfiguration {}
 }

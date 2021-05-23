@@ -9,17 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
 @JsonSerialize
 public class RegistrationBasket implements Serializable {
 
     private static final long serialVersionUID = 20210522173000L;
 
-    @JsonProperty
-    private String id;
+    @JsonProperty private String id;
 
-    @JsonProperty
-    private Map<UUID, Subscription> subscriptions;
+    @JsonProperty private Map<UUID, Subscription> subscriptions;
 
     public RegistrationBasket() {
         this.id = UUID.randomUUID().toString();
@@ -50,14 +47,13 @@ public class RegistrationBasket implements Serializable {
     }
 
     public Subscription updateSubscription(Subscription subscription) {
-        Subscription currentSubscription = this.subscriptions.get(subscription.getUuid()).updateFrom(subscription);
+        Subscription currentSubscription =
+                this.subscriptions.get(subscription.getUuid()).updateFrom(subscription);
         return currentSubscription;
     }
 
     public BigDecimal getBasketTotal() {
-        return subscriptions
-                .values()
-                .stream()
+        return subscriptions.values().stream()
                 .map(subscription -> subscription.getPrice())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
