@@ -1,0 +1,5 @@
+include 'keycloak'
+include 'keycloak:keycloak-sms2fa'
+findProject(':keycloak:keycloak-sms2fa')?.name = 'sms2fa'
+include 'acceptance-tests'
+include 'frontend'

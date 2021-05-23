@@ -1,0 +1,38 @@
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.14.3"
+}
+
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'com.avast.gradle.docker-compose'
+
+dockerCompose {
+    buildBeforeUp = true
+    forceRecreate = true
+    startedServices = [
+            'loki',
+            'traefik',
+            'postgres',
+            'redis',
+            'keycloak',
+            'graph',
+            'smtp',
+            'prometheus',
+            'web',
+    ]
+
+    def logDir = new File(project.buildDir, "logs")
+    if (!logDir.exists()) {
+        println("Creating logs folder...")
+        logDir.mkdir()
+    }
+    captureContainersOutput = false
+    captureContainersOutputToFile = new File('logs', 'docker-compose-gradle.log')
+    projectName = "website"
+}
+
+group 'cricket.merstham'
+
+repositories {
+    mavenCentral()
+}

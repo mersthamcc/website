@@ -7,4 +7,6 @@ keycloak/keycloak-sms2fa/
 graphql/
 dev-config/keycloak/.terraform
 dev-config/keycloak/terraform.tfstate*
-
+acceptance-tests/
+logs/
+.gradle/
