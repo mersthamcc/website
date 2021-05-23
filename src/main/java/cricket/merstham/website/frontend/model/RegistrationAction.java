@@ -7,7 +7,8 @@ import java.io.Serializable;
 @JsonSerialize
 public enum RegistrationAction implements Serializable {
     NEW("NEW"),
-    RENEW("RENEW");
+    RENEW("RENEW"),
+    NONE("NONE");
 
     String action;
 

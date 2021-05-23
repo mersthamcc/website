@@ -25,13 +25,13 @@ public class Subscription implements Serializable {
     private String category;
 
     @JsonProperty
-    private int pricelistItemId;
+    private int pricelistItemId = 0;
 
     @JsonProperty
     private Map<String, Object> member;
 
     @JsonProperty
-    private Map<String, AttributeDefinition> attributes;
+    private Map<String, AttributeDefinition> attributes = new HashMap<>();
 
     @JsonProperty
     private BigDecimal price;
@@ -103,11 +103,16 @@ public class Subscription implements Serializable {
     }
 
     public Subscription updateFrom(Subscription subscription) {
-
-        subscription.member.forEach( (key, value) -> {
-            Object convertedValue = convert(key, value);
-            member.put(key, value);
-        });
+        if (subscription.member!=null) {
+            subscription.member.forEach((key, value) -> {
+                Object convertedValue = convert(key, value);
+                member.put(key, convertedValue);
+            });
+        }
+        if (subscription.getPrice()!=null) this.setPrice(subscription.getPrice());
+        if (subscription.getCategory()!=null) this.setCategory(subscription.getCategory());
+        if (subscription.getAttributes()!=null) this.setAttributes(subscription.getAttributes());
+        if (subscription.getPricelistItemId()>0) this.setPricelistItemId(subscription.getPricelistItemId());
         return this;
     }
 
@@ -142,9 +147,10 @@ public class Subscription implements Serializable {
                     return Boolean.parseBoolean((String) value);
                 } else if (attr.getValue().getType().equals(AttributeType.NUMBER.rawValue())) {
                     return Long.parseLong((String) value);
-                } else {
-                    return (String) value;
+                } else if (attr.getValue().getType().equals(AttributeType.LIST.rawValue())) {
+                    if (value instanceof String) return new String[] {(String)value};
                 }
+                return value;
             }
         }
         return null;

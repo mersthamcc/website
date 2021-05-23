@@ -63,17 +63,17 @@
     </div>
 </#macro>
 
-<#macro membershipCategories categories _csrf>
+<#macro membershipCategories categories _csrf uuid>
     <#list categories as category>
         <div class="c-content-title-1 c-title-md c-margin-b-20 clearfix">
             <h3 class="c-font-thin"><@spring.message code="membership.${category.key()}" /></h3>
             <div class="c-line-left c-theme-bg"></div>
-            <@categoryPricelist category=category _csrf=_csrf/>
+            <@categoryPricelist category=category _csrf=_csrf uuid=uuid/>
         </div>
     </#list>
 </#macro>
 
-<#macro categoryPricelist category _csrf>
+<#macro categoryPricelist category _csrf uuid>
     <div class="row">
         <div class="c-content-pricing-1 c-opt-1">
             <div class="col-md-2 c-sm-hidden">
@@ -122,10 +122,12 @@
                             <span class="c-dollar c-font-20">&pound;</span> <span class="c-font-30 c-font-bold">${item.currentPrice()}</span>
                         </div>
                         <div class="c-row c-purchase">
-                            <form class="form-horizontal" method="post" name="action">
+                            <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
                                 <input type="hidden" name="_csrf" value="${_csrf.token}" />
                                 <input type="hidden" name="category" value="${category.key()}" />
-                                <button class="btn btn-md c-btn-square c-btn-green c-btn-uppercase c-btn-bold" value="${item.id()}" name="pricelistitemid" id="pricelistitemid-${item.id()}" type="submit"><@spring.message code="membership.select" /></button>
+                                <input type="hidden" name="uuid" value="${subscription.uuid}" />
+
+                                <button class="btn btn-md c-btn-square c-btn-green c-btn-uppercase c-btn-bold" value="${item.id()}" name="pricelistItemId" id="pricelistItemId-${item.id()}" type="submit"><@spring.message code="membership.select" /></button>
                             </form>
                         </div>
                     </div>
@@ -151,7 +153,7 @@
     </div>
 </#macro>
 
-<#macro memberField attribute localeCategory="membership">
+<#macro memberField attribute subscription localeCategory="membership">
     <#if attribute.mandatory()>
         <#assign required>required="required"</#assign>
     <#else>
@@ -162,22 +164,47 @@
         <div class="col-md-6">
             <#switch attribute.definition().type().rawValue()>
                 <#case "String">
-                    <input class="form-control  c-square c-theme" name="member[${attribute.definition().key()}]" type="text" placeholder="<@spring.messageText code="${localeCategory}.${attribute.definition().key()}-placeholder" text="" />" ${required}/>
+                    <@memberInputField type="text"
+                        required=required
+                        subscription=subscription
+                        key=attribute.definition().key()
+                        localeCategory=localeCategory />
                     <#break>
                 <#case "Number">
-                    <input class="form-control  c-square c-theme" name="member[${attribute.definition().key()}]" type="number" placeholder="<@spring.messageText code="${localeCategory}.${attribute.definition().key()}-placeholder" text="" />" ${required} />
+                    <@memberInputField type="number"
+                        required=required
+                        subscription=subscription
+                        key=attribute.definition().key()
+                        localeCategory=localeCategory />
                     <#break>
                 <#case "Email">
-                    <input class="form-control  c-square c-theme" name="member[${attribute.definition().key()}]" type="email" placeholder="<@spring.messageText code="${localeCategory}.${attribute.definition().key()}-placeholder" text="" />" ${required} />
+                    <@memberInputField type="email"
+                        required=required
+                        subscription=subscription
+                        key=attribute.definition().key()
+                        localeCategory=localeCategory />
                     <#break>
                 <#case "Date">
-                    <input class="form-control  c-square c-theme" name="member[${attribute.definition().key()}]" type="date" placeholder="<@spring.messageText code="${localeCategory}.${attribute.definition().key()}-placeholder" text="" />" ${required} />
+                    <@memberInputField type="date"
+                        required=required
+                        subscription=subscription
+                        key=attribute.definition().key()
+                        localeCategory=localeCategory />
                     <#break>
                 <#case "Option">
                     <#list attribute.definition().choices() as choice>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="member[${attribute.definition().key()}]" id="member-${attribute.definition().key()}" value="${choice}" ${required} />
+                                <input
+                                        type="radio"
+                                        name="member[${attribute.definition().key()}]"
+                                        id="member-${attribute.definition().key()}"
+                                        value="${choice}"
+                                        <#if subscription.member?keys?seq_contains(attribute.definition().key())
+                                            && choice == subscription.member[attribute.definition().key()]>
+                                            checked="checked"
+                                        </#if>
+                                        ${required} />
                                 &nbsp;&nbsp;<@spring.messageText code="${localeCategory}.${choice}" text="${choice}"/>
                             </label>
                         </div>
@@ -187,7 +214,16 @@
                     <#list attribute.definition().choices() as choice>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="member[${attribute.definition().key()}]" id="member-${attribute.definition().key()}" value="${choice}" ${required} />
+                                <input
+                                        type="checkbox"
+                                        name="member[${attribute.definition().key()}]"
+                                        id="member-${attribute.definition().key()}"
+                                        value="${choice}"
+                                        <#if subscription.member?keys?seq_contains(attribute.definition().key())
+                                            && subscription.member[attribute.definition().key()]?seq_contains(choice)>
+                                            checked="checked"
+                                        </#if>
+                                        ${required} />
                                 &nbsp;&nbsp;<@spring.messageText code="${localeCategory}.${choice}" text="${choice}"/>
                             </label>
                         </div>
@@ -197,4 +233,14 @@
             <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition().key()}-help" text="" /></span>
         </div>
     </div>
+</#macro>
+
+<#macro memberInputField type required subscription key localeCategory>
+    <input class="form-control  c-square c-theme"
+           name="member[${key}]"
+           type="text"
+           placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
+           value="${subscription.member[key]!""}"
+            ${required}
+    />
 </#macro>

@@ -24,7 +24,7 @@
                                 <td>${subscription.member["family-name"]}</td>
                                 <td><@spring.message code="membership.${subscription.action}" /></td>
                                 <td><@spring.message code="membership.${subscription.category}" /></td>
-                                <td>${subscription.price?string.currency}</td>
+                                <td align="right">${subscription.price?string.currency}</td>
                                 <td>
                                     <button type="submit" class="btn btn-info btn-xs" name="edit-member" value="${id}">
                                         <i class="fa fa-edit"></i>
@@ -46,7 +46,7 @@
                             <td></td>
                             <td></td>
                             <th>Total:</th>
-                            <td>${basket.basketTotal?string.currency}</td>
+                            <td align="right">${basket.basketTotal?string.currency}</td>
                             <td></td>
                         </tr>
                     </tfoot>
