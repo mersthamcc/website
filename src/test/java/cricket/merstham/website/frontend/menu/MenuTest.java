@@ -207,7 +207,7 @@ class MenuTest {
     }
 
     private ViewConfiguration.CurrentRoute createMockCurrentRoute(String name) {
-        return createMockCurrentRoute(name, null);
+        return createMockCurrentRoute(name, new LinkedHashMap<>());
     }
 
     private ViewConfiguration.CurrentRoute createMockCurrentRoute(String name, LinkedHashMap<String, String> pathVariables) {

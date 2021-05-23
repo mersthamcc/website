@@ -4,6 +4,8 @@ import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Query;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
+import cricket.merstham.website.graph.MembershipCategoriesQuery;
+import cricket.merstham.website.graph.type.StringFilter;
 import okio.ByteString;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -17,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.OK;
 
@@ -46,6 +49,30 @@ public class GraphService {
         String accessToken = accessTokenManager.getAccessToken();
         LOG.info("Sending `{}` GraphQL API request with client credentials token", query.name().name());
         return getResult(query, accessToken);
+    }
+
+    public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
+        MembershipCategoriesQuery query = new MembershipCategoriesQuery(StringFilter.builder().build());
+        try {
+            Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
+            return result.getData().membershipCategories();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
+        MembershipCategoriesQuery query = new MembershipCategoriesQuery(
+                StringFilter
+                        .builder()
+                        .equals(categoryName)
+                        .build());
+        try {
+            Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
+            return result.getData().membershipCategories().get(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <T extends Query, R extends Operation.Data> Response<R> getResult(T query, String accessToken) throws IOException {
