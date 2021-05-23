@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
+
 @Controller
 @SessionAttributes("basket")
 @PreAuthorize("isAuthenticated()")
@@ -140,11 +143,14 @@ public class RegistrationController {
             @ModelAttribute("basket") RegistrationBasket basket,
             Principal principal
     ) {
-        membershipService.registerMembersFromBasket(basket, principal);
+        int orderId = membershipService.registerMembersFromBasket(basket, principal);
+        basket.reset();
         return new ModelAndView(
                 "registration/confirmation",
-                Map.of("basket", basket)
+                Map.of(
+                        "basket", basket,
+                        "order", format("WEB-%1$6s", orderId).replace(' ', '0')
+                )
         );
     }
-
 }

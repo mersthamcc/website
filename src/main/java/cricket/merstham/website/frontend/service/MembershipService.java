@@ -1,8 +1,9 @@
 package cricket.merstham.website.frontend.service;
 
-import com.apollographql.apollo.api.Operation;
+import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.graph.CreateMemberMutation;
+import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -26,7 +27,30 @@ public class MembershipService {
         this.graphService = graphService;
     }
 
-    public void registerMembersFromBasket(RegistrationBasket basket, Principal principal) {
+    public int registerMembersFromBasket(RegistrationBasket basket, Principal principal) {
+        CreateOrderMutation createOrder = new CreateOrderMutation(basket.getId());
+        int orderId = 0;
+        try {
+            Response<CreateOrderMutation.Data> orderResult = graphService.executeMutation(
+                    createOrder,
+                    principal
+            );
+            if (orderResult.hasErrors()) {
+                throw new RuntimeException("GraphQL error(s) registering member: "
+                        + String.join("\n",
+                        orderResult
+                                .getErrors()
+                                .stream()
+                                .map(error -> error.getMessage())
+                                .collect(Collectors.toList()))
+                );
+            }
+            orderId = orderResult.getData().createOrder().id();
+        } catch (IOException e) {
+            LOG.error("Error creating order", e);
+            throw new RuntimeException(e);
+        }
+
         for(var subscription: basket.getSubscriptions().entrySet()) {
             MemberInput memberInput = MemberInput.builder()
                     .attributes(
@@ -47,6 +71,7 @@ public class MembershipService {
                                     .year(2021)
                                     .pricelistItemId(subscription.getValue().getPricelistItemId())
                                     .price(subscription.getValue().getPrice().doubleValue())
+                                    .orderId(orderId)
                                     .build()
                     )
                     .build();
@@ -69,5 +94,6 @@ public class MembershipService {
                 throw new RuntimeException(e);
             }
         }
+        return orderId;
     }
 }

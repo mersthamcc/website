@@ -1,0 +1,9 @@
+mutation createOrder ($uuid: String!) {
+    createOrder(uuid: $uuid) {
+        id
+        uuid
+        createDate
+        ownerUserId
+        accountingId
+    }
+}
