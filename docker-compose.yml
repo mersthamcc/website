@@ -139,7 +139,7 @@ services:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: curl http://localhost:8080/
+      test: curl http://localhost:8080/actuator/health
       interval: 5s
       retries: 30
     depends_on:
