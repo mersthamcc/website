@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS member_subscription
 (
-    member_id BIGINT NOT NULL,
-    year INT NOT NULL,
+    member_id         BIGINT NOT NULL,
+    year              INT NOT NULL,
     pricelist_item_id BIGINT NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    added_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    price             DECIMAL(10,2) NOT NULL,
+    added_date        DATE NOT NULL DEFAULT CURRENT_DATE,
 
     PRIMARY KEY (member_id, year)
 );
