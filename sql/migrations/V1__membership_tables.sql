@@ -57,13 +57,11 @@ CREATE TABLE member
     id                SERIAL,
     type              VARCHAR(20) NOT NULL,
     registration_date TIMESTAMP   NOT NULL,
-    owner_user_id     BIGINT      NOT NULL,
+    owner_user_id     VARCHAR(64) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE INDEX IDX_MEMBER_OWNER_USER_ID ON member (owner_user_id);
-ALTER TABLE member
-    ADD CONSTRAINT FK_MEMBER_USER_ID FOREIGN KEY (owner_user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE TABLE member_attribute
 (
