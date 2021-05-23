@@ -208,11 +208,11 @@
             <div class="container">
                 <div class="c-page-title c-pull-left">
                     <h3 class="c-font-sbold c-font-uppercase">
-                        <#if pageTitle??>
-                            ${pageTitle}
-                        <#else>
-                            <@spring.messageArgs code="menu.${currentRoute.name}" args=currentRoute.argumentValues />
-                        </#if>
+                        <@spring.messageArgsText
+                            code="menu.${currentRoute.name}"
+                            args=currentRoute.argumentValues
+                            text=pageTitle!""
+                        />
                     </h3>
                 </div>
                 <ul class="c-page-breadcrumbs c-theme-nav c-pull-right c-fonts-regular">

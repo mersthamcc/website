@@ -8,8 +8,12 @@ mutation createMember($member: MemberInput!) {
       }
       value
     }
-    owner {
-      email
+    subscription {
+      price
+      pricelistItem {
+        id
+      }
+      year
     }
   }
 }

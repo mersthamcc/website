@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.GraphService;
+import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,10 +33,12 @@ public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 
     private GraphService graphService;
+    private MembershipService membershipService;
 
     @Autowired
-    public RegistrationController(GraphService graphService) {
+    public RegistrationController(GraphService graphService, MembershipService membershipService) {
         this.graphService = graphService;
+        this.membershipService = membershipService;
     }
 
     @ModelAttribute("basket")
@@ -82,6 +86,8 @@ public class RegistrationController {
                                     graphService.getMembershipCategories(),
                                     "subscription",
                                     subscription));
+                case "next":
+                    return new RedirectView("/register/confirmation");
             }
         }
         return new RedirectView("/register");
@@ -125,4 +131,20 @@ public class RegistrationController {
 
         return new RedirectView("/register");
     }
+
+    @RequestMapping(
+            value = "/register/confirmation",
+            name = "registration-confirmation",
+            method = RequestMethod.GET)
+    public ModelAndView confirmation(
+            @ModelAttribute("basket") RegistrationBasket basket,
+            Principal principal
+    ) {
+        membershipService.registerMembersFromBasket(basket, principal);
+        return new ModelAndView(
+                "registration/confirmation",
+                Map.of("basket", basket)
+        );
+    }
+
 }
