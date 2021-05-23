@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.GraphService;
+import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,13 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static java.lang.String.format;
+
 
 @Controller
 @SessionAttributes("basket")
@@ -31,10 +36,12 @@ public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 
     private GraphService graphService;
+    private MembershipService membershipService;
 
     @Autowired
-    public RegistrationController(GraphService graphService) {
+    public RegistrationController(GraphService graphService, MembershipService membershipService) {
         this.graphService = graphService;
+        this.membershipService = membershipService;
     }
 
     @ModelAttribute("basket")
@@ -82,6 +89,8 @@ public class RegistrationController {
                                     graphService.getMembershipCategories(),
                                     "subscription",
                                     subscription));
+                case "next":
+                    return new RedirectView("/register/confirmation");
             }
         }
         return new RedirectView("/register");
@@ -124,5 +133,24 @@ public class RegistrationController {
         basket.updateSubscription(subscription);
 
         return new RedirectView("/register");
+    }
+
+    @RequestMapping(
+            value = "/register/confirmation",
+            name = "registration-confirmation",
+            method = RequestMethod.GET)
+    public ModelAndView confirmation(
+            @ModelAttribute("basket") RegistrationBasket basket,
+            Principal principal
+    ) {
+        int orderId = membershipService.registerMembersFromBasket(basket, principal);
+        basket.reset();
+        return new ModelAndView(
+                "registration/confirmation",
+                Map.of(
+                        "basket", basket,
+                        "order", format("WEB-%1$6s", orderId).replace(' ', '0')
+                )
+        );
     }
 }

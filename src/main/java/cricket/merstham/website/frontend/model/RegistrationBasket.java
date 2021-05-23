@@ -62,4 +62,9 @@ public class RegistrationBasket implements Serializable {
         subscriptions.remove(uuid);
         return this;
     }
+
+    public void reset() {
+        this.id = UUID.randomUUID().toString();
+        this.subscriptions.clear();
+    }
 }

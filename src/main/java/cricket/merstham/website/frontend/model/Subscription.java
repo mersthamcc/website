@@ -142,7 +142,8 @@ public class Subscription implements Serializable {
                 } else if (attr.getValue().getType().equals(AttributeType.NUMBER.rawValue())) {
                     return Long.parseLong((String) value);
                 } else if (attr.getValue().getType().equals(AttributeType.LIST.rawValue())) {
-                    if (value instanceof String) return new String[] {(String) value};
+                    if (value instanceof String) return List.of(value);
+                    return Arrays.asList((String[]) value);
                 }
                 return value;
             }

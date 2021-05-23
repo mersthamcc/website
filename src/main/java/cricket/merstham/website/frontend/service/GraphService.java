@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.service;
 
+import com.apollographql.apollo.api.Mutation;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Query;
 import com.apollographql.apollo.api.Response;
@@ -56,6 +57,13 @@ public class GraphService {
         return getResult(query, accessToken);
     }
 
+    public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(T mutation, Principal principal) throws IOException {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
+        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+
+        return getResult(mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+    }
+
     public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
         MembershipCategoriesQuery query =
                 new MembershipCategoriesQuery(StringFilter.builder().build());
@@ -78,7 +86,7 @@ public class GraphService {
         }
     }
 
-    private <T extends Query, R extends Operation.Data> Response<R> getResult(
+    private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(graphConfiguration.getGraphUri());
