@@ -1,5 +1,6 @@
 plugins {
     id "com.avast.gradle.docker-compose" version "0.14.3"
+    id "com.diffplug.spotless" version "5.8.2" apply false
 }
 
 apply plugin: 'application'
@@ -36,3 +37,4 @@ group 'cricket.merstham'
 repositories {
     mavenCentral()
 }
+

@@ -10,3 +10,4 @@ dev-config/keycloak/terraform.tfstate*
 acceptance-tests/
 logs/
 .gradle/
+build/
