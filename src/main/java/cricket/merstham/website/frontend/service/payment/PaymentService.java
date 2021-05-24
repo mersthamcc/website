@@ -21,4 +21,6 @@ public interface PaymentService {
     ModelAndView execute(HttpServletRequest request, Order order);
 
     ModelAndView confirm(HttpServletRequest request, Order order);
+
+    ModelAndView cancel(HttpServletRequest request, Order order);
 }

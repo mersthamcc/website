@@ -52,3 +52,9 @@ payments:
   pay-later:
     enabled: true
     disabled-reason: ~
+  paypal:
+    enabled: true
+    disabled-reason: ~
+    client-id: ${PAYPAL_CLIENT_ID:}
+    client-secret: ${PAYPAL_CLIENT_SECRET:}
+    sandbox: true

@@ -1,0 +1,23 @@
+mutation addPaymentToOrder(
+    $orderId: Int!,
+    $payment: PaymentInput!
+) {
+    addPaymentToOrder(
+        orderId: $orderId,
+        payment: $payment) {
+        id
+        type
+        reference
+        date
+        amount
+        processingFees
+        collected
+        reconciled
+        order {
+            id
+            accountingId
+            createDate
+            uuid
+        }
+    }
+}

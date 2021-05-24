@@ -22,6 +22,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -150,12 +151,13 @@ public class RegistrationController {
             HttpSession session) {
         Order order = membershipService.registerMembersFromBasket(basket, principal);
         session.setAttribute("order", order);
-        session.removeAttribute("basket");
+        basket.reset();
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(
-                        "basket", basket,
-                        "order", order,
-                        "paymentTypes", paymentServiceManager.getAvailableServices()));
+                        "order",
+                        order,
+                        "paymentTypes",
+                        paymentServiceManager.getAvailableServices()));
     }
 }

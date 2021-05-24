@@ -59,4 +59,9 @@ public class PayLaterSerice implements PaymentService {
     public ModelAndView confirm(HttpServletRequest request, Order order) {
         return new ModelAndView(format("payments/{0}/confirmation", SERVICE_NAME));
     }
+
+    @Override
+    public ModelAndView cancel(HttpServletRequest request, Order order) {
+        return null;
+    }
 }
