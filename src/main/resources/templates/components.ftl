@@ -238,7 +238,7 @@
 <#macro memberInputField type required subscription key localeCategory>
     <input class="form-control  c-square c-theme"
            name="member[${key}]"
-           type="text"
+           type="${type}"
            placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
            value="${subscription.member[key]!""}"
             ${required}

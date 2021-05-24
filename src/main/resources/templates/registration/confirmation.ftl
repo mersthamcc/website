@@ -3,11 +3,34 @@
 <#import "../components.ftl" as components />
 <@layout.mainLayout>
     <@components.panel title="membership.confirmation" type="info">
-        <form class="form-horizontal" method="post" name="action">
+        <form class="form-horizontal" method="post" name="payment" action="/payments">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <input type="hidden" name="id" value="${order.id}" />
+            <input type="hidden" name="uuid" value="${order.uuid}" />
 
             <@components.section title="Order Number">
-                Your order number is ${order}.
+                Your order number is ${order.webReference}.
+            </@components.section>
+
+            <@components.section title="Payment">
+                <div class="form-group">
+                    <label class="col-md-4 control-label"><@spring.message code="payments.how-to-pay" /></label>
+                    <div class="col-md-6">
+                        <#list paymentTypes as paymentType>
+                            <div class="radio">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="payment-type"
+                                        id="payment-type"
+                                        value="${paymentType}"
+                                        required="required" />
+                                        &nbsp;&nbsp;<@spring.messageText code="payments.${paymentType}" text="${paymentType}"/>
+                                </label>
+                            </div>
+                        </#list>
+                    </div>
+                </div>
             </@components.section>
 
             <@components.buttonGroup>

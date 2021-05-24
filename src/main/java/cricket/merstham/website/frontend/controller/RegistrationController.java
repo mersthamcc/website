@@ -1,10 +1,12 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
+import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,15 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static java.lang.String.format;
-
 
 @Controller
 @SessionAttributes("basket")
@@ -37,11 +37,16 @@ public class RegistrationController {
 
     private GraphService graphService;
     private MembershipService membershipService;
+    private PaymentServiceManager paymentServiceManager;
 
     @Autowired
-    public RegistrationController(GraphService graphService, MembershipService membershipService) {
+    public RegistrationController(
+            GraphService graphService,
+            MembershipService membershipService,
+            PaymentServiceManager paymentServiceManager) {
         this.graphService = graphService;
         this.membershipService = membershipService;
+        this.paymentServiceManager = paymentServiceManager;
     }
 
     @ModelAttribute("basket")
@@ -141,16 +146,16 @@ public class RegistrationController {
             method = RequestMethod.GET)
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
-            Principal principal
-    ) {
-        int orderId = membershipService.registerMembersFromBasket(basket, principal);
-        basket.reset();
+            Principal principal,
+            HttpSession session) {
+        Order order = membershipService.registerMembersFromBasket(basket, principal);
+        session.setAttribute("order", order);
+        session.removeAttribute("basket");
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(
                         "basket", basket,
-                        "order", format("WEB-%1$6s", orderId).replace(' ', '0')
-                )
-        );
+                        "order", order,
+                        "paymentTypes", paymentServiceManager.getAvailableServices()));
     }
 }
