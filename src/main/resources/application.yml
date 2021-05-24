@@ -47,3 +47,8 @@ club:
           - "gid"
 graph:
   graph-uri: ${GRAPH_URI}
+
+payments:
+  pay-later:
+    enabled: true
+    disabled-reason: ~

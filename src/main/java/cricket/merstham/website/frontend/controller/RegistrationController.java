@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
@@ -20,15 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static java.lang.String.format;
-
 
 @Controller
 @SessionAttributes("basket")
@@ -41,7 +40,10 @@ public class RegistrationController {
     private PaymentServiceManager paymentServiceManager;
 
     @Autowired
-    public RegistrationController(GraphService graphService, MembershipService membershipService, PaymentServiceManager paymentServiceManager) {
+    public RegistrationController(
+            GraphService graphService,
+            MembershipService membershipService,
+            PaymentServiceManager paymentServiceManager) {
         this.graphService = graphService;
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
@@ -144,17 +146,16 @@ public class RegistrationController {
             method = RequestMethod.GET)
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
-            Principal principal
-    ) {
-        int orderId = membershipService.registerMembersFromBasket(basket, principal);
-        basket.reset();
+            Principal principal,
+            HttpSession session) {
+        Order order = membershipService.registerMembersFromBasket(basket, principal);
+        session.setAttribute("order", order);
+        session.removeAttribute("basket");
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(
                         "basket", basket,
-                        "order", format("WEB-%1$6s", orderId).replace(' ', '0'),
-                        "paymentTypes", paymentServiceManager.getAvailableServices()
-                )
-        );
+                        "order", order,
+                        "paymentTypes", paymentServiceManager.getAvailableServices()));
     }
 }

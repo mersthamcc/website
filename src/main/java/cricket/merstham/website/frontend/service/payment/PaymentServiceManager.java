@@ -1,6 +1,5 @@
 package cricket.merstham.website.frontend.service.payment;
 
-import cricket.merstham.website.frontend.service.payment.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +14,9 @@ public class PaymentServiceManager {
 
     @Autowired
     public PaymentServiceManager(List<PaymentService> paymentServices) {
-        this.paymentServiceMap = paymentServices.stream().collect(
-                Collectors.toMap(PaymentService::getName, Function.identity())
-        );
+        this.paymentServiceMap =
+                paymentServices.stream()
+                        .collect(Collectors.toMap(PaymentService::getName, Function.identity()));
     }
 
     public PaymentService getServiceByName(String name) {

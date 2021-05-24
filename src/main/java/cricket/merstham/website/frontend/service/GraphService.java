@@ -57,7 +57,8 @@ public class GraphService {
         return getResult(query, accessToken);
     }
 
-    public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(T mutation, Principal principal) throws IOException {
+    public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
+            T mutation, Principal principal) throws IOException {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
         KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
 
