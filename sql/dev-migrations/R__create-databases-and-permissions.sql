@@ -1,13 +1,29 @@
-DROP DATABASE IF EXISTS grafana;
-DROP DATABASE IF EXISTS keycloak;
-DROP DATABASE IF EXISTS development;
+DROP
+    DATABASE IF EXISTS grafana;
 
-DROP USER IF EXISTS grafana;
-DROP USER IF EXISTS keycloak;
+DROP
+    DATABASE IF EXISTS keycloak;
 
-CREATE USER grafana PASSWORD '${apps_database_password}';
-CREATE USER keycloak PASSWORD '${apps_database_password}';
+DROP
+    DATABASE IF EXISTS development;
 
-CREATE DATABASE grafana OWNER grafana;
-CREATE DATABASE keycloak OWNER keycloak;
-CREATE DATABASE development OWNER postgres;
+DROP
+    USER IF EXISTS grafana;
+
+DROP
+    USER IF EXISTS keycloak;
+
+CREATE
+    USER grafana PASSWORD '${apps_database_password}';
+
+CREATE
+    USER keycloak PASSWORD '${apps_database_password}';
+
+CREATE
+    DATABASE grafana OWNER grafana;
+
+CREATE
+    DATABASE keycloak OWNER keycloak;
+
+CREATE
+    DATABASE development OWNER postgres;
