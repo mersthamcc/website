@@ -10,6 +10,7 @@ import java.net.URI;
 @ConfigurationProperties(prefix = "graph")
 @Profile("!test")
 public class GraphConfiguration {
+
     private URI graphUri;
 
     public URI getGraphUri() {

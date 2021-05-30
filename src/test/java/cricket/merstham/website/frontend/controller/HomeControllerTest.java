@@ -13,11 +13,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class HomeControllerTest {
 
     @Configuration
-    static class HomeControllerTestContextConfiguration {
-
-    }
+    static class HomeControllerTestContextConfiguration {}
 
     @Test
-    void homepage() {
-    }
+    void homepage() {}
 }

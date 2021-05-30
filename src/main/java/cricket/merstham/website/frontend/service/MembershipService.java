@@ -52,8 +52,7 @@ public class MembershipService {
             order.setId(orderResult.getData().createOrder().id())
                     .setUuid(UUID.fromString(orderResult.getData().createOrder().uuid()))
                     .setTotal(basket.getBasketTotal())
-                    .setSubscriptions(basket.getSubscriptions())
-        ;
+                    .setSubscriptions(basket.getSubscriptions());
         } catch (IOException e) {
             LOG.error("Error creating order", e);
             throw new RuntimeException(e);

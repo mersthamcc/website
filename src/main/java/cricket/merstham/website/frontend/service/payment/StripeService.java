@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Instant;
@@ -26,7 +27,7 @@ import java.util.Optional;
 import static java.text.MessageFormat.format;
 
 @Service("stripe")
-public class StripeService implements PaymentService{
+public class StripeService implements PaymentService {
     private static final Logger LOG = LoggerFactory.getLogger(StripeService.class);
 
     private static final String SERVICE_NAME = "stripe";
@@ -84,34 +85,50 @@ public class StripeService implements PaymentService{
                         .setCancelUrl(format("{0}/payments/{1}/cancel", baseUri, SERVICE_NAME))
                         .setLocale(SessionCreateParams.Locale.EN_GB);
 
-        order.getSubscriptions().values().forEach(subscription ->
-                params.addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("gbp")
-                                                .setUnitAmount(toStripeLongValue(subscription.getPrice()))
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(format("{0} {1}",
-                                                                        subscription.getMember().get("given-name"),
-                                                                        subscription.getMember().get("family-name")))
+        order.getSubscriptions()
+                .values()
+                .forEach(
+                        subscription ->
+                                params.addLineItem(
+                                        SessionCreateParams.LineItem.builder()
+                                                .setQuantity(1L)
+                                                .setPriceData(
+                                                        SessionCreateParams.LineItem.PriceData
+                                                                .builder()
+                                                                .setCurrency("gbp")
+                                                                .setUnitAmount(
+                                                                        toStripeLongValue(
+                                                                                subscription
+                                                                                        .getPrice()))
+                                                                .setProductData(
+                                                                        SessionCreateParams.LineItem
+                                                                                .PriceData
+                                                                                .ProductData
+                                                                                .builder()
+                                                                                .setName(
+                                                                                        format(
+                                                                                                "{0} {1}",
+                                                                                                subscription
+                                                                                                        .getMember()
+                                                                                                        .get(
+                                                                                                                "given-name"),
+                                                                                                subscription
+                                                                                                        .getMember()
+                                                                                                        .get(
+                                                                                                                "family-name")))
+                                                                                .build())
                                                                 .build())
-                                                .build())
-                                .build())
-        );
+                                                .build()));
 
         try {
-            Session session = Session.create(params.build(), RequestOptions.builder().setApiKey(apiKey).build());
+            Session session =
+                    Session.create(
+                            params.build(), RequestOptions.builder().setApiKey(apiKey).build());
             LOG.info("Successfully create Stripe session: {}", session.getId());
             request.getSession().setAttribute(STRIPE_SESSION_ATTRIBUTE, session.getId());
-            return new ModelAndView("payments/stripe/checkout",
-                    Map.of(
-                            "sessionId", session.getId(),
-                            "publishableKey", publishableKey
-                    )
-            );
+            return new ModelAndView(
+                    "payments/stripe/checkout",
+                    Map.of("sessionId", session.getId(), "publishableKey", publishableKey));
         } catch (StripeException e) {
             LOG.error("Error create Stripe session", e);
             throw new RuntimeException(e);
@@ -126,25 +143,27 @@ public class StripeService implements PaymentService{
     @Override
     public ModelAndView execute(HttpServletRequest request, Order order) {
         try {
-            Session session = Session.retrieve(
-                    (String)request.getSession().getAttribute(STRIPE_SESSION_ATTRIBUTE),
-                    RequestOptions.builder().setApiKey(apiKey).build()
-            );
-            PaymentIntent paymentIntent = PaymentIntent.retrieve(
-                    session.getPaymentIntent(),
-                    RequestOptions.builder().setApiKey(apiKey).build()
-            );
+            Session session =
+                    Session.retrieve(
+                            (String) request.getSession().getAttribute(STRIPE_SESSION_ATTRIBUTE),
+                            RequestOptions.builder().setApiKey(apiKey).build());
+            PaymentIntent paymentIntent =
+                    PaymentIntent.retrieve(
+                            session.getPaymentIntent(),
+                            RequestOptions.builder().setApiKey(apiKey).build());
             membershipService.createPayment(
                     order,
                     SERVICE_NAME,
                     paymentIntent.getId(),
-                    ZonedDateTime.ofInstant(Instant.ofEpochSecond(paymentIntent.getCreated()), ZoneId.systemDefault()).toLocalDateTime(),
+                    ZonedDateTime.ofInstant(
+                                    Instant.ofEpochSecond(paymentIntent.getCreated()),
+                                    ZoneId.systemDefault())
+                            .toLocalDateTime(),
                     fromStripeLongValue(paymentIntent.getAmount()),
                     BigDecimal.ZERO,
                     false,
                     false,
-                    request.getUserPrincipal()
-            );
+                    request.getUserPrincipal());
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
 
         } catch (StripeException e) {

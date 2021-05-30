@@ -15,5 +15,4 @@ public class SessionConfiguration {
     public LettuceConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory();
     }
-
 }
