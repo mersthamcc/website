@@ -41,7 +41,7 @@ public class PayLaterSerice implements PaymentService {
     }
 
     @Override
-    public ModelAndView information(Order order) {
+    public ModelAndView checkout(HttpServletRequest request, Order order) {
         return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 

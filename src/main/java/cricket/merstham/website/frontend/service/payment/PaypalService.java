@@ -35,12 +35,11 @@ public class PaypalService implements PaymentService {
 
     private final boolean enabled;
     private final String disabledReason;
-    private final PayPalEnvironment environment;
     private final ClubConfiguration clubConfiguration;
     private final MembershipService membershipService;
 
     // Creating a client for the environment
-    static PayPalHttpClient client;
+    private final PayPalHttpClient client;
 
     public PaypalService(
             @Value("${payments.paypal.enabled}") boolean enabled,
@@ -54,10 +53,11 @@ public class PaypalService implements PaymentService {
         this.disabledReason = disabledReason;
         this.clubConfiguration = clubConfiguration;
         this.membershipService = membershipService;
+        PayPalEnvironment environment;
         if (sandbox) {
-            this.environment = new PayPalEnvironment.Sandbox(clientId, clientSecret);
+            environment = new PayPalEnvironment.Sandbox(clientId, clientSecret);
         } else {
-            this.environment = new PayPalEnvironment.Live(clientId, clientSecret);
+            environment = new PayPalEnvironment.Live(clientId, clientSecret);
         }
         this.client = new PayPalHttpClient(environment);
     }
@@ -78,8 +78,8 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView information(Order order) {
-        return new ModelAndView("payments/paypal/start");
+    public ModelAndView checkout(HttpServletRequest request, Order order) {
+        return new ModelAndView("payments/paypal/checkout");
     }
 
     @Override

@@ -48,6 +48,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
     implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
     implementation "com.paypal.sdk:checkout-sdk:1.0.3"
+    implementation "com.stripe:stripe-java:20.52.0"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"

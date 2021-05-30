@@ -26,10 +26,11 @@ public class PaymentsController {
     public ModelAndView start(
             @ModelAttribute("order") Order order,
             @ModelAttribute("payment-type") String paymentType,
+            HttpServletRequest request,
             HttpSession session) {
         PaymentService paymentService = paymentServiceManager.getServiceByName(paymentType);
         session.setAttribute("payment-type", paymentType);
-        return paymentService.information(order);
+        return paymentService.checkout(request, order);
     }
 
     @RequestMapping(

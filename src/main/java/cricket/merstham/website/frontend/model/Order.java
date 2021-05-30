@@ -2,6 +2,8 @@ package cricket.merstham.website.frontend.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -13,6 +15,7 @@ public class Order implements Serializable {
     private int id;
     private UUID uuid;
     private BigDecimal total;
+    private Map<UUID, Subscription> subscriptions;
 
     public int getId() {
         return id;
@@ -38,6 +41,15 @@ public class Order implements Serializable {
 
     public Order setUuid(UUID uuid) {
         this.uuid = uuid;
+        return this;
+    }
+
+    public Map<UUID, Subscription> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public Order setSubscriptions(Map<UUID, Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
         return this;
     }
 

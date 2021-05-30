@@ -1,7 +1,15 @@
 <#import "/spring.ftl" as spring />
 <#import "components.ftl" as components />
 
-<#macro mainLayout>
+<#macro defaultHeaders>
+
+</#macro>
+
+<#macro defaultScripts>
+
+</#macro>
+
+<#macro mainLayout headers=defaultHeaders script=defaultScripts>
 <!DOCTYPE html>
 <!--[if IE 9]>
 <html lang="en" class="ie9 no-js">
@@ -46,6 +54,8 @@
         <link href="/assets/mcc/css/custom.css" rel="stylesheet" type="text/css"/>
         <!-- END THEME STYLES -->
         <link rel="shortcut icon" href="favicon.ico"/>
+
+        <#if headers?is_directive><@headers /><#else>${headers}</#if>
     </head>
 
     <body
@@ -546,6 +556,7 @@
             App.init();
         });
     </script>
+    <#if script?is_directive><@script /><#else>${script}</#if>
     </body>
 </html>
 </#macro>

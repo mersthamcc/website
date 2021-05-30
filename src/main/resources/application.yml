@@ -58,3 +58,8 @@ payments:
     client-id: ${PAYPAL_CLIENT_ID:}
     client-secret: ${PAYPAL_CLIENT_SECRET:}
     sandbox: true
+  stripe:
+    enabled: true
+    disabled-reason: ~
+    api-key: ${STRIPE_API_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}

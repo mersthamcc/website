@@ -14,7 +14,7 @@ public interface PaymentService {
 
     Optional<String> getDisabledReason();
 
-    ModelAndView information(Order order);
+    ModelAndView checkout(HttpServletRequest request, Order order);
 
     ModelAndView authorise(HttpServletRequest request, Order order);
 
