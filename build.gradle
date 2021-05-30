@@ -52,8 +52,10 @@ dependencies {
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
+    testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.assertj:assertj-core:3.19.0"
     testImplementation "org.mockito:mockito-core:3.10.0"
+    testImplementation "com.c4-soft.springaddons:spring-security-oauth2-test-addons:2.5.2"
 }
 
 apollo {
