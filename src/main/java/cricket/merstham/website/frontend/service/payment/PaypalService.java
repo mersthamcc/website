@@ -88,13 +88,32 @@ public class PaypalService implements PaymentService {
         orderRequest.checkoutPaymentIntent(CAPTURE_INTENT);
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        order.getSubscriptions().values().forEach(subscription ->
+                items.add(
+                        new Item()
+                                .name(
+                                        format("{0} {1}",
+                                                subscription.getMember().get("given-name"),
+                                                subscription.getMember().get("family-name"))
+                                )
+                                .quantity("1")
+                        .sku(subscription.getCategory())e
+                        .unitAmount(new Money().currencyCode("GBP").value(subscription.getPrice().toPlainString()))
+                )
+        );
         purchaseUnits.add(
                 new PurchaseUnitRequest()
                         .description(order.getWebReference())
+                        .items(items)
                         .amountWithBreakdown(
                                 new AmountWithBreakdown()
                                         .currencyCode("GBP")
+                                        .amountBreakdown(new AmountBreakdown().itemTotal(
+                                                new Money().currencyCode("GBP").value(order.getTotal().toPlainString())
+                                        ))
                                         .value(order.getTotal().toPlainString())));
+
         orderRequest.purchaseUnits(purchaseUnits);
         URI requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
