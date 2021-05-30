@@ -14,11 +14,13 @@ public interface PaymentService {
 
     Optional<String> getDisabledReason();
 
-    ModelAndView information(Order order);
+    ModelAndView checkout(HttpServletRequest request, Order order);
 
     ModelAndView authorise(HttpServletRequest request, Order order);
 
     ModelAndView execute(HttpServletRequest request, Order order);
 
     ModelAndView confirm(HttpServletRequest request, Order order);
+
+    ModelAndView cancel(HttpServletRequest request, Order order);
 }

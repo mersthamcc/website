@@ -65,6 +65,6 @@ public class RegistrationBasket implements Serializable {
 
     public void reset() {
         this.id = UUID.randomUUID().toString();
-        this.subscriptions.clear();
+        this.subscriptions = new HashMap<>();
     }
 }

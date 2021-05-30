@@ -47,11 +47,16 @@ dependencies {
     implementation "org.springframework.session:spring-session-data-redis:${dependencyVersions.spring_sessions}"
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
     implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
+    implementation "com.paypal.sdk:checkout-sdk:1.0.3"
+    implementation "com.stripe:stripe-java:20.52.0"
+
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
+    testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.assertj:assertj-core:3.19.0"
     testImplementation "org.mockito:mockito-core:3.10.0"
+    testImplementation "com.c4-soft.springaddons:spring-security-oauth2-test-addons:2.5.2"
 }
 
 apollo {
