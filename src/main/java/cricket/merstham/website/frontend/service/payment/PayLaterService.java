@@ -12,13 +12,13 @@ import java.util.Optional;
 import static java.text.MessageFormat.format;
 
 @Service("pay-later")
-public class PayLaterSerice implements PaymentService {
+public class PayLaterService implements PaymentService {
 
     private static final String SERVICE_NAME = "pay-later";
     private final boolean enabled;
     private final String disabledReason;
 
-    public PayLaterSerice(
+    public PayLaterService(
             @Value("${payments.pay-later.enabled}") boolean enabled,
             @Value("${payments.pay-later.disabled-reason}") String disabledReason) {
         this.enabled = enabled;

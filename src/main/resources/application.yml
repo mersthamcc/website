@@ -63,3 +63,9 @@ payments:
     disabled-reason: ~
     api-key: ${STRIPE_API_KEY:}
     publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+  gocardless:
+    enabled: true
+    disabled-reason: ~
+    access-token: ${GOCARDLESS_ACCESS_TOKEN:}
+    sandbox: true
+    mandate-description: Membership and Match Fees
