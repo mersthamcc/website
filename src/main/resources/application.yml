@@ -69,3 +69,9 @@ payments:
     access-token: ${GOCARDLESS_ACCESS_TOKEN:}
     sandbox: true
     mandate-description: Membership and Match Fees
+  bank:
+    enabled: true
+    disabled-reason: ~
+    account-name: ${BANK_ACCOUNT_NAME:Merstham Cricket Club}
+    account-number: ${BANK_ACCOUNT_NUMBER:49244507}
+    sort-code: ${BANK_ACCOUNT_SORT_CODE:56-00-46}
