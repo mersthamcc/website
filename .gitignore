@@ -11,3 +11,5 @@ acceptance-tests/
 logs/
 .gradle/
 build/
+infrastructure/
+.run/
