@@ -661,6 +661,41 @@ services:
       options:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
+  minio:
+    image: minio/minio:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.resources.rule=Host(`resources.${DEVDOMAIN}`)
+      - traefik.http.services.resources.loadbalancer.server.port=9000
+      - traefik.http.routers.resources.entrypoints=web
+      - traefik.http.routers.resources.middlewares=forcehttps
+      - traefik.http.routers.resources-tls.tls=true
+      - traefik.http.routers.resources-tls.rule=Host(`resources.${DEVDOMAIN}`)
+      - traefik.http.routers.resources-tls.entrypoints=websecure
+      - traefik.http.routers.resources-tls.tls.certresolver=le
+      - traefik.http.routers.resources-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=resources
+      - tls-cert-host-check=resources.${DEVDOMAIN}
+    command: server /data
+    environment:
+      MINIO_DOMAIN: resources.${DEVDOMAIN},localhost:9000
+    volumes:
+      - ./infrastructure/spaces-data:/data
+    ports:
+      - 9000:9000
+    networks:
+      - backendnetwork
+    restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:9000
+      interval: 5s
+      retries: 30
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
 volumes:
   pg-data:
