@@ -7,6 +7,7 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,13 +34,18 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ViewConfiguration.class);
 
-    private MenuBuilder menuBuilderProvider;
-    private ClubConfiguration clubConfiguration;
+    private final MenuBuilder menuBuilderProvider;
+    private final ClubConfiguration clubConfiguration;
+    private final String resourcePrefix;
 
     @Autowired
-    public ViewConfiguration(MenuBuilder menuBuilderProvider, ClubConfiguration clubConfiguration) {
+    public ViewConfiguration(
+            MenuBuilder menuBuilderProvider,
+            ClubConfiguration clubConfiguration,
+            @Value("${resources.base-url}") String resourcePrefix) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
+        this.resourcePrefix = resourcePrefix;
     }
 
     @Override
@@ -68,6 +74,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             CurrentRoute currentRoute = getCurrentRoute(request, handler);
             model.put("currentRoute", currentRoute);
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
+            model.put("resourcePrefix", resourcePrefix);
 
             modelAndView.addAllObjects(model);
         }
