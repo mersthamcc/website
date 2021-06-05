@@ -48,6 +48,9 @@ club:
 graph:
   graph-uri: ${GRAPH_URI}
 
+resources:
+  base-url: "${RESOURCES_BASE_URL://resources.new.mersthamcc.co.uk/jango}"
+
 payments:
   pay-later:
     enabled: true

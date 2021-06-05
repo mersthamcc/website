@@ -28,30 +28,30 @@
         <meta content="" name="author"/>
         <!-- BEGIN GLOBAL MANDATORY STYLES -->
         <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700&amp;subset=all' rel='stylesheet' type='text/css'>
-        <link href="/assets/plugins/socicon/socicon.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/bootstrap-social/bootstrap-social.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/animate/animate.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/socicon/socicon.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/bootstrap-social/bootstrap-social.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/animate/animate.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <!-- END GLOBAL MANDATORY STYLES -->
 
         <!-- BEGIN: BASE PLUGINS  -->
-        <link href="/assets/plugins/revo-slider/css/settings.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/revo-slider/css/layers.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/revo-slider/css/navigation.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/cubeportfolio/css/cubeportfolio.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/owl-carousel/assets/owl.carousel.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/fancybox/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/plugins/slider-for-bootstrap/css/slider.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/settings.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/layers.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/navigation.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/cubeportfolio/css/cubeportfolio.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/owl-carousel/assets/owl.carousel.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/fancybox/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/plugins/slider-for-bootstrap/css/slider.css" rel="stylesheet" type="text/css"/>
         <!-- END: BASE PLUGINS -->
 
 
         <!-- BEGIN THEME STYLES -->
-        <link href="/assets/mcc/css/plugins.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/mcc/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>
-        <link href="/assets/mcc/css/themes/blue2.css" rel="stylesheet" id="style_theme" type="text/css"/>
-        <link href="/assets/mcc/css/custom.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/mcc/css/plugins.css" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/mcc/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>
+        <link href="${resourcePrefix}/assets/mcc/css/themes/blue2.css" rel="stylesheet" id="style_theme" type="text/css"/>
+        <link href="${resourcePrefix}/assets/mcc/css/custom.css" rel="stylesheet" type="text/css"/>
         <!-- END THEME STYLES -->
         <link rel="shortcut icon" href="favicon.ico"/>
 
@@ -94,14 +94,14 @@
                     <div class="c-brand c-pull-left">
                         <a href="/" class="c-logo">
                             <h1 class="c-desktop-logo">
-                                <img src="${config.logo}" alt="${config.clubName}">
+                                <img src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
                                 ${config.clubName}
                             </h1>
                             <h1 class="c-desktop-logo-inverse" style="margin-top: 0px;">
                                 ${config.clubName}
                             </h1>
                             <h1 class="c-mobile-logo">
-                                <img src="${config.logo}" alt="${config.clubName}">
+                                <img src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
                                 ${config.clubName}
                             </h1>
                         </a>
@@ -325,7 +325,7 @@
                             </p>
                             <!-- START BANNER -->
                             <div class="margin-bottom-20">
-                                <a href="//www.easyfundraising.org.uk/causes/mersthamcc/" target="_blank"><img src="/assets/mcc/img/EF-Logo-01.png" border="0"  height="60"/></a>
+                                <a href="//www.easyfundraising.org.uk/causes/mersthamcc/" target="_blank"><img src="${resourcePrefix}/assets/mcc/img/EF-Logo-01.png" border="0"  height="60"/></a>
                             </div>
                             <!-- END BANNER -->
                             <p class="c-text c-font-16 c-font-regular">
@@ -424,43 +424,43 @@
 
     <!-- BEGIN: CORE PLUGINS -->
     <!--[if lt IE 9]>
-    <script src="/assets/global/plugins/excanvas.min.js"></script>
+    <script src="${resourcePrefix}/assets/global/plugins/excanvas.min.js"></script>
     <![endif]-->
-    <script src="/assets/plugins/jquery.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="/assets/plugins/jquery-migrate.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="/assets/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="/assets/plugins/jquery.easing.min.js" type="text/javascript" ></script>
-    <script src="/assets/plugins/reveal-animate/wow.js" type="text/javascript" ></script>
-    <script src="/assets/mcc/js/scripts/reveal-animate/reveal-animate.js" type="text/javascript" ></script>
-    <script src="/assets/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/jquery.min.js" type="text/javascript" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/plugins/jquery-migrate.min.js" type="text/javascript" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/plugins/jquery.easing.min.js" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/plugins/reveal-animate/wow.js" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/mcc/js/scripts/reveal-animate/reveal-animate.js" type="text/javascript" ></script>
+    <script src="${resourcePrefix}/assets/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
     <!-- END: CORE PLUGINS -->
 
     <!-- BEGIN: LAYOUT PLUGINS -->
-    <script src="/assets/plugins/revo-slider/js/jquery.themepunch.tools.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/jquery.themepunch.revolution.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/extensions/revolution.extension.slideanims.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/extensions/revolution.extension.layeranimation.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/extensions/revolution.extension.navigation.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/extensions/revolution.extension.video.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/revo-slider/js/extensions/revolution.extension.parallax.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/cubeportfolio/js/jquery.cubeportfolio.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/owl-carousel/owl.carousel.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/counterup/jquery.waypoints.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/counterup/jquery.counterup.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
-    <script src="/assets/plugins/smooth-scroll/jquery.smooth-scroll.js" type="text/javascript"></script>
-    <script src="/assets/plugins/typed/typed.min.js" type="text/javascript"></script>
-    <script src="/assets/plugins/slider-for-bootstrap/js/bootstrap-slider.js" type="text/javascript"></script>
-    <script src="/assets/plugins/js-cookie/js.cookie.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/jquery.themepunch.tools.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/jquery.themepunch.revolution.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.slideanims.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.layeranimation.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.navigation.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.video.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.parallax.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/cubeportfolio/js/jquery.cubeportfolio.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/owl-carousel/owl.carousel.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/counterup/jquery.waypoints.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/counterup/jquery.counterup.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/smooth-scroll/jquery.smooth-scroll.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/typed/typed.min.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/slider-for-bootstrap/js/bootstrap-slider.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/plugins/js-cookie/js.cookie.js" type="text/javascript"></script>
     <!-- END: LAYOUT PLUGINS -->
 
     <!-- BEGIN: THEME SCRIPTS -->
-    <script src="/assets/base/js/components.js" type="text/javascript"></script>
-    <script src="/assets/base/js/components-shop.js" type="text/javascript"></script>
-    <script src="/assets/base/js/app.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/base/js/components.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/base/js/components-shop.js" type="text/javascript"></script>
+    <script src="${resourcePrefix}/assets/base/js/app.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
-            App.init(); // init core
+            App.init();
         });
     </script>
     <!-- END: THEME SCRIPTS -->
@@ -546,16 +546,9 @@
     <!--  GOOGLE reCAPTCHA -->
 
     <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.x.min.js" type="text/javascript"></script>
-<#--    <script src="{{ path("cookie_control") }}" type="text/javascript"></script>-->
 
     <script src="https://tymxcm8ksmvn.statuspage.io/embed/script.js" type="text/javascript"></script>
 
-
-    <script>
-        $(document).ready(function() {
-            App.init();
-        });
-    </script>
     <#if script?is_directive><@script /><#else>${script}</#if>
     </body>
 </html>
