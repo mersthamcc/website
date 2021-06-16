@@ -1,8 +1,8 @@
 <#import "/spring.ftl" as spring />
 <#import "../base.ftl" as layout />
 <#import "../components.ftl" as components />
-<@layout.mainLayout>
-    <@components.panel title="membership.register" type="info">
+<@layout.mainLayout formName="menu.register">
+    <@components.panel>
         <form class="form-horizontal" method="post" name="action">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             <@components.section title="Members">
@@ -51,14 +51,17 @@
                         </tr>
                     </tfoot>
                 </table>
-                <button type="submit" class="btn btn-info" name="action" value="add-member">
+                <button type="submit"
+                        class="btn btn-soft-primary transition-3d-hover"
+                        name="action"
+                        value="add-member">
                     <i class="fa fa-plus"></i>
                     <@spring.message code="membership.add-member" />
                 </button>&nbsp;
             </@components.section>
 
             <@components.buttonGroup>
-                <button type="submit" class="btn btn-info btn-xlg" name="action" value="next">
+                <button type="submit" class="btn btn-primary transition-3d-hover" name="action" value="next">
                     <@spring.message code="membership.next" />
                     <i class="fa fa-arrow-circle-o-right"></i>
                 </button>&nbsp;

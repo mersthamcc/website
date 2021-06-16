@@ -13,11 +13,26 @@ import java.util.List;
 public class Menu {
     private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
 
-    private String name;
-    private LinkedHashMap<String, String> arguments;
-    private URI destinationUrl;
-    private List<String> roles;
-    private List<Menu> children;
+    private final String name;
+    private final LinkedHashMap<String, String> arguments;
+    private final URI destinationUrl;
+    private final List<String> roles;
+    private final List<Menu> children;
+    private final String icons;
+
+    public Menu(
+            String name,
+            LinkedHashMap<String, String> arguments,
+            URI destinationUrl,
+            List<String> roles,
+            List<Menu> children, String icons) {
+        this.name = name;
+        this.arguments = arguments;
+        this.destinationUrl = destinationUrl;
+        this.roles = roles;
+        this.children = children;
+        this.icons = icons;
+    }
 
     public Menu(
             String name,
@@ -25,11 +40,7 @@ public class Menu {
             URI destinationUrl,
             List<String> roles,
             List<Menu> children) {
-        this.name = name;
-        this.arguments = arguments;
-        this.destinationUrl = destinationUrl;
-        this.roles = roles;
-        this.children = children;
+        this(name, arguments, destinationUrl, roles, children, null);
     }
 
     public String getName() {
@@ -110,5 +121,9 @@ public class Menu {
             }
         }
         return List.of();
+    }
+
+    public String getIcons() {
+        return icons;
     }
 }

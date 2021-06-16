@@ -15,8 +15,8 @@
         });
     </script>
 </#macro>
-<@layout.mainLayout headers=stripeHeaders script=stripeScripts>
-    <@components.panel title="membership.confirmation" type="info">
+<@layout.mainLayout headers=stripeHeaders script=stripeScripts formName="membership.confirmation">
+    <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/paypal/authorise" data-session="${sessionId}" >
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             <input type="hidden" name="id" value="${order.id}" />
@@ -31,7 +31,7 @@
             </@components.section>
 
             <@components.buttonGroup>
-                <button type="button" class="btn btn-info btn-xlg" name="action" id="checkout-button">
+                <button type="button" class="btn btn-primary btn-xlg transition-3d-hover" name="action" id="checkout-button">
                     <@spring.message code="membership.next" />
                     <i class="fa fa-arrow-circle-o-right"></i>
                 </button>&nbsp;

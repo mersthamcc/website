@@ -83,8 +83,8 @@
         });
     </script>
 </#macro>
-<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts>
-    <@components.panel title="membership.confirmation" type="info">
+<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.confirmation">
+    <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             <input type="hidden" name="id" value="${order.id}" />
@@ -138,7 +138,7 @@
             </@components.section>
 
             <@components.buttonGroup>
-                <button type="submit" class="btn btn-info btn-xlg" name="action" value="next">
+                <button type="submit" class="btn btn-primary btn-xlg transition-3d-hover" name="action" value="next">
                     <@spring.message code="membership.next" />
                     <i class="fa fa-arrow-circle-o-right"></i>
                 </button>&nbsp;
