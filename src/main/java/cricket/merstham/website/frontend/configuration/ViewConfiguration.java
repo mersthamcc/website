@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,8 +23,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.lang.reflect.Method;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,6 +76,13 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             model.put("currentRoute", currentRoute);
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
             model.put("resourcePrefix", resourcePrefix);
+            model.put("dashboardMenu", menuBuilderProvider.getDashboardMenu());
+            model.put("adminMenus", new LinkedHashMap<>() {{
+                        put("content", menuBuilderProvider.getAdminContentMenu());
+                        put("administration", menuBuilderProvider.getAdminAdministrationMenu());
+                        put("system", menuBuilderProvider.getAdminSystemMenu());
+                    }}
+            );
 
             modelAndView.addAllObjects(model);
         }
@@ -148,6 +156,10 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
                 if (this.roles.contains(role)) return true;
             }
             return false;
+        }
+
+        public String getGravatarHash() throws NoSuchAlgorithmException {
+            return DigestUtils.md5DigestAsHex(getEmail().toLowerCase().getBytes()).toLowerCase();
         }
     }
 

@@ -6,7 +6,7 @@ COPY build.gradle /app
 COPY settings.gradle /app
 COPY src /app/src
 WORKDIR /app
-RUN gradle build
+RUN gradle build -x test
 
 ARG JAVA_VERSION=11
 FROM adoptopenjdk:${JAVA_VERSION}

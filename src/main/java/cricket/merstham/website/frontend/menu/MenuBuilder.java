@@ -17,6 +17,7 @@ import java.util.List;
 public class MenuBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(MenuBuilder.class);
+    private static final URI SCRIPT_LINK = URI.create("javascript:;");
 
     private final List<Menu> topMenu =
             List.of(
@@ -47,7 +48,7 @@ public class MenuBuilder {
                                     new Menu(
                                             "result-archive",
                                             null,
-                                            URI.create("javascript:;"),
+                                            SCRIPT_LINK,
                                             List.of(),
                                             List.of(
                                                     new Menu(
@@ -63,6 +64,78 @@ public class MenuBuilder {
                                                             List.of(),
                                                             null))))),
                     new Menu("social", null, URI.create("/social"), List.of(), null));
+
+    private final List<Menu> dashboardMenu = List.of(
+            new Menu(
+                    "admin-dashboards-top",
+                    null,
+                    SCRIPT_LINK,
+                    List.of(),
+                    List.of(
+                            new Menu(
+                                    "admin-home",
+                                    null,
+                                    SCRIPT_LINK,
+                                    List.of(),
+                                    null),
+                            new Menu(
+                                    "admin-membership-dashboard",
+                                    null,
+                                    SCRIPT_LINK,
+                                    List.of(),
+                                    null)
+                    ), "tio-dashboard-outlined")
+    );
+
+    private final List<Menu> adminContentMenu = List.of(
+            new Menu(
+                    "admin-news-top",
+                    null,
+                    SCRIPT_LINK,
+                    List.of(),
+                    List.of(
+                            new Menu(
+                                    "admin-news-list",
+                                    null,
+                                    SCRIPT_LINK,
+                                    List.of(),
+                                    null)
+                    ), "tio-feed-outlined"
+            )
+    );
+
+    private final List<Menu> adminAdministrationMenu = List.of(
+            new Menu(
+                    "admin-members-top",
+                    null,
+                    SCRIPT_LINK,
+                    List.of(),
+                    List.of(
+                            new Menu(
+                                    "admin-members-list",
+                                    null,
+                                    SCRIPT_LINK,
+                                    List.of(),
+                                    List.of())
+                    ), "tio-group-senior"
+            )
+    );
+
+    private final List<Menu> adminSystemMenu = List.of(
+            new Menu(
+                    "admin-configuration-top",
+                    null,
+                    SCRIPT_LINK,
+                    List.of(),
+                    List.of(
+                            new Menu(
+                                    "admin-configuration-list",
+                                    null,
+                                    SCRIPT_LINK,
+                                    List.of(),
+                                    null)
+                    ), "tio-tune")
+    );
 
     public List<Menu> getTopMenu() {
         return topMenu;
@@ -96,5 +169,21 @@ public class MenuBuilder {
             }
         }
         return List.of();
+    }
+
+    public List<Menu> getDashboardMenu() {
+        return dashboardMenu;
+    }
+
+    public List<Menu> getAdminContentMenu() {
+        return adminContentMenu;
+    }
+
+    public List<Menu> getAdminAdministrationMenu() {
+        return adminAdministrationMenu;
+    }
+
+    public List<Menu> getAdminSystemMenu() {
+        return adminSystemMenu;
     }
 }

@@ -23,11 +23,11 @@ server:
 
 club:
   club-name: ${CLUBNAME:Merstham Cricket Club}
-  logo: "/assets/mcc/img/header_logo.png"
+  logo: "/mcc/img/header_logo.png"
   phone-number: "(01737) 645485"
   google-analytics-key: "UA-48714932-4"
   play-cricket:
-    enabled: false
+    enabled: true
     site: merstham
   social:
     twitter:
@@ -49,7 +49,7 @@ graph:
   graph-uri: ${GRAPH_URI}
 
 resources:
-  base-url: "${RESOURCES_BASE_URL://resources.new.mersthamcc.co.uk/jango}"
+  base-url: "${RESOURCES_BASE_URL://resources.new.mersthamcc.co.uk}"
 
 payments:
   pay-later:

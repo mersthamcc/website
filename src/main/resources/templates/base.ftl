@@ -9,547 +9,517 @@
 
 </#macro>
 
-<#macro mainLayout headers=defaultHeaders script=defaultScripts>
-<!DOCTYPE html>
-<!--[if IE 9]>
-<html lang="en" class="ie9 no-js">
-<![endif]-->
-<!--[if !IE]><!-->
-<html lang="en">
-    <!--<![endif]-->
-    <!-- BEGIN HEAD -->
-    <head>
-        <meta charset="utf-8"/>
-        <title></title>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-        <meta content="" name="description"/>
-        <meta content="" name="author"/>
-        <!-- BEGIN GLOBAL MANDATORY STYLES -->
-        <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700&amp;subset=all' rel='stylesheet' type='text/css'>
-        <link href="${resourcePrefix}/assets/plugins/socicon/socicon.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/bootstrap-social/bootstrap-social.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/animate/animate.min.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-        <!-- END GLOBAL MANDATORY STYLES -->
+<#macro mainLayout formName="" headers=defaultHeaders script=defaultScripts>
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <!-- Title -->
+            <title>
+                ${config.clubName} -
+                <#if pageTitle??>
+                    ${pageTitle}
+                <#else>
+                    <@spring.messageArgsText
+                        code="menu.${currentRoute.name}"
+                        args=currentRoute.argumentValues
+                        text=currentRoute.name
+                    />
+                </#if>
+            </title>
+            <!-- Required Meta Tags Always Come First -->
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <!-- BEGIN: BASE PLUGINS  -->
-        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/settings.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/layers.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/revo-slider/css/navigation.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/cubeportfolio/css/cubeportfolio.min.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/owl-carousel/assets/owl.carousel.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/fancybox/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/plugins/slider-for-bootstrap/css/slider.css" rel="stylesheet" type="text/css"/>
-        <!-- END: BASE PLUGINS -->
+            <!-- Favicon -->
+            <link rel="shortcut icon" href="${resourcePrefix}/mcc/favicon.ico">
 
+            <!-- Font -->
+            <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
-        <!-- BEGIN THEME STYLES -->
-        <link href="${resourcePrefix}/assets/mcc/css/plugins.css" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/mcc/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>
-        <link href="${resourcePrefix}/assets/mcc/css/themes/blue2.css" rel="stylesheet" id="style_theme" type="text/css"/>
-        <link href="${resourcePrefix}/assets/mcc/css/custom.css" rel="stylesheet" type="text/css"/>
-        <!-- END THEME STYLES -->
-        <link rel="shortcut icon" href="favicon.ico"/>
+            <!-- CSS Implementing Plugins -->
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/vendor/fontawesome/css/all.min.css">
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/vendor/hs-mega-menu/dist/hs-mega-menu.min.css">
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/vendor/dzsparallaxer/dzsparallaxer.css">
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/vendor/cubeportfolio/css/cubeportfolio.min.css">
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/vendor/aos/dist/aos.css">
 
-        <#if headers?is_directive><@headers /><#else>${headers}</#if>
-    </head>
+            <!-- CSS Front Template -->
+            <link rel="stylesheet" href="${resourcePrefix}/front/assets/css/theme.min.css">
 
-    <body
-            class="c-layout-header-fixed c-layout-header-mobile-fixed c-layout-header-topbar c-layout-header-topbar-collapse"
+            <#if headers?is_directive><@headers /><#else>${headers}</#if>
+        </head>
+
+        <body
             data-google-analytics-key="${config.googleAnalyticsKey}"
             data-cookie-controller-optional-cookies=""
             data-cookie-controller-api-key="${config.cookies.apiKey}"
             data-cookie-controller-product-code="${config.cookies.productCode}"
-    >
-
-    <!-- BEGIN: HEADER -->
-    <header class="c-layout-header c-layout-header-4 c-layout-header-default-mobile" data-minimize-offset="80">
-        <div class="c-topbar c-topbar-light">
-            <div class="container">
-                <!-- BEGIN: INLINE NAV -->
-                <nav class="c-top-menu c-pull-left">
-                    <ul class="c-icons c-theme-ul">
-                        <li><a href="//www.twitter.com/${config.social.twitter.handle}"><i class="icon-social-twitter"></i></a></li>
-                        <li><a href="//www.facebook.com/${config.social.facebook.handle}"><i class="icon-social-facebook"></i></a></li>
-                        <li><a href="tel:${config.phoneNumber}"><i class="fa fa-phone"></i><span>&nbsp;&nbsp;${config.phoneNumber}</span></a></li>
-                        <#if config.playCricket.enabled>
-                            <li><a href="https://${config.playCricket.site}.play-cricket.com"><i class="fa fa-globe"></i><span>&nbsp;&nbsp;Play-Cricket</span></a></li>
-                        </#if>
-                    </ul>
-                </nav>
-                <!-- END: INLINE NAV -->
-                <!-- BEGIN: INLINE NAV -->
-                <@components.topmenu topMenu=topMenu user=user userMenu=userMenu />
-                <!-- END: INLINE NAV -->
-            </div>
-        </div>
-        <div class="c-navbar">
-            <div class="container">
-                <div class="c-navbar-wrapper clearfix">
-                    <!-- BEGIN: BRAND -->
-                    <div class="c-brand c-pull-left">
-                        <a href="/" class="c-logo">
-                            <h1 class="c-desktop-logo">
-                                <img src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
-                                ${config.clubName}
-                            </h1>
-                            <h1 class="c-desktop-logo-inverse" style="margin-top: 0px;">
-                                ${config.clubName}
-                            </h1>
-                            <h1 class="c-mobile-logo">
-                                <img src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
-                                ${config.clubName}
-                            </h1>
-                        </a>
-                        <button class="c-hor-nav-toggler" type="button" data-target=".c-mega-menu">
-                            <span class="c-line"></span>
-                            <span class="c-line"></span>
-                            <span class="c-line"></span>
-                        </button>
-                        <button class="c-topbar-toggler" type="button">
-                            <i class="fa fa-ellipsis-v"></i>
-                        </button>
-                        <button class="c-search-toggler" type="button">
-                            <i class="fa fa-search"></i>
-                        </button>
-                        <button class="c-cart-toggler" type="button">
-                            <i class="icon-handbag"></i> <span class="c-cart-number c-theme-bg">2</span>
-                        </button>
-                    </div>
-                    <!-- END: BRAND -->
-                    <!-- BEGIN: QUICK SEARCH -->
-                    <form class="c-quick-search" action="#">
-                        <input type="text" name="query" placeholder="Search..." value="" class="form-control" autocomplete="off">
-                        <span class="c-theme-link">&times;</span>
-                    </form>
-                    <!-- END: QUICK SEARCH -->
-                    <!-- BEGIN: HOR NAV -->
-                    <!-- BEGIN: LAYOUT/HEADERS/MEGA-MENU -->
-                    <!-- BEGIN: MEGA MENU -->
-                    <!-- Dropdown menu toggle on mobile: c-toggler class can be applied to the link arrow or link itself depending on toggle mode -->
-                    <nav class="c-mega-menu c-pull-right c-mega-menu-dark c-mega-menu-dark-mobile c-fonts-uppercase-reset c-fonts-bold-reset">
-                        <ul class="nav navbar-nav c-theme-nav">
-                            <#list mainMenu as item>
-                                <#if item.onActivePath(currentRoute)>
-                                    <#assign classes>c-active</#assign>
-                                <#else>
-                                    <#assign classes></#assign>
-                                </#if>
-                                <li class="c-menu-type-classic ${classes}">
-                                    <a href="${item.destinationUrl}" class="c-link dropdown-toggle">
-                                        <@spring.messageArgs code="menu.${item.name}" args=item.argumentValues />
-                                        <span class="c-arrow c-toggler"></span>
+        >
+            <!-- ========== HEADER ========== -->
+            <header id="header" class="header header-box-shadow-on-scroll header-show-hide"
+                    data-hs-header-options='{"fixMoment": 1000, "fixEffect": "slide"}'>
+                <!-- Search -->
+                <div id="searchPushTop" class="search-push-top">
+                    <div class="container position-relative">
+                        <div class="search-push-top-content pt-3">
+                            <!-- Close Button -->
+                            <div class="search-push-top-close-btn">
+                                <div class="hs-unfold">
+                                    <a class="js-hs-unfold-invoker btn btn-icon btn-xs btn-soft-secondary mt-2 mr-2" href="javascript:;"
+                                       data-hs-unfold-options='{"target": "#searchPushTop", "type": "jquery-slide", "contentSelector": ".search-push-top"}'>
+                                        <svg width="10" height="10" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill="currentColor" d="M11.5,9.5l5-5c0.2-0.2,0.2-0.6-0.1-0.9l-1-1c-0.3-0.3-0.7-0.3-0.9-0.1l-5,5l-5-5C4.3,2.3,3.9,2.4,3.6,2.6l-1,1 C2.4,3.9,2.3,4.3,2.5,4.5l5,5l-5,5c-0.2,0.2-0.2,0.6,0.1,0.9l1,1c0.3,0.3,0.7,0.3,0.9,0.1l5-5l5,5c0.2,0.2,0.6,0.2,0.9-0.1l1-1 c0.3-0.3,0.3-0.7,0.1-0.9L11.5,9.5z"/>
+                                        </svg>
                                     </a>
-                                    <#if item.children??>
-                                        <ul class="dropdown-menu c-menu-type-classic c-pull-left">
-                                            <#list item.children as subitem>
-                                                <#if subitem.onActivePath(currentRoute)>
-                                                    <#assign classes>c-active</#assign>
-                                                <#else>
-                                                    <#assign classes></#assign>
-                                                </#if>
-                                                <#if subitem.children??>
-                                                    <li class="dropdown-submenu ${classes}">
-                                                        <a href="javascript:;">
-                                                            <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
-                                                            <span class="c-arrow c-toggler"></span>
-                                                        </a>
-                                                        <ul class="dropdown-menu c-pull-right">
-                                                            <#list subitem.children as leafItem>
-                                                                <#if leafItem.onActivePath(currentRoute)>
-                                                                    <#assign classes>c-active</#assign>
-                                                                <#else>
-                                                                    <#assign classes></#assign>
-                                                                </#if>
-                                                                <li class="${classes}">
-                                                                    <a href="${leafItem.destinationUrl}">
-                                                                        <@spring.messageArgs code="menu.${leafItem.name}" args=leafItem.argumentValues />
-                                                                    </a>
-                                                                </li>
-                                                            </#list>
-                                                        </ul>
-                                                    </li>
-                                                <#else>
-                                                    <li class="${classes}">
-                                                        <a href="${subitem.destinationUrl}">
-                                                            <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
-                                                        </a>
-                                                    </li>
-                                                </#if>
-                                            </#list>
-                                        </ul>
-                                    </#if>
-                                </li>
-                            </#list>
-                            <li class="c-search-toggler-wrapper">
-                                <a  href="#" class="c-btn-icon c-search-toggler"><i class="fa fa-search"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <!-- END: MEGA MENU --><!-- END: LAYOUT/HEADERS/MEGA-MENU -->
-                    <!-- END: HOR NAV -->
-                </div>
-            </div>
-        </div>
-    </header>
-    <div class="modal fade c-content-login-form" id="forget-password-form" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content c-square">
-                <div class="modal-header c-no-border">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                </div>
-                <div class="modal-body">
-
-                </div>
-                <div class="modal-footer c-no-border">
-                    <span class="c-text-account">Don't Have An Account Yet ?</span>
-                    <a href="javascript:;" data-toggle="modal" data-target="#signup-form" data-dismiss="modal" class="btn c-btn-dark-1 btn c-btn-uppercase c-btn-bold c-btn-slim c-btn-border-2x c-btn-square c-btn-signup">Signup!</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="c-layout-page">
-        <div class="c-layout-breadcrumbs-1 c-bordered c-bordered-both c-fonts-uppercase-reset c-fonts-bold-reset">
-            <div class="container">
-                <div class="c-page-title c-pull-left">
-                    <h3 class="c-font-sbold c-font-uppercase">
-                        <@spring.messageArgsText
-                            code="menu.${currentRoute.name}"
-                            args=currentRoute.argumentValues
-                            text=pageTitle!""
-                        />
-                    </h3>
-                </div>
-                <ul class="c-page-breadcrumbs c-theme-nav c-pull-right c-fonts-regular">
-                    <#if breadcrumbs??>
-                        <#list breadcrumbs as breadcrumb>
-                            <#if breadcrumb?has_next>
-                                <li>
-                                    <a href="${breadcrumb.destinationUrl}">
-                                        <@spring.messageArgs code="menu.${breadcrumb.name}" args=breadcrumb.argumentValues />
-                                    </a>
-                                </li>
-                                <li>/</li>
-                            <#else>
-                                <li class="c-state_active"><@spring.messageArgs code="menu.${breadcrumb.name}" args=breadcrumb.argumentValues /></li>
-                            </#if>
-                        </#list>
-                    </#if>
-                </ul>
-            </div>
-        </div>
-        <div class="c-content-box c-size-md c-bg-white">
-            <div class="container">
-                <#nested "content">
-            </div>
-        </div>
-    </div>
-
-    <footer class="c-layout-footer c-layout-footer-7">
-
-        <div class="container">
-
-            <div class="c-prefooter">
-
-                <div class="c-body">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="c-content-title-1 c-title-md">
-                                    <h2 class="c-title c-font-uppercase">Quick Links</h2>
                                 </div>
-                                <ul class="c-links c-theme-ul">
-                                    <li><a href="#">About Jango</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                    <li><a href="#">Terms &	Conditions</a></li>
-                                    <li><a href="#">Delivery</a></li>
-                                    <li><a href="#">Promotions</a></li>
-                                    <li><a href="#">News</a></li>
-                                </ul>
-                                <ul class="c-links c-theme-ul">
-                                    <li><a href="#">Blogs</a></li>
-                                    <li><a href="#">Projects</a></li>
-                                    <li><a href="#">Clients</a></li>
-                                    <li><a href="#">Services</a></li>
-                                    <li><a href="#">Features</a></li>
-                                    <li><a href="#">Stats</a></li>
-                                </ul>
                             </div>
-                            <div class="row">
-                                <div class="c-content-title-1 c-title-md">
-                                    <h2 class="c-title c-font-uppercase">Membership Subs</h2>
-                                </div>
-                                <p class="c-text c-font-16 c-font-regular">Merstham Cricket Club now operates an online membership registration form, ALL members (playing members and social) should register annually.</p>
-                                <p class="c-text c-font-16 c-font-regular">There are a number of easy payment options including Direct Debit, PayPal, Cash/Cheque and Bank Transfer.</p>
-                                <p class="c-text c-font-16 c-font-regular">Please <a href="/register">click here</a> to complete your registration form for the current season.</p>
-                            </div>
-                            <div class="row">
-                                <div class="c-content-title-1 c-title-md">
-                                    <h2 class="c-title c-font-uppercase">ECB Clubmark</h2>
-                                </div>
-                                <p class="c-text c-font-16 c-font-regular">
-                                    Merstham Cricket Club is proud to be <a href="/pages/clubmark">ECB Clubmark Accredited</a>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-md-5 col-sm-6 col-xs-12">
-                            <#if config.social.twitter.handle?has_content>
-                                <div class="c-content-title-1 c-title-md">
-                                    <h2 class="c-title c-font-uppercase">Latest Tweets</h2>
-                                    <div class="c-line-left hide"></div>
-                                </div>
-                                <div class="c-twitter">
-                                    <a class="twitter-timeline" href="https://twitter.com/${config.social.twitter.handle}" data-theme="dark" data-widget-id="437554408700641280" data-tweet-limit="3" data-chrome="noheader nofooter noscrollbar noborders transparent">Latest Tweets by ${config.social.twitter.handle}...</a>
-                                </div>
-                            </#if>
-                        </div>
-                        <div class="col-md-3 col-sm-12 col-xs-12">
-                            <div class="c-content-title-1 c-title-md">
-                                <h2 class="c-title c-font-uppercase">Contact</h2>
-                            </div>
+                            <!-- End Close Button -->
 
-                            <p class="c-text c-font-16 c-font-regular">For general information please contact our <a href="/feeds/contactcard/41" class="webcontacts fancybox.ajax">Information Manager</a></p>
-                            <p class="c-text c-font-16 c-font-regular">If you are interested in joining to play adult cricket then please contact our <a href="/feeds/contactcard/36" class="webcontacts fancybox.ajax">Club Captain</a></p>
-                            <p class="c-text c-font-16 c-font-regular">For enquiries relating to Colts (junior) cricket please contact our <a href="/feeds/contactcard/81" class="webcontacts fancybox.ajax">Junior Co-ordinator</a></p>
-
-                            <div class="c-content-title-1 c-title-md">
-                                <h2 class="c-title c-font-uppercase">Fundraising & Donations</h2>
-                            </div>
-                            <p class="c-text c-font-16 c-font-regular">
-                                <a href="//www.easyfundraising.org.uk/causes/mersthamcc/">EasyFundrasing</a> offer you a way to raise much needed funds for Merstham Cricket Club as you shop online.
-                            </p>
-                            <!-- START BANNER -->
-                            <div class="margin-bottom-20">
-                                <a href="//www.easyfundraising.org.uk/causes/mersthamcc/" target="_blank"><img src="${resourcePrefix}/assets/mcc/img/EF-Logo-01.png" border="0"  height="60"/></a>
-                            </div>
-                            <!-- END BANNER -->
-                            <p class="c-text c-font-16 c-font-regular">
-                                Merstham Cricket Club is now available as a cause on <a href="https://www.justgiving.com/merstham-cc/" target="_blank">JustGiving</a>, if you are taking part in an event and wish to raise
-                                money for the club please use JustGiving to host your fundraising page.
-                            </p>
-                            <p class="c-text c-font-16 c-font-regular">
-                                Alternatively, to simply donate money to the club, please do so via JustGiving by <a href="https://www.justgiving.com/4w350m3/donation/direct/charity/542336" target="_blank">clicking here</a> (don't forget to tick the gift-aid button)!
-                            </p>
-                            <div class="margin-bottom-20">
-                                <a href="https://www.justgiving.com/merstham-cc/donate/?utm_source=website_cid542336&utm_medium=buttons&utm_content=merstham-cc&utm_campaign=donate_white"><img src="https://www.justgiving.com/charities/content/images/logo-buttons/white/donate_white.gif" alt="Donate with JustGiving" /></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="c-line"></div>
-
-                <div class="c-foot">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="c-content-title-1 c-title-md">
-                                <h3 class="c-title c-font-uppercase c-font-bold">About Merstham<span class="c-theme-font">CC</span></h3>
-                                <div class="c-line-left hide"></div>
-                            </div>
-                            <p class="c-text c-font-16 c-font-regular">Tolerare unus ducunt ad brevis buxum. Est alter buxum, cesaris. Eheu, lura! Racanas crescere in emeritis oenipons! Ubi est rusticus repressor? Lixa grandis clabulare est. Eposs tolerare, tanquam fatalis.</p>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="c-content-title-1 c-title-md">
-                                <h3 class="c-title c-font-uppercase c-font-bold">Subscribe to Mailing List</h3>
-                                <div class="c-line-left hide"></div>
-                            </div>
-
-                            <p class="c-text c-font-16 c-font-regular">Subscribe to our monthly eNewsletter and other mails to stay up to date with the latest events at the club!</p>
-
-                            <form action="/feeds/mail" method="post">
-                                <div class="input-group input-group-lg c-square">
-                                    <input type="text" class="c-input form-control c-square c-theme" placeholder="Your Email Here"/>
-                                    <span class="input-group-btn">
-                                                <button class="btn c-theme-btn c-theme-border c-btn-square c-btn-uppercase c-font-16" type="button">Manage Subscription</button>
-                                            </span>
+                            <!-- Input -->
+                            <form class="input-group">
+                                <input type="search" class="form-control" placeholder="Search Front" aria-label="Search Front">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary">Search</button>
                                 </div>
                             </form>
+                            <!-- End Input -->
+
                         </div>
                     </div>
                 </div>
+                <!-- End Search -->
 
-                <div class="c-line"></div>
+                <div class="header-section">
+                    <!-- Topbar -->
+                    <div class="container header-hide-content pt-2">
+                        <div class="d-flex align-items-center">
+                            <a href="//www.twitter.com/${config.social.twitter.handle}"
+                               class="nav-link font-size-1 py-2 pl-0">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="//www.facebook.com/${config.social.facebook.handle}"
+                               class="nav-link font-size-1 py-2 pl-0">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="tel:${config.phoneNumber}"
+                               class="nav-link font-size-1 py-2 pl-0">
+                                <i class="fas fa-phone"></i>
+                                ${config.phoneNumber}
+                            </a>
+                            <#if config.playCricket.enabled>
+                                <a href="https://${config.playCricket.site}.play-cricket.com"
+                                   class="nav-link font-size-1 py-2 pl-0">
+                                    <i class="fas fa-globe"></i>
+                                    Visit us on Play-Cricket
+                                </a>
+                            </#if>
 
-                <div class="c-head">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                            <div class="c-left">
-                                <div class="socicon">
-                                    <a href="//www.facebook.com/MersthamCC" class="socicon-btn socicon-btn-circle socicon-solid c-font-dark-1 c-theme-on-hover socicon-facebook tooltips" data-original-title="Facebook" data-container="body"></a>
-                                    <a href="//www.twitter.com/@mersthammagics" class="socicon-btn socicon-btn-circle socicon-solid c-font-dark-1 c-theme-on-hover socicon-twitter tooltips" data-original-title="Twitter" data-container="body"></a>
-                                    <a href="#" class="socicon-btn socicon-btn-circle socicon-solid c-font-dark-1 c-theme-on-hover socicon-youtube tooltips" data-original-title="Youtube" data-container="body"></a>
-                                    <a href="#" class="socicon-btn socicon-btn-circle socicon-solid c-font-dark-1 c-theme-on-hover socicon-tumblr tooltips" data-original-title="Tumblr" data-container="body"></a>
-                                    <a href="/feeds/subscribe" class="socicon-btn socicon-btn-circle socicon-solid c-font-dark-1 c-theme-on-hover socicon-rss tooltips" data-original-title="RSS" data-container="body"></a>
+                            <@components.topmenu topMenu=topMenu user=user />
+
+                            <ul class="list-inline ml-2 mb-0">
+                                <!-- Search -->
+                                <li class="list-inline-item">
+                                    <div class="hs-unfold">
+                                        <a class="js-hs-unfold-invoker btn btn-xs btn-icon btn-ghost-secondary" href="javascript:;"
+                                           data-hs-unfold-options='{"target": "#searchPushTop", "type": "jquery-slide", "contentSelector": ".search-push-top"}'>
+                                            <i class="fas fa-search"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <!-- End Search -->
+
+                                <!-- Account Login -->
+                                <li class="list-inline-item">
+                                    <@components.userMenu user=user userMenu=userMenu />
+                                </li>
+                                <!-- End Account Login -->
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- End Topbar -->
+
+                    <div id="logoAndNav" class="container">
+                        <!-- Nav -->
+                        <nav class="js-mega-menu navbar navbar-expand-lg">
+                            <!-- Logo -->
+                            <a class="navbar-brand" href="/" aria-label="${config.clubName}">
+                                <img src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
+                            </a>
+                            <!-- End Logo -->
+
+                            <!-- Responsive Toggle Button -->
+                            <button type="button" class="navbar-toggler btn btn-icon btn-sm rounded-circle"
+                                    aria-label="Toggle navigation"
+                                    aria-expanded="false"
+                                    aria-controls="navBar"
+                                    data-toggle="collapse"
+                                    data-target="#navBar">
+                                <span class="navbar-toggler-default">
+                                  <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="currentColor" d="M17.4,6.2H0.6C0.3,6.2,0,5.9,0,5.5V4.1c0-0.4,0.3-0.7,0.6-0.7h16.9c0.3,0,0.6,0.3,0.6,0.7v1.4C18,5.9,17.7,6.2,17.4,6.2z M17.4,14.1H0.6c-0.3,0-0.6-0.3-0.6-0.7V12c0-0.4,0.3-0.7,0.6-0.7h16.9c0.3,0,0.6,0.3,0.6,0.7v1.4C18,13.7,17.7,14.1,17.4,14.1z"/>
+                                  </svg>
+                                </span>
+                                <span class="navbar-toggler-toggled">
+                                  <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="currentColor" d="M11.5,9.5l5-5c0.2-0.2,0.2-0.6-0.1-0.9l-1-1c-0.3-0.3-0.7-0.3-0.9-0.1l-5,5l-5-5C4.3,2.3,3.9,2.4,3.6,2.6l-1,1 C2.4,3.9,2.3,4.3,2.5,4.5l5,5l-5,5c-0.2,0.2-0.2,0.6,0.1,0.9l1,1c0.3,0.3,0.7,0.3,0.9,0.1l5-5l5,5c0.2,0.2,0.6,0.2,0.9-0.1l1-1 c0.3-0.3,0.3-0.7,0.1-0.9L11.5,9.5z"/>
+                                  </svg>
+                                </span>
+                            </button>
+                            <!-- End Responsive Toggle Button -->
+
+                            <!-- Navigation -->
+                            <@components.navMenu mainMenu=mainMenu />
+                            <!-- End Navigation -->
+                        </nav>
+                        <!-- End Nav -->
+                    </div>
+                </div>
+            </header>
+            <!-- ========== END HEADER ========== -->
+
+            <!-- ========== MAIN CONTENT ========== -->
+            <main id="content" role="main" class="<#if formName!="">bg-light</#if>">
+                <#if formName == "">
+                    <@components.breadcrumbs breadcrumbs=breadcrumbs currentRoute=currentRoute />
+                <#else>
+                    <@components.formHeader
+                        formName=formName
+                        resourcePrefix=resourcePrefix
+                        breadcrumbs=breadcrumbs
+                        currentRoute=currentRoute />
+                </#if>
+                <#nested />
+            </main>
+            <!-- ========== END MAIN CONTENT ========== -->
+
+            <!-- ========== FOOTER ========== -->
+            <footer class="bg-dark">
+                <div class="container">
+                    <div class="space-top-2 space-bottom-1 space-bottom-lg-2">
+                        <div class="row justify-content-lg-between">
+                            <div class="col-lg-3 ml-lg-auto mb-5 mb-lg-0">
+                                <!-- Logo -->
+                                <div class="mb-4">
+                                    <a href="index.html" aria-label="Front">
+                                        <img class="brand" src="${resourcePrefix}/front/assets/svg/logos/logo-white.svg" alt="Logo">
+                                    </a>
                                 </div>
+                                <!-- End Logo -->
+
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-x-0 nav-white flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link media" href="javascript:;">
+                                <span class="media">
+                                  <span class="fas fa-location-arrow mt-1 mr-2"></span>
+                                  <span class="media-body">
+                                    153 Williamson Plaza, Maggieberg
+                                  </span>
+                                </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link media" href="tel:1-062-109-9222">
+                                <span class="media">
+                                  <span class="fas fa-phone-alt mt-1 mr-2"></span>
+                                  <span class="media-body">
+                                    +1 (062) 109-9222
+                                  </span>
+                                </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- End Nav Link -->
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg mb-5 mb-lg-0">
+                                <h5 class="text-white">Company</h5>
+
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-x-0 nav-white flex-column">
+                                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Careers <span class="badge badge-primary ml-1">We're hiring</span></a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Customers</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Hire us</a></li>
+                                </ul>
+                                <!-- End Nav Link -->
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg mb-5 mb-lg-0">
+                                <h5 class="text-white">Features</h5>
+
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-x-0 nav-white flex-column">
+                                    <li class="nav-item"><a class="nav-link" href="#">Press</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Release notes</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Integrations</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+                                </ul>
+                                <!-- End Nav Link -->
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg">
+                                <h5 class="text-white">Documentation</h5>
+
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-x-0 nav-white flex-column">
+                                    <li class="nav-item"><a class="nav-link" href="#">Support</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Docs</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Status</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">API Reference</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#">Tech Requirements</a></li>
+                                </ul>
+                                <!-- End Nav Link -->
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg">
+                                <h5 class="text-white">Resources</h5>
+
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-x-0 nav-white flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                <span class="media align-items-center">
+                                  <i class="fa fa-info-circle mr-2"></i>
+                                  <span class="media-body">Help</span>
+                                </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                <span class="media align-items-center">
+                                  <i class="fa fa-user-circle mr-2"></i>
+                                  <span class="media-body">Your Account</span>
+                                </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- End Nav Link -->
                             </div>
                         </div>
-                        <div class="col-md-6 col-sm-12">
-                            <div class="c-right">
-                                <h3 class="c-title c-font-uppercase c-font-bold">Download Mobile App</h3>
-                                <div class="c-icons">
-                                    <a href="#" class="c-font-30 c-font-green-1 socicon-btn socicon-android tooltips" data-original-title="Android" data-container="body"></a>
-                                    <a href="#" class="c-font-30 c-font-grey-3 socicon-btn socicon-apple tooltips" data-original-title="Apple" data-container="body"></a>
-                                    <a href="#" class="c-font-30 c-font-blue-3 socicon-btn socicon-windows tooltips" data-original-title="Windows" data-container="body"></a>
-                                </div>
+                    </div>
+
+                    <hr class="opacity-xs my-0">
+
+                    <div class="space-1">
+                        <div class="row align-items-md-center mb-7">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <!-- Nav Link -->
+                                <ul class="nav nav-sm nav-white nav-x-sm align-items-center">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">Privacy &amp; Policy</a>
+                                    </li>
+                                    <li class="nav-item opacity mx-3">&#47;</li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">Terms</a>
+                                    </li>
+                                    <li class="nav-item opacity mx-3">&#47;</li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">Site Map</a>
+                                    </li>
+                                </ul>
+                                <!-- End Nav Link -->
+                            </div>
+
+                            <div class="col-md-6 text-md-right">
+                                <ul class="list-inline mb-0">
+                                    <!-- Social Networks -->
+                                    <li class="list-inline-item">
+                                        <a class="btn btn-xs btn-icon btn-soft-light" href="#">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="btn btn-xs btn-icon btn-soft-light" href="#">
+                                            <i class="fab fa-google"></i>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="btn btn-xs btn-icon btn-soft-light" href="#">
+                                            <i class="fab fa-twitter"></i>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="btn btn-xs btn-icon btn-soft-light" href="#">
+                                            <i class="fab fa-github"></i>
+                                        </a>
+                                    </li>
+                                    <!-- End Social Networks -->
+
+                                    <!-- Language -->
+                                    <li class="list-inline-item">
+                                        <div class="hs-unfold">
+                                            <a class="js-hs-unfold-invoker dropdown-toggle btn btn-xs btn-soft-light" href="javascript:;"
+                                               data-hs-unfold-options='{"target": "#footerLanguage","type": "css-animation","animationIn": "slideInDown"}'>
+                                                <img class="dropdown-item-icon" src="${resourcePrefix}/front/assets/vendor/flag-icon-css/flags/4x3/us.svg" alt="United States Flag">
+                                                <span>United States</span>
+                                            </a>
+
+                                            <div id="footerLanguage" class="hs-unfold-content dropdown-menu dropdown-unfold dropdown-menu-bottom mb-2">
+                                                <a class="dropdown-item active" href="#">English</a>
+                                                <a class="dropdown-item" href="#">Deutsch</a>
+                                                <a class="dropdown-item" href="#">Español</a>
+                                                <a class="dropdown-item" href="#">Français</a>
+                                                <a class="dropdown-item" href="#">Italiano</a>
+                                                <a class="dropdown-item" href="#">日本語</a>
+                                                <a class="dropdown-item" href="#">한국어</a>
+                                                <a class="dropdown-item" href="#">Nederlands</a>
+                                                <a class="dropdown-item" href="#">Português</a>
+                                                <a class="dropdown-item" href="#">Русский</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- End Language -->
+                                </ul>
                             </div>
                         </div>
+
+                        <!-- Copyright -->
+                        <div class="w-md-75 text-lg-center mx-lg-auto">
+                            <p class="text-white opacity-sm small">&copy; Front. 2020 Htmlstream. All rights reserved.</p>
+                            <p class="text-white opacity-sm small">When you visit or interact with our sites, services or tools, we or our authorised service providers may use cookies for storing information to help provide you with a better, faster and safer experience and for marketing purposes.</p>
+                        </div>
+                        <!-- End Copyright -->
                     </div>
                 </div>
+            </footer>
+            <!-- ========== END FOOTER ========== -->
 
-            </div>
+            <!-- Go to Top -->
+            <a class="js-go-to go-to position-fixed" href="javascript:;" style="visibility: hidden;"
+               data-hs-go-to-options='{
+                   "offsetTop": 700,
+                   "position": {
+                     "init": {
+                       "right": 15
+                     },
+                     "show": {
+                       "bottom": 15
+                     },
+                     "hide": {
+                       "bottom": -15
+                     }
+                   }
+                 }'>
+                <i class="fas fa-angle-up"></i>
+            </a>
+            <!-- End Go to Top -->
 
-        </div>
+            <!-- JS Global Compulsory  -->
+            <script src="${resourcePrefix}/front/assets/vendor/jquery/dist/jquery.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/jquery-migrate/dist/jquery-migrate.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-        <div class="c-postfooter c-bg-dark-2">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 col-sm-12 c-col">
-                        <p class="c-copyright c-font-grey">&copy; ${.now?string["yyyy"]} ${config.clubName}
-                            <span class="c-font-grey-3">All Rights Reserved.</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+            <!-- JS Implementing Plugins -->
+            <script src="${resourcePrefix}/front/assets/vendor/hs-header/dist/hs-header.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-go-to/dist/hs-go-to.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-unfold/dist/hs-unfold.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-mega-menu/dist/hs-mega-menu.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-show-animation/dist/hs-show-animation.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-sticky-block/dist/hs-sticky-block.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/hs-counter/dist/hs-counter.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/appear/dist/appear.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/cubeportfolio/js/jquery.cubeportfolio.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/dzsparallaxer/dzsparallaxer.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/typed.js/lib/typed.min.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/aos/dist/aos.js"></script>
 
-    <div class="c-layout-go2top" style="display: none;">
-        <i class="icon-arrow-up"></i>
-    </div>
+            <!-- JS Front -->
+            <script src="${resourcePrefix}/front/assets/js/theme.min.js"></script>
 
-    <!-- BEGIN: CORE PLUGINS -->
-    <!--[if lt IE 9]>
-    <script src="${resourcePrefix}/assets/global/plugins/excanvas.min.js"></script>
-    <![endif]-->
-    <script src="${resourcePrefix}/assets/plugins/jquery.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/plugins/jquery-migrate.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/plugins/jquery.easing.min.js" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/plugins/reveal-animate/wow.js" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/mcc/js/scripts/reveal-animate/reveal-animate.js" type="text/javascript" ></script>
-    <script src="${resourcePrefix}/assets/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
-    <!-- END: CORE PLUGINS -->
+            <!-- JS Plugins Init. -->
+            <script>
+                $(document).on('ready', function () {
+                    // INITIALIZATION OF HEADER
+                    // =======================================================
+                    var header = new HSHeader($('#header')).init();
 
-    <!-- BEGIN: LAYOUT PLUGINS -->
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/jquery.themepunch.tools.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/jquery.themepunch.revolution.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.slideanims.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.layeranimation.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.navigation.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.video.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/revo-slider/js/extensions/revolution.extension.parallax.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/cubeportfolio/js/jquery.cubeportfolio.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/owl-carousel/owl.carousel.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/counterup/jquery.waypoints.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/counterup/jquery.counterup.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/smooth-scroll/jquery.smooth-scroll.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/typed/typed.min.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/slider-for-bootstrap/js/bootstrap-slider.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/plugins/js-cookie/js.cookie.js" type="text/javascript"></script>
-    <!-- END: LAYOUT PLUGINS -->
 
-    <!-- BEGIN: THEME SCRIPTS -->
-    <script src="${resourcePrefix}/assets/base/js/components.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/base/js/components-shop.js" type="text/javascript"></script>
-    <script src="${resourcePrefix}/assets/base/js/app.js" type="text/javascript"></script>
-    <script>
-        $(document).ready(function() {
-            App.init();
-        });
-    </script>
-    <!-- END: THEME SCRIPTS -->
-
-    <!-- BEGIN: PAGE SCRIPTS -->
-    <script>
-        $(document).ready(function() {
-
-            var slider = $('.c-layout-revo-slider .tp-banner');
-            var cont = $('.c-layout-revo-slider .tp-banner-container');
-            var height = (App.getViewPort().width < App.getBreakpoint('md') ? 400 : 620);
-
-            var api = slider.show().revolution({
-                sliderType:"standard",
-                sliderLayout:"fullwidth",
-                delay: 15000,
-                autoHeight: 'off',
-                gridheight:500,
-
-                navigation: {
-                    keyboardNavigation:"off",
-                    keyboard_direction: "horizontal",
-                    mouseScrollNavigation:"off",
-                    onHoverStop:"on",
-                    arrows: {
-                        style:"circle",
-                        enable:true,
-                        hide_onmobile:false,
-                        hide_onleave:false,
-                        tmp:'',
-                        left: {
-                            h_align:"left",
-                            v_align:"center",
-                            h_offset:30,
-                            v_offset:0
-                        },
-                        right: {
-                            h_align:"right",
-                            v_align:"center",
-                            h_offset:30,
-                            v_offset:0
+                    // INITIALIZATION OF MEGA MENU
+                    // =======================================================
+                    var megaMenu = new HSMegaMenu($('.js-mega-menu'), {
+                        desktop: {
+                            position: 'left'
                         }
-                    },
-                    touch:{
-                        touchenabled:"on",
-                        swipe_threshold: 75,
-                        swipe_min_touches: 1,
-                        swipe_direction: "horizontal",
-                        drag_block_vertical: false
-                    },
-                },
-                viewPort: {
-                    enable:true,
-                    outof:"pause",
-                    visible_area:"80%"
-                },
+                    }).init();
 
-                shadow: 0,
 
-                spinner: "spinner2",
+                    // INITIALIZATION OF UNFOLD
+                    // =======================================================
+                    var unfold = new HSUnfold('.js-hs-unfold-invoker').init();
 
-                disableProgressBar:"on",
 
-                fullScreenOffsetContainer: '.tp-banner-container',
+                    // INITIALIZATION OF TEXT ANIMATION (TYPING)
+                    // =======================================================
+                    var typed = $.HSCore.components.HSTyped.init(".js-text-animation");
 
-                hideThumbsOnMobile: "on",
-                hideNavDelayOnMobile: 1500,
-                hideBulletsOnMobile: "on",
-                hideArrowsOnMobile: "on",
-                hideThumbsUnderResolution: 0,
 
-            });
-        }); //ready
-    </script>
-    <!-- END: PAGE SCRIPTS -->
-    <!-- END: LAYOUT/BASE/BOTTOM -->
+                    // INITIALIZATION OF AOS
+                    // =======================================================
+                    AOS.init({
+                        duration: 650,
+                        once: true
+                    });
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.googleAnalyticsKey }}"></script>
 
-    <!--  GOOGLE reCAPTCHA -->
-    <script src='//www.google.com/recaptcha/api.js'></script>
-    <!--  GOOGLE reCAPTCHA -->
+                    // INITIALIZATION OF FORM VALIDATION
+                    // =======================================================
+                    $('.js-validate').each(function() {
+                        $.HSCore.components.HSValidation.init($(this), {
+                            rules: {
+                                confirmPassword: {
+                                    equalTo: '#signupPassword'
+                                }
+                            }
+                        });
+                    });
 
-    <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.x.min.js" type="text/javascript"></script>
+                    // INITIALIZATION OF SHOW ANIMATIONS
+                    // =======================================================
+                    $('.js-animation-link').each(function () {
+                        var showAnimation = new HSShowAnimation($(this)).init();
+                    });
 
-    <script src="https://tymxcm8ksmvn.statuspage.io/embed/script.js" type="text/javascript"></script>
 
-    <#if script?is_directive><@script /><#else>${script}</#if>
-    </body>
-</html>
+                    // INITIALIZATION OF COUNTER
+                    // =======================================================
+                    $('.js-counter').each(function() {
+                        var counter = new HSCounter($(this)).init();
+                    });
+
+
+                    // INITIALIZATION OF GO TO
+                    // =======================================================
+                    $('.js-go-to').each(function () {
+                        var goTo = new HSGoTo($(this)).init();
+                    });
+                });
+            </script>
+
+
+
+            <!-- Global site tag (gtag.js) - Google Analytics -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.googleAnalyticsKey }}"></script>
+
+            <!--  GOOGLE reCAPTCHA -->
+            <script src='//www.google.com/recaptcha/api.js'></script>
+            <!--  GOOGLE reCAPTCHA -->
+
+            <script src="//cc.cdn.civiccomputing.com/9/cookieControl-9.x.min.js" type="text/javascript"></script>
+
+            <script src="//tymxcm8ksmvn.statuspage.io/embed/script.js" type="text/javascript"></script>
+
+            <script
+                    type="text/javascript"
+                    src="//mersthamcricketclub.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/sb53l8/b/24/bc54840da492f9ca037209037ef0522a/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=e8e9adb2">
+
+            </script>
+
+
+
+            <#if script?is_directive><@script /><#else>${script}</#if>
+        </body>
+    </html>
 </#macro>
