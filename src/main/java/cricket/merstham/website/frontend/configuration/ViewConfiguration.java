@@ -24,10 +24,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.text.MessageFormat.format;
 
 @Configuration
 @ComponentScan("cricket.merstham.website.frontend")
@@ -64,7 +65,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
         if (handler instanceof HandlerMethod && modelAndView != null) {
             Map<String, Object> model = new HashMap<>();
-            Principal principal = request.getUserPrincipal();
+            var principal = request.getUserPrincipal();
             if (principal != null) {
                 model.put("user", createUserView(principal));
             }
@@ -72,7 +73,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             model.put("topMenu", menuBuilderProvider.getTopMenu());
             model.put("userMenu", menuBuilderProvider.getUserMenu());
             model.put("mainMenu", menuBuilderProvider.getFrontEndMenu());
-            CurrentRoute currentRoute = getCurrentRoute(request, handler);
+            var currentRoute = getCurrentRoute(request, handler);
             model.put("currentRoute", currentRoute);
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
             model.put("resourcePrefix", resourcePrefix);
@@ -89,26 +90,26 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
     private UserView createUserView(Principal principal) {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
         List<String> roles =
                 ((Collection<SimpleGrantedAuthority>)
                                 SecurityContextHolder.getContext()
                                         .getAuthentication()
                                         .getAuthorities())
-                        .stream().map(r -> r.getAuthority()).collect(Collectors.toList());
+                        .stream().map(SimpleGrantedAuthority::getAuthority).collect(Collectors.toList());
         return new UserView(keycloakPrincipal, roles);
     }
 
     private CurrentRoute getCurrentRoute(HttpServletRequest request, Object handler) {
-        CurrentRoute route = new CurrentRoute();
-        Method method = ((HandlerMethod) handler).getMethod();
+        var route = new CurrentRoute();
+        var method = ((HandlerMethod) handler).getMethod();
         route.setMethod(method).setRequestMapping(method.getAnnotation(RequestMapping.class));
         try {
             route.setPathVariables(
                     (LinkedHashMap<String, String>)
                             request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
-        } catch (Exception ignored) {
-
+        } catch (Exception ex) {
+            LOG.warn("No parameters to cast", ex);
         }
         LOG.info(
                 "Matched route = {}, parameters = {}",
@@ -116,7 +117,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
                 String.join(
                         ", ",
                         route.getPathVariables().entrySet().stream()
-                                .map(e -> e.getKey() + "=" + e.getValue())
+                                .map(e -> format("{0}={1}", e.getKey(), e.getValue()))
                                 .collect(Collectors.toList())));
         return route;
     }
@@ -157,7 +158,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             return false;
         }
 
-        public String getGravatarHash() throws NoSuchAlgorithmException {
+        public String getGravatarHash() {
             return DigestUtils.md5DigestAsHex(getEmail().toLowerCase().getBytes()).toLowerCase();
         }
     }

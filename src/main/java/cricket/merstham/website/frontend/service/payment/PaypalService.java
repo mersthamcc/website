@@ -7,6 +7,8 @@ import com.paypal.orders.*;
 import cricket.merstham.website.frontend.configuration.ClubConfiguration;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.service.MembershipService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,6 +28,7 @@ import static java.text.MessageFormat.format;
 
 @Service("paypal")
 public class PaypalService implements PaymentService {
+    private static final Logger LOG = LoggerFactory.getLogger(PaypalService.class);
 
     private static final String SERVICE_NAME = "paypal";
     private static final String CAPTURE_INTENT = "CAPTURE";
@@ -84,7 +87,7 @@ public class PaypalService implements PaymentService {
 
     @Override
     public ModelAndView authorise(HttpServletRequest request, Order order) {
-        OrderRequest orderRequest = new OrderRequest();
+        var orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent(CAPTURE_INTENT);
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
@@ -131,7 +134,7 @@ public class PaypalService implements PaymentService {
                                         .value(order.getTotal().toPlainString())));
 
         orderRequest.purchaseUnits(purchaseUnits);
-        URI requestUri = URI.create(request.getRequestURL().toString());
+        var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
         orderRequest.applicationContext(
                 new ApplicationContext()
@@ -142,7 +145,7 @@ public class PaypalService implements PaymentService {
             var apiRequest = new OrdersCreateRequest().requestBody(orderRequest);
             HttpResponse<com.paypal.orders.Order> result = client.execute(apiRequest);
 
-            com.paypal.orders.Order paypalOrder = result.result();
+            var paypalOrder = result.result();
             String authoriseUrl =
                     paypalOrder.links().stream()
                             .filter(l -> l.rel().equals(APPROVAL_LINK))
@@ -152,20 +155,21 @@ public class PaypalService implements PaymentService {
 
             request.getSession().setAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE, paypalOrder.id());
             return new ModelAndView(format(REDIRECT_FORMAT, authoriseUrl));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            LOG.error("Error Creating PayPal Order", e);
+            throw new RuntimeException("Error Creating PayPal Order", e);
         }
     }
 
     @Override
     public ModelAndView execute(HttpServletRequest request, Order order) {
-        OrdersCaptureRequest captureRequest =
+        var captureRequest =
                 new OrdersCaptureRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
 
         try {
-            HttpResponse<com.paypal.orders.Order> response = client.execute(captureRequest);
-            com.paypal.orders.Order paypalOrder = response.result();
+            var response = client.execute(captureRequest);
+            var paypalOrder = response.result();
 
             List<Capture> captures = paypalOrder.purchaseUnits().get(0).payments().captures();
 
@@ -187,25 +191,27 @@ public class PaypalService implements PaymentService {
 
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.error("Error Capturing PayPal Order", e);
+            throw new RuntimeException("Error Capturing PayPal Order", e);
         }
     }
 
     @Override
     public ModelAndView confirm(HttpServletRequest request, Order order) {
-        OrdersGetRequest ordersGetRequest =
+        var ordersGetRequest =
                 new OrdersGetRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
         request.getSession().removeAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE);
         try {
-            HttpResponse<com.paypal.orders.Order> response = client.execute(ordersGetRequest);
-            com.paypal.orders.Order paypalOrder = response.result();
+            var response = client.execute(ordersGetRequest);
+            var paypalOrder = response.result();
 
             return new ModelAndView(
                     "payments/paypal/confirmation",
                     Map.of("order", order, "paypal-order", paypalOrder));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.error("Error Getting Order from PayPal", e);
+            throw new RuntimeException("Error Getting Order from PayPal", e);
         }
     }
 

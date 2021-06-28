@@ -1,12 +1,9 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Singleton;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,7 +13,6 @@ import java.util.List;
 @Singleton
 public class MenuBuilder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MenuBuilder.class);
     private static final URI SCRIPT_LINK = URI.create("javascript:;");
 
     private final List<Menu> topMenu =
@@ -154,7 +150,7 @@ public class MenuBuilder {
             throw new IllegalArgumentException("Number of parameters should be even");
         var map = new LinkedHashMap<String, String>();
 
-        for (int i = 0; i < params.length; i = i + 2) {
+        for (var i = 0; i < params.length; i = i + 2) {
             map.put(params[i], params[i + 1]);
         }
         return map;

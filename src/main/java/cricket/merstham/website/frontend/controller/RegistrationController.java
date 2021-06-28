@@ -13,16 +13,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -56,22 +56,21 @@ public class RegistrationController {
         return new RegistrationBasket();
     }
 
-    @RequestMapping(value = "/register", name = "register", method = RequestMethod.GET)
+    @GetMapping(value = "/register", name = "register")
     public ModelAndView register(@ModelAttribute("basket") RegistrationBasket basket) {
         return new ModelAndView("registration/register", Map.of("basket", basket));
     }
 
-    @RequestMapping(value = "/register", name = "registration-actions", method = RequestMethod.POST)
+    @PostMapping(value = "/register", name = "registration-actions")
     public Object actionProcessor(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
-            @ModelAttribute("edit-member") String editMember)
-            throws IOException {
+            @ModelAttribute("edit-member") String editMember) {
         if (!deleteMember.isBlank()) {
             basket.removeSuscription(UUID.fromString(deleteMember));
         } else if (!editMember.isBlank()) {
-            Subscription subscription = basket.getSubscriptions().get(UUID.fromString(editMember));
+            var subscription = basket.getSubscriptions().get(UUID.fromString(editMember));
             return new ModelAndView(
                     "registration/select-membership",
                     Map.of(
@@ -82,7 +81,7 @@ public class RegistrationController {
         } else {
             switch (action) {
                 case "add-member":
-                    Subscription subscription = new Subscription();
+                    var subscription = new Subscription();
                     subscription
                             .setUuid(UUID.randomUUID())
                             .setAction(RegistrationAction.NEW)
@@ -102,16 +101,15 @@ public class RegistrationController {
         return new RedirectView("/register");
     }
 
-    @RequestMapping(
+    @PostMapping(
             value = "/register/select-membership",
-            name = "member-details",
-            method = RequestMethod.POST)
+            name = "member-details")
     public ModelAndView membershipForm(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("subscription") Subscription subscription) {
-        MembershipCategoriesQuery.MembershipCategory membershipCategory =
+        var membershipCategory =
                 graphService.getMembershipCategory(subscription.getCategory());
-        MembershipCategoriesQuery.PricelistItem pricelistItem =
+        var pricelistItem =
                 membershipCategory.pricelistItem().stream()
                         .filter(p -> p.id() == subscription.getPricelistItemId())
                         .findFirst()
@@ -129,10 +127,9 @@ public class RegistrationController {
                         "subscription", basket.updateSubscription(subscription)));
     }
 
-    @RequestMapping(
+    @PostMapping(
             value = "/register/add-member",
-            name = "member-details",
-            method = RequestMethod.POST)
+            name = "member-details")
     public View membershipFormProcess(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("subscription") Subscription subscription) {
@@ -141,17 +138,17 @@ public class RegistrationController {
         return new RedirectView("/register");
     }
 
-    @RequestMapping(
+    @GetMapping(
             value = "/register/confirmation",
-            name = "registration-confirmation",
-            method = RequestMethod.GET)
+            name = "registration-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
             Principal principal,
-            HttpSession session) {
-        Order order = membershipService.registerMembersFromBasket(basket, principal);
+            HttpSession session,
+            SessionStatus status) {
+        var order = membershipService.registerMembersFromBasket(basket, principal);
+        status.setComplete();
         session.setAttribute("order", order);
-        basket.reset();
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(

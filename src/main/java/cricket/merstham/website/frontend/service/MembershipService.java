@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.service;
 
+import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
@@ -35,8 +36,8 @@ public class MembershipService {
     }
 
     public Order registerMembersFromBasket(RegistrationBasket basket, Principal principal) {
-        CreateOrderMutation createOrder = new CreateOrderMutation(basket.getId());
-        Order order = new Order();
+        var createOrder = new CreateOrderMutation(basket.getId());
+        var order = new Order();
         try {
             Response<CreateOrderMutation.Data> orderResult =
                     graphService.executeMutation(createOrder, principal);
@@ -55,11 +56,11 @@ public class MembershipService {
                     .setSubscriptions(basket.getSubscriptions());
         } catch (IOException e) {
             LOG.error("Error creating order", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error creating order", e);
         }
 
         for (var subscription : basket.getSubscriptions().entrySet()) {
-            MemberInput memberInput =
+            var memberInput =
                     MemberInput.builder()
                             .attributes(
                                     subscription.getValue().getMember().entrySet().stream()
@@ -80,21 +81,19 @@ public class MembershipService {
                                             .build())
                             .build();
 
-            CreateMemberMutation createMemberMutation = new CreateMemberMutation(memberInput);
+            var createMemberMutation = new CreateMemberMutation(memberInput);
             try {
                 var result = graphService.executeMutation(createMemberMutation, principal);
                 if (result.hasErrors()) {
                     throw new RuntimeException(
                             "GraphQL error(s) registering member: "
-                                    + String.join(
-                                            "\n",
-                                            result.getErrors().stream()
-                                                    .map(error -> error.getMessage())
-                                                    .collect(Collectors.toList())));
+                                    + result.getErrors().stream()
+                                            .map(Error::getMessage)
+                                            .collect(Collectors.joining("\n")));
                 }
             } catch (IOException e) {
                 LOG.error("Error registering member", e);
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error registering member", e);
             }
         }
         return order;
@@ -110,7 +109,7 @@ public class MembershipService {
             boolean collected,
             boolean reconciled,
             Principal principal) {
-        AddPaymentToOrderMutation addPaymentToOrderMutation =
+        var addPaymentToOrderMutation =
                 new AddPaymentToOrderMutation(
                         order.getId(),
                         PaymentInput.builder()
@@ -128,16 +127,14 @@ public class MembershipService {
             if (result.hasErrors()) {
                 throw new RuntimeException(
                         "GraphQL error(s) creating payment: "
-                                + String.join(
-                                        "\n",
-                                        result.getErrors().stream()
-                                                .map(error -> error.getMessage())
-                                                .collect(Collectors.toList())));
+                                + result.getErrors().stream()
+                                        .map(Error::getMessage)
+                                        .collect(Collectors.joining("\n")));
             }
             return result.getData().addPaymentToOrder();
         } catch (IOException e) {
             LOG.error("Error registering payment", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error registering payment", e);
         }
     }
 }
