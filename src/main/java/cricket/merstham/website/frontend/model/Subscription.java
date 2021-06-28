@@ -131,11 +131,11 @@ public class Subscription implements Serializable {
         for (var attr : attributes.entrySet()) {
             if (key.equals(attr.getKey())) {
                 if (attr.getValue().getType().equals(AttributeType.DATE.rawValue())) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    var formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                     try {
                         return formatter.parse((String) value);
                     } catch (ParseException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException("Error parsing date string", e);
                     }
                 } else if (attr.getValue().getType().equals(AttributeType.BOOLEAN.rawValue())) {
                     return Boolean.parseBoolean((String) value);

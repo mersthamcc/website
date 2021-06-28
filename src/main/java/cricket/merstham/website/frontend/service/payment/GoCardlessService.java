@@ -86,7 +86,7 @@ public class GoCardlessService implements PaymentService {
     @Override
     public ModelAndView checkout(HttpServletRequest request, Order order) {
         List<PaymentSchedule> schedules = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (var i = 1; i <= 10; i++) {
             BigDecimal monthly = order.getTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
             schedules.add(
                     new PaymentSchedule()
@@ -95,7 +95,7 @@ public class GoCardlessService implements PaymentService {
                             .setFinalAmount(
                                     order.getTotal()
                                             .subtract(
-                                                    monthly.multiply(BigDecimal.valueOf(i - 1)))));
+                                                    monthly.multiply(BigDecimal.valueOf((long) i - 1)))));
         }
 
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);
@@ -104,13 +104,13 @@ public class GoCardlessService implements PaymentService {
 
     @Override
     public ModelAndView authorise(HttpServletRequest request, Order order) {
-        URI requestUri = URI.create(request.getRequestURL().toString());
+        var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-        KeycloakAuthenticationToken keycloakAuthenticationToken =
+        var keycloakAuthenticationToken =
                 (KeycloakAuthenticationToken) request.getUserPrincipal();
-        KeycloakPrincipal keycloakPrincipal =
+        var keycloakPrincipal =
                 (KeycloakPrincipal) keycloakAuthenticationToken.getPrincipal();
-        RedirectFlow redirectFlow =
+        var redirectFlow =
                 client.redirectFlows()
                         .create()
                         .withDescription(mandateDescription)
@@ -153,28 +153,26 @@ public class GoCardlessService implements PaymentService {
         List<PaymentSchedule> schedules =
                 (List<PaymentSchedule>) request.getSession().getAttribute(SESSION_SCHEDULES);
 
-        PaymentSchedule paymentSchedule =
+        var paymentSchedule =
                 schedules.stream()
                         .filter(ps -> ps.getNumberOfPayments() == numberOfPayments)
                         .findFirst()
                         .orElseThrow();
 
-        RedirectFlow redirectFlow =
+        var redirectFlow =
                 client.redirectFlows()
                         .complete(flowId)
                         .withSessionToken(request.getRequestedSessionId())
                         .execute();
-        Mandate mandate = client.mandates().get(redirectFlow.getLinks().getMandate()).execute();
-        Customer customer = client.customers().get(redirectFlow.getLinks().getCustomer()).execute();
+        var mandate = client.mandates().get(redirectFlow.getLinks().getMandate()).execute();
+        var customer = client.customers().get(redirectFlow.getLinks().getCustomer()).execute();
 
         List<LocalDate> chargeDates = calculateDates(mandate, dayOfMonth, numberOfPayments);
         LOG.info(
                 "Payment dates = {}",
-                String.join(
-                        ", ",
-                        chargeDates.stream()
-                                .map(localDate -> localDate.toString())
-                                .collect(Collectors.toList())));
+                chargeDates.stream()
+                        .map(LocalDate::toString)
+                        .collect(Collectors.joining(", ")));
 
         BigDecimal remaining = order.getTotal();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
@@ -183,7 +181,7 @@ public class GoCardlessService implements PaymentService {
             if (remaining.compareTo(chargeAmount) < 0) {
                 chargeAmount = paymentSchedule.getFinalAmount();
             }
-            Payment payment =
+            var payment =
                     client.payments()
                             .create()
                             .withAmount(chargeAmount.multiply(BigDecimal.valueOf(100)).intValue())
@@ -212,8 +210,8 @@ public class GoCardlessService implements PaymentService {
 
     public List<LocalDate> calculateDates(Mandate mandate, int dayOfMonth, int numberOfPayments) {
         List<LocalDate> chargeDates = new ArrayList<>();
-        LocalDate earliestDate = LocalDate.parse(mandate.getNextPossibleChargeDate());
-        LocalDate startDate = earliestDate;
+        var earliestDate = LocalDate.parse(mandate.getNextPossibleChargeDate());
+        var startDate = earliestDate;
 
         if (dayOfMonth == -1) {
             startDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
@@ -225,7 +223,7 @@ public class GoCardlessService implements PaymentService {
             startDate = startDate.plusMonths(1);
         }
 
-        for (int i = 1; i <= numberOfPayments; i++) {
+        for (var i = 1; i <= numberOfPayments; i++) {
             chargeDates.add(startDate);
             startDate = startDate.plusMonths(1);
         }

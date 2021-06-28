@@ -1,13 +1,12 @@
 package cricket.merstham.website.frontend.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class SelectionController {
 
-    @RequestMapping(value = "/selection", name = "selection", method = RequestMethod.GET)
+    @GetMapping(value = "/selection", name = "selection")
     public String selection() {
         return "home/home";
     }

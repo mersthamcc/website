@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -52,7 +54,7 @@ public class AccessTokenManager {
                 .getAccessToken()
                 .orElseGet(
                         () -> {
-                            AccessTokenResponse accessTokenResponse = requestAccessToken();
+                            var accessTokenResponse = requestAccessToken();
                             return tokenCache
                                     .updateToken(
                                             accessTokenResponse.getToken(),
@@ -67,19 +69,19 @@ public class AccessTokenManager {
     private AccessTokenResponse requestAccessToken() {
         LOG.info("Getting new client credentials access token");
 
-        ServerConfiguration configuration = getServerConfiguration();
+        var configuration = getServerConfiguration();
 
-        Client client = ClientBuilder.newClient();
+        var client = ClientBuilder.newClient();
         client.register(HttpAuthenticationFeature.basic(clientId, clientSecret));
         WebTarget target = client.target(configuration.getTokenEndpoint());
-        Invocation.Builder requestBuilder = target.request(MediaType.APPLICATION_JSON_TYPE);
+        var requestBuilder = target.request(MediaType.APPLICATION_JSON_TYPE);
 
-        Form form = new Form();
+        var form = new Form();
         form.param("grant_type", "client_credentials");
 
-        Response response = requestBuilder.build(HttpMethod.POST, Entity.form(form)).invoke();
+        var response = requestBuilder.build(HttpMethod.POST, Entity.form(form)).invoke();
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            AccessTokenResponse accessToken = response.readEntity(AccessTokenResponse.class);
+            var accessToken = response.readEntity(AccessTokenResponse.class);
             LOG.debug("Successfully got client access token: {}", accessToken.getToken());
             return accessToken;
         }
@@ -88,16 +90,17 @@ public class AccessTokenManager {
     }
 
     private ServerConfiguration getServerConfiguration() {
-        String configurationUrl =
+        var configurationUrl =
                 KeycloakUriBuilder.fromUri(authServerUrl)
                         .clone()
                         .path(AUTHZ_DISCOVERY_URL)
                         .build(realm)
                         .toString();
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(configurationUrl);
-        Invocation.Builder requestBuilder = target.request(MediaType.APPLICATION_JSON_TYPE);
-        requestBuilder.accept(MediaType.APPLICATION_JSON_TYPE);
-        return requestBuilder.get().readEntity(ServerConfiguration.class);
+        var client = ClientBuilder.newClient();
+        var target = client.target(configurationUrl);
+        return target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get().readEntity(ServerConfiguration.class);
     }
 }

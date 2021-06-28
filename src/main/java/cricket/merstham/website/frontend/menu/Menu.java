@@ -61,9 +61,9 @@ public class Menu {
             MvcUriComponentsBuilder.MethodArgumentBuilder builder =
                     MvcUriComponentsBuilder.fromMappingName(name);
             if (arguments != null) {
-                int i = 0;
-                for (var key : arguments.keySet()) {
-                    builder.arg(i, arguments.get(key));
+                var i = 0;
+                for (var entry : arguments.entrySet()) {
+                    builder.arg(i, entry.getValue());
                     i++;
                 }
             }

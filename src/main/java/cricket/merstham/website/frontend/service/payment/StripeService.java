@@ -5,7 +5,6 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
-import cricket.merstham.website.frontend.configuration.ClubConfiguration;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Instant;
@@ -35,7 +33,6 @@ public class StripeService implements PaymentService {
 
     private final boolean enabled;
     private final String disabledReason;
-    private final ClubConfiguration clubConfiguration;
     private final MembershipService membershipService;
     private final String apiKey;
     private final String publishableKey;
@@ -45,11 +42,9 @@ public class StripeService implements PaymentService {
             @Value("${payments.stripe.disabled-reason}") String disabledReason,
             @Value("${payments.stripe.api-key}") String apiKey,
             @Value("${payments.stripe.publishable-key}") String publishableKey,
-            ClubConfiguration clubConfiguration,
             MembershipService membershipService) {
         this.enabled = enabled;
         this.disabledReason = disabledReason;
-        this.clubConfiguration = clubConfiguration;
         this.membershipService = membershipService;
         this.apiKey = apiKey;
         this.publishableKey = publishableKey;
@@ -72,7 +67,7 @@ public class StripeService implements PaymentService {
 
     @Override
     public ModelAndView checkout(HttpServletRequest request, Order order) {
-        URI requestUri = URI.create(request.getRequestURL().toString());
+        var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
 
         SessionCreateParams.Builder params =
@@ -121,7 +116,7 @@ public class StripeService implements PaymentService {
                                                 .build()));
 
         try {
-            Session session =
+            var session =
                     Session.create(
                             params.build(), RequestOptions.builder().setApiKey(apiKey).build());
             LOG.info("Successfully create Stripe session: {}", session.getId());
@@ -130,8 +125,8 @@ public class StripeService implements PaymentService {
                     "payments/stripe/checkout",
                     Map.of("sessionId", session.getId(), "publishableKey", publishableKey));
         } catch (StripeException e) {
-            LOG.error("Error create Stripe session", e);
-            throw new RuntimeException(e);
+            LOG.error("Error creating Stripe session", e);
+            throw new RuntimeException("Error creating Stripe session", e);
         }
     }
 
@@ -143,11 +138,11 @@ public class StripeService implements PaymentService {
     @Override
     public ModelAndView execute(HttpServletRequest request, Order order) {
         try {
-            Session session =
+            var session =
                     Session.retrieve(
                             (String) request.getSession().getAttribute(STRIPE_SESSION_ATTRIBUTE),
                             RequestOptions.builder().setApiKey(apiKey).build());
-            PaymentIntent paymentIntent =
+            var paymentIntent =
                     PaymentIntent.retrieve(
                             session.getPaymentIntent(),
                             RequestOptions.builder().setApiKey(apiKey).build());
@@ -168,7 +163,7 @@ public class StripeService implements PaymentService {
 
         } catch (StripeException e) {
             LOG.error("Error getting payment details from Stripe", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting payment details from Stripe", e);
         }
     }
 

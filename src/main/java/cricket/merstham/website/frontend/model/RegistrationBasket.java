@@ -47,14 +47,12 @@ public class RegistrationBasket implements Serializable {
     }
 
     public Subscription updateSubscription(Subscription subscription) {
-        Subscription currentSubscription =
-                this.subscriptions.get(subscription.getUuid()).updateFrom(subscription);
-        return currentSubscription;
+        return this.subscriptions.get(subscription.getUuid()).updateFrom(subscription);
     }
 
     public BigDecimal getBasketTotal() {
         return subscriptions.values().stream()
-                .map(subscription -> subscription.getPrice())
+                .map(Subscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

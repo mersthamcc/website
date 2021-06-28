@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
@@ -42,7 +41,7 @@ public class GraphService {
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(
             T query, Principal principal) throws IOException {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
         return getResult(query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
@@ -60,13 +59,13 @@ public class GraphService {
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
             T mutation, Principal principal) throws IOException {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
 
         return getResult(mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
     }
 
     public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
-        MembershipCategoriesQuery query =
+        var query =
                 new MembershipCategoriesQuery(StringFilter.builder().build());
         try {
             Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
@@ -77,7 +76,7 @@ public class GraphService {
     }
 
     public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
-        MembershipCategoriesQuery query =
+        var query =
                 new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
         try {
             Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
@@ -89,16 +88,16 @@ public class GraphService {
 
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(graphConfiguration.getGraphUri());
+        var client = ClientBuilder.newClient();
+        var webTarget = client.target(graphConfiguration.getGraphUri());
 
-        Invocation invocation =
+        var invocation =
                 webTarget
                         .request(MediaType.APPLICATION_JSON_TYPE)
                         .accept(MediaType.APPLICATION_JSON_TYPE)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .buildPost(Entity.json(query.composeRequestBody().utf8()));
-        javax.ws.rs.core.Response response = invocation.invoke();
+        var response = invocation.invoke();
         LOG.info(
                 "Received `{}` GraphQL API response: {}",
                 query.name().name(),

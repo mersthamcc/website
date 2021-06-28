@@ -1,26 +1,24 @@
 package cricket.merstham.website.frontend.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class CricketController {
-    @RequestMapping(path = "/fixtures", name = "fixtures", method = RequestMethod.GET)
+    @GetMapping(path = "/fixtures", name = "fixtures")
     public String fixtures() {
         return "home/home";
     }
 
-    @RequestMapping(path = "/results", name = "results", method = RequestMethod.GET)
+    @GetMapping(path = "/results", name = "results")
     public String results() {
         return "home/home";
     }
 
-    @RequestMapping(
+    @GetMapping(
             path = "/results/{year:[\\d]{4}}",
-            name = "results-for-year",
-            method = RequestMethod.GET)
+            name = "results-for-year")
     public String resultsForYear(@PathVariable int year) {
         return "home/home";
     }
