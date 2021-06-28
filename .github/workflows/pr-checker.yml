@@ -18,11 +18,21 @@ jobs:
         with:
           java-version: '16'
           distribution: 'adopt'
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Prepare
         shell: bash
         run: |
           echo "Removing symbolic link to assets..."
           rm src/main/resources/static
 
-      - name: Run Tests
-        run: ./gradlew build
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew build sonarqube --info
