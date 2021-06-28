@@ -95,7 +95,7 @@ public class GoCardlessService implements PaymentService {
                             .setFinalAmount(
                                     order.getTotal()
                                             .subtract(
-                                                    monthly.multiply(BigDecimal.valueOf(i - 1)))));
+                                                    monthly.multiply(BigDecimal.valueOf((long) i - 1)))));
         }
 
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);

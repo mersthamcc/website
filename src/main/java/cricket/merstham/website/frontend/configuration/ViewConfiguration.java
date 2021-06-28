@@ -77,12 +77,11 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
             model.put("resourcePrefix", resourcePrefix);
             model.put("dashboardMenu", menuBuilderProvider.getDashboardMenu());
-            model.put("adminMenus", new LinkedHashMap<>() {{
-                        put("content", menuBuilderProvider.getAdminContentMenu());
-                        put("administration", menuBuilderProvider.getAdminAdministrationMenu());
-                        put("system", menuBuilderProvider.getAdminSystemMenu());
-                    }}
-            );
+            var adminMenus = new LinkedHashMap<>();
+            adminMenus.put("content", menuBuilderProvider.getAdminContentMenu());
+            adminMenus.put("administration", menuBuilderProvider.getAdminAdministrationMenu());
+            adminMenus.put("system", menuBuilderProvider.getAdminSystemMenu());
+            model.put("adminMenus", adminMenus);
 
             modelAndView.addAllObjects(model);
         }
