@@ -4,13 +4,8 @@ import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
-import cricket.merstham.website.graph.AddPaymentToOrderMutation;
-import cricket.merstham.website.graph.CreateMemberMutation;
-import cricket.merstham.website.graph.CreateOrderMutation;
-import cricket.merstham.website.graph.type.AttributeInput;
-import cricket.merstham.website.graph.type.MemberInput;
-import cricket.merstham.website.graph.type.MemberSubscriptionInput;
-import cricket.merstham.website.graph.type.PaymentInput;
+import cricket.merstham.website.graph.*;
+import cricket.merstham.website.graph.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +16,7 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -136,5 +132,31 @@ public class MembershipService {
             LOG.error("Error registering payment", e);
             throw new RuntimeException("Error registering payment", e);
         }
+    }
+
+    public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
+        var query =
+                new MembershipCategoriesQuery(StringFilter.builder().build());
+        try {
+            Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
+            return result.getData().membershipCategories();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
+        var query =
+                new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
+        try {
+            Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
+            return result.getData().membershipCategories().get(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<OrdersForYearQuery.Member> getAllMembers() {
+        return null;
     }
 }
