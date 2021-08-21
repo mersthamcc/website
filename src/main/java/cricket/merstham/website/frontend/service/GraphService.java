@@ -64,28 +64,6 @@ public class GraphService {
         return getResult(mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
     }
 
-    public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
-        var query =
-                new MembershipCategoriesQuery(StringFilter.builder().build());
-        try {
-            Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
-            return result.getData().membershipCategories();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
-        var query =
-                new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
-        try {
-            Response<MembershipCategoriesQuery.Data> result = executeQuery(query);
-            return result.getData().membershipCategories().get(0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
         var client = ClientBuilder.newClient();

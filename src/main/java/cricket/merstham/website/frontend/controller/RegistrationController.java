@@ -1,13 +1,10 @@
 package cricket.merstham.website.frontend.controller;
 
-import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.Subscription;
-import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
-import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
@@ -36,16 +32,13 @@ import java.util.UUID;
 public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 
-    private GraphService graphService;
     private MembershipService membershipService;
     private PaymentServiceManager paymentServiceManager;
 
     @Autowired
     public RegistrationController(
-            GraphService graphService,
             MembershipService membershipService,
             PaymentServiceManager paymentServiceManager) {
-        this.graphService = graphService;
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
     }
@@ -75,7 +68,7 @@ public class RegistrationController {
                     "registration/select-membership",
                     Map.of(
                             "categories",
-                            graphService.getMembershipCategories(),
+                            membershipService.getMembershipCategories(),
                             "subscription",
                             subscription));
         } else {
@@ -91,7 +84,7 @@ public class RegistrationController {
                             "registration/select-membership",
                             Map.of(
                                     "categories",
-                                    graphService.getMembershipCategories(),
+                                    membershipService.getMembershipCategories(),
                                     "subscription",
                                     subscription));
                 case "next":
@@ -108,7 +101,7 @@ public class RegistrationController {
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("subscription") Subscription subscription) {
         var membershipCategory =
-                graphService.getMembershipCategory(subscription.getCategory());
+                membershipService.getMembershipCategory(subscription.getCategory());
         var pricelistItem =
                 membershipCategory.pricelistItem().stream()
                         .filter(p -> p.id() == subscription.getPricelistItemId())

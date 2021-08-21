@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -23,7 +25,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Request;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
+import java.security.Policy;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -103,7 +108,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
     private CurrentRoute getCurrentRoute(HttpServletRequest request, Object handler) {
         var route = new CurrentRoute();
         var method = ((HandlerMethod) handler).getMethod();
-        route.setMethod(method).setRequestMapping(method.getAnnotation(RequestMapping.class));
+        route.setMethod(method);
         try {
             route.setPathVariables(
                     (LinkedHashMap<String, String>)
@@ -166,7 +171,6 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
     public class CurrentRoute {
 
         private Method method;
-        private RequestMapping requestMapping;
         private LinkedHashMap<String, String> pathVariables;
 
         public Method getMethod() {
@@ -175,15 +179,6 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
         public CurrentRoute setMethod(Method method) {
             this.method = method;
-            return this;
-        }
-
-        public RequestMapping getRequestMapping() {
-            return requestMapping;
-        }
-
-        public CurrentRoute setRequestMapping(RequestMapping requestMapping) {
-            this.requestMapping = requestMapping;
             return this;
         }
 
@@ -204,7 +199,16 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         }
 
         public String getName() {
-            return requestMapping.name();
+            for(var annotation: method.getAnnotations()) {
+                if (annotation instanceof RequestMapping) {
+                    return ((RequestMapping) annotation).name();
+                } else if (annotation instanceof GetMapping) {
+                    return ((GetMapping) annotation).name();
+                } else if (annotation instanceof PostMapping) {
+                    return ((PostMapping) annotation).name();
+                }
+            }
+            return "no-mapping-attribute";
         }
     }
 }
