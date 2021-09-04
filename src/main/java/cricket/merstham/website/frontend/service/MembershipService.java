@@ -1,7 +1,9 @@
 package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Error;
+import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.website.frontend.model.AttributeDefinition;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.graph.*;
@@ -17,6 +19,8 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -156,7 +160,54 @@ public class MembershipService {
         }
     }
 
-    public List<OrdersForYearQuery.Member> getAllMembers() {
-        return null;
+    public List<MembersQuery.Member> getAllMembers(Principal principal) {
+        var query = new MembersQuery();
+        try {
+            Response<MembersQuery.Data> result = graphService.executeQuery(query, principal);
+            return result.getData().members();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Optional<MemberQuery.Member> get(int id, Principal principal) {
+        var query = new MemberQuery(id);
+        try {
+            Response<MemberQuery.Data> result = graphService.executeQuery(query, principal);
+
+            return Optional.of(result.getData().member());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public UpdateMemberMutation.UpdateMember update(int id, Principal principal, Map<String, Object> data) {
+        var request = new UpdateMemberMutation(id, data.entrySet().stream().map(
+                f -> AttributeInput.builder()
+                        .key(f.getKey())
+                        .value(f.getValue())
+                        .build()
+        ).collect(Collectors.toList()));
+        try {
+            Response<UpdateMemberMutation.Data> result = graphService.executeMutation(request, principal);
+
+            return result.getData().updateMember();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Map<String, AttributeDefinition> getAttributes() {
+        var query = new AttributesQuery();
+        try {
+            Response<AttributesQuery.Data> result = graphService.executeQuery(query);
+
+            return result.getData().attributes().stream().collect(Collectors.toMap(
+                    a -> a.key(),
+                    a -> new AttributeDefinition().setKey(a.key()).setType(a.type().rawValue())
+            ));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,7 +1,14 @@
 <#import "/spring.ftl" as spring />
 <#import "components.ftl" as components />
 
-<#macro mainLayout>
+<#macro defaultHeaders>
+
+</#macro>
+
+<#macro defaultScripts>
+
+</#macro>
+<#macro mainLayout headers=defaultHeaders script=defaultScripts>
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -24,16 +31,18 @@
 			</title>
 
 			<!-- Favicon -->
-			<link rel="shortcut icon" href="${resourcePrefix}/mcc/img/favicon.ico">
+			<link rel="shortcut icon" href="${resourcePrefix}${config.favicon}">
 
 			<!-- Font -->
 			<link href="//fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
 			<!-- CSS Implementing Plugins -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css">
-
+			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/select2/dist/css/select2.min.css">
 			<!-- CSS Front Template -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/css/theme.min.css">
+
+			<#if headers?is_directive><@headers /><#else>${headers}</#if>
 		</head>
 		<body class="bg-light">
 			<!-- Search Form -->
@@ -52,12 +61,12 @@
 							<div class="hs-unfold">
 								<a class="js-hs-unfold-invoker" href="javascript:;"
 								   data-hs-unfold-options='{
-						 "target": "#searchDropdown",
-						 "type": "css-animation",
-						 "animationIn": "fadeIn",
-						 "hasOverlay": "rgba(46, 52, 81, 0.1)",
-						 "closeBreakpoint": "md"
-					   }'>
+										 "target": "#searchDropdown",
+										 "type": "css-animation",
+										 "animationIn": "fadeIn",
+										 "hasOverlay": "rgba(46, 52, 81, 0.1)",
+										 "closeBreakpoint": "md"
+									   }'>
 									<i class="tio-clear tio-lg"></i>
 								</a>
 							</div>
@@ -305,6 +314,9 @@
 										</#if>
 									</h1>
 								</div>
+								<div class="col-auto">
+									<a class="btn btn-primary" href="#">My dashboard</a>
+								</div>
 							</div>
 							<!-- End Row -->
 						</div>
@@ -410,11 +422,7 @@
 
 					<!-- Sidebar Detached Content -->
 					<div class="sidebar-detached-content mt-3 mt-lg-0">
-						<!-- Card -->
-						<div class="card mb-3 mb-lg-5">
-							<#nested />
-						</div>
-						<!-- End Card -->
+						<#nested />
 					</div>
 					<!-- End Sidebar Detached Content -->
 				</div>
@@ -1025,9 +1033,15 @@
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-unfold/dist/hs-unfold.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-form-search/dist/hs-form-search.min.js"></script>
-
+			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-transform-tabs-to-btn/dist/hs-transform-tabs-to-btn.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/select2/dist/js/select2.full.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables.net.extensions/select/select.min.js"></script>
 			<!-- JS Front -->
 			<script src="${resourcePrefix}/front/admin/assets/js/theme.min.js"></script>
+
+			<#if script?is_directive><@script /><#else>${script}</#if>
 
 			<!-- JS Plugins Init. -->
 			<script>
@@ -1049,6 +1063,7 @@
 					$('.js-form-search').each(function () {
 						new HSFormSearch($(this)).init()
 					});
+					if (typeof onPageLoad === "function") onPageLoad();
 				});
 			</script>
 

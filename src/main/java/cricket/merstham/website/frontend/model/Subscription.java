@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+
 @JsonSerialize
 @RedisHash
 public class Subscription implements Serializable {
@@ -99,7 +101,7 @@ public class Subscription implements Serializable {
         if (subscription.member != null) {
             subscription.member.forEach(
                     (key, value) -> {
-                        Object convertedValue = convert(key, value);
+                        Object convertedValue = convert(attributes, key, value);
                         member.put(key, convertedValue);
                     });
         }
@@ -125,29 +127,5 @@ public class Subscription implements Serializable {
             }
         }
         return this.setCategory(category.key()).setAttributes(attrs);
-    }
-
-    private Object convert(String key, Object value) {
-        for (var attr : attributes.entrySet()) {
-            if (key.equals(attr.getKey())) {
-                if (attr.getValue().getType().equals(AttributeType.DATE.rawValue())) {
-                    var formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-                    try {
-                        return formatter.parse((String) value);
-                    } catch (ParseException e) {
-                        throw new RuntimeException("Error parsing date string", e);
-                    }
-                } else if (attr.getValue().getType().equals(AttributeType.BOOLEAN.rawValue())) {
-                    return Boolean.parseBoolean((String) value);
-                } else if (attr.getValue().getType().equals(AttributeType.NUMBER.rawValue())) {
-                    return Long.parseLong((String) value);
-                } else if (attr.getValue().getType().equals(AttributeType.LIST.rawValue())) {
-                    if (value instanceof String) return List.of(value);
-                    return Arrays.asList((String[]) value);
-                }
-                return value;
-            }
-        }
-        return null;
     }
 }

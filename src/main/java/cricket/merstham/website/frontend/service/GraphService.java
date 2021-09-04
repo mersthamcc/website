@@ -4,9 +4,8 @@ import com.apollographql.apollo.api.Mutation;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Query;
 import com.apollographql.apollo.api.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
-import cricket.merstham.website.graph.MembershipCategoriesQuery;
-import cricket.merstham.website.graph.type.StringFilter;
 import okio.ByteString;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -20,7 +19,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.OK;
 
@@ -30,12 +28,24 @@ public class GraphService {
 
     private final GraphConfiguration graphConfiguration;
     private final AccessTokenManager accessTokenManager;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public GraphService(
-            GraphConfiguration graphConfiguration, AccessTokenManager accessTokenManager) {
+            GraphConfiguration graphConfiguration, AccessTokenManager accessTokenManager, ObjectMapper objectMapper) {
         this.graphConfiguration = graphConfiguration;
         this.accessTokenManager = accessTokenManager;
+        this.objectMapper = objectMapper;
+    }
+
+    public <T extends Query, R> R executeQuery(
+            T query, Principal principal, Class<R> clazz) throws IOException {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+
+        LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
+        byte[] response = getRawResult(query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        return objectMapper.readValue(response, clazz);
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(
@@ -66,6 +76,11 @@ public class GraphService {
 
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
+        return query.parse(ByteString.of(getRawResult(query, accessToken)));
+    }
+
+    private <T extends Operation> byte[] getRawResult(
+            T query, String accessToken) throws IOException {
         var client = ClientBuilder.newClient();
         var webTarget = client.target(graphConfiguration.getGraphUri());
 
@@ -84,7 +99,7 @@ public class GraphService {
             String body = response.readEntity(String.class);
             LOG.debug("Response Body = {}", body);
 
-            return query.parse(ByteString.of(body.getBytes()));
+            return body.getBytes();
         }
         throw new RuntimeException("Failed to get GraphQL response from service");
     }

@@ -102,15 +102,15 @@ public class MenuBuilder {
 
     private final List<Menu> adminAdministrationMenu = List.of(
             new Menu(
-                    "admin-members-top",
+                    "admin-membership-top",
                     null,
                     SCRIPT_LINK,
                     List.of(),
                     List.of(
                             new Menu(
-                                    "admin-members-list",
+                                    "admin-membership-list",
                                     null,
-                                    SCRIPT_LINK,
+                                    null,
                                     List.of(),
                                     List.of())
                     ), "tio-group-senior"
