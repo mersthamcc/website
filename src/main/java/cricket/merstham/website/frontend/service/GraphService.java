@@ -1,11 +1,11 @@
 package cricket.merstham.website.frontend.service;
 
-import com.apollographql.apollo.api.Mutation;
-import com.apollographql.apollo.api.Operation;
-import com.apollographql.apollo.api.Query;
-import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.api.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
+import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
+import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
+import cricket.merstham.website.frontend.mappers.LocalDateTimeCustomTypeAdapter;
 import okio.ByteString;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -19,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.OK;
 
@@ -29,6 +30,10 @@ public class GraphService {
     private final GraphConfiguration graphConfiguration;
     private final AccessTokenManager accessTokenManager;
     private final ObjectMapper objectMapper;
+    private final ScalarTypeAdapters adapters = new ScalarTypeAdapters(Map.of(
+            CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
+            CustomGraphQLScalars.DATETIME, new LocalDateTimeCustomTypeAdapter()
+    ));
 
     @Autowired
     public GraphService(
@@ -76,7 +81,7 @@ public class GraphService {
 
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
-        return query.parse(ByteString.of(getRawResult(query, accessToken)));
+        return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
     }
 
     private <T extends Operation> byte[] getRawResult(
@@ -89,7 +94,7 @@ public class GraphService {
                         .request(MediaType.APPLICATION_JSON_TYPE)
                         .accept(MediaType.APPLICATION_JSON_TYPE)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .buildPost(Entity.json(query.composeRequestBody().utf8()));
+                        .buildPost(Entity.json(query.composeRequestBody(adapters).utf8()));
         var response = invocation.invoke();
         LOG.info(
                 "Received `{}` GraphQL API response: {}",

@@ -115,7 +115,7 @@ public class MembershipService {
                         PaymentInput.builder()
                                 .type(type)
                                 .reference(reference)
-                                .date(date)
+                                .date(date.toLocalDate())
                                 .amount(amount.doubleValue())
                                 .processingFees(fees.doubleValue())
                                 .collected(collected)

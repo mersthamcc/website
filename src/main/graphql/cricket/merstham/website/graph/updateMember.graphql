@@ -16,8 +16,29 @@ mutation updateMember($id: Int!, $data: [AttributeInput]!) {
         subscription {
             addedDate
             price
+            order {
+                id
+                accountingId
+                createDate
+                payment {
+                    id
+                    accountingId
+                    amount
+                    collected
+                    date
+                    processingFees
+                    reconciled
+                    reference
+                    type
+                }
+                uuid
+            }
             pricelistItem {
+                id
                 description
+                includesMatchFees
+                maxAge
+                minAge
                 memberCategory {
                     key
                     form {

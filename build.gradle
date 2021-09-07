@@ -64,6 +64,11 @@ apollo {
         sourceFolder.set("src/main/graphql/cricket/merstham/website/graph")
         schemaFile.set(file("src/main/graphql/cricket/merstham/website/graph/schema.json"))
         rootPackageName.set("cricket.merstham.website.graph")
+
+        customTypeMapping = [
+                "Date" : "java.time.LocalDate",
+                "DateTime" : "java.time.LocalDateTime"
+        ]
     }
 }
 

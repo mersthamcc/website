@@ -1,3 +1,5 @@
+<#import "/spring.ftl" as spring />
+
 <#macro section title action buttons=noButtons>
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
@@ -111,4 +113,198 @@
            value="${data[key]!""}"
             ${required}
     />
+</#macro>
+
+<#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100]>
+    <div class="card ${cardClass}">
+        <!-- Header -->
+        <div class="card-header">
+            <h5 class="card-header-title">
+                <@spring.messageText code=title text=title />
+            </h5>
+
+            <#if selectable>
+                <!-- Datatable Info -->
+                <div id="${id}WithCheckboxSelectCounterInfo" class="mr-2" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <span class="font-size-sm mr-3">
+                          <span id="${id}WithCheckboxSelectCounter">0</span>
+                          Selected
+                        </span>
+                    </div>
+                </div>
+                <!-- End Datatable Info -->
+            </#if>
+        </div>
+        <!-- End Header -->
+        <div class="card-body">
+            <#if searchable>
+                <div class="row justify-content-between align-items-center flex-grow-1">
+                    <div class="col-10 col-md">
+                        <form>
+                            <!-- Search -->
+                            <div class="input-group input-group-merge input-group-flush">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="tio-search"></i>
+                                    </div>
+                                </div>
+                                <input id="${id}Search" type="search" class="form-control" placeholder="<@spring.messageText code=searchPrompt text=searchPrompt />..." aria-label="<@spring.messageText code=searchPrompt text=searchPrompt />">
+                            </div>
+                            <!-- End Search -->
+                        </form>
+                    </div>
+                    <div class="col-auto">
+                    </div>
+                </div>
+            </#if>
+            <div class="table-responsive datatable-custom">
+                <table id="${id}"
+                       class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer"
+                       data-hs-datatables-options='{
+                            <#if selectable>
+                            "columnDefs": [{
+                                "targets": [0],
+                                "orderable": false
+                            }],
+                            "order": [],
+                            </#if>
+                            "info": {
+                                "totalQty": "#${id}WithPaginationInfoTotalQty"
+                            },
+                            <#if searchable>
+                            "search": "#${id}Search",
+                            </#if>
+                            "entries": "#${id}Entries",
+                            "pageLength": ${defaultPageLength},
+                            "isResponsive": true,
+                            "isShowPaging": false,
+                            "pagination": "${id}EntriesPagination"
+                            }' role="grid" aria-describedby="${id}_info">
+                    <thead class="thead-light">
+                        <tr role="row">
+                            <#if selectable>
+                                <th class="table-column-pr-0 sorting_disabled">
+                                    <div class="custom-control custom-checkbox">
+                                        <input id="${id}WithCheckboxSelectAll"
+                                               type="checkbox"
+                                               class="custom-control-input">
+                                        <label class="custom-control-label" for="${id}WithCheckboxSelectAll"></label>
+                                    </div>
+                                </th>
+                            </#if>
+                            <#list columns as column>
+                                <th class="table-column-pl-0 sorting" tabindex="0" aria-controls="${id}" rowspan="1"
+                                    colspan="1" aria-label="<@spring.messageText code=column.key text=column.key />: activate to sort column ascending">
+                                    <@spring.messageText code=column.key text=column.key />
+                                </th>
+                            </#list>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <#list data as row>
+                            <tr role="row" class="<#if row?is_odd_item>odd<#else>even</#if>">
+                                <#if selectable>
+                                    <td class="table-column-pr-0">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox"
+                                                   class="custom-control-input"
+                                                   id="${id}Check${row?counter}"
+                                                   name="selected"
+                                                   value="${row[idField].value}">
+                                            <label class="custom-control-label" for="${id}Check${row?counter}"></label>
+                                        </div>
+                                    </td>
+                                </#if>
+                                <#list columns as column>
+                                    <td class="table-column-pl-0">
+                                        <#if row[column.key].link??>
+                                            <a class="d-flex align-items-center" href="${row[column.key].link}">
+                                                <div class="avatar avatar-circle">
+                                                </div>
+                                                <div class="ml-3">
+                                                    <span class="h5 text-hover-primary">${row[column.key].value}</span>
+                                                </div>
+                                            </a>
+                                        <#else>
+                                            ${row[column.key].value}
+                                        </#if>
+                                    </td>
+                                </#list>
+                            </tr>
+                        </#list>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div class="card-footer">
+            <#if data?size gt pageLengths?min>
+                <!-- Pagination -->
+                <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
+                <div class="col-sm mb-2 mb-sm-0">
+                    <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
+                        <span class="mr-2">Showing:</span>
+
+                        <!-- Select -->
+                        <select id="${id}Entries" class="js-select2-custom"
+                                data-hs-select2-options='{
+                                    "minimumResultsForSearch": "Infinity",
+                                    "customClass": "custom-select custom-select-sm custom-select-borderless",
+                                    "dropdownAutoWidth": true,
+                                    "width": true
+                                  }'>
+                            <#list pageLengths as pageLength>
+                                <option value="${pageLength}" <#if pageLength==defaultPageLength>selected</#if>>${pageLength}</option>
+                            </#list>
+                        </select>
+                        <!-- End Select -->
+
+                        <span class="text-secondary mr-2">of</span>
+
+                        <!-- Pagination Quantity -->
+                        <span id="${id}WithPaginationInfoTotalQty"></span>
+                    </div>
+                </div>
+
+                <div class="col-sm-auto">
+                    <div class="d-flex justify-content-center justify-content-sm-end">
+                        <nav id="${id}EntriesPagination" aria-label="<@spring.messageText code=title text=title /> pagination"></nav>
+                    </div>
+                </div>
+            </div>
+                <!-- End Pagination -->
+            </#if>
+        </div>
+        <!-- End Footer -->
+    </div>
+</#macro>
+
+<#macro adminTableScript id>
+    var ${id} = $.HSCore.components.HSDatatables.init($('#${id}'), {
+        select: {
+            style: 'multi',
+            selector: 'td:first-child input[type="checkbox"]',
+            classMap: {
+                checkAll: '#${id}WithCheckboxSelectAll',
+                counter: '#${id}WithCheckboxSelectCounter',
+                counterInfo: '#${id}WithCheckboxSelectCounterInfo'
+            }
+        }
+    });
+
+    $('#${id}Search').on('mouseup', function (e) {
+        var $input = $(this),
+        oldValue = $input.val();
+
+        if (oldValue == "") return;
+
+        setTimeout(function(){
+            var newValue = $input.val();
+
+            if (newValue == ""){
+                ${id}.search('').draw();
+            }
+        }, 1);
+    });
 </#macro>
