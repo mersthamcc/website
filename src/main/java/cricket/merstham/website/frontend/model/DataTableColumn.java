@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.model;
 
 public class DataTableColumn {
     private String key;
+    private String fieldName;
     private boolean sortable = true;
     private boolean display = true;
 
@@ -11,6 +12,15 @@ public class DataTableColumn {
 
     public DataTableColumn setKey(String key) {
         this.key = key;
+        return this;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public DataTableColumn setFieldName(String fieldName) {
+        this.fieldName = fieldName;
         return this;
     }
 

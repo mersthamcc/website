@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.OK;
 
 @Service
@@ -91,9 +93,9 @@ public class GraphService {
 
         var invocation =
                 webTarget
-                        .request(MediaType.APPLICATION_JSON_TYPE)
-                        .accept(MediaType.APPLICATION_JSON_TYPE)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .request(APPLICATION_JSON_TYPE)
+                        .accept(APPLICATION_JSON_TYPE)
+                        .header(AUTHORIZATION, "Bearer " + accessToken)
                         .buildPost(Entity.json(query.composeRequestBody(adapters).utf8()));
         var response = invocation.invoke();
         LOG.info(

@@ -4,12 +4,16 @@
 <#macro dataScript>
     <script>
         function onPageLoad() {
-            <@admin.adminTableScript id="memberTable" />
+            <@admin.adminSspTableScript
+                id="memberTable"
+                selectable=true
+                columns=memberColumns
+            />
         };
     </script>
 </#macro>
 <@layout.mainLayout script=dataScript>
-    <@admin.adminTableCard
+    <@admin.adminSspTableCard
         id="memberTable"
         selectable=true
         searchable=true
@@ -17,6 +21,5 @@
         pageLengths=[10,50,100]
         title="membership.member-details"
         columns=memberColumns
-        data=memberData
     />
 </@layout.mainLayout>
