@@ -13,16 +13,11 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Member {
 
-    @JsonProperty
-    private int id;
-    @JsonProperty
-    private int ownerUserId;
-    @JsonProperty
-    private LocalDate registrationDate;
-    @JsonProperty
-    private List<Subscription> subscription;
-    @JsonProperty
-    private List<Attribute> attributes;
+    @JsonProperty private int id;
+    @JsonProperty private int ownerUserId;
+    @JsonProperty private LocalDate registrationDate;
+    @JsonProperty private List<Subscription> subscription;
+    @JsonProperty private List<Attribute> attributes;
 
     public int getId() {
         return id;
@@ -45,9 +40,7 @@ public class Member {
     }
 
     public Map<String, Object> getData() {
-        return attributes.stream().collect(Collectors.toMap(
-                a -> a.getDefinition().getKey(),
-                a -> a.getValue()
-        ));
+        return attributes.stream()
+                .collect(Collectors.toMap(a -> a.getDefinition().getKey(), a -> a.getValue()));
     }
 }

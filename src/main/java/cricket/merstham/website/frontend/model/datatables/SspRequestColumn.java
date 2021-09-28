@@ -15,14 +15,9 @@ import lombok.NoArgsConstructor;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SspRequestColumn {
-    @JsonProperty
-    private String data;
-    @JsonProperty
-    private String name;
-    @JsonProperty
-    private boolean searchable;
-    @JsonProperty
-    private boolean orderable;
-    @JsonProperty
-    private SspRequestSearch search;
+    @JsonProperty private String data;
+    @JsonProperty private String name;
+    @JsonProperty private boolean searchable;
+    @JsonProperty private boolean orderable;
+    @JsonProperty private SspRequestSearch search;
 }

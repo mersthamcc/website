@@ -7,13 +7,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public enum CustomGraphQLScalars implements ScalarType {
-        DATETIME,
-        DATE;
+    DATETIME,
+    DATE;
 
     @NotNull
     @Override
     public String className() {
-        switch(this){
+        switch (this) {
             case DATE:
                 return LocalDate.class.getCanonicalName();
             case DATETIME:
@@ -26,7 +26,7 @@ public enum CustomGraphQLScalars implements ScalarType {
     @NotNull
     @Override
     public String typeName() {
-        switch(this){
+        switch (this) {
             case DATE:
                 return "Date";
             case DATETIME:

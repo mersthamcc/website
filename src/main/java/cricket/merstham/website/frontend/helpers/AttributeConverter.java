@@ -11,7 +11,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class AttributeConverter {
-    public static Object convert(Map<String, AttributeDefinition> attributes, String key, Object value) {
+    public static Object convert(
+            Map<String, AttributeDefinition> attributes, String key, Object value) {
         for (var attr : attributes.entrySet()) {
             if (key.equals(attr.getKey())) {
                 AttributeType type = AttributeType.safeValueOf(attr.getValue().getType());

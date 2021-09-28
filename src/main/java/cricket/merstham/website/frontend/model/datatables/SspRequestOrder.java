@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SspRequestOrder {
-    @JsonProperty
-    private int column;
-    @JsonProperty
-    private String dir;
+    @JsonProperty private int column;
+    @JsonProperty private String dir;
 }

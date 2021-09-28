@@ -18,7 +18,8 @@ public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDa
         try {
             return LocalDateTime.parse(value.value.toString(), formatter);
         } catch (Exception e) {
-            throw new RuntimeException(format("Cannot parse datetime: {0}", value.value.toString()), e);
+            throw new RuntimeException(
+                    format("Cannot parse datetime: {0}", value.value.toString()), e);
         }
     }
 

@@ -25,7 +25,8 @@ public class Menu {
             LinkedHashMap<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
-            List<Menu> children, String icons) {
+            List<Menu> children,
+            String icons) {
         this.name = name;
         this.arguments = arguments;
         this.destinationUrl = destinationUrl;

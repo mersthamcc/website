@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.net.URI;
 
 @Data
@@ -17,23 +18,18 @@ import java.net.URI;
 @AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Member extends SspBaseResponseData {
+public class Member extends SspBaseResponseData implements Serializable {
+    private static final long serialVersionUID = 20210927233800L;
 
-    @JsonProperty
-    private String id;
+    @JsonProperty private String id;
 
-    @JsonProperty
-    private String familyName;
+    @JsonProperty private String familyName;
 
-    @JsonProperty
-    private String givenName;
+    @JsonProperty private String givenName;
 
-    @JsonProperty
-    private String category;
+    @JsonProperty private String category;
 
-    @JsonProperty
-    private String lastSubscription;
+    @JsonProperty private String lastSubscription;
 
-    @JsonProperty
-    private URI editLink;
+    @JsonProperty private URI editLink;
 }

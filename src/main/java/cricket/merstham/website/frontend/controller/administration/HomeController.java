@@ -12,4 +12,3 @@ public class HomeController {
         return "administration/home/home";
     }
 }
-

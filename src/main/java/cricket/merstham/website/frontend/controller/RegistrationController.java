@@ -20,6 +20,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
@@ -37,8 +38,7 @@ public class RegistrationController {
 
     @Autowired
     public RegistrationController(
-            MembershipService membershipService,
-            PaymentServiceManager paymentServiceManager) {
+            MembershipService membershipService, PaymentServiceManager paymentServiceManager) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
     }
@@ -94,9 +94,7 @@ public class RegistrationController {
         return new RedirectView("/register");
     }
 
-    @PostMapping(
-            value = "/register/select-membership",
-            name = "member-details")
+    @PostMapping(value = "/register/select-membership", name = "member-details")
     public ModelAndView membershipForm(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("subscription") Subscription subscription) {
@@ -120,9 +118,7 @@ public class RegistrationController {
                         "subscription", basket.updateSubscription(subscription)));
     }
 
-    @PostMapping(
-            value = "/register/add-member",
-            name = "member-details")
+    @PostMapping(value = "/register/add-member", name = "member-details")
     public View membershipFormProcess(
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("subscription") Subscription subscription) {
@@ -131,9 +127,7 @@ public class RegistrationController {
         return new RedirectView("/register");
     }
 
-    @GetMapping(
-            value = "/register/confirmation",
-            name = "registration-confirmation")
+    @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
             Principal principal,

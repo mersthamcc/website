@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
@@ -32,26 +31,31 @@ public class GraphService {
     private final GraphConfiguration graphConfiguration;
     private final AccessTokenManager accessTokenManager;
     private final ObjectMapper objectMapper;
-    private final ScalarTypeAdapters adapters = new ScalarTypeAdapters(Map.of(
-            CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
-            CustomGraphQLScalars.DATETIME, new LocalDateTimeCustomTypeAdapter()
-    ));
+    private final ScalarTypeAdapters adapters =
+            new ScalarTypeAdapters(
+                    Map.of(
+                            CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
+                            CustomGraphQLScalars.DATETIME, new LocalDateTimeCustomTypeAdapter()));
 
     @Autowired
     public GraphService(
-            GraphConfiguration graphConfiguration, AccessTokenManager accessTokenManager, ObjectMapper objectMapper) {
+            GraphConfiguration graphConfiguration,
+            AccessTokenManager accessTokenManager,
+            ObjectMapper objectMapper) {
         this.graphConfiguration = graphConfiguration;
         this.accessTokenManager = accessTokenManager;
         this.objectMapper = objectMapper;
     }
 
-    public <T extends Query, R> R executeQuery(
-            T query, Principal principal, Class<R> clazz) throws IOException {
+    public <T extends Query, R> R executeQuery(T query, Principal principal, Class<R> clazz)
+            throws IOException {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
         var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
-        byte[] response = getRawResult(query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        byte[] response =
+                getRawResult(
+                        query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
         return objectMapper.readValue(response, clazz);
     }
 
@@ -86,8 +90,8 @@ public class GraphService {
         return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
     }
 
-    private <T extends Operation> byte[] getRawResult(
-            T query, String accessToken) throws IOException {
+    private <T extends Operation> byte[] getRawResult(T query, String accessToken)
+            throws IOException {
         var client = ClientBuilder.newClient();
         var webTarget = client.target(graphConfiguration.getGraphUri());
 

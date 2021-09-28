@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,9 +72,7 @@ public class BankTransferService implements PaymentService {
                 Map.of(
                         "bankAccountName", bankAccountName,
                         "bankAccountNumber", bankAccountNumber,
-                        "bankAccountSortCode", bankAccountSortCode
-                )
-        );
+                        "bankAccountSortCode", bankAccountSortCode));
     }
 
     @Override

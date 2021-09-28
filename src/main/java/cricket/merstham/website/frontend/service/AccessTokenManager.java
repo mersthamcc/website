@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -98,9 +98,9 @@ public class AccessTokenManager {
                         .toString();
         var client = ClientBuilder.newClient();
         var target = client.target(configurationUrl);
-        return target
-                .request(MediaType.APPLICATION_JSON_TYPE)
+        return target.request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get().readEntity(ServerConfiguration.class);
+                .get()
+                .readEntity(ServerConfiguration.class);
     }
 }

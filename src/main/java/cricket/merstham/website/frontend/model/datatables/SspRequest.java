@@ -17,16 +17,10 @@ import java.util.List;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SspRequest {
-    @JsonProperty
-    private int draw;
-    @JsonProperty
-    private int start;
-    @JsonProperty
-    private int length;
-    @JsonProperty
-    private SspRequestSearch search;
-    @JsonProperty
-    private List<SspRequestOrder> order;
-    @JsonProperty
-    private List<SspRequestColumn> columns;
+    @JsonProperty private int draw;
+    @JsonProperty private int start;
+    @JsonProperty private int length;
+    @JsonProperty private SspRequestSearch search;
+    @JsonProperty private List<SspRequestOrder> order;
+    @JsonProperty private List<SspRequestColumn> columns;
 }

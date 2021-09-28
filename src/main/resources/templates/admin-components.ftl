@@ -447,6 +447,7 @@
 
     var ${id} = $.HSCore.components.HSDatatables.init($('#${id}'), {
         serverSide: true,
+        processing: true,
         ajax: {
             url: "${ajaxSrc}",
             type: "POST",
@@ -458,7 +459,10 @@
                 request.setRequestHeader(header, token);
             }
         },
-        "columns": [
+        language: {
+            processing: "<div class='loading'><p><i class='fa fa-spinner fa-2x fa-spin'></i></p><p><@spring.message code="fetching" /></p></div>"
+        },
+        columns: [
             <#if selectable>
                 { "data": "id" },
             </#if>

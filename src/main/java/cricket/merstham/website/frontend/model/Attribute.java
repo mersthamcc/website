@@ -10,14 +10,10 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attribute {
 
-    @JsonProperty
-    private AttributeDefinition definition;
-    @JsonProperty
-    private LocalDateTime createdDate;
-    @JsonProperty
-    private LocalDateTime updatedDate;
-    @JsonProperty
-    private Object value;
+    @JsonProperty private AttributeDefinition definition;
+    @JsonProperty private LocalDateTime createdDate;
+    @JsonProperty private LocalDateTime updatedDate;
+    @JsonProperty private Object value;
 
     public AttributeDefinition getDefinition() {
         return definition;

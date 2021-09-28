@@ -8,7 +8,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
 
 public abstract class SspController<T extends SspBaseResponseData> {
-    public abstract SspResponse getData(
-            Principal principal,
-            @RequestBody SspRequest request);
+    public abstract SspResponse getData(Principal principal, @RequestBody SspRequest request);
 }

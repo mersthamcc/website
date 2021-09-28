@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Singleton;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -61,77 +62,66 @@ public class MenuBuilder {
                                                             null))))),
                     new Menu("social", null, URI.create("/social"), List.of(), null));
 
-    private final List<Menu> dashboardMenu = List.of(
-            new Menu(
-                    "admin-dashboards-top",
-                    null,
-                    SCRIPT_LINK,
-                    List.of(),
-                    List.of(
-                            new Menu(
-                                    "admin-home",
-                                    null,
-                                    SCRIPT_LINK,
-                                    List.of(),
-                                    null),
-                            new Menu(
-                                    "admin-membership-dashboard",
-                                    null,
-                                    SCRIPT_LINK,
-                                    List.of(),
-                                    null)
-                    ), "tio-dashboard-outlined")
-    );
+    private final List<Menu> dashboardMenu =
+            List.of(
+                    new Menu(
+                            "admin-dashboards-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu("admin-home", null, SCRIPT_LINK, List.of(), null),
+                                    new Menu(
+                                            "admin-membership-dashboard",
+                                            null,
+                                            SCRIPT_LINK,
+                                            List.of(),
+                                            null)),
+                            "tio-dashboard-outlined"));
 
-    private final List<Menu> adminContentMenu = List.of(
-            new Menu(
-                    "admin-news-top",
-                    null,
-                    SCRIPT_LINK,
-                    List.of(),
-                    List.of(
-                            new Menu(
-                                    "admin-news-list",
-                                    null,
-                                    SCRIPT_LINK,
-                                    List.of(),
-                                    null)
-                    ), "tio-feed-outlined"
-            )
-    );
+    private final List<Menu> adminContentMenu =
+            List.of(
+                    new Menu(
+                            "admin-news-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu(
+                                            "admin-news-list", null, SCRIPT_LINK, List.of(), null)),
+                            "tio-feed-outlined"));
 
-    private final List<Menu> adminAdministrationMenu = List.of(
-            new Menu(
-                    "admin-membership-top",
-                    null,
-                    SCRIPT_LINK,
-                    List.of(),
-                    List.of(
-                            new Menu(
-                                    "admin-membership-list",
-                                    null,
-                                    null,
-                                    List.of(),
-                                    List.of())
-                    ), "tio-group-senior"
-            )
-    );
+    private final List<Menu> adminAdministrationMenu =
+            List.of(
+                    new Menu(
+                            "admin-membership-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu(
+                                            "admin-membership-list",
+                                            null,
+                                            null,
+                                            List.of(),
+                                            List.of())),
+                            "tio-group-senior"));
 
-    private final List<Menu> adminSystemMenu = List.of(
-            new Menu(
-                    "admin-configuration-top",
-                    null,
-                    SCRIPT_LINK,
-                    List.of(),
-                    List.of(
-                            new Menu(
-                                    "admin-configuration-list",
-                                    null,
-                                    SCRIPT_LINK,
-                                    List.of(),
-                                    null)
-                    ), "tio-tune")
-    );
+    private final List<Menu> adminSystemMenu =
+            List.of(
+                    new Menu(
+                            "admin-configuration-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu(
+                                            "admin-configuration-list",
+                                            null,
+                                            SCRIPT_LINK,
+                                            List.of(),
+                                            null)),
+                            "tio-tune"));
 
     public List<Menu> getTopMenu() {
         return topMenu;

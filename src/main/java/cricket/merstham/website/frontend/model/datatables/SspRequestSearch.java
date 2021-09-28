@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SspRequestSearch {
-    @JsonProperty
-    private String value;
-    @JsonProperty
-    private boolean regex;
+    @JsonProperty private String value;
+    @JsonProperty private boolean regex;
 }

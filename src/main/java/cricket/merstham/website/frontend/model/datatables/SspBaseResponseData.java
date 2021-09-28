@@ -14,12 +14,15 @@ public abstract class SspBaseResponseData {
     @JsonProperty("DT_RowId")
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     protected Optional<String> rowId;
+
     @JsonProperty("DT_RowClass")
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     protected Optional<String> rowClass;
+
     @JsonProperty("DT_RowData")
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     protected Optional<Map<String, Object>> rowData;
+
     @JsonProperty("DT_RowAttr")
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     protected Optional<Map<String, String>> rowAttr;

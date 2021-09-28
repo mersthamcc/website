@@ -33,9 +33,7 @@ public class PaymentsController {
         return paymentService.checkout(request, order);
     }
 
-    @PostMapping(
-            value = "/payments/{payment-type}/authorise",
-            name = "payment-authorise")
+    @PostMapping(value = "/payments/{payment-type}/authorise", name = "payment-authorise")
     public ModelAndView authorise(
             @ModelAttribute("order") Order order,
             @PathVariable("payment-type") String paymentType,
@@ -44,9 +42,7 @@ public class PaymentsController {
         return paymentService.authorise(request, order);
     }
 
-    @GetMapping(
-            value = "/payments/{payment-type}/execute",
-            name = "payment-execute")
+    @GetMapping(value = "/payments/{payment-type}/execute", name = "payment-execute")
     public ModelAndView execute(
             @ModelAttribute("order") Order order,
             @PathVariable("payment-type") String paymentType,
@@ -55,9 +51,7 @@ public class PaymentsController {
         return paymentService.execute(request, order);
     }
 
-    @GetMapping(
-            value = "/payments/{payment-type}/confirmation",
-            name = "payment-confirmation")
+    @GetMapping(value = "/payments/{payment-type}/confirmation", name = "payment-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("order") Order order,
             @PathVariable("payment-type") String paymentType,
@@ -68,9 +62,7 @@ public class PaymentsController {
         return paymentService.confirm(request, order);
     }
 
-    @GetMapping(
-            value = "/payments/{payment-type}/cancel",
-            name = "payment-cancel")
+    @GetMapping(value = "/payments/{payment-type}/cancel", name = "payment-cancel")
     public ModelAndView cancel(
             @ModelAttribute("order") Order order,
             @PathVariable("payment-type") String paymentType,

@@ -37,12 +37,13 @@
 
 			<!-- Font -->
 			<link href="//fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
+			<link href="${resourcePrefix}/front/assets/vendor/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet" >
 			<!-- CSS Implementing Plugins -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css">
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/select2/dist/css/select2.min.css">
 			<!-- CSS Front Template -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/css/theme.min.css">
+			<link rel="stylesheet" href="${resourcePrefix}/mcc/css/custom.css">
 
 			<#if headers?is_directive><@headers /><#else>${headers}</#if>
 		</head>

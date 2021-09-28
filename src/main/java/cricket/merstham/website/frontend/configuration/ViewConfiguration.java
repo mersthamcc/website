@@ -25,10 +25,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Request;
-import java.lang.reflect.AnnotatedType;
+
 import java.lang.reflect.Method;
-import java.security.Policy;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,7 +99,9 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
                                 SecurityContextHolder.getContext()
                                         .getAuthentication()
                                         .getAuthorities())
-                        .stream().map(SimpleGrantedAuthority::getAuthority).collect(Collectors.toList());
+                        .stream()
+                                .map(SimpleGrantedAuthority::getAuthority)
+                                .collect(Collectors.toList());
         return new UserView(keycloakPrincipal, roles);
     }
 
@@ -199,7 +199,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         }
 
         public String getName() {
-            for(var annotation: method.getAnnotations()) {
+            for (var annotation : method.getAnnotations()) {
                 if (annotation instanceof RequestMapping) {
                     return ((RequestMapping) annotation).name();
                 } else if (annotation instanceof GetMapping) {

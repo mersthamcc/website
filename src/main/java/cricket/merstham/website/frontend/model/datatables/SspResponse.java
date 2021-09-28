@@ -12,20 +12,22 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SspResponse<T extends SspBaseResponseData> {
 
-    @JsonProperty
-    private final int draw;
-    @JsonProperty
-    private final int recordsTotal;
-    @JsonProperty
-    private final int recordsFiltered;
+    @JsonProperty private final int draw;
+    @JsonProperty private final int recordsTotal;
+    @JsonProperty private final int recordsFiltered;
+
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     private final Optional<List<String>> error;
 
-    @JsonProperty
-    private final List<T> data;
+    @JsonProperty private final List<T> data;
 
-    protected SspResponse(int draw, int recordsTotal, int recordsFiltered, Optional<List<String>> error, List<T> data) {
+    protected SspResponse(
+            int draw,
+            int recordsTotal,
+            int recordsFiltered,
+            Optional<List<String>> error,
+            List<T> data) {
         this.draw = draw;
         this.recordsTotal = recordsTotal;
         this.recordsFiltered = recordsFiltered;
