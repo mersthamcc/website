@@ -1,0 +1,7 @@
+query attributes {
+    attributes {
+        key
+        type
+        choices
+    }
+}

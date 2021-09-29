@@ -1,0 +1,25 @@
+query members {
+    members {
+        id
+        ownerUserId
+        registrationDate
+        attributes {
+            createdDate
+            updatedDate
+            definition {
+                key
+                type
+                choices
+            }
+            value
+        }
+        subscription {
+            addedDate
+            price
+            pricelistItem {
+                description
+            }
+            year
+        }
+    }
+}

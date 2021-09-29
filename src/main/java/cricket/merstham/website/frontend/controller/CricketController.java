@@ -16,9 +16,7 @@ public class CricketController {
         return "home/home";
     }
 
-    @GetMapping(
-            path = "/results/{year:[\\d]{4}}",
-            name = "results-for-year")
+    @GetMapping(path = "/results/{year:[\\d]{4}}", name = "results-for-year")
     public String resultsForYear(@PathVariable int year) {
         return "home/home";
     }

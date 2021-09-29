@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClubConfiguration {
     private String clubName;
     private String logo;
+    private String favicon;
     private String phoneNumber;
     private PlayCricketConfiguration playCricket;
     private SocialConfiguration social;
@@ -29,6 +30,15 @@ public class ClubConfiguration {
 
     public ClubConfiguration setLogo(String logo) {
         this.logo = logo;
+        return this;
+    }
+
+    public String getFavicon() {
+        return favicon;
+    }
+
+    public ClubConfiguration setFavicon(String favicon) {
+        this.favicon = favicon;
         return this;
     }
 

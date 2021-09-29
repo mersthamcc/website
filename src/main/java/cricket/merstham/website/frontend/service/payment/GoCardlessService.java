@@ -1,10 +1,7 @@
 package cricket.merstham.website.frontend.service.payment;
 
 import com.gocardless.GoCardlessClient;
-import com.gocardless.resources.Customer;
 import com.gocardless.resources.Mandate;
-import com.gocardless.resources.Payment;
-import com.gocardless.resources.RedirectFlow;
 import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
@@ -95,7 +92,8 @@ public class GoCardlessService implements PaymentService {
                             .setFinalAmount(
                                     order.getTotal()
                                             .subtract(
-                                                    monthly.multiply(BigDecimal.valueOf((long) i - 1)))));
+                                                    monthly.multiply(
+                                                            BigDecimal.valueOf((long) i - 1)))));
         }
 
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);
@@ -106,10 +104,8 @@ public class GoCardlessService implements PaymentService {
     public ModelAndView authorise(HttpServletRequest request, Order order) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-        var keycloakAuthenticationToken =
-                (KeycloakAuthenticationToken) request.getUserPrincipal();
-        var keycloakPrincipal =
-                (KeycloakPrincipal) keycloakAuthenticationToken.getPrincipal();
+        var keycloakAuthenticationToken = (KeycloakAuthenticationToken) request.getUserPrincipal();
+        var keycloakPrincipal = (KeycloakPrincipal) keycloakAuthenticationToken.getPrincipal();
         var redirectFlow =
                 client.redirectFlows()
                         .create()
@@ -170,9 +166,7 @@ public class GoCardlessService implements PaymentService {
         List<LocalDate> chargeDates = calculateDates(mandate, dayOfMonth, numberOfPayments);
         LOG.info(
                 "Payment dates = {}",
-                chargeDates.stream()
-                        .map(LocalDate::toString)
-                        .collect(Collectors.joining(", ")));
+                chargeDates.stream().map(LocalDate::toString).collect(Collectors.joining(", ")));
 
         BigDecimal remaining = order.getTotal();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;

@@ -23,7 +23,8 @@ server:
 
 club:
   club-name: ${CLUBNAME:Merstham Cricket Club}
-  logo: "/mcc/img/header_logo.png"
+  logo: "/mcc/img/logos/mcc-logo-header.svg"
+  favicon: "/mcc/img/logos/mcc-logo-favicon.svg"
   phone-number: "(01737) 645485"
   google-analytics-key: "UA-48714932-4"
   play-cricket:

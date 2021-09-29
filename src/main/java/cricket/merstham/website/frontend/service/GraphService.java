@@ -1,12 +1,11 @@
 package cricket.merstham.website.frontend.service;
 
-import com.apollographql.apollo.api.Mutation;
-import com.apollographql.apollo.api.Operation;
-import com.apollographql.apollo.api.Query;
-import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.api.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
-import cricket.merstham.website.graph.MembershipCategoriesQuery;
-import cricket.merstham.website.graph.type.StringFilter;
+import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
+import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
+import cricket.merstham.website.frontend.mappers.LocalDateTimeCustomTypeAdapter;
 import okio.ByteString;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -16,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
+import java.util.Map;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.OK;
 
 @Service
@@ -30,12 +30,33 @@ public class GraphService {
 
     private final GraphConfiguration graphConfiguration;
     private final AccessTokenManager accessTokenManager;
+    private final ObjectMapper objectMapper;
+    private final ScalarTypeAdapters adapters =
+            new ScalarTypeAdapters(
+                    Map.of(
+                            CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
+                            CustomGraphQLScalars.DATETIME, new LocalDateTimeCustomTypeAdapter()));
 
     @Autowired
     public GraphService(
-            GraphConfiguration graphConfiguration, AccessTokenManager accessTokenManager) {
+            GraphConfiguration graphConfiguration,
+            AccessTokenManager accessTokenManager,
+            ObjectMapper objectMapper) {
         this.graphConfiguration = graphConfiguration;
         this.accessTokenManager = accessTokenManager;
+        this.objectMapper = objectMapper;
+    }
+
+    public <T extends Query, R> R executeQuery(T query, Principal principal, Class<R> clazz)
+            throws IOException {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+
+        LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
+        byte[] response =
+                getRawResult(
+                        query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        return objectMapper.readValue(response, clazz);
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(
@@ -66,15 +87,20 @@ public class GraphService {
 
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
+        return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
+    }
+
+    private <T extends Operation> byte[] getRawResult(T query, String accessToken)
+            throws IOException {
         var client = ClientBuilder.newClient();
         var webTarget = client.target(graphConfiguration.getGraphUri());
 
         var invocation =
                 webTarget
-                        .request(MediaType.APPLICATION_JSON_TYPE)
-                        .accept(MediaType.APPLICATION_JSON_TYPE)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .buildPost(Entity.json(query.composeRequestBody().utf8()));
+                        .request(APPLICATION_JSON_TYPE)
+                        .accept(APPLICATION_JSON_TYPE)
+                        .header(AUTHORIZATION, "Bearer " + accessToken)
+                        .buildPost(Entity.json(query.composeRequestBody(adapters).utf8()));
         var response = invocation.invoke();
         LOG.info(
                 "Received `{}` GraphQL API response: {}",
@@ -84,7 +110,7 @@ public class GraphService {
             String body = response.readEntity(String.class);
             LOG.debug("Response Body = {}", body);
 
-            return query.parse(ByteString.of(body.getBytes()));
+            return body.getBytes();
         }
         throw new RuntimeException("Failed to get GraphQL response from service");
     }

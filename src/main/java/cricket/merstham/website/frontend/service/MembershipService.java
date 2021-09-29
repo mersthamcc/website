@@ -2,23 +2,43 @@ package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.website.frontend.model.AttributeDefinition;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
-import cricket.merstham.website.graph.*;
-import cricket.merstham.website.graph.type.*;
+import cricket.merstham.website.frontend.model.admintables.Member;
+import cricket.merstham.website.graph.AddPaymentToOrderMutation;
+import cricket.merstham.website.graph.AttributesQuery;
+import cricket.merstham.website.graph.CreateMemberMutation;
+import cricket.merstham.website.graph.CreateOrderMutation;
+import cricket.merstham.website.graph.MemberQuery;
+import cricket.merstham.website.graph.MembersQuery;
+import cricket.merstham.website.graph.MembershipCategoriesQuery;
+import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.type.AttributeInput;
+import cricket.merstham.website.graph.type.MemberInput;
+import cricket.merstham.website.graph.type.MemberSubscriptionInput;
+import cricket.merstham.website.graph.type.PaymentInput;
+import cricket.merstham.website.graph.type.StringFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
+import static java.text.MessageFormat.format;
 
 @Service
 public class MembershipService {
@@ -111,7 +131,7 @@ public class MembershipService {
                         PaymentInput.builder()
                                 .type(type)
                                 .reference(reference)
-                                .date(date)
+                                .date(date.toLocalDate())
                                 .amount(amount.doubleValue())
                                 .processingFees(fees.doubleValue())
                                 .collected(collected)
@@ -135,8 +155,7 @@ public class MembershipService {
     }
 
     public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
-        var query =
-                new MembershipCategoriesQuery(StringFilter.builder().build());
+        var query = new MembershipCategoriesQuery(StringFilter.builder().build());
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
             return result.getData().membershipCategories();
@@ -156,7 +175,106 @@ public class MembershipService {
         }
     }
 
-    public List<OrdersForYearQuery.Member> getAllMembers() {
-        return null;
+    public List<MembersQuery.Member> getAllMembers(Principal principal) {
+        var query = new MembersQuery();
+        try {
+            Response<MembersQuery.Data> result = graphService.executeQuery(query, principal);
+            return result.getData().members();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#principal.name")
+    public List<Member> getMemberSummary(Principal principal) {
+        return getAllMembers(principal).stream()
+                .map(
+                        m ->
+                                Member.builder()
+                                        .id(Integer.toString(m.id()))
+                                        .familyName(
+                                                getMemberAttributeString(
+                                                        m.attributes(), "family-name", ""))
+                                        .givenName(
+                                                getMemberAttributeString(
+                                                        m.attributes(), "given-name", ""))
+                                        .category(
+                                                m.subscription().stream()
+                                                        .findFirst()
+                                                        .map(s -> s.pricelistItem().description())
+                                                        .orElse("unknown"))
+                                        .lastSubscription(
+                                                m.subscription().stream()
+                                                        .findFirst()
+                                                        .map(s -> Integer.toString(s.year()))
+                                                        .orElse("unknown"))
+                                        .editLink(
+                                                URI.create(
+                                                        format(
+                                                                "/administration/membership/edit/{0}",
+                                                                m.id())))
+                                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public Optional<MemberQuery.Member> get(int id, Principal principal) {
+        var query = new MemberQuery(id);
+        try {
+            Response<MemberQuery.Data> result = graphService.executeQuery(query, principal);
+
+            return Optional.of(result.getData().member());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public UpdateMemberMutation.UpdateMember update(
+            int id, Principal principal, Map<String, Object> data) {
+        var request =
+                new UpdateMemberMutation(
+                        id,
+                        data.entrySet().stream()
+                                .map(
+                                        f ->
+                                                AttributeInput.builder()
+                                                        .key(f.getKey())
+                                                        .value(f.getValue())
+                                                        .build())
+                                .collect(Collectors.toList()));
+        try {
+            Response<UpdateMemberMutation.Data> result =
+                    graphService.executeMutation(request, principal);
+
+            return result.getData().updateMember();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Map<String, AttributeDefinition> getAttributes() {
+        var query = new AttributesQuery();
+        try {
+            Response<AttributesQuery.Data> result = graphService.executeQuery(query);
+
+            return result.getData().attributes().stream()
+                    .collect(
+                            Collectors.toMap(
+                                    a -> a.key(),
+                                    a ->
+                                            new AttributeDefinition()
+                                                    .setKey(a.key())
+                                                    .setType(a.type().rawValue())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getMemberAttributeString(
+            List<MembersQuery.Attribute> attributeList, String field, String defaultValue) {
+        return attributeList.stream()
+                .filter(a -> a.definition().key().equals(field))
+                .findFirst()
+                .map(f -> (String) f.value())
+                .orElse(defaultValue);
     }
 }
