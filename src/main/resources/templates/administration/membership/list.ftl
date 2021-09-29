@@ -6,8 +6,9 @@
         function onPageLoad() {
             <@admin.adminSspTableScript
                 id="memberTable"
-                selectable=true
+                selectable=false
                 columns=memberColumns
+                ajaxSrc="membership/get-data"
             />
         };
     </script>
@@ -15,7 +16,7 @@
 <@layout.mainLayout script=dataScript>
     <@admin.adminSspTableCard
         id="memberTable"
-        selectable=true
+        selectable=false
         searchable=true
         defaultPageLength=50
         pageLengths=[10,50,100]

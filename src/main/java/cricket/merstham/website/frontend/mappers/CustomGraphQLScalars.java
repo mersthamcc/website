@@ -19,7 +19,7 @@ public enum CustomGraphQLScalars implements ScalarType {
             case DATETIME:
                 return LocalDateTime.class.getCanonicalName();
             default:
-                return null;
+                throw new IllegalArgumentException();
         }
     }
 
@@ -32,7 +32,7 @@ public enum CustomGraphQLScalars implements ScalarType {
             case DATETIME:
                 return "DateTime";
             default:
-                return null;
+                throw new IllegalArgumentException();
         }
     }
 }

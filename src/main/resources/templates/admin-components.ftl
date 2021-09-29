@@ -393,6 +393,7 @@
                                 <@spring.messageText code=column.key text=column.key />
                             </th>
                         </#list>
+                        <th class="table-column-pr-0 sorting_disabled">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -441,7 +442,7 @@
     </div>
 </#macro>
 
-<#macro adminSspTableScript id ajaxSrc="membership/get-data" selectable=false columns=[]>
+<#macro adminSspTableScript id ajaxSrc selectable=false columns=[]>
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
 
@@ -464,11 +465,27 @@
         },
         columns: [
             <#if selectable>
-                { "data": "id" },
+                { "data": function(row, type, set, meta) {
+                    return '<td class="table-column-pr-0"> \
+                                <div class="custom-control custom-checkbox"> \
+                                    <input type="checkbox" \
+                                           class="custom-control-input" \
+                                           id="${id}Check' + row.id + '" \
+                                           name="selected" \
+                                           value="' + row.id + '"> \
+                                    <label class="custom-control-label" for="${id}Check' + row.id + '"></label> \
+                                </div> \
+                            </td>';
+                } },
             </#if>
             <#list columns as column>
-                { "data": "${column.fieldName}" }<#if column?has_next>,</#if>
+                { "data": "${column.fieldName}" },
             </#list>
+            { "data": function(row, type, set, meta) {
+                let actions = "";
+                if ( row.editLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.editLink +'"><i class="js-edit-icon tio-edit"></i> Edit</a>';
+                return actions;
+            }}
         ],
         select: {
             style: 'multi',
