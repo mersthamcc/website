@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ROUTE_TEMPLATE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
@@ -54,6 +55,10 @@ public class News extends SspBaseResponseData implements Serializable {
 
     public URI getEditLink() {
         return buildRoute(ADMIN_NEWS_EDIT_ROUTE, Map.of("id", id));
+    }
+
+    public URI getDeleteLink() {
+        return buildRoute(ADMIN_NEWS_DELETE_ROUTE, Map.of("id", id));
     }
 
     public URI getLink() {

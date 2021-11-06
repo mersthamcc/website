@@ -3,12 +3,15 @@ package cricket.merstham.website.frontend.service;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
-import cricket.merstham.website.frontend.model.NewsGraphResponse;
 import cricket.merstham.website.frontend.model.admintables.News;
+import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.graph.AdminNewsQuery;
+import cricket.merstham.website.graph.DeleteNewsMutation;
 import cricket.merstham.website.graph.GetNewsItemQuery;
 import cricket.merstham.website.graph.SaveNewsMutation;
 import cricket.merstham.website.graph.type.NewsInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class NewsService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NewsService.class);
     private final GraphService graphService;
 
     @Autowired
@@ -27,11 +31,12 @@ public class NewsService {
         this.graphService = graphService;
     }
 
-    public NewsGraphResponse getItems(Principal principal, int start, int length, String search) throws IOException {
+    public SspGraphResponse<News> getItems(Principal principal, int start, int length, String search) throws IOException {
         var query = new AdminNewsQuery(start, length, Input.optional(search));
         Response<AdminNewsQuery.Data> result = graphService.executeQuery(query, principal);
-        return NewsGraphResponse.builder()
-                .news(result.getData().news().stream().map(n -> News
+        var data = result.getData();
+        return SspGraphResponse.<News>builder()
+                .data(data.news().stream().map(n -> News
                         .builder()
                         .id(n.id())
                         .title(n.title())
@@ -41,8 +46,8 @@ public class NewsService {
                         .publishDate(n.publishDate())
                         .build()
                 ).collect(Collectors.toList()))
-                .recordsFiltered(result.getData().newsTotals().totalMatching())
-                .recordsTotal(result.getData().newsTotals().totalRecords())
+                .recordsFiltered(data.newsTotals().totalMatching())
+                .recordsTotal(data.newsTotals().totalRecords())
                 .build();
     }
 
@@ -61,6 +66,7 @@ public class NewsService {
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result = graphService.executeMutation(saveRequest, principal);
         if (result.hasErrors()) {
+            result.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
                     "Error saving News item",
                     result.getErrors().stream().map(e -> e.getMessage()).collect(Collectors.toList()));
@@ -86,5 +92,14 @@ public class NewsService {
                 .publishDate(news.getData().newsItem().publishDate())
                 .body(news.getData().newsItem().body())
                 .build();
+    }
+
+    public boolean delete(Principal principal, int id) throws IOException {
+        var query = new DeleteNewsMutation(id);
+        Response<DeleteNewsMutation.Data> result = graphService.executeMutation(query, principal);
+        if (result.hasErrors()) {
+            result.getErrors().forEach(e -> LOG.error(e.getMessage()));
+        }
+        return !result.hasErrors();
     }
 }

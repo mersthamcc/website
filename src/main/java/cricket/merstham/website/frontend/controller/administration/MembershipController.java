@@ -224,14 +224,14 @@ public class MembershipController extends SspController<Member> {
                                                 || m.getLastSubscription().contains(search))
                         .sorted(comparator)
                         .collect(Collectors.toList());
-        return SspResponse.builder(Member.class)
-                .withDraw(request.getDraw())
-                .withData(
+        return SspResponse.<Member>builder()
+                .draw(request.getDraw())
+                .data(
                         members.subList(
                                 request.getStart(),
                                 min(request.getStart() + request.getLength(), members.size())))
-                .withRecordsTotal(members.size())
-                .withRecordsFiltered(members.size())
+                .recordsTotal(members.size())
+                .recordsFiltered(members.size())
                 .build();
     }
 

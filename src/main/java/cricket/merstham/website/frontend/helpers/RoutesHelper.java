@@ -11,6 +11,7 @@ public class RoutesHelper {
     public static final String ADMIN_NEWS_SAVE_ROUTE = ADMIN_NEWS_BASE + "/save";
     public static final String ADMIN_NEWS_NEW_ROUTE = ADMIN_NEWS_BASE + "/new";
     public static final String ADMIN_NEWS_EDIT_ROUTE = ADMIN_NEWS_BASE + "/edit/{id}";
+    public static final String ADMIN_NEWS_DELETE_ROUTE = ADMIN_NEWS_BASE + "/delete/{id}";
     public static final String ADMIN_NEWS_AJAX_ROUTE = ADMIN_NEWS_BASE + "/get-data";
     public static final String NEWS_ROUTE_TEMPLATE = "/{year}/{month}/{day}/{slug}";
 

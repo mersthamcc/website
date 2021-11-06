@@ -1,0 +1,15 @@
+mutation deleteNews($id: Int!) {
+    deleteNews(id: $id) {
+        id
+        title
+        path
+        author
+        createdDate
+        publishDate
+        body
+        attributes {
+            name
+            value
+        }
+    }
+}

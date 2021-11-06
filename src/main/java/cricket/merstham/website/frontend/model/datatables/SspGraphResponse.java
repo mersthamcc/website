@@ -1,8 +1,7 @@
-package cricket.merstham.website.frontend.model;
+package cricket.merstham.website.frontend.model.datatables;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cricket.merstham.website.frontend.model.admintables.News;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NewsGraphResponse implements Serializable {
+public class SspGraphResponse<T> implements Serializable {
     private static final long serialVersionUID = 20211031184100L;
 
     @JsonProperty
-    private List<News> news = List.of();
+    private List<T> data;
 
     @JsonProperty
     private int recordsTotal;

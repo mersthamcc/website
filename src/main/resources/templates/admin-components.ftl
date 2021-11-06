@@ -532,7 +532,8 @@
             </#list>
             { "data": function(row, type, set, meta) {
                 let actions = "";
-                if ( row.editLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.editLink +'"><i class="js-edit-icon tio-edit"></i> Edit</a>';
+                if ( row.editLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.editLink +'"><i class="js-edit-icon tio-edit"></i> Edit</a>&nbsp;';
+                if ( row.deleteLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.deleteLink +'"><i class="js-edit-icon tio-delete"></i> Delete</a>&nbsp;';
                 return actions;
             }}
         ],

@@ -27,12 +27,15 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_BASE;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_NEW_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_SAVE_ROUTE;
+import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller("AdminNewsController")
@@ -66,7 +69,7 @@ public class NewsController extends SspController<News> {
     @PreAuthorize("hasRole('ROLE_NEWS')")
     public ModelAndView newPost(HttpServletRequest request, Principal principal) {
         var flash = RequestContextUtils.getInputFlashMap(request);
-        if (flash.isEmpty()) {
+        if (isNull(flash) || flash.isEmpty()) {
             var news = News.builder()
                     .title("")
                     .author(UserHelper.getUserFullName(principal))
@@ -91,6 +94,13 @@ public class NewsController extends SspController<News> {
         return new ModelAndView("administration/news/edit", Map.of(
                 "news", news
         ));
+    }
+
+    @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
+    @PreAuthorize("hasRole('ROLE_NEWS')")
+    public RedirectView deletePost(Principal principal, @PathVariable("id") int id) throws IOException {
+        newsService.delete(principal, id);
+        return new RedirectView(ADMIN_NEWS_BASE);
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
@@ -118,16 +128,16 @@ public class NewsController extends SspController<News> {
                     request.getStart(),
                     request.getLength(),
                     request.getSearch().getValue());
-            return SspResponse.builder(News.class)
-                    .withDraw(request.getDraw())
-                    .withData(data.getNews())
-                    .withRecordsFiltered(data.getRecordsFiltered())
-                    .withRecordsTotal(data.getRecordsTotal())
+            return SspResponse.<News>builder()
+                    .draw(request.getDraw())
+                    .data(data.getData())
+                    .recordsFiltered(data.getRecordsFiltered())
+                    .recordsTotal(data.getRecordsTotal())
                     .build();
         } catch (IOException e) {
             LOG.error("Error getting news items from graph service", e);
-            return SspResponse.builder(News.class)
-                    .withError(List.of(e.getMessage()))
+            return SspResponse.<News>builder()
+                    .error(Optional.of(List.of(e.getMessage())))
                     .build();
         }
     }
