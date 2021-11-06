@@ -1,0 +1,15 @@
+query getNewsItem($id: Int!) {
+    newsItem(id: $id) {
+        id
+        title
+        path
+        author
+        createdDate
+        publishDate
+        body
+        attributes {
+            name
+            value
+        }
+    }
+}

@@ -37,7 +37,7 @@ import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
 
 @Controller("AdminMembershipController")
-public class MembershipController {
+public class MembershipController extends SspController<Member> {
 
     private final MessageSource messageSource;
 

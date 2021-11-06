@@ -1,5 +1,8 @@
 <#import "/spring.ftl" as spring />
 
+<#macro noButtons>
+</#macro>
+
 <#macro section title action buttons=noButtons>
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
@@ -113,6 +116,46 @@
            value="${data[key]!""}"
             ${required}
     />
+</#macro>
+
+<#macro adminFormField name localeCategory data required=false type="text">
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <input class="form-control c-square c-theme"
+                   name="${name}"
+                   type="${type}"
+                   placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
+                   value="${data}"
+                   ${requiredAttribute}
+            />
+        </div>
+    </div>
+</#macro>
+
+<#macro adminCkEditorField name localeCategory data required=false type="text" rows=25>
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>
+                ${data}
+            </textarea>
+        </div>
+    </div>
 </#macro>
 
 <#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100]>
@@ -356,13 +399,19 @@
                 <table id="${id}"
                        class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer"
                        data-hs-datatables-options='{
+                            "columnDefs": [
                             <#if selectable>
-                            "columnDefs": [{
-                                "targets": [0],
-                                "orderable": false
-                            }],
-                            "order": [],
+                                {
+                                    "targets": [0],
+                                    "orderable": false
+                                },
                             </#if>
+                                {
+                                    "targets": [${columns?size + (selectable?then(1,0))}],
+                                    "orderable": false
+                                }
+                            ],
+                            "order": [],
                             "info": {
                                 "totalQty": "#${id}WithPaginationInfoTotalQty"
                             },
@@ -393,7 +442,7 @@
                                 <@spring.messageText code=column.key text=column.key />
                             </th>
                         </#list>
-                        <th class="table-column-pr-0 sorting_disabled">Actions</th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -512,4 +561,16 @@
             }
         }, 1);
     });
+</#macro>
+
+<#macro formErrors errors errorKey>
+    <#if (errors?size > 0)>
+        <div class="alert alert-soft-danger" role="alert">
+            <h5 class="alert-heading"><@spring.messageText code=errorKey text="An error occured" /></h5>
+            <hr />
+            <#list errors as error>
+                <p class="text-inherit">${error}</p>
+            </#list>
+        </div>
+    </#if>
 </#macro>

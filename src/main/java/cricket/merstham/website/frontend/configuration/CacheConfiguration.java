@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 public class CacheConfiguration implements CacheManagerCustomizer<ConcurrentMapCacheManager> {
 
     public static final String MEMBER_SUMMARY_CACHE = "member_summary";
+    public static final String NEWS_SUMMARY_CACHE = "news_summary";
 
     @Override
     public void customize(ConcurrentMapCacheManager cacheManager) {

@@ -5,13 +5,14 @@ import com.apollographql.apollo.api.CustomTypeValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import static java.text.MessageFormat.format;
 
 public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDateTime> {
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+    private DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     @Override
     public LocalDateTime decode(@NotNull CustomTypeValue<?> value) {
@@ -26,6 +27,6 @@ public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDa
     @NotNull
     @Override
     public CustomTypeValue<?> encode(LocalDateTime value) {
-        return new CustomTypeValue.GraphQLString(value.format(formatter));
+        return new CustomTypeValue.GraphQLString(value.atZone(ZoneId.systemDefault()).format(formatter));
     }
 }

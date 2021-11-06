@@ -1,0 +1,11 @@
+query newsFeed {
+    feed {
+        id
+        title
+        author
+        path
+        body
+        createdDate
+        publishDate
+    }
+}

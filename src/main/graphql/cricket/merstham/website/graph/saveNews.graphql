@@ -1,0 +1,15 @@
+mutation saveNews ($news: NewsInput!) {
+    saveNews(news: $news) {
+        id
+        title
+        body
+        author
+        path
+        createdDate
+        publishDate
+        attributes {
+            name
+            value
+        }
+    }
+}
