@@ -1,5 +1,5 @@
-query newsFeed {
-    feed {
+query newsFeed ($page: Int!){
+    feed (page: $page){
         id
         title
         author
@@ -7,5 +7,9 @@ query newsFeed {
         body
         createdDate
         publishDate
+    }
+
+    newsTotals {
+        totalRecords
     }
 }

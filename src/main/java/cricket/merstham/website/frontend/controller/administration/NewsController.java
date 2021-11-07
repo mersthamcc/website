@@ -62,7 +62,7 @@ public class NewsController extends SspController<News> {
                                         .setFieldName("title"),
                                 new DataTableColumn()
                                         .setKey("news.publish-date")
-                                        .setFieldName("publishDate"))));
+                                        .setFieldName("formattedPublishDate"))));
     }
 
     @GetMapping(value = ADMIN_NEWS_NEW_ROUTE, name = "admin-news-new")

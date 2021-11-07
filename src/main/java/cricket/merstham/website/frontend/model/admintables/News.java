@@ -11,17 +11,25 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.safety.Safelist;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ROUTE_TEMPLATE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Objects.isNull;
 
 
 @Data
@@ -64,9 +72,33 @@ public class News extends SspBaseResponseData implements Serializable {
     public URI getLink() {
         return buildRoute(NEWS_ROUTE_TEMPLATE, Map.of(
                 "year", publishDate.getYear(),
-                "month", publishDate.format(DateTimeFormatter.ofPattern("MM")),
-                "day", publishDate.format(DateTimeFormatter.ofPattern("dd")),
+                "month", publishDate.format(ofPattern("MM")),
+                "day", publishDate.format(ofPattern("dd")),
                 "slug", title.toSlug()
         ));
+    }
+
+    @JsonProperty("formattedPublishDate")
+    public String getFormattedPublishDate() {
+        return publishDate.format(ofPattern("dd/MM/YYYY"));
+    }
+
+    public String getDisplayPublishDate() {
+        return publishDate.format(ofPattern("d MMMM, yyyy"));
+    }
+
+    public String getAbstract() {
+        Document doc = Jsoup.parse(body);
+        Element readMoreAnchor = doc.selectFirst("a#readmore");
+
+        if (isNull(readMoreAnchor)) {
+            return Jsoup.clean(body, Safelist.basic());
+        }
+
+        return Jsoup.clean(body.substring(0, body.indexOf(readMoreAnchor.outerHtml())), Safelist.basic());
+    }
+
+    public String getAuthorInitials() {
+        return String.join("", Arrays.stream(author.split(" ")).map(n -> n.toUpperCase(Locale.ROOT).substring(0,1)).collect(Collectors.toList()));
     }
 }

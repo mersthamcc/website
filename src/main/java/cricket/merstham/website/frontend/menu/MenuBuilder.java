@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_HOME_ROUTE;
+
 @Service
 @Singleton
 public class MenuBuilder {
@@ -32,7 +34,7 @@ public class MenuBuilder {
     private final List<Menu> frontEndMenu =
             List.of(
                     new Menu("home", null, null, List.of(), null),
-                    new Menu("news", null, URI.create("/news"), List.of(), null),
+                    new Menu("news", null, URI.create(NEWS_HOME_ROUTE), List.of(), null),
                     new Menu(
                             "cricket",
                             null,

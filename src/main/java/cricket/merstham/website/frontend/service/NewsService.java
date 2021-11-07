@@ -8,6 +8,7 @@ import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.graph.AdminNewsQuery;
 import cricket.merstham.website.graph.DeleteNewsMutation;
 import cricket.merstham.website.graph.GetNewsItemQuery;
+import cricket.merstham.website.graph.NewsFeedQuery;
 import cricket.merstham.website.graph.SaveNewsMutation;
 import cricket.merstham.website.graph.type.NewsInput;
 import org.slf4j.Logger;
@@ -48,6 +49,23 @@ public class NewsService {
                 ).collect(Collectors.toList()))
                 .recordsFiltered(data.newsTotals().totalMatching())
                 .recordsTotal(data.newsTotals().totalRecords())
+                .build();
+    }
+
+    public SspGraphResponse<News> feed(int page) throws IOException {
+        var query = new NewsFeedQuery(page);
+        Response<NewsFeedQuery.Data> result = graphService.executeQuery(query);
+        return SspGraphResponse.<News>builder()
+                .data(result.getData().feed().stream().map(
+                        n -> News.builder()
+                                .id(n.id())
+                                .title(n.title())
+                                .author(n.author())
+                                .publishDate(n.publishDate())
+                                .createdDate(n.createdDate())
+                                .body(n.body())
+                                .build()).collect(Collectors.toList()))
+                .recordsTotal(result.getData().newsTotals().totalRecords())
                 .build();
     }
 
