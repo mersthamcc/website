@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.model.admintables;
+package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,4 +102,14 @@ public class News extends SspBaseResponseData implements Serializable {
     public String getAuthorInitials() {
         return String.join("", Arrays.stream(author.split(" ")).map(n -> n.toUpperCase(Locale.ROOT).substring(0,1)).collect(Collectors.toList()));
     }
+
+    public List<Image> getImages() {
+        return Jsoup.parse(body).select("img").stream()
+                .map(i -> Image.builder()
+                        .path(i.attr("src"))
+                        .caption(i.attr("alt"))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

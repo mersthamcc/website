@@ -4,13 +4,20 @@ import cricket.merstham.website.frontend.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_HOME_ROUTE;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ITEM_LEGACY_ROUTE;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ITEM_ROUTE;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ROUTE_TEMPLATE;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
 
 @Controller("NewsController")
 public class NewsController {
@@ -30,5 +37,27 @@ public class NewsController {
                         "news", news.getData(),
                         "totalPages", Math.floorDiv(news.getRecordsTotal(), 10) + 1,
                         "page", page));
+    }
+
+    @GetMapping(value = NEWS_ITEM_LEGACY_ROUTE, name = "news-item-legacy")
+    public RedirectView legacyRedirect(Principal principal, @PathVariable("id") int id) throws IOException {
+        return new RedirectView(newsService.get(id).getLink().toString());
+    }
+
+    @GetMapping(value = NEWS_ITEM_ROUTE, name = "news")
+    public ModelAndView home(@PathVariable String year, @PathVariable String month, @PathVariable String day, @PathVariable String slug) throws IOException {
+        var news = newsService.get(
+                buildRoute(
+                        NEWS_ROUTE_TEMPLATE,
+                        Map.of(
+                                "year", year,
+                                "month", month,
+                                "day", day,
+                                "slug", slug)
+                ).toString()
+        );
+        return new ModelAndView(
+                "news/item",
+                Map.of("news", news));
     }
 }

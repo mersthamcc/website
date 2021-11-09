@@ -3,7 +3,7 @@ package cricket.merstham.website.frontend.controller.administration;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.helpers.UserHelper;
 import cricket.merstham.website.frontend.model.DataTableColumn;
-import cricket.merstham.website.frontend.model.admintables.News;
+import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.service.NewsService;

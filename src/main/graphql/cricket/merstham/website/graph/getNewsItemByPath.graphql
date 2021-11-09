@@ -1,0 +1,15 @@
+query getNewsItemByPath($path: String!) {
+    newsItemByPath(path: $path) {
+        id
+        title
+        path
+        author
+        createdDate
+        publishDate
+        body
+        attributes {
+            name
+            value
+        }
+    }
+}

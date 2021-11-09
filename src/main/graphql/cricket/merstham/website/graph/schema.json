@@ -2425,7 +2425,7 @@
               "deprecationReason": null
             },
             {
-              "name": "newsItemByItem",
+              "name": "newsItemByPath",
               "description": null,
               "args": [
                 {

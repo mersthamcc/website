@@ -3,10 +3,11 @@ package cricket.merstham.website.frontend.service;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
-import cricket.merstham.website.frontend.model.admintables.News;
+import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.graph.AdminNewsQuery;
 import cricket.merstham.website.graph.DeleteNewsMutation;
+import cricket.merstham.website.graph.GetNewsItemByPathQuery;
 import cricket.merstham.website.graph.GetNewsItemQuery;
 import cricket.merstham.website.graph.NewsFeedQuery;
 import cricket.merstham.website.graph.SaveNewsMutation;
@@ -109,6 +110,32 @@ public class NewsService {
                 .createdDate(news.getData().newsItem().createdDate())
                 .publishDate(news.getData().newsItem().publishDate())
                 .body(news.getData().newsItem().body())
+                .build();
+    }
+
+    public News get(int id) throws IOException {
+        var query = new GetNewsItemQuery(id);
+        Response<GetNewsItemQuery.Data> news = graphService.executeQuery(query);
+        return News.builder()
+                .id(news.getData().newsItem().id())
+                .author(news.getData().newsItem().author())
+                .title(news.getData().newsItem().title())
+                .createdDate(news.getData().newsItem().createdDate())
+                .publishDate(news.getData().newsItem().publishDate())
+                .body(news.getData().newsItem().body())
+                .build();
+    }
+
+    public News get(String path) throws IOException {
+        var query = new GetNewsItemByPathQuery(path);
+        Response<GetNewsItemByPathQuery.Data> news = graphService.executeQuery(query);
+        return News.builder()
+                .id(news.getData().newsItemByPath().id())
+                .author(news.getData().newsItemByPath().author())
+                .title(news.getData().newsItemByPath().title())
+                .createdDate(news.getData().newsItemByPath().createdDate())
+                .publishDate(news.getData().newsItemByPath().publishDate())
+                .body(news.getData().newsItemByPath().body())
                 .build();
     }
 

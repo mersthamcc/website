@@ -50,7 +50,7 @@ graph:
   graph-uri: ${GRAPH_URI}
 
 resources:
-  base-url: "${RESOURCES_BASE_URL://resources.new.mersthamcc.co.uk}"
+  base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"
 
 payments:
   pay-later:
