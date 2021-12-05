@@ -6,7 +6,27 @@
 <#macro dataScript>
     <script>
         ClassicEditor
-            .create(document.querySelector('#body-editor'))
+            .create(document.querySelector('#body-editor'), {
+                toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'ckfinder'],
+                ckfinder: {
+                    uploadUrl: '/administration/components/ckfinder/connector?command=QuickUpload&type=Files&responseType=json',
+                    options: {
+                        connectorPath: '/administration/components/ckfinder/connector',
+                        section: 'news',
+                        id: '${news.id}',
+                        pass: 'section, id'
+                    }
+                },
+                mention: {
+                    feeds: [
+                        {
+                            marker: '@',
+                            feed: ['@Chris', '@Richard'],
+                            minimumCharacters: 1
+                        }
+                    ]
+                }
+            })
             .then(editor => {
                 console.log(editor);
             })

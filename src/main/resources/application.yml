@@ -51,6 +51,7 @@ graph:
 
 resources:
   base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"
+  base-directory: "${RESOURCES_BASE_DIRECTORY:../infrastructure/spaces-data}"
 
 payments:
   pay-later:

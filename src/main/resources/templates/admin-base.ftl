@@ -1043,8 +1043,8 @@
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables.net.extensions/select/select.min.js"></script>
 			<!-- JS Front -->
 			<script src="${resourcePrefix}/front/admin/assets/js/theme.min.js"></script>
-			<script src="${resourcePrefix}/mcc/js/ckeditor/build/ckeditor.js"></script>
 			<script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
+			<script src="${resourcePrefix}/mcc/js/ckeditor/ckeditor.js"></script>
 			<#if script?is_directive><@script /><#else>${script}</#if>
 
 			<!-- JS Plugins Init. -->

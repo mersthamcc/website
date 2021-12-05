@@ -25,10 +25,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.lang.reflect.Method;
 import java.security.Principal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
@@ -47,7 +50,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
     public ViewConfiguration(
             MenuBuilder menuBuilderProvider,
             ClubConfiguration clubConfiguration,
-            @Value("${resources.base-url}") String resourcePrefix) {
+            @Value("${resources.base-url:}") String resourcePrefix) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;

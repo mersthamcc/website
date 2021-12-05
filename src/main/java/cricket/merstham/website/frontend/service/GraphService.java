@@ -1,6 +1,10 @@
 package cricket.merstham.website.frontend.service;
 
-import com.apollographql.apollo.api.*;
+import com.apollographql.apollo.api.Mutation;
+import com.apollographql.apollo.api.Operation;
+import com.apollographql.apollo.api.Query;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.api.ScalarTypeAdapters;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
@@ -15,8 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.client.*;
-
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
@@ -24,7 +28,6 @@ import java.util.Map;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
-import static javax.ws.rs.core.Response.Status.OK;
 
 @Service
 public class GraphService {
@@ -120,7 +123,7 @@ public class GraphService {
                 query.name().name(),
                 response.getStatus());
         String body = response.readEntity(String.class);
-        LOG.info("Response Body = {}", body);
+        LOG.debug("Response Body = {}", body);
         if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
             return body.getBytes();
         }
