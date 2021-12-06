@@ -6,6 +6,7 @@ import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.exception.ResourceNotFoundException;
 import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
+import cricket.merstham.website.frontend.service.processors.ItemProcessor;
 import cricket.merstham.website.graph.AdminNewsQuery;
 import cricket.merstham.website.graph.DeleteNewsMutation;
 import cricket.merstham.website.graph.GetNewsItemByPathQuery;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -30,10 +31,12 @@ public class NewsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NewsService.class);
     private final GraphService graphService;
+    private final List<ItemProcessor<News>> processors;
 
     @Autowired
-    public NewsService(GraphService graphService) {
+    public NewsService(GraphService graphService, List<ItemProcessor<News>> processors) {
         this.graphService = graphService;
+        this.processors = processors;
     }
 
     public SspGraphResponse<News> getItems(
@@ -86,8 +89,7 @@ public class NewsService {
     }
 
     public News saveNewsItem(Principal principal, News news) throws IOException {
-        news.setPublishDate(LocalDateTime.now());
-        news.setCreatedDate(LocalDateTime.now());
+        processors.forEach(p -> p.preSave(news));
         var input =
                 NewsInput.builder()
                         .id(news.getId())
@@ -111,7 +113,7 @@ public class NewsService {
                             .map(e -> e.getMessage())
                             .collect(Collectors.toList()));
         }
-        return News.builder()
+        var saved = News.builder()
                 .id(result.getData().saveNews().id())
                 .title(result.getData().saveNews().title())
                 .body(result.getData().saveNews().body())
@@ -121,6 +123,9 @@ public class NewsService {
                 .draft(result.getData().saveNews().draft())
                 .uuid(result.getData().saveNews().uuid())
                 .build();
+
+        processors.forEach(p -> p.postProcessing(saved));
+        return saved;
     }
 
     public News get(Principal principal, int id) throws IOException {
