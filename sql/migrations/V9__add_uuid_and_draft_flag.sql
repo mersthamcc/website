@@ -1,0 +1,7 @@
+ALTER TABLE
+    news ADD COLUMN uuid TEXT,
+    ADD COLUMN draft BOOLEAN;
+
+CREATE
+    UNIQUE INDEX IDX_UNIQUE_NEWS_UUID ON
+    news(uuid);
