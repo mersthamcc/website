@@ -13,6 +13,11 @@ import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+
+import static cricket.merstham.website.frontend.configuration.CkFinderRegistration.CONNECTOR_PATH;
 
 @Configuration
 @EnableWebSecurity
@@ -41,6 +46,12 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.authorizeRequests().anyRequest().permitAll();
+        http
+                .csrf().requireCsrfProtectionMatcher(
+                        new AndRequestMatcher(
+                                keycloakCsrfRequestMatcher(),
+                                new NegatedRequestMatcher(new AntPathRequestMatcher(CONNECTOR_PATH))))
+                .and()
+                .authorizeRequests().anyRequest().permitAll();
     }
 }

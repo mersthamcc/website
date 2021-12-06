@@ -87,7 +87,7 @@ public class CkFinderConfigLoader implements ConfigLoader {
         backend.setHideFolders(List.of(".*", "CVS", "__thumbs"));
         backend.setHideFiles(List.of(".*"));
         backend.setHtmlExtensions(List.of("html", "htm", "xml", "js"));
-        backend.setOverwriteOnUpload(false);
+        backend.setOverwriteOnUpload(true);
         backend.setUseProxyCommand(false);
         ArrayList<Config.Backend> backends = new ArrayList<>();
         backends.add(backend);
