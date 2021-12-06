@@ -1,6 +1,8 @@
 mutation saveNews ($news: NewsInput!) {
     saveNews(news: $news) {
         id
+        uuid
+        draft
         title
         body
         author

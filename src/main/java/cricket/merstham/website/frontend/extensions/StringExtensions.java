@@ -7,10 +7,12 @@ public class StringExtensions {
         if (in == null || in.trim().length() == 0) {
             throw new IllegalArgumentException();
         }
-        return String.join("-", in.toLowerCase()
-                .replace("\n", " ")
-                .replaceAll("[^a-z\\d\\s]", " ")
-                .split(" "))
+        return String.join(
+                        "-",
+                        in.toLowerCase()
+                                .replace("\n", " ")
+                                .replaceAll("[^a-z\\d\\s]", " ")
+                                .split(" "))
                 .replaceAll("-+", "-");
     }
 }

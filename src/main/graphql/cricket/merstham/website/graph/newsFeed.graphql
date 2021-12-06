@@ -1,6 +1,8 @@
 query newsFeed ($page: Int!){
     feed (page: $page){
         id
+        uuid
+        draft
         title
         author
         path

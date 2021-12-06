@@ -1,6 +1,8 @@
 query adminNews($start: Int!, $length: Int!, $search: String) {
     news(start: $start, length: $length, searchString: $search) {
         id
+        uuid
+        draft
         title
         author
         createdDate

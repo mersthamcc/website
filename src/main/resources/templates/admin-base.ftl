@@ -1061,15 +1061,16 @@
 						var unfold = new HSUnfold($(this)).init();
 					});
 
-
-					// INITIALIZATION OF FORM SEARCH
-					// =======================================================
 					$('.js-form-search').each(function () {
 						new HSFormSearch($(this)).init()
 					});
 
 					$('.js-select2-custom').each(function () {
-						var select2 = $.HSCore.components.HSSelect2.init($(this));
+						$.HSCore.components.HSSelect2.init($(this));
+					});
+
+					$('.js-toggle-switch').each(function () {
+						new HSToggleSwitch($(this)).init();
 					});
 
 					if (typeof onPageLoad === "function") onPageLoad();

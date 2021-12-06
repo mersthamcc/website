@@ -18,12 +18,9 @@ import java.util.List;
 public class SspGraphResponse<T> implements Serializable {
     private static final long serialVersionUID = 20211031184100L;
 
-    @JsonProperty
-    private List<T> data;
+    @JsonProperty private List<T> data;
 
-    @JsonProperty
-    private int recordsTotal;
+    @JsonProperty private int recordsTotal;
 
-    @JsonProperty
-    private int recordsFiltered;
+    @JsonProperty private int recordsFiltered;
 }

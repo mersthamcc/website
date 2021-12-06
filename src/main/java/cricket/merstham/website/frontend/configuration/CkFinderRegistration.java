@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.MultipartConfigElement;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
@@ -28,11 +29,12 @@ public class CkFinderRegistration {
         bean.setLoadOnStartup(-1);
         bean.setInitParameters(
                 Map.of("scan-path", "cricket.merstham.website.frontend.configuration.ckfinder"));
-        bean.setMultipartConfig(new MultipartConfigElement(
-                createTempDirectory(),
-                MAX_FILE_SIZE,
-                MAX_REQUEST_SIZE,
-                FILE_SIZE_THRESHOLD));
+        bean.setMultipartConfig(
+                new MultipartConfigElement(
+                        createTempDirectory(),
+                        MAX_FILE_SIZE,
+                        MAX_REQUEST_SIZE,
+                        FILE_SIZE_THRESHOLD));
         return bean;
     }
 

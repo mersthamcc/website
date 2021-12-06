@@ -1,6 +1,8 @@
 mutation deleteNews($id: Int!) {
     deleteNews(id: $id) {
         id
+        uuid
+        draft
         title
         path
         author

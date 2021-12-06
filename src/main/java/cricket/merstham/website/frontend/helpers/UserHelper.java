@@ -13,6 +13,8 @@ public class UserHelper {
     }
 
     private static IDToken getIdToken(Principal principal) {
-        return ((KeycloakPrincipal)((KeycloakAuthenticationToken) principal).getPrincipal()).getKeycloakSecurityContext().getIdToken();
+        return ((KeycloakPrincipal) ((KeycloakAuthenticationToken) principal).getPrincipal())
+                .getKeycloakSecurityContext()
+                .getIdToken();
     }
 }

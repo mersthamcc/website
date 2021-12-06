@@ -20,11 +20,8 @@ public class RoutesHelper {
 
     public static final String LEGACY_RESOURCES = "/resources/**";
 
-
     public static URI buildRoute(String template, Map<String, Object> parameters) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .path(template)
-                .build();
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().path(template).build();
         return uriComponents.expand(parameters).toUri();
     }
 }

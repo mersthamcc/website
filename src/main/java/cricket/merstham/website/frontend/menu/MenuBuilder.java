@@ -89,10 +89,8 @@ public class MenuBuilder {
                             SCRIPT_LINK,
                             List.of(),
                             List.of(
-                                    new Menu(
-                                            "admin-news-list", null, null, List.of(), null),
-                                    new Menu(
-                                            "admin-news-new", null, null, List.of(), null)),
+                                    new Menu("admin-news-list", null, null, List.of(), null),
+                                    new Menu("admin-news-new", null, null, List.of(), null)),
                             "tio-feed-outlined"));
 
     private final List<Menu> adminAdministrationMenu =

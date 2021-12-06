@@ -12,8 +12,7 @@ public class CkFinderConfiguration {
             @Value("#{environment.CKFINDER_LICENCE_NAME}") String licenseName,
             @Value("#{environment.CKFINDER_LICENCE_KEY}") String licenseKey,
             @Value("#{environment.RESOURCES_BASE_URL}") String resourceUrl,
-            @Value("#{environment.RESOURCES_BASE_DIRECTORY}") String resourceDirectory
-            ) {
+            @Value("#{environment.RESOURCES_BASE_DIRECTORY}") String resourceDirectory) {
         return new CkFinderConfigLoader(licenseName, licenseKey, resourceUrl, resourceDirectory);
     }
 }

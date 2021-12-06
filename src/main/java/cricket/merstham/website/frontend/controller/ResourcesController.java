@@ -23,8 +23,8 @@ public class ResourcesController {
 
     @GetMapping(value = LEGACY_RESOURCES, name = "legacy-resources-redirect")
     public RedirectView redirectToResourceServer(HttpServletRequest request) {
-        String resource = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String resource =
+                (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         return new RedirectView(resourcePrefix + resource, false, false, false);
     }
 }

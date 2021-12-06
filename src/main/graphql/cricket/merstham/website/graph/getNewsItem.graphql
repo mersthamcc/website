@@ -1,6 +1,8 @@
 query getNewsItem($id: Int!) {
     newsItem(id: $id) {
         id
+        uuid
+        draft
         title
         path
         author

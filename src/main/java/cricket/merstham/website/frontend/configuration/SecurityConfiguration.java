@@ -46,12 +46,15 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http
-                .csrf().requireCsrfProtectionMatcher(
+        http.csrf()
+                .requireCsrfProtectionMatcher(
                         new AndRequestMatcher(
                                 keycloakCsrfRequestMatcher(),
-                                new NegatedRequestMatcher(new AntPathRequestMatcher(CONNECTOR_PATH))))
+                                new NegatedRequestMatcher(
+                                        new AntPathRequestMatcher(CONNECTOR_PATH))))
                 .and()
-                .authorizeRequests().anyRequest().permitAll();
+                .authorizeRequests()
+                .anyRequest()
+                .permitAll();
     }
 }

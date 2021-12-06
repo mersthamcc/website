@@ -21,15 +21,12 @@ import static com.cksource.ckfinder.acl.Permission.FOLDER_VIEW;
 import static com.cksource.ckfinder.acl.Permission.IMAGE_RESIZE;
 import static com.cksource.ckfinder.acl.Permission.IMAGE_RESIZE_CUSTOM;
 
-
 public class CkFinderConfigLoader implements ConfigLoader {
 
     private Config config;
 
-    public CkFinderConfigLoader(String licenseName,
-                                String licenseKey,
-                                String resourceUrl,
-                                String resourcePath) {
+    public CkFinderConfigLoader(
+            String licenseName, String licenseKey, String resourceUrl, String resourcePath) {
         config = new Config();
         config.setLicenseName(licenseName);
         config.setLicenseKey(licenseKey);
@@ -52,18 +49,13 @@ public class CkFinderConfigLoader implements ConfigLoader {
                 Map.of(
                         "small", imageSize(400, 320, 80),
                         "medium", imageSize(600, 480, 80),
-                        "large", imageSize(800, 600, 80)
-                )
-        );
+                        "large", imageSize(800, 600, 80)));
         config.setImages(images);
 
         Config.Thumbnails thumbnails = new Config.Thumbnails();
         thumbnails.setEnabled(true);
         thumbnails.setSizes(
-                List.of(
-                        imageSize(150, 150, 80),
-                        imageSize(300, 300, 80),
-                        imageSize(500, 500, 80)));
+                List.of(imageSize(150, 150, 80), imageSize(300, 300, 80), imageSize(500, 500, 80)));
 
         config.setThumbnails(thumbnails);
 
@@ -74,7 +66,21 @@ public class CkFinderConfigLoader implements ConfigLoader {
         config.setCache(cache);
 
         ArrayList<AclRule> rules = new ArrayList<>();
-        rules.add(createRule("*", "*", "/", List.of(FOLDER_VIEW, FOLDER_CREATE, FOLDER_RENAME, FOLDER_DELETE, FILE_VIEW, FILE_CREATE, FILE_RENAME, IMAGE_RESIZE, IMAGE_RESIZE_CUSTOM)));
+        rules.add(
+                createRule(
+                        "*",
+                        "*",
+                        "/",
+                        List.of(
+                                FOLDER_VIEW,
+                                FOLDER_CREATE,
+                                FOLDER_RENAME,
+                                FOLDER_DELETE,
+                                FILE_VIEW,
+                                FILE_CREATE,
+                                FILE_RENAME,
+                                IMAGE_RESIZE,
+                                IMAGE_RESIZE_CUSTOM)));
         config.setAccessControl(rules);
 
         Config.Backend backend = new Config.Backend();
@@ -94,14 +100,17 @@ public class CkFinderConfigLoader implements ConfigLoader {
         config.setBackends(backends);
     }
 
-    private AclRule createRule(String role, String resourceType, String folder, List<Permission> permissions) {
+    private AclRule createRule(
+            String role, String resourceType, String folder, List<Permission> permissions) {
         AclRule aclRule = new AclRule();
         aclRule.setRole(role);
         aclRule.setResourceType(resourceType);
         aclRule.setFolder(folder);
-        Arrays.asList(Permission.values()).forEach(
-                permission -> aclRule.setPermission(permission, permissions.contains(permission))
-        );
+        Arrays.asList(Permission.values())
+                .forEach(
+                        permission ->
+                                aclRule.setPermission(
+                                        permission, permissions.contains(permission)));
         return aclRule;
     }
 

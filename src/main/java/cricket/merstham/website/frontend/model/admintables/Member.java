@@ -19,7 +19,7 @@ import java.net.URI;
 @AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class Member extends SspBaseResponseData implements Serializable {
     private static final long serialVersionUID = 20210927233800L;
 

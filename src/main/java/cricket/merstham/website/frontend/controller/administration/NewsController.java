@@ -23,11 +23,13 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_BASE;
@@ -57,9 +59,7 @@ public class NewsController extends SspController<News> {
                 Map.of(
                         "newsColumns",
                         List.of(
-                                new DataTableColumn()
-                                        .setKey("news.title")
-                                        .setFieldName("title"),
+                                new DataTableColumn().setKey("news.title").setFieldName("title"),
                                 new DataTableColumn()
                                         .setKey("news.publish-date")
                                         .setFieldName("formattedPublishDate"))));
@@ -70,42 +70,43 @@ public class NewsController extends SspController<News> {
     public ModelAndView newPost(HttpServletRequest request, Principal principal) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
-            var news = News.builder()
-                    .title("")
-                    .author(UserHelper.getUserFullName(principal))
-                    .body("")
-                    .build();
-            return new ModelAndView("administration/news/edit", Map.of(
-                    "news", news
-            ));
+            var news =
+                    News.builder()
+                            .author(UserHelper.getUserFullName(principal))
+                            .draft(false)
+                            .uuid(UUID.randomUUID().toString())
+                            .build();
+            return new ModelAndView("administration/news/edit", Map.of("news", news));
         } else {
-            return new ModelAndView("administration/news/edit", Map.of(
-                    "news", flash.get("news"),
-                    "errors", flash.get("errors")
-            ));
+            return new ModelAndView(
+                    "administration/news/edit",
+                    Map.of(
+                            "news", flash.get("news"),
+                            "errors", flash.get("errors")));
         }
-
     }
 
     @GetMapping(value = ADMIN_NEWS_EDIT_ROUTE, name = "admin-news-edit")
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public ModelAndView editPost(Principal principal, @PathVariable("id") int id) throws IOException {
+    public ModelAndView editPost(Principal principal, @PathVariable("id") int id)
+            throws IOException {
         News news = newsService.get(principal, id);
-        return new ModelAndView("administration/news/edit", Map.of(
-                "news", news
-        ));
+        return new ModelAndView("administration/news/edit", Map.of("news", news));
     }
 
     @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public RedirectView deletePost(Principal principal, @PathVariable("id") int id) throws IOException {
+    public RedirectView deletePost(Principal principal, @PathVariable("id") int id)
+            throws IOException {
         newsService.delete(principal, id);
         return new RedirectView(ADMIN_NEWS_BASE);
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public RedirectView newPost(Principal principal, News news, RedirectAttributes redirectAttributes) throws IOException {
+    public RedirectView newPost(
+            Principal principal, News news, RedirectAttributes redirectAttributes)
+            throws IOException {
         try {
             newsService.saveNewsItem(principal, news);
             return new RedirectView(ADMIN_NEWS_BASE);
@@ -121,13 +122,15 @@ public class NewsController extends SspController<News> {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE,
             path = ADMIN_NEWS_AJAX_ROUTE)
-    public @ResponseBody SspResponse<News> getData(Principal principal, @RequestBody SspRequest request) {
+    public @ResponseBody SspResponse<News> getData(
+            Principal principal, @RequestBody SspRequest request) {
         try {
-            var data = newsService.getItems(
-                    principal,
-                    request.getStart(),
-                    request.getLength(),
-                    request.getSearch().getValue());
+            var data =
+                    newsService.getItems(
+                            principal,
+                            request.getStart(),
+                            request.getLength(),
+                            request.getSearch().getValue());
             return SspResponse.<News>builder()
                     .draw(request.getDraw())
                     .data(data.getData())
@@ -136,9 +139,7 @@ public class NewsController extends SspController<News> {
                     .build();
         } catch (IOException e) {
             LOG.error("Error getting news items from graph service", e);
-            return SspResponse.<News>builder()
-                    .error(Optional.of(List.of(e.getMessage())))
-                    .build();
+            return SspResponse.<News>builder().error(Optional.of(List.of(e.getMessage()))).build();
         }
     }
 }

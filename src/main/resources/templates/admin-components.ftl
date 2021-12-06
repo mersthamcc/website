@@ -140,6 +140,29 @@
     </div>
 </#macro>
 
+<#macro adminSwitchField name localeCategory checked=false>
+    <div class="row form-group">
+        <label class="col-md-2 control-label" for="${name}">
+            <@spring.messageText code="${localeCategory}.${name}" text=name />
+        </label>
+        <div class="col-md-10">
+            <div class="d-flex mb-5">
+                <label class="toggle-switch mx-2" for="${name}">
+                    <input type="checkbox" class="js-toggle-switch toggle-switch-input"
+                           id="${name}"
+                           name="${name}"
+                           data-hs-toggle-switch-options='{"targetSelector": "#${name}"}'
+                           <#if checked>checked="checked"</#if>
+                    />
+                    <span class="toggle-switch-label">
+                    <span class="toggle-switch-indicator"></span>
+                </span>
+                </label>
+            </div>
+        </div>
+    </div>
+</#macro>
+
 <#macro adminCkEditorField name localeCategory data required=false type="text" rows=25>
     <#if required>
         <#assign requiredAttribute>required="required"</#assign>

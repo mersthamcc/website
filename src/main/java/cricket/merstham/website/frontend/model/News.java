@@ -32,35 +32,32 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.isNull;
 
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @ExtensionMethod({StringExtensions.class})
 public class News extends SspBaseResponseData implements Serializable {
     private static final long serialVersionUID = 20211024150500L;
 
-    @JsonProperty
-    private int id;
+    @JsonProperty private int id;
 
-    @JsonProperty
-    private String title;
+    @JsonProperty private String title;
 
-    @JsonProperty
-    private String author;
+    @JsonProperty private String author;
 
-    @JsonProperty
-    private String body;
+    @JsonProperty private String body;
 
-    @JsonProperty
-    private LocalDateTime createdDate;
+    @JsonProperty private String uuid;
 
-    @JsonProperty
-    private LocalDateTime publishDate;
+    @JsonProperty private LocalDateTime createdDate;
+
+    @JsonProperty private LocalDateTime publishDate;
+
+    @JsonProperty private boolean draft;
 
     public URI getEditLink() {
         return buildRoute(ADMIN_NEWS_EDIT_ROUTE, Map.of("id", id));
@@ -71,12 +68,13 @@ public class News extends SspBaseResponseData implements Serializable {
     }
 
     public URI getLink() {
-        return buildRoute(NEWS_ROUTE_TEMPLATE, Map.of(
-                "year", publishDate.getYear(),
-                "month", publishDate.format(ofPattern("MM")),
-                "day", publishDate.format(ofPattern("dd")),
-                "slug", title.toSlug()
-        ));
+        return buildRoute(
+                NEWS_ROUTE_TEMPLATE,
+                Map.of(
+                        "year", publishDate.getYear(),
+                        "month", publishDate.format(ofPattern("MM")),
+                        "day", publishDate.format(ofPattern("dd")),
+                        "slug", title.toSlug()));
     }
 
     @JsonProperty("formattedPublishDate")
@@ -96,20 +94,21 @@ public class News extends SspBaseResponseData implements Serializable {
             return Jsoup.clean(body, Safelist.basic());
         }
 
-        return Jsoup.clean(body.substring(0, body.indexOf(readMoreAnchor.outerHtml())), Safelist.basic());
+        return Jsoup.clean(
+                body.substring(0, body.indexOf(readMoreAnchor.outerHtml())), Safelist.basic());
     }
 
     public String getAuthorInitials() {
-        return String.join("", Arrays.stream(author.split(" ")).map(n -> n.toUpperCase(Locale.ROOT).substring(0,1)).collect(Collectors.toList()));
+        return String.join(
+                "",
+                Arrays.stream(author.split(" "))
+                        .map(n -> n.toUpperCase(Locale.ROOT).substring(0, 1))
+                        .collect(Collectors.toList()));
     }
 
     public List<Image> getImages() {
         return Jsoup.parse(body).select("img").stream()
-                .map(i -> Image.builder()
-                        .path(i.attr("src"))
-                        .caption(i.attr("alt"))
-                        .build())
+                .map(i -> Image.builder().path(i.attr("src")).caption(i.attr("alt")).build())
                 .collect(Collectors.toList());
     }
-
 }

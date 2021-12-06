@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;

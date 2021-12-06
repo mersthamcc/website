@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.service;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
+import cricket.merstham.website.frontend.exception.ResourceNotFoundException;
 import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.graph.AdminNewsQuery;
@@ -22,6 +23,8 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class NewsService {
 
@@ -33,21 +36,27 @@ public class NewsService {
         this.graphService = graphService;
     }
 
-    public SspGraphResponse<News> getItems(Principal principal, int start, int length, String search) throws IOException {
+    public SspGraphResponse<News> getItems(
+            Principal principal, int start, int length, String search) throws IOException {
         var query = new AdminNewsQuery(start, length, Input.optional(search));
         Response<AdminNewsQuery.Data> result = graphService.executeQuery(query, principal);
         var data = result.getData();
         return SspGraphResponse.<News>builder()
-                .data(data.news().stream().map(n -> News
-                        .builder()
-                        .id(n.id())
-                        .title(n.title())
-                        .body(n.body())
-                        .author(n.author())
-                        .createdDate(n.createdDate())
-                        .publishDate(n.publishDate())
-                        .build()
-                ).collect(Collectors.toList()))
+                .data(
+                        data.news().stream()
+                                .map(
+                                        n ->
+                                                News.builder()
+                                                        .id(n.id())
+                                                        .title(n.title())
+                                                        .body(n.body())
+                                                        .author(n.author())
+                                                        .createdDate(n.createdDate())
+                                                        .publishDate(n.publishDate())
+                                                        .draft(n.draft())
+                                                        .uuid(n.uuid())
+                                                        .build())
+                                .collect(Collectors.toList()))
                 .recordsFiltered(data.newsTotals().totalMatching())
                 .recordsTotal(data.newsTotals().totalRecords())
                 .build();
@@ -57,15 +66,21 @@ public class NewsService {
         var query = new NewsFeedQuery(page);
         Response<NewsFeedQuery.Data> result = graphService.executeQuery(query);
         return SspGraphResponse.<News>builder()
-                .data(result.getData().feed().stream().map(
-                        n -> News.builder()
-                                .id(n.id())
-                                .title(n.title())
-                                .author(n.author())
-                                .publishDate(n.publishDate())
-                                .createdDate(n.createdDate())
-                                .body(n.body())
-                                .build()).collect(Collectors.toList()))
+                .data(
+                        result.getData().feed().stream()
+                                .map(
+                                        n ->
+                                                News.builder()
+                                                        .id(n.id())
+                                                        .title(n.title())
+                                                        .author(n.author())
+                                                        .publishDate(n.publishDate())
+                                                        .createdDate(n.createdDate())
+                                                        .body(n.body())
+                                                        .draft(n.draft())
+                                                        .uuid(n.uuid())
+                                                        .build())
+                                .collect(Collectors.toList()))
                 .recordsTotal(result.getData().newsTotals().totalRecords())
                 .build();
     }
@@ -73,36 +88,50 @@ public class NewsService {
     public News saveNewsItem(Principal principal, News news) throws IOException {
         news.setPublishDate(LocalDateTime.now());
         news.setCreatedDate(LocalDateTime.now());
-        var input = NewsInput.builder()
-                .id(news.getId())
-                .title(news.getTitle())
-                .author(news.getAuthor())
-                .body(news.getBody())
-                .createdDate(news.getCreatedDate())
-                .publishDate(news.getPublishDate())
-                .path(news.getLink().toString())
-                .build();
+        var input =
+                NewsInput.builder()
+                        .id(news.getId())
+                        .title(news.getTitle())
+                        .author(news.getAuthor())
+                        .body(news.getBody())
+                        .createdDate(news.getCreatedDate())
+                        .publishDate(news.getPublishDate())
+                        .path(news.getLink().toString())
+                        .draft(news.isDraft())
+                        .uuid(news.getUuid())
+                        .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
-        Response<SaveNewsMutation.Data> result = graphService.executeMutation(saveRequest, principal);
+        Response<SaveNewsMutation.Data> result =
+                graphService.executeMutation(saveRequest, principal);
         if (result.hasErrors()) {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
                     "Error saving News item",
-                    result.getErrors().stream().map(e -> e.getMessage()).collect(Collectors.toList()));
+                    result.getErrors().stream()
+                            .map(e -> e.getMessage())
+                            .collect(Collectors.toList()));
         }
         return News.builder()
                 .id(result.getData().saveNews().id())
                 .title(result.getData().saveNews().title())
                 .body(result.getData().saveNews().body())
                 .publishDate(result.getData().saveNews().publishDate())
-                .createdDate(result.getData().saveNews(). createdDate())
+                .createdDate(result.getData().saveNews().createdDate())
                 .author(result.getData().saveNews().author())
+                .draft(result.getData().saveNews().draft())
+                .uuid(result.getData().saveNews().uuid())
                 .build();
     }
 
     public News get(Principal principal, int id) throws IOException {
         var query = new GetNewsItemQuery(id);
-        Response<GetNewsItemQuery.Data> news = graphService.executeQuery(query, principal);
+        Response<GetNewsItemQuery.Data> news;
+        if (isNull(principal)) {
+            news = graphService.executeQuery(query);
+        } else {
+            news = graphService.executeQuery(query, principal);
+        }
+        if (isNull(news.getData().newsItem())) throw new ResourceNotFoundException();
         return News.builder()
                 .id(news.getData().newsItem().id())
                 .author(news.getData().newsItem().author())
@@ -110,25 +139,19 @@ public class NewsService {
                 .createdDate(news.getData().newsItem().createdDate())
                 .publishDate(news.getData().newsItem().publishDate())
                 .body(news.getData().newsItem().body())
+                .draft(news.getData().newsItem().draft())
+                .uuid(news.getData().newsItem().uuid())
                 .build();
     }
 
     public News get(int id) throws IOException {
-        var query = new GetNewsItemQuery(id);
-        Response<GetNewsItemQuery.Data> news = graphService.executeQuery(query);
-        return News.builder()
-                .id(news.getData().newsItem().id())
-                .author(news.getData().newsItem().author())
-                .title(news.getData().newsItem().title())
-                .createdDate(news.getData().newsItem().createdDate())
-                .publishDate(news.getData().newsItem().publishDate())
-                .body(news.getData().newsItem().body())
-                .build();
+        return get(null, id);
     }
 
     public News get(String path) throws IOException {
         var query = new GetNewsItemByPathQuery(path);
         Response<GetNewsItemByPathQuery.Data> news = graphService.executeQuery(query);
+        if (isNull(news.getData().newsItemByPath())) throw new ResourceNotFoundException();
         return News.builder()
                 .id(news.getData().newsItemByPath().id())
                 .author(news.getData().newsItemByPath().author())
@@ -136,6 +159,8 @@ public class NewsService {
                 .createdDate(news.getData().newsItemByPath().createdDate())
                 .publishDate(news.getData().newsItemByPath().publishDate())
                 .body(news.getData().newsItemByPath().body())
+                .draft(news.getData().newsItemByPath().draft())
+                .uuid(news.getData().newsItemByPath().uuid())
                 .build();
     }
 

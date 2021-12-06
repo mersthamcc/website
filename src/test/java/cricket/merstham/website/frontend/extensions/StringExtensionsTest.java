@@ -16,7 +16,8 @@ class StringExtensionsTest {
         assertThat(toSlug("Hello-World"), equalTo("hello-world"));
         assertThat(toSlug("Hello,- World!"), equalTo("hello-world"));
         assertThat(toSlug("Hello 2 Worlds"), equalTo("hello-2-worlds"));
-        assertThat(toSlug("This is  a   really long title with all  sorts of 32&^345''' // in it!"),
+        assertThat(
+                toSlug("This is  a   really long title with all  sorts of 32&^345''' // in it!"),
                 equalTo("this-is-a-really-long-title-with-all-sorts-of-32-345-in-it"));
     }
 
