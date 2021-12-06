@@ -125,7 +125,7 @@
         <#assign requiredAttribute></#assign>
     </#if>
     <div class="row form-group">
-        <label class="col-md-2 control-label">
+        <label class="col-md-2 control-label text-right align-middle">
             <@spring.message code="${localeCategory}.${name}" />
         </label>
         <div class="col-md-10">
@@ -142,7 +142,7 @@
 
 <#macro adminSwitchField name localeCategory checked=false>
     <div class="row form-group">
-        <label class="col-md-2 control-label" for="${name}">
+        <label class="col-md-2 control-label text-right align-middle" for="${name}">
             <@spring.messageText code="${localeCategory}.${name}" text=name />
         </label>
         <div class="col-md-10">
@@ -170,7 +170,7 @@
         <#assign requiredAttribute></#assign>
     </#if>
     <div class="row form-group">
-        <label class="col-md-2 control-label">
+        <label class="col-md-2 control-label text-right">
             <@spring.message code="${localeCategory}.${name}" />
         </label>
         <div class="col-md-10">

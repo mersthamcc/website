@@ -19,9 +19,7 @@
                         connectorPath: '/administration/components/ckfinder/connector',
                         section: 'news',
                         uuid: '${news.uuid}',
-                        pass: 'section,uuid',
-                        resourceType: 'images'
-
+                        pass: 'section,uuid'
                     }
                 },
                 mention: {
@@ -61,12 +59,12 @@
         <div class="col-lg-12">
             <@admin.section title="menu.admin-news-new" action="/administration/news/save" buttons=formButtons>
                 <input type="hidden" name="id" value="${news.id?long?c}" />
-                <input type="hidden" name="uuid" value="${news.uuid}" />
+                <input type="hidden" name="uuid" value="${news.uuid!""}" />
                 <@admin.formErrors errors=errors![] errorKey="news.error-saving"/>
                 <@admin.adminFormField name="title" data=news.title!"" required=true type="text" localeCategory="news" />
                 <@admin.adminFormField name="author" data=news.author!"" required=true type="text" localeCategory="news" />
                 <@admin.adminCkEditorField name="body" data=news.body!"" required=true type="text" localeCategory="news" rows=40/>
-                <@admin.adminSwitchField name="draft" checked=news.draft localeCategory="news" />
+                <@admin.adminSwitchField name="draft" checked=news.draft!false localeCategory="news" />
             </@admin.section>
         </div>
     </div>

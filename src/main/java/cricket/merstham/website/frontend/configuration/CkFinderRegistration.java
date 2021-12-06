@@ -3,17 +3,14 @@ package cricket.merstham.website.frontend.configuration;
 import com.cksource.ckfinder.servlet.CKFinderServlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.MultipartConfigElement;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
 @Configuration
-@ComponentScan(basePackages = {"cricket.merstham.website.frontend"})
 public class CkFinderRegistration {
 
     private static final int MAX_FILE_SIZE = 5 * 1024 * 1024;

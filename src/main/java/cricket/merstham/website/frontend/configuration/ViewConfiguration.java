@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +24,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Collection;
@@ -38,7 +36,6 @@ import java.util.stream.Collectors;
 import static java.text.MessageFormat.format;
 
 @Configuration
-@ComponentScan("cricket.merstham.website.frontend")
 public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ViewConfiguration.class);
@@ -51,7 +48,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
     public ViewConfiguration(
             MenuBuilder menuBuilderProvider,
             ClubConfiguration clubConfiguration,
-            @Value("${resources.base-url:}") String resourcePrefix) {
+            @Value("${resources.base-url}") String resourcePrefix) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;
@@ -120,7 +117,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         } catch (Exception ex) {
             LOG.warn("No parameters to cast", ex);
         }
-        LOG.info(
+        LOG.debug(
                 "Matched route = {}, parameters = {}",
                 route.getName(),
                 String.join(
