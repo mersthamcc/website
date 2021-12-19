@@ -4,10 +4,14 @@ import com.cksource.ckfinder.config.Config;
 import com.cksource.ckfinder.event.GetConfigForRequestEvent;
 import com.cksource.ckfinder.listener.Listener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import static java.lang.String.format;
@@ -15,11 +19,15 @@ import static java.lang.String.format;
 @Named
 public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent> {
 
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
+    private final String baseDirectory;
 
     @Autowired
-    public ModifyConfigForRequest(HttpServletRequest request) {
+    public ModifyConfigForRequest(
+            HttpServletRequest request,
+            @Value("${resources.base-directory}") String baseDirectory) {
         this.request = request;
+        this.baseDirectory = baseDirectory;
     }
 
     @Override
@@ -27,7 +35,15 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
 
         var uuid = request.getParameter("uuid");
         var section = request.getParameter("section");
+        var baseDir = Paths.get(format("%s/resources/%s/%s", baseDirectory, section, uuid));
 
+        if (Files.notExists(baseDir)) {
+            try {
+                Files.createDirectory(baseDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         Config config = event.getConfig();
         ArrayList<Config.ResourceType> resourceTypes = new ArrayList<>();
         int i = 0;

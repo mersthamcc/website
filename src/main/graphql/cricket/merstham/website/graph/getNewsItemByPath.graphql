@@ -9,6 +9,7 @@ query getNewsItemByPath($path: String!) {
         createdDate
         publishDate
         body
+        socialSummary
         attributes {
             name
             value

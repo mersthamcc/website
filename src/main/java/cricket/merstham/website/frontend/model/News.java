@@ -16,10 +16,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
 
+import javax.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +61,16 @@ public class News extends SspBaseResponseData implements Serializable {
     @JsonProperty private LocalDateTime publishDate;
 
     @JsonProperty private boolean draft;
+
+    @JsonProperty private boolean publishToFacebook;
+
+    @JsonProperty private boolean publishToTwitter;
+
+    @JsonProperty
+    @Size(max = 140, message = "{news.social-summary.too-long}")
+    private String socialSummary;
+
+    @JsonProperty private Map<String, String> attributes = new HashMap<>();
 
     public URI getEditLink() {
         return buildRoute(ADMIN_NEWS_EDIT_ROUTE, Map.of("id", id));

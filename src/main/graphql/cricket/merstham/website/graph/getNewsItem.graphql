@@ -8,6 +8,7 @@ query getNewsItem($id: Int!) {
         author
         createdDate
         publishDate
+        socialSummary
         body
         attributes {
             name

@@ -12,7 +12,9 @@ import cricket.merstham.website.graph.DeleteNewsMutation;
 import cricket.merstham.website.graph.GetNewsItemByPathQuery;
 import cricket.merstham.website.graph.GetNewsItemQuery;
 import cricket.merstham.website.graph.NewsFeedQuery;
+import cricket.merstham.website.graph.SaveNewsAttributesMutation;
 import cricket.merstham.website.graph.SaveNewsMutation;
+import cricket.merstham.website.graph.type.NewsAttributeInput;
 import cricket.merstham.website.graph.type.NewsInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,7 @@ public class NewsService {
                                                         .publishDate(n.publishDate())
                                                         .draft(n.draft())
                                                         .uuid(n.uuid())
+                                                        .socialSummary(n.socialSummary())
                                                         .build())
                                 .collect(Collectors.toList()))
                 .recordsFiltered(data.newsTotals().totalMatching())
@@ -96,11 +99,13 @@ public class NewsService {
                         .title(news.getTitle())
                         .author(news.getAuthor())
                         .body(news.getBody())
+                        .socialSummary(news.getSocialSummary())
                         .createdDate(news.getCreatedDate())
                         .publishDate(news.getPublishDate())
                         .path(news.getLink().toString())
                         .draft(news.isDraft())
                         .uuid(news.getUuid())
+                        .attributes(List.of())
                         .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result =
@@ -113,18 +118,48 @@ public class NewsService {
                             .map(e -> e.getMessage())
                             .collect(Collectors.toList()));
         }
-        var saved = News.builder()
-                .id(result.getData().saveNews().id())
-                .title(result.getData().saveNews().title())
-                .body(result.getData().saveNews().body())
-                .publishDate(result.getData().saveNews().publishDate())
-                .createdDate(result.getData().saveNews().createdDate())
-                .author(result.getData().saveNews().author())
-                .draft(result.getData().saveNews().draft())
-                .uuid(result.getData().saveNews().uuid())
-                .build();
 
-        processors.forEach(p -> p.postProcessing(saved));
+        processors.forEach(p -> p.postProcessing(news));
+        var attributes =
+                news.getAttributes().entrySet().stream()
+                        .map(
+                                e ->
+                                        NewsAttributeInput.builder()
+                                                .name(e.getKey())
+                                                .value(e.getValue())
+                                                .build())
+                        .collect(Collectors.toList());
+        var saveAttributesRequest =
+                SaveNewsAttributesMutation.builder()
+                        .id(news.getId())
+                        .attributes(attributes)
+                        .build();
+        Response<SaveNewsAttributesMutation.Data> attributeResult =
+                graphService.executeMutation(saveAttributesRequest, principal);
+        if (attributeResult.hasErrors()) {
+            attributeResult.getErrors().forEach(e -> LOG.error(e.getMessage()));
+            throw new EntitySaveException(
+                    "Error saving News item",
+                    attributeResult.getErrors().stream()
+                            .map(e -> e.getMessage())
+                            .collect(Collectors.toList()));
+        }
+        var saved =
+                News.builder()
+                        .id(attributeResult.getData().saveNewsAttributes().id())
+                        .title(attributeResult.getData().saveNewsAttributes().title())
+                        .body(attributeResult.getData().saveNewsAttributes().body())
+                        .publishDate(attributeResult.getData().saveNewsAttributes().publishDate())
+                        .createdDate(attributeResult.getData().saveNewsAttributes().createdDate())
+                        .author(attributeResult.getData().saveNewsAttributes().author())
+                        .draft(attributeResult.getData().saveNewsAttributes().draft())
+                        .uuid(attributeResult.getData().saveNewsAttributes().uuid())
+                        .socialSummary(
+                                attributeResult.getData().saveNewsAttributes().socialSummary())
+                        .attributes(
+                                attributeResult.getData().saveNewsAttributes().attributes().stream()
+                                        .collect(Collectors.toMap(o -> o.name(), o -> o.value())))
+                        .build();
         return saved;
     }
 
@@ -146,6 +181,7 @@ public class NewsService {
                 .body(news.getData().newsItem().body())
                 .draft(news.getData().newsItem().draft())
                 .uuid(news.getData().newsItem().uuid())
+                .socialSummary(news.getData().newsItem().socialSummary())
                 .build();
     }
 
@@ -166,6 +202,7 @@ public class NewsService {
                 .body(news.getData().newsItemByPath().body())
                 .draft(news.getData().newsItemByPath().draft())
                 .uuid(news.getData().newsItemByPath().uuid())
+                .socialSummary(news.getData().newsItemByPath().socialSummary())
                 .build();
     }
 

@@ -18,8 +18,8 @@ public class SetDefaultsProcessor implements ItemProcessor<News> {
     @Override
     public void preSave(News item) {
         LOG.info("Setting defaults on news item '{}'", item.getTitle());
-        if(isNull(item.getCreatedDate())) item.setCreatedDate(LocalDateTime.now());
-        if(isNull(item.getPublishDate())) item.setPublishDate(item.getCreatedDate());
-        if(isNull(item.getUuid())) item.setUuid(UUID.randomUUID().toString());
+        if (isNull(item.getCreatedDate())) item.setCreatedDate(LocalDateTime.now());
+        if (isNull(item.getPublishDate())) item.setPublishDate(item.getCreatedDate());
+        if (isNull(item.getUuid())) item.setUuid(UUID.randomUUID().toString());
     }
 }

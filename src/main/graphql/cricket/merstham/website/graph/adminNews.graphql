@@ -8,6 +8,7 @@ query adminNews($start: Int!, $length: Int!, $search: String) {
         createdDate
         publishDate
         body
+        socialSummary
         path
     }
     newsTotals (searchString: $search){

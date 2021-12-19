@@ -3,7 +3,7 @@
 <#macro noButtons>
 </#macro>
 
-<#macro section title action buttons=noButtons>
+<#macro section title action buttons=false>
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
         <!-- Card -->
@@ -17,13 +17,41 @@
                 <#nested />
             </div>
             <!-- End Body -->
-
-            <div class="card-footer d-flex justify-content-end">
-                <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
-            </div>
+            <#if buttons>
+                <div class="card-footer d-flex justify-content-end">
+                    <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
+                </div>
+            </#if>
         </div>
         <!-- End Card -->
     </form>
+</#macro>
+
+<#macro form action>
+    <form class="form-horizontal" method="post" name="action" action="${action}">
+        <input type="hidden" name="_csrf" value="${_csrf.token}" />
+        <#nested />
+    </form>
+</#macro>
+
+<#macro card title buttons=noButtons>
+    <!-- Card -->
+    <div class="card mb-3 mb-lg-5">
+        <div class="card-header">
+            <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+            <#nested />
+        </div>
+        <!-- End Body -->
+
+        <div class="card-footer d-flex justify-content-end">
+            <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
+        </div>
+    </div>
+    <!-- End Card -->
 </#macro>
 
 <#macro memberAdminField attribute data localeCategory="membership">

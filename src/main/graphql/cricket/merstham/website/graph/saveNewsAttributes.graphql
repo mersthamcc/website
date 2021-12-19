@@ -1,14 +1,14 @@
-mutation deleteNews($id: Int!) {
-    deleteNews(id: $id) {
+mutation saveNewsAttributes ($id: Int!, $attributes: [NewsAttributeInput]!) {
+    saveNewsAttributes(id: $id, attributes: $attributes) {
         id
         uuid
         draft
         title
-        path
+        body
         author
+        path
         createdDate
         publishDate
-        body
         socialSummary
         attributes {
             name
