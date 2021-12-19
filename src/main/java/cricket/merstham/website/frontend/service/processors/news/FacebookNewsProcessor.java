@@ -1,80 +1,67 @@
 package cricket.merstham.website.frontend.service.processors.news;
 
-import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
-import com.facebook.ads.sdk.APINodeList;
-import com.facebook.ads.sdk.Page;
-import com.facebook.ads.sdk.User;
+import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.model.News;
+import cricket.merstham.website.frontend.service.FacebookPageService;
 import cricket.merstham.website.frontend.service.processors.ItemProcessor;
-import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
+
 @Service("NewsFacebook")
 public class FacebookNewsProcessor implements ItemProcessor<News> {
     public static final String FACEBOOK_ID = "facebook_id";
     private static Logger LOG = LoggerFactory.getLogger(FacebookNewsProcessor.class);
 
-    private final APIContext apiContext;
-    private final String facebookPageId;
     private final String baseUrl;
+    private final FacebookPageService facebookPageService;
 
     @Autowired
-    public FacebookNewsProcessor(
-            @Value("${facebook.application-secret}") String facebookAppSecret,
-            @Value("${facebook.page-id}") String facebookPageId,
-            @Value("${facebook.access-token}") String accessToken,
-            @Value("${facebook.base-url}") String baseUrl) {
+    public FacebookNewsProcessor(@Value("${base-url}") String baseUrl, FacebookPageService facebookPageService) {
         this.baseUrl = baseUrl;
-        this.apiContext = new APIContext(accessToken, facebookAppSecret);
-        this.facebookPageId = facebookPageId;
+        this.facebookPageService = facebookPageService;
     }
 
     @Override
-    public void postProcessing(News item) {
-        if (!item.isDraft()) {
-            LOG.info("Running Facebook processor on news item '{}'", item.getTitle());
-            if (item.isPublishToFacebook() && !item.getAttributes().containsKey(FACEBOOK_ID)) {
-                try {
-                    var context = getPageTokenContext();
-                    var page = new Page(facebookPageId, context).get().execute();
+    public void postOpen(News item) {
+        item.setPublishToFacebook(hasFacebookPost(item));
+    }
 
-                    var post =
-                            page.createFeed()
-                                    .setMessage(
-                                            Strings.isBlank(item.getSocialSummary())
-                                                    ? item.getTitle()
-                                                    : item.getSocialSummary())
-                                    .setLink(baseUrl + item.getLink().toString())
-                                    .execute();
-
-                    LOG.info("Created facebook post {}", post.getId());
-                    item.getAttributes().put(FACEBOOK_ID, post.getId());
-                } catch (APIException e) {
-                    e.printStackTrace();
+    @Override
+    public void postSave(News item) {
+        try {
+            if (!item.isDraft()) {
+                LOG.info("Running Facebook processor on news item '{}'", item.getTitle());
+                if (item.isPublishToFacebook() && !hasFacebookPost(item)) {
+                    var id = facebookPageService.createFacebookPost(
+                            isBlank(item.getSocialSummary()) ? item.getTitle() : item.getSocialSummary(),
+                            baseUrl + item.getLink().toString()
+                    );
+                    item.getAttributes().put(FACEBOOK_ID, id);
+                } else if (!item.isPublishToFacebook()
+                        && hasFacebookPost(item)) {
+                    facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
+                    item.getAttributes().put(FACEBOOK_ID, "");
                 }
-            } else if (!item.isPublishToFacebook()
-                    && item.getAttributes().containsKey(FACEBOOK_ID)) {
-                // Delete FB post
+            } else if (hasFacebookPost(item)) {
+                facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
+                item.getAttributes().put(FACEBOOK_ID, "");
             }
-        } else if (item.getAttributes().containsKey(FACEBOOK_ID)) {
-            // Delete FB post
+        } catch (APIException ex) {
+            throw new EntitySaveException("Error processing Facebook post",
+                    List.of(ex.getMessage()));
         }
     }
 
-    private APIContext getPageTokenContext() throws APIException {
-        APINodeList<Page> pages =
-                new User("me", apiContext).getAccounts().requestAccessTokenField().execute();
-        var pageToken =
-                pages.stream()
-                        .filter(p -> p.getId().equals(facebookPageId))
-                        .findFirst()
-                        .map(p -> p.getFieldAccessToken())
-                        .orElseThrow();
-        return new APIContext(pageToken).enableDebug(false);
+    private boolean hasFacebookPost(News item) {
+        return item.getAttributes().containsKey(FACEBOOK_ID) && isNotBlank(item.getAttributes().get(FACEBOOK_ID));
     }
 }

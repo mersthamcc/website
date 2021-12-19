@@ -118,8 +118,11 @@ public class NewsService {
                             .map(e -> e.getMessage())
                             .collect(Collectors.toList()));
         }
+        news.setAttributes(
+                result.getData().saveNews().attributes().stream()
+                        .collect(Collectors.toMap(o -> o.name(), o -> o.value())));
 
-        processors.forEach(p -> p.postProcessing(news));
+        processors.forEach(p -> p.postSave(news));
         var attributes =
                 news.getAttributes().entrySet().stream()
                         .map(
@@ -172,7 +175,7 @@ public class NewsService {
             news = graphService.executeQuery(query, principal);
         }
         if (isNull(news.getData().newsItem())) throw new ResourceNotFoundException();
-        return News.builder()
+        var result = News.builder()
                 .id(news.getData().newsItem().id())
                 .author(news.getData().newsItem().author())
                 .title(news.getData().newsItem().title())
@@ -182,7 +185,14 @@ public class NewsService {
                 .draft(news.getData().newsItem().draft())
                 .uuid(news.getData().newsItem().uuid())
                 .socialSummary(news.getData().newsItem().socialSummary())
+                .attributes(news.getData().newsItem().attributes()
+                        .stream().collect(Collectors.toMap(
+                                a -> a.name(),
+                                a -> a.value()
+                        )))
                 .build();
+        processors.forEach(p -> p.postOpen(result));
+        return result;
     }
 
     public News get(int id) throws IOException {
@@ -193,7 +203,7 @@ public class NewsService {
         var query = new GetNewsItemByPathQuery(path);
         Response<GetNewsItemByPathQuery.Data> news = graphService.executeQuery(query);
         if (isNull(news.getData().newsItemByPath())) throw new ResourceNotFoundException();
-        return News.builder()
+        var result = News.builder()
                 .id(news.getData().newsItemByPath().id())
                 .author(news.getData().newsItemByPath().author())
                 .title(news.getData().newsItemByPath().title())
@@ -203,7 +213,14 @@ public class NewsService {
                 .draft(news.getData().newsItemByPath().draft())
                 .uuid(news.getData().newsItemByPath().uuid())
                 .socialSummary(news.getData().newsItemByPath().socialSummary())
+                .attributes(news.getData().newsItemByPath().attributes()
+                        .stream().collect(Collectors.toMap(
+                                a -> a.name(),
+                                a -> a.value()
+                        )))
                 .build();
+        processors.forEach(p -> p.postOpen(result));
+        return result;
     }
 
     public boolean delete(Principal principal, int id) throws IOException {

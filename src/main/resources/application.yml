@@ -1,3 +1,4 @@
+base-url: https://www.new.mersthamcc.co.uk
 spring:
   freemarker:
     template-loader-path: "classpath:/templates"
@@ -86,4 +87,3 @@ facebook:
   application-secret: ${FACEBOOK_APP_SECRET}
   page-id: ${FACEBOOK_PAGE_ID}
   access-token: ${FACEBOOK_PAGE_ACCESS_TOKEN}
-  base-url: https://www.new.mersthamcc.co.uk
