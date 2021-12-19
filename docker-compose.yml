@@ -166,7 +166,7 @@ services:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: pg_isready
+      test: pg_isready -U ${DATABASE_ROOT_USER}
       interval: 5s
       retries: 30
     depends_on:
@@ -662,7 +662,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   resources:
-    image: nginx:alpine
+    image: nginx:latest
     labels:
       - traefik.enable=true
       - traefik.http.routers.resources.rule=Host(`resources.${DEVDOMAIN}`)
@@ -684,10 +684,10 @@ services:
     networks:
       - backendnetwork
     restart: unless-stopped
-#    healthcheck:
-#      test: curl http://localhost/health
-#      interval: 5s
-#      retries: 30
+    healthcheck:
+      test: service nginx status
+      interval: 5s
+      retries: 30
     depends_on:
       - loki
     logging:
