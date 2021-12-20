@@ -87,3 +87,9 @@ facebook:
   application-secret: ${FACEBOOK_APP_SECRET}
   page-id: ${FACEBOOK_PAGE_ID}
   access-token: ${FACEBOOK_PAGE_ACCESS_TOKEN}
+
+twitter:
+  api-key: ${TWITTER_API_KEY}
+  api-secret: ${TWITTER_API_SECRET}
+  oauth-access-token: ${TWITTER_OAUTH_ACCESS_TOKEN}
+  oauth-access-token-secret: ${TWITTER_OAUTH_ACCESS_TOKEN_SECRET}
