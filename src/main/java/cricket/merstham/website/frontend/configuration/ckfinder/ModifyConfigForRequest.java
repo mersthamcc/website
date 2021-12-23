@@ -47,16 +47,6 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
         Config config = event.getConfig();
         ArrayList<Config.ResourceType> resourceTypes = new ArrayList<>();
         int i = 0;
-        //        resourceTypes.add(resourceType(
-        //                i,
-        //                "Files",
-        //                "This items files",
-        //                "default",
-        //                format("/resources/%s/%s/files", section, uuid),
-        //                "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
-        //                null,
-        //                0));
-        //        i = i + 1;
         resourceTypes.add(
                 resourceType(
                         i,
@@ -79,6 +69,26 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
                         null,
                         0));
 
+        i = i + 1;
+        resourceTypes.add(resourceType(
+                i,
+                "Files",
+                "This items files",
+                "default",
+                format("/resources/%s/%s/files", section, uuid),
+                "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
+                null,
+                0));
+        i = i + 1;
+        resourceTypes.add(resourceType(
+                i,
+                "WebGlobalFiles",
+                "Global files",
+                "default",
+                "/resources/statics/files",
+                "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
+                null,
+                0));
         config.setResourceTypes(resourceTypes);
     }
 

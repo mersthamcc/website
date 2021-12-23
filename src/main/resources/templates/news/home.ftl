@@ -40,8 +40,8 @@
         </div>
     </div>
 </#macro>
-<#macro itemBody n>
-    <div class="card col-md-7">
+<#macro itemBody n width=7>
+    <div class="card col-md-${width}">
         <div class="card-header-title">
             <h3><a class="text-inherit" href="/news${n.link}">${n.title}</a></h3>
         </div>
@@ -75,12 +75,16 @@
             <div class="col-lg-9">
                 <#list news as n>
                     <article class="row mb-7">
-                        <#if n?is_odd_item>
-                            <@itemImages n=n />
-                            <@itemBody n=n />
+                        <#if n.hasImages()>
+                            <#if n?is_odd_item>
+                                <@itemImages n=n />
+                                <@itemBody n=n />
+                            <#else>
+                                <@itemBody n=n />
+                                <@itemImages n=n />
+                            </#if>
                         <#else>
-                            <@itemBody n=n />
-                            <@itemImages n=n />
+                            <@itemBody n=n width=12 />
                         </#if>
                     </article>
                     <#if n?has_next>

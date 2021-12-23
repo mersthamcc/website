@@ -124,4 +124,8 @@ public class News extends SspBaseResponseData implements Serializable {
                 .map(i -> Image.builder().path(i.attr("src")).caption(i.attr("alt")).build())
                 .collect(Collectors.toList());
     }
+
+    public boolean hasImages() {
+        return getImages().size() > 0;
+    }
 }

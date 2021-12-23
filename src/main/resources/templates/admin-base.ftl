@@ -1038,6 +1038,7 @@
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-form-search/dist/hs-form-search.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-transform-tabs-to-btn/dist/hs-transform-tabs-to-btn.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-toggle-switch/dist/hs-toggle-switch.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/select2/dist/js/select2.full.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables.net.extensions/select/select.min.js"></script>
