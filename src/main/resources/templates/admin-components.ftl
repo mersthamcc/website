@@ -3,7 +3,7 @@
 <#macro noButtons>
 </#macro>
 
-<#macro section title action buttons=false>
+<#macro section title action buttons="">
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
         <!-- Card -->
@@ -17,9 +17,9 @@
                 <#nested />
             </div>
             <!-- End Body -->
-            <#if buttons>
+            <#if buttons?is_directive>
                 <div class="card-footer d-flex justify-content-end">
-                    <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
+                    <@buttons />
                 </div>
             </#if>
         </div>
@@ -34,7 +34,7 @@
     </form>
 </#macro>
 
-<#macro card title buttons=noButtons>
+<#macro card title buttons="">
     <!-- Card -->
     <div class="card mb-3 mb-lg-5">
         <div class="card-header">
@@ -46,10 +46,11 @@
             <#nested />
         </div>
         <!-- End Body -->
-
-        <div class="card-footer d-flex justify-content-end">
-            <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
-        </div>
+        <#if buttons?is_directive>
+            <div class="card-footer d-flex justify-content-end">
+                <@buttons />
+            </div>
+        </#if>
     </div>
     <!-- End Card -->
 </#macro>
@@ -165,6 +166,52 @@
                    ${requiredAttribute}
             />
         </div>
+    </div>
+</#macro>
+
+<#macro adminDateField name localeCategory data>
+    <!-- Form Group -->
+    <div class="row form-group">
+        <label for="${name}Label" class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+
+        <div class="col-md-10">
+            <div id="${name}Flatpickr"
+                 class="js-flatpickr flatpickr-custom input-group input-group-merge"
+                 data-hs-flatpickr-options='{
+                    "appendTo": "#${name}Flatpickr",
+                    "dateFormat": "d/m/Y",
+                    "wrap": true
+                  }'>
+                <div class="input-group-prepend" data-toggle>
+                    <div class="input-group-text">
+                        <i class="tio-date-range"></i>
+                    </div>
+                </div>
+
+                <input
+                        type="text"
+                        name="${name}"
+                        class="flatpickr-custom-form-control form-control"
+                        id="${name}Label"
+                        placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
+                        data-input
+                        value=${data.format("dd/MM/yyyy")} />
+            </div>
+        </div>
+    </div>
+    <!-- End Form Group -->
+</#macro>
+
+<#macro adminFormDisplayField name localeCategory data>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <label class="col-md-10 control-label align-middle">
+            ${data}
+        </label>
     </div>
 </#macro>
 

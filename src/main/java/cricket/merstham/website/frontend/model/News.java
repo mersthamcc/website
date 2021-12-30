@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import cricket.merstham.website.frontend.extensions.StringExtensions;
+import cricket.merstham.website.frontend.formatters.LocalDateTimeDateOnlyFormat;
+import cricket.merstham.website.frontend.formatters.LocalDateTimeFormat;
 import cricket.merstham.website.frontend.model.datatables.SspBaseResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +17,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
-
-import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -34,11 +34,12 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ROUTE_
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.isNull;
+import static lombok.AccessLevel.PRIVATE;
 
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PRIVATE)
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper = false)
@@ -56,9 +57,13 @@ public class News extends SspBaseResponseData implements Serializable {
 
     @JsonProperty private String uuid;
 
-    @JsonProperty private LocalDateTime createdDate;
+    @JsonProperty
+    @LocalDateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime createdDate;
 
-    @JsonProperty private LocalDateTime publishDate;
+    @JsonProperty
+    @LocalDateTimeDateOnlyFormat(pattern = "dd/MM/yyyy")
+    private LocalDateTime publishDate;
 
     @JsonProperty private boolean draft;
 
@@ -67,7 +72,6 @@ public class News extends SspBaseResponseData implements Serializable {
     @JsonProperty private boolean publishToTwitter;
 
     @JsonProperty
-    @Size(max = 140, message = "{news.social-summary.too-long}")
     private String socialSummary;
 
     @JsonProperty private Map<String, String> attributes = new HashMap<>();

@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class NewsController extends SspController<News> {
                         List.of(
                                 new DataTableColumn().setKey("news.title").setFieldName("title"),
                                 new DataTableColumn()
-                                        .setKey("news.publish-date")
+                                        .setKey("news.publishDate")
                                         .setFieldName("formattedPublishDate"))));
     }
 
@@ -70,9 +71,12 @@ public class NewsController extends SspController<News> {
     public ModelAndView newPost(HttpServletRequest request, Principal principal) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
+            var now = LocalDateTime.now();
             var news =
                     News.builder()
                             .author(UserHelper.getUserFullName(principal))
+                            .createdDate(now)
+                            .publishDate(now)
                             .draft(false)
                             .uuid(UUID.randomUUID().toString())
                             .build();
@@ -104,7 +108,7 @@ public class NewsController extends SspController<News> {
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public RedirectView newPost(
+    public RedirectView save(
             Principal principal, News news, RedirectAttributes redirectAttributes)
             throws IOException {
         try {

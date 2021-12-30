@@ -41,6 +41,7 @@
 			<!-- CSS Implementing Plugins -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css">
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/select2/dist/css/select2.min.css">
+			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/flatpickr/dist/flatpickr.min.css">
 			<!-- CSS Front Template -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/css/theme.min.css">
 			<link rel="stylesheet" href="${resourcePrefix}/mcc/css/custom.css">
@@ -1042,6 +1043,7 @@
 			<script src="${resourcePrefix}/front/admin/assets/vendor/select2/dist/js/select2.full.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables.net.extensions/select/select.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/flatpickr/dist/flatpickr.min.js"></script>
 			<!-- JS Front -->
 			<script src="${resourcePrefix}/front/admin/assets/js/theme.min.js"></script>
 			<script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
@@ -1073,7 +1075,9 @@
 					$('.js-toggle-switch').each(function () {
 						new HSToggleSwitch($(this)).init();
 					});
-
+					$('.js-flatpickr').each(function () {
+						$.HSCore.components.HSFlatpickr.init($(this));
+					});
 					if (typeof onPageLoad === "function") onPageLoad();
 				});
 			</script>

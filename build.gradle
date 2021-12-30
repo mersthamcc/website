@@ -60,6 +60,7 @@ dependencies {
     implementation "org.jsoup:jsoup:1.14.3"
     implementation "com.facebook.business.sdk:facebook-java-business-sdk:12.0.1"
     implementation "org.twitter4j:twitter4j-core:4.0.7"
+    implementation "no.api.freemarker:freemarker-java8:2.0.0"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"

@@ -12,7 +12,7 @@ import static java.text.MessageFormat.format;
 
 public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDateTime> {
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     @Override
     public LocalDateTime decode(@NotNull CustomTypeValue<?> value) {
@@ -28,6 +28,6 @@ public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDa
     @Override
     public CustomTypeValue<?> encode(LocalDateTime value) {
         return new CustomTypeValue.GraphQLString(
-                value.atZone(ZoneId.systemDefault()).format(formatter));
+                value.atZone(ZoneId.of("UTC")).format(formatter));
     }
 }
