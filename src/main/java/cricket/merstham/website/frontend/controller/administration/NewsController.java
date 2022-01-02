@@ -44,6 +44,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Controller("AdminNewsController")
 public class NewsController extends SspController<News> {
     private static final Logger LOG = LoggerFactory.getLogger(NewsController.class);
+    public static final String ADMINISTRATION_NEWS_EDIT = "administration/news/edit";
+    public static final String ADMINISTRATION_NEWS_LIST = "administration/news/list";
+    public static final String HAS_ROLE_ROLE_NEWS = "hasRole('ROLE_NEWS')";
+    public static final String NEWS = "news";
+    public static final String ERRORS = "errors";
 
     private final NewsService newsService;
 
@@ -53,10 +58,10 @@ public class NewsController extends SspController<News> {
     }
 
     @GetMapping(value = ADMIN_NEWS_BASE, name = "admin-news-list")
-    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public ModelAndView list(Principal principal) {
         return new ModelAndView(
-                "administration/news/list",
+                ADMINISTRATION_NEWS_LIST,
                 Map.of(
                         "newsColumns",
                         List.of(
@@ -67,7 +72,7 @@ public class NewsController extends SspController<News> {
     }
 
     @GetMapping(value = ADMIN_NEWS_NEW_ROUTE, name = "admin-news-new")
-    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public ModelAndView newPost(HttpServletRequest request, Principal principal) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
@@ -80,26 +85,26 @@ public class NewsController extends SspController<News> {
                             .draft(false)
                             .uuid(UUID.randomUUID().toString())
                             .build();
-            return new ModelAndView("administration/news/edit", Map.of("news", news));
+            return new ModelAndView(ADMINISTRATION_NEWS_EDIT, Map.of(NEWS, news));
         } else {
             return new ModelAndView(
-                    "administration/news/edit",
+                    ADMINISTRATION_NEWS_EDIT,
                     Map.of(
-                            "news", flash.get("news"),
-                            "errors", flash.get("errors")));
+                            NEWS, flash.get(NEWS),
+                            ERRORS, flash.get(ERRORS)));
         }
     }
 
     @GetMapping(value = ADMIN_NEWS_EDIT_ROUTE, name = "admin-news-edit")
-    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public ModelAndView editPost(Principal principal, @PathVariable("id") int id)
             throws IOException {
         News news = newsService.get(principal, id);
-        return new ModelAndView("administration/news/edit", Map.of("news", news));
+        return new ModelAndView(ADMINISTRATION_NEWS_EDIT, Map.of(NEWS, news));
     }
 
     @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
-    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public RedirectView deletePost(Principal principal, @PathVariable("id") int id)
             throws IOException {
         newsService.delete(principal, id);
@@ -107,15 +112,15 @@ public class NewsController extends SspController<News> {
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
-    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public RedirectView save(Principal principal, News news, RedirectAttributes redirectAttributes)
             throws IOException {
         try {
             newsService.saveNewsItem(principal, news);
             return new RedirectView(ADMIN_NEWS_BASE);
         } catch (EntitySaveException ex) {
-            redirectAttributes.addFlashAttribute("errors", ex.getErrors());
-            redirectAttributes.addFlashAttribute("news", news);
+            redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
+            redirectAttributes.addFlashAttribute(NEWS, news);
             return new RedirectView(ADMIN_NEWS_NEW_ROUTE);
         }
     }

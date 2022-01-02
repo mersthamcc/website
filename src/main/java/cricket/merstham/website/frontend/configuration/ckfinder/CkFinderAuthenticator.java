@@ -12,12 +12,12 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 @Named
-public class Authenticator implements com.cksource.ckfinder.authentication.Authenticator {
+public class CkFinderAuthenticator implements com.cksource.ckfinder.authentication.Authenticator {
 
     private HttpServletRequest request;
 
     @Autowired
-    public Authenticator(HttpServletRequest request) {
+    public CkFinderAuthenticator(HttpServletRequest request) {
         this.request = request;
     }
 

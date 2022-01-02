@@ -19,6 +19,8 @@
                     options: {
                         connectorPath: '/administration/components/ckfinder/connector',
                         section: 'news',
+                        startupPath: '0-Images:/',
+                        rememberLastFolder: false,
                         uuid: '${news.uuid}',
                         pass: 'section,uuid'
                     }

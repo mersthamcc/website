@@ -94,7 +94,7 @@ public class News extends SspBaseResponseData implements Serializable {
 
     @JsonProperty("formattedPublishDate")
     public String getFormattedPublishDate() {
-        return publishDate.format(ofPattern("dd/MM/YYYY"));
+        return publishDate.format(ofPattern("dd/MM/yyyy"));
     }
 
     public String getDisplayPublishDate() {
