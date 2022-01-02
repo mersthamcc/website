@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
@@ -33,6 +36,21 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
     @Override
     public void postOpen(News item) {
         item.setPublishToFacebook(hasFacebookPost(item));
+    }
+
+    @Override
+    public List<String> preSave(News item) {
+        if (item.isPublishToFacebook() && !item.isDraft()) {
+            var scheduledPublishTime = item.getPublishDate()
+                    .atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("UTC"))
+                    .toInstant();
+            if (scheduledPublishTime.isAfter(Instant.now())
+                    && scheduledPublishTime.isBefore(Instant.now().plus(15, ChronoUnit.MINUTES))) {
+                return List.of("When scheduling an item published to Facebook, publish time must be, at least, 15 minutes in the future");
+            }
+        }
+        return List.of();
     }
 
     @Override

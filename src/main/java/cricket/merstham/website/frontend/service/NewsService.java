@@ -92,7 +92,14 @@ public class NewsService {
     }
 
     public News saveNewsItem(Principal principal, News news) throws IOException {
-        processors.forEach(p -> p.preSave(news));
+        var validationErrors = processors
+                .stream()
+                .map(p -> p.preSave(news))
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        if (!validationErrors.isEmpty()) {
+            throw new EntitySaveException("Error saving News item", validationErrors);
+        }
         var input =
                 NewsInput.builder()
                         .id(news.getId())

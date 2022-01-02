@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import twitter4j.TwitterException;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
@@ -33,6 +35,20 @@ public class TwitterNewsProcessor implements ItemProcessor<News> {
     @Override
     public void postOpen(News item) {
         item.setPublishToTwitter(hasTweet(item));
+    }
+
+    @Override
+    public List<String> preSave(News item) {
+        if (item.isPublishToTwitter() && !item.isDraft()) {
+            var scheduledPublishTime = item.getPublishDate()
+                    .atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("UTC"))
+                    .toInstant();
+            if (scheduledPublishTime.isAfter(Instant.now())) {
+                return List.of("Twitter does not allow scheduling of posts");
+            }
+        }
+        return List.of();
     }
 
     @Override
