@@ -35,17 +35,16 @@ public class FacebookPageService {
         this.debug = debug;
     }
 
-    public String createFacebookPost(String message, String link, LocalDateTime publishTime) throws APIException {
+    public String createFacebookPost(String message, String link, LocalDateTime publishTime)
+            throws APIException {
         var page = new Page(facebookPageId, getPageTokenContext()).get().execute();
 
-        var scheduledPublishTime = publishTime
-                .atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.of("UTC"))
-                .toInstant();
-        var postRequest =
-                page.createFeed()
-                        .setMessage(message)
-                        .setLink(link);
+        var scheduledPublishTime =
+                publishTime
+                        .atZone(ZoneId.systemDefault())
+                        .withZoneSameInstant(ZoneId.of("UTC"))
+                        .toInstant();
+        var postRequest = page.createFeed().setMessage(message).setLink(link);
 
         if (scheduledPublishTime.isAfter(Instant.now())) {
             postRequest
@@ -57,15 +56,16 @@ public class FacebookPageService {
         return post.getId();
     }
 
-    public void updateFacebookPost(String id, String message, LocalDateTime publishTime) throws APIException {
+    public void updateFacebookPost(String id, String message, LocalDateTime publishTime)
+            throws APIException {
         var post = new Post(id, getPageTokenContext()).get().execute();
 
-        var scheduledPublishTime = publishTime
-                .atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.of("UTC"))
-                .toInstant();
-        var postUpdateRequest = post.update()
-                .setMessage(message);
+        var scheduledPublishTime =
+                publishTime
+                        .atZone(ZoneId.systemDefault())
+                        .withZoneSameInstant(ZoneId.of("UTC"))
+                        .toInstant();
+        var postUpdateRequest = post.update().setMessage(message);
 
         if (scheduledPublishTime.isAfter(Instant.now())) {
             postUpdateRequest

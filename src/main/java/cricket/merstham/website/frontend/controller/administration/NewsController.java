@@ -108,8 +108,7 @@ public class NewsController extends SspController<News> {
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public RedirectView save(
-            Principal principal, News news, RedirectAttributes redirectAttributes)
+    public RedirectView save(Principal principal, News news, RedirectAttributes redirectAttributes)
             throws IOException {
         try {
             newsService.saveNewsItem(principal, news);

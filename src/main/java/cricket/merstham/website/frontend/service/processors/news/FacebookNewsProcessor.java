@@ -28,7 +28,8 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
     private final FacebookPageService facebookPageService;
 
     @Autowired
-    public FacebookNewsProcessor(@Value("${base-url}") String baseUrl, FacebookPageService facebookPageService) {
+    public FacebookNewsProcessor(
+            @Value("${base-url}") String baseUrl, FacebookPageService facebookPageService) {
         this.baseUrl = baseUrl;
         this.facebookPageService = facebookPageService;
     }
@@ -41,13 +42,15 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
     @Override
     public List<String> preSave(News item) {
         if (item.isPublishToFacebook() && !item.isDraft()) {
-            var scheduledPublishTime = item.getPublishDate()
-                    .atZone(ZoneId.systemDefault())
-                    .withZoneSameInstant(ZoneId.of("UTC"))
-                    .toInstant();
+            var scheduledPublishTime =
+                    item.getPublishDate()
+                            .atZone(ZoneId.systemDefault())
+                            .withZoneSameInstant(ZoneId.of("UTC"))
+                            .toInstant();
             if (scheduledPublishTime.isAfter(Instant.now())
                     && scheduledPublishTime.isBefore(Instant.now().plus(15, ChronoUnit.MINUTES))) {
-                return List.of("When scheduling an item published to Facebook, publish time must be, at least, 15 minutes in the future");
+                return List.of(
+                        "When scheduling an item published to Facebook, publish time must be, at least, 15 minutes in the future");
             }
         }
         return List.of();
@@ -59,19 +62,23 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
             if (!item.isDraft()) {
                 LOG.info("Running Facebook processor on news item '{}'", item.getTitle());
                 if (item.isPublishToFacebook() && !hasFacebookPost(item)) {
-                    var id = facebookPageService.createFacebookPost(
-                            isBlank(item.getSocialSummary()) ? item.getTitle() : item.getSocialSummary(),
-                            baseUrl + item.getLink().toString(),
-                            item.getPublishDate());
+                    var id =
+                            facebookPageService.createFacebookPost(
+                                    isBlank(item.getSocialSummary())
+                                            ? item.getTitle()
+                                            : item.getSocialSummary(),
+                                    baseUrl + item.getLink().toString(),
+                                    item.getPublishDate());
                     item.getAttributes().put(FACEBOOK_ID, id);
-                } else if (!item.isPublishToFacebook()
-                        && hasFacebookPost(item)) {
+                } else if (!item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
                     item.getAttributes().put(FACEBOOK_ID, "");
                 } else if (item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.updateFacebookPost(
                             item.getAttributes().get(FACEBOOK_ID),
-                            isBlank(item.getSocialSummary()) ? item.getTitle() : item.getSocialSummary(),
+                            isBlank(item.getSocialSummary())
+                                    ? item.getTitle()
+                                    : item.getSocialSummary(),
                             item.getPublishDate());
                 }
             } else if (hasFacebookPost(item)) {
@@ -79,12 +86,13 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                 item.getAttributes().put(FACEBOOK_ID, "");
             }
         } catch (APIException ex) {
-            throw new EntitySaveException("Error processing Facebook post",
-                    List.of(ex.getMessage()));
+            throw new EntitySaveException(
+                    "Error processing Facebook post", List.of(ex.getMessage()));
         }
     }
 
     private boolean hasFacebookPost(News item) {
-        return item.getAttributes().containsKey(FACEBOOK_ID) && isNotBlank(item.getAttributes().get(FACEBOOK_ID));
+        return item.getAttributes().containsKey(FACEBOOK_ID)
+                && isNotBlank(item.getAttributes().get(FACEBOOK_ID));
     }
 }

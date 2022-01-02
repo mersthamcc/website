@@ -26,6 +26,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Collection;
@@ -215,7 +216,10 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             throws BeansException {
         if (bean instanceof FreeMarkerConfigurer) {
             FreeMarkerConfigurer configurer = (FreeMarkerConfigurer) bean;
-            configurer.getConfiguration().setObjectWrapper(new Java8ObjectWrapper(freemarker.template.Configuration.getVersion()));
+            configurer
+                    .getConfiguration()
+                    .setObjectWrapper(
+                            new Java8ObjectWrapper(freemarker.template.Configuration.getVersion()));
         }
         return bean;
     }

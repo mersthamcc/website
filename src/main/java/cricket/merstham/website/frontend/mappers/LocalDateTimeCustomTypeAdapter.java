@@ -27,7 +27,6 @@ public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDa
     @NotNull
     @Override
     public CustomTypeValue<?> encode(LocalDateTime value) {
-        return new CustomTypeValue.GraphQLString(
-                value.atZone(ZoneId.of("UTC")).format(formatter));
+        return new CustomTypeValue.GraphQLString(value.atZone(ZoneId.of("UTC")).format(formatter));
     }
 }

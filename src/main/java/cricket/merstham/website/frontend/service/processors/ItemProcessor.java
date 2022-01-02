@@ -6,7 +6,9 @@ public interface ItemProcessor<T> {
 
     default void postOpen(T item) {}
 
-    default List<String> preSave(T item) { return List.of(); }
+    default List<String> preSave(T item) {
+        return List.of();
+    }
 
     default void postSave(T item) {}
 }

@@ -23,8 +23,7 @@ public class LocalDateTimeFormatter implements Formatter<LocalDateTime> {
         try {
             return LocalDateTime.parse(text, formatter.withLocale(locale));
         } catch (Exception e) {
-            throw new RuntimeException(
-                    format("Cannot parse datetime: {0}", text), e);
+            throw new RuntimeException(format("Cannot parse datetime: {0}", text), e);
         }
     }
 

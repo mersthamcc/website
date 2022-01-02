@@ -70,8 +70,7 @@ public class News extends SspBaseResponseData implements Serializable {
 
     @JsonProperty private boolean publishToTwitter;
 
-    @JsonProperty
-    private String socialSummary;
+    @JsonProperty private String socialSummary;
 
     @JsonProperty private Map<String, String> attributes = new HashMap<>();
 

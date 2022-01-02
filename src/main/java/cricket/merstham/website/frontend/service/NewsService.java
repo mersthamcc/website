@@ -92,11 +92,11 @@ public class NewsService {
     }
 
     public News saveNewsItem(Principal principal, News news) throws IOException {
-        var validationErrors = processors
-                .stream()
-                .map(p -> p.preSave(news))
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        var validationErrors =
+                processors.stream()
+                        .map(p -> p.preSave(news))
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
         if (!validationErrors.isEmpty()) {
             throw new EntitySaveException("Error saving News item", validationErrors);
         }
@@ -182,22 +182,21 @@ public class NewsService {
             news = graphService.executeQuery(query, principal);
         }
         if (isNull(news.getData().newsItem())) throw new ResourceNotFoundException();
-        var result = News.builder()
-                .id(news.getData().newsItem().id())
-                .author(news.getData().newsItem().author())
-                .title(news.getData().newsItem().title())
-                .createdDate(news.getData().newsItem().createdDate())
-                .publishDate(news.getData().newsItem().publishDate())
-                .body(news.getData().newsItem().body())
-                .draft(news.getData().newsItem().draft())
-                .uuid(news.getData().newsItem().uuid())
-                .socialSummary(news.getData().newsItem().socialSummary())
-                .attributes(news.getData().newsItem().attributes()
-                        .stream().collect(Collectors.toMap(
-                                a -> a.name(),
-                                a -> a.value()
-                        )))
-                .build();
+        var result =
+                News.builder()
+                        .id(news.getData().newsItem().id())
+                        .author(news.getData().newsItem().author())
+                        .title(news.getData().newsItem().title())
+                        .createdDate(news.getData().newsItem().createdDate())
+                        .publishDate(news.getData().newsItem().publishDate())
+                        .body(news.getData().newsItem().body())
+                        .draft(news.getData().newsItem().draft())
+                        .uuid(news.getData().newsItem().uuid())
+                        .socialSummary(news.getData().newsItem().socialSummary())
+                        .attributes(
+                                news.getData().newsItem().attributes().stream()
+                                        .collect(Collectors.toMap(a -> a.name(), a -> a.value())))
+                        .build();
         processors.forEach(p -> p.postOpen(result));
         return result;
     }
@@ -210,22 +209,21 @@ public class NewsService {
         var query = new GetNewsItemByPathQuery(path);
         Response<GetNewsItemByPathQuery.Data> news = graphService.executeQuery(query);
         if (isNull(news.getData().newsItemByPath())) throw new ResourceNotFoundException();
-        var result = News.builder()
-                .id(news.getData().newsItemByPath().id())
-                .author(news.getData().newsItemByPath().author())
-                .title(news.getData().newsItemByPath().title())
-                .createdDate(news.getData().newsItemByPath().createdDate())
-                .publishDate(news.getData().newsItemByPath().publishDate())
-                .body(news.getData().newsItemByPath().body())
-                .draft(news.getData().newsItemByPath().draft())
-                .uuid(news.getData().newsItemByPath().uuid())
-                .socialSummary(news.getData().newsItemByPath().socialSummary())
-                .attributes(news.getData().newsItemByPath().attributes()
-                        .stream().collect(Collectors.toMap(
-                                a -> a.name(),
-                                a -> a.value()
-                        )))
-                .build();
+        var result =
+                News.builder()
+                        .id(news.getData().newsItemByPath().id())
+                        .author(news.getData().newsItemByPath().author())
+                        .title(news.getData().newsItemByPath().title())
+                        .createdDate(news.getData().newsItemByPath().createdDate())
+                        .publishDate(news.getData().newsItemByPath().publishDate())
+                        .body(news.getData().newsItemByPath().body())
+                        .draft(news.getData().newsItemByPath().draft())
+                        .uuid(news.getData().newsItemByPath().uuid())
+                        .socialSummary(news.getData().newsItemByPath().socialSummary())
+                        .attributes(
+                                news.getData().newsItemByPath().attributes().stream()
+                                        .collect(Collectors.toMap(a -> a.name(), a -> a.value())))
+                        .build();
         processors.forEach(p -> p.postOpen(result));
         return result;
     }

@@ -16,7 +16,8 @@ public class LocalDateTimeDateOnlyFormatter implements Formatter<LocalDateTime> 
     private final DateTimeFormatter formatter;
     private final String time;
 
-    public LocalDateTimeDateOnlyFormatter(String pattern, ResolverStyle resolverStyle, String time) {
+    public LocalDateTimeDateOnlyFormatter(
+            String pattern, ResolverStyle resolverStyle, String time) {
         this.formatter = DateTimeFormatter.ofPattern(pattern).withResolverStyle(resolverStyle);
         this.time = time;
     }
@@ -27,8 +28,7 @@ public class LocalDateTimeDateOnlyFormatter implements Formatter<LocalDateTime> 
             var date = LocalDate.parse(text, formatter.withLocale(locale));
             return date.atStartOfDay();
         } catch (Exception e) {
-            throw new RuntimeException(
-                    format("Cannot parse datetime: {0}", text), e);
+            throw new RuntimeException(format("Cannot parse datetime: {0}", text), e);
         }
     }
 
