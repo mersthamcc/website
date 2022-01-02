@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import cricket.merstham.website.frontend.extensions.StringExtensions;
-import cricket.merstham.website.frontend.formatters.LocalDateTimeDateOnlyFormat;
 import cricket.merstham.website.frontend.formatters.LocalDateTimeFormat;
 import cricket.merstham.website.frontend.model.datatables.SspBaseResponseData;
 import lombok.AllArgsConstructor;
@@ -62,7 +61,7 @@ public class News extends SspBaseResponseData implements Serializable {
     private LocalDateTime createdDate;
 
     @JsonProperty
-    @LocalDateTimeDateOnlyFormat(pattern = "dd/MM/yyyy")
+    @LocalDateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime publishDate;
 
     @JsonProperty private boolean draft;

@@ -43,13 +43,18 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                 if (item.isPublishToFacebook() && !hasFacebookPost(item)) {
                     var id = facebookPageService.createFacebookPost(
                             isBlank(item.getSocialSummary()) ? item.getTitle() : item.getSocialSummary(),
-                            baseUrl + item.getLink().toString()
-                    );
+                            baseUrl + item.getLink().toString(),
+                            item.getPublishDate());
                     item.getAttributes().put(FACEBOOK_ID, id);
                 } else if (!item.isPublishToFacebook()
                         && hasFacebookPost(item)) {
                     facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
                     item.getAttributes().put(FACEBOOK_ID, "");
+                } else if (item.isPublishToFacebook() && hasFacebookPost(item)) {
+                    facebookPageService.updateFacebookPost(
+                            item.getAttributes().get(FACEBOOK_ID),
+                            isBlank(item.getSocialSummary()) ? item.getTitle() : item.getSocialSummary(),
+                            item.getPublishDate());
                 }
             } else if (hasFacebookPost(item)) {
                 facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));

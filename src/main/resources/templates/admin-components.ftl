@@ -226,7 +226,7 @@
                     <input type="checkbox" class="js-toggle-switch toggle-switch-input"
                            id="${name}"
                            name="${name}"
-                           data-hs-toggle-switch-options='{"targetSelector": "#${name}"}'
+                           data-hs-toggle-switch-options='{}'
                            <#if checked>checked="checked"</#if>
                     />
                     <span class="toggle-switch-label">
