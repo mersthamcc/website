@@ -1,6 +1,9 @@
 <#import "/spring.ftl" as spring />
 
-<#macro section title action buttons=noButtons>
+<#macro noButtons>
+</#macro>
+
+<#macro section title action buttons="">
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
         <!-- Card -->
@@ -14,13 +17,42 @@
                 <#nested />
             </div>
             <!-- End Body -->
-
-            <div class="card-footer d-flex justify-content-end">
-                <#if buttons?is_directive><@buttons /><#else>${buttons}</#if>
-            </div>
+            <#if buttons?is_directive>
+                <div class="card-footer d-flex justify-content-end">
+                    <@buttons />
+                </div>
+            </#if>
         </div>
         <!-- End Card -->
     </form>
+</#macro>
+
+<#macro form action>
+    <form class="form-horizontal" method="post" name="action" action="${action}">
+        <input type="hidden" name="_csrf" value="${_csrf.token}" />
+        <#nested />
+    </form>
+</#macro>
+
+<#macro card title buttons="">
+    <!-- Card -->
+    <div class="card mb-3 mb-lg-5">
+        <div class="card-header">
+            <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+            <#nested />
+        </div>
+        <!-- End Body -->
+        <#if buttons?is_directive>
+            <div class="card-footer d-flex justify-content-end">
+                <@buttons />
+            </div>
+        </#if>
+    </div>
+    <!-- End Card -->
 </#macro>
 
 <#macro memberAdminField attribute data localeCategory="membership">
@@ -113,6 +145,115 @@
            value="${data[key]!""}"
             ${required}
     />
+</#macro>
+
+<#macro adminFormField name localeCategory data required=false type="text">
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <input class="form-control c-square c-theme"
+                   name="${name}"
+                   type="${type}"
+                   placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
+                   value="${data}"
+                   ${requiredAttribute}
+            />
+        </div>
+    </div>
+</#macro>
+
+<#macro adminDateField name localeCategory data>
+    <!-- Form Group -->
+    <div class="row form-group">
+        <label for="${name}Label" class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+
+        <div class="col-md-10">
+            <div id="${name}Flatpickr"
+                 class="js-flatpickr flatpickr-custom input-group input-group-merge"
+                 data-hs-flatpickr-options='{
+                    "appendTo": "#${name}Flatpickr",
+                    "dateFormat": "d/m/Y",
+                    "wrap": true
+                  }'>
+                <div class="input-group-prepend" data-toggle>
+                    <div class="input-group-text">
+                        <i class="tio-date-range"></i>
+                    </div>
+                </div>
+
+                <input
+                        type="text"
+                        name="${name}"
+                        class="flatpickr-custom-form-control form-control"
+                        id="${name}Label"
+                        placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
+                        data-input
+                        value=${data.format("dd/MM/yyyy")} />
+            </div>
+        </div>
+    </div>
+    <!-- End Form Group -->
+</#macro>
+
+<#macro adminFormDisplayField name localeCategory data>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <label class="col-md-10 control-label align-middle">
+            ${data}
+        </label>
+    </div>
+</#macro>
+
+<#macro adminSwitchField name localeCategory checked=false>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right align-middle" for="${name}">
+            <@spring.messageText code="${localeCategory}.${name}" text=name />
+        </label>
+        <div class="col-md-10">
+            <div class="d-flex mb-5">
+                <label class="toggle-switch mx-2" for="${name}">
+                    <input type="checkbox" class="js-toggle-switch toggle-switch-input"
+                           id="${name}"
+                           name="${name}"
+                           data-hs-toggle-switch-options='{}'
+                           <#if checked>checked="checked"</#if>
+                    />
+                    <span class="toggle-switch-label">
+                    <span class="toggle-switch-indicator"></span>
+                </span>
+                </label>
+            </div>
+        </div>
+    </div>
+</#macro>
+
+<#macro adminCkEditorField name localeCategory data required=false type="text" rows=25>
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>
+                ${data}
+            </textarea>
+        </div>
+    </div>
 </#macro>
 
 <#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100]>
@@ -356,13 +497,19 @@
                 <table id="${id}"
                        class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer"
                        data-hs-datatables-options='{
+                            "columnDefs": [
                             <#if selectable>
-                            "columnDefs": [{
-                                "targets": [0],
-                                "orderable": false
-                            }],
-                            "order": [],
+                                {
+                                    "targets": [0],
+                                    "orderable": false
+                                },
                             </#if>
+                                {
+                                    "targets": [${columns?size + (selectable?then(1,0))}],
+                                    "orderable": false
+                                }
+                            ],
+                            "order": [],
                             "info": {
                                 "totalQty": "#${id}WithPaginationInfoTotalQty"
                             },
@@ -393,7 +540,7 @@
                                 <@spring.messageText code=column.key text=column.key />
                             </th>
                         </#list>
-                        <th class="table-column-pr-0 sorting_disabled">Actions</th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -483,7 +630,8 @@
             </#list>
             { "data": function(row, type, set, meta) {
                 let actions = "";
-                if ( row.editLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.editLink +'"><i class="js-edit-icon tio-edit"></i> Edit</a>';
+                if ( row.editLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.editLink +'"><i class="js-edit-icon tio-edit"></i> Edit</a>&nbsp;';
+                if ( row.deleteLink ) actions = actions + '<a class="js-edit btn btn-sm btn-white" href="' + row.deleteLink +'"><i class="js-edit-icon tio-delete"></i> Delete</a>&nbsp;';
                 return actions;
             }}
         ],
@@ -512,4 +660,16 @@
             }
         }, 1);
     });
+</#macro>
+
+<#macro formErrors errors errorKey>
+    <#if (errors?size > 0)>
+        <div class="alert alert-soft-danger" role="alert">
+            <h5 class="alert-heading"><@spring.messageText code=errorKey text="An error occured" /></h5>
+            <hr />
+            <#list errors as error>
+                <p class="text-inherit">${error}</p>
+            </#list>
+        </div>
+    </#if>
 </#macro>

@@ -5,22 +5,22 @@
     <script>
         function onPageLoad() {
             <@admin.adminSspTableScript
-                id="memberTable"
+                id="newsTable"
                 selectable=true
-                columns=memberColumns
-                ajaxSrc="membership/get-data"
+                columns=newsColumns
+                ajaxSrc="news/get-data"
             />
         };
     </script>
 </#macro>
 <@layout.mainLayout script=dataScript>
     <@admin.adminSspTableCard
-        id="memberTable"
+        id="newsTable"
         selectable=true
         searchable=true
         defaultPageLength=50
         pageLengths=[10,50,100]
-        title="membership.member-details"
-        columns=memberColumns
+        title="menu.admin-news-list"
+        columns=newsColumns
     />
 </@layout.mainLayout>

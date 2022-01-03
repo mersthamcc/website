@@ -1,6 +1,11 @@
 package cricket.merstham.website.frontend.service;
 
-import com.apollographql.apollo.api.*;
+import com.apollographql.apollo.api.Mutation;
+import com.apollographql.apollo.api.Operation;
+import com.apollographql.apollo.api.Query;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.api.ScalarTypeAdapters;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
 import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
@@ -14,7 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -22,7 +28,7 @@ import java.util.Map;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 @Service
 public class GraphService {
@@ -47,7 +53,7 @@ public class GraphService {
         this.objectMapper = objectMapper;
     }
 
-    public <T extends Query, R> R executeQuery(T query, Principal principal, Class<R> clazz)
+    public <T extends Query, R> R executeQuery(T query, Principal principal, TypeReference<R> clazz)
             throws IOException {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
         var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
@@ -85,6 +91,17 @@ public class GraphService {
         return getResult(mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
     }
 
+    public <T extends Mutation, R> R executeMutation(
+            T mutation, Principal principal, Class<R> clazz) throws IOException {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
+        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+
+        byte[] response =
+                getRawResult(
+                        mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        return objectMapper.readValue(response, clazz);
+    }
+
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
             T query, String accessToken) throws IOException {
         return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
@@ -106,10 +123,9 @@ public class GraphService {
                 "Received `{}` GraphQL API response: {}",
                 query.name().name(),
                 response.getStatus());
-        if (response.getStatus() == OK.getStatusCode()) {
-            String body = response.readEntity(String.class);
-            LOG.debug("Response Body = {}", body);
-
+        String body = response.readEntity(String.class);
+        LOG.debug("Response Body = {}", body);
+        if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
             return body.getBytes();
         }
         throw new RuntimeException("Failed to get GraphQL response from service");

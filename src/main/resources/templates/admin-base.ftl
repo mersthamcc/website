@@ -41,6 +41,7 @@
 			<!-- CSS Implementing Plugins -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css">
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/select2/dist/css/select2.min.css">
+			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/flatpickr/dist/flatpickr.min.css">
 			<!-- CSS Front Template -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/css/theme.min.css">
 			<link rel="stylesheet" href="${resourcePrefix}/mcc/css/custom.css">
@@ -1038,12 +1039,15 @@
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-form-search/dist/hs-form-search.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-transform-tabs-to-btn/dist/hs-transform-tabs-to-btn.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/hs-toggle-switch/dist/hs-toggle-switch.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/select2/dist/js/select2.full.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/datatables.net.extensions/select/select.min.js"></script>
+			<script src="${resourcePrefix}/front/admin/assets/vendor/flatpickr/dist/flatpickr.min.js"></script>
 			<!-- JS Front -->
 			<script src="${resourcePrefix}/front/admin/assets/js/theme.min.js"></script>
-
+			<script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
+			<script src="${resourcePrefix}/mcc/js/ckeditor/ckeditor.js"></script>
 			<#if script?is_directive><@script /><#else>${script}</#if>
 
 			<!-- JS Plugins Init. -->
@@ -1060,17 +1064,20 @@
 						var unfold = new HSUnfold($(this)).init();
 					});
 
-
-					// INITIALIZATION OF FORM SEARCH
-					// =======================================================
 					$('.js-form-search').each(function () {
 						new HSFormSearch($(this)).init()
 					});
 
 					$('.js-select2-custom').each(function () {
-						var select2 = $.HSCore.components.HSSelect2.init($(this));
+						$.HSCore.components.HSSelect2.init($(this));
 					});
 
+					$('.js-toggle-switch').each(function () {
+						new HSToggleSwitch($(this)).init();
+					});
+					$('.js-flatpickr').each(function () {
+						$.HSCore.components.HSFlatpickr.init($(this));
+					});
 					if (typeof onPageLoad === "function") onPageLoad();
 				});
 			</script>

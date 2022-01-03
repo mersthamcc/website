@@ -1,14 +1,16 @@
 package cricket.merstham.website.frontend.configuration;
 
 import cricket.merstham.website.frontend.menu.MenuBuilder;
+import no.api.freemarker.java8.Java8ObjectWrapper;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,22 +22,24 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.security.Principal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
 
 @Configuration
-@ComponentScan("cricket.merstham.website.frontend")
-public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
+public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(ViewConfiguration.class);
 
@@ -51,11 +55,6 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this);
     }
 
     @Override
@@ -116,7 +115,7 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
         } catch (Exception ex) {
             LOG.warn("No parameters to cast", ex);
         }
-        LOG.info(
+        LOG.debug(
                 "Matched route = {}, parameters = {}",
                 route.getName(),
                 String.join(
@@ -210,5 +209,18 @@ public class ViewConfiguration implements HandlerInterceptor, WebMvcConfigurer {
             }
             return "no-mapping-attribute";
         }
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName)
+            throws BeansException {
+        if (bean instanceof FreeMarkerConfigurer) {
+            FreeMarkerConfigurer configurer = (FreeMarkerConfigurer) bean;
+            configurer
+                    .getConfiguration()
+                    .setObjectWrapper(
+                            new Java8ObjectWrapper(freemarker.template.Configuration.getVersion()));
+        }
+        return bean;
     }
 }

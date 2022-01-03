@@ -37,7 +37,7 @@ import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
 
 @Controller("AdminMembershipController")
-public class MembershipController {
+public class MembershipController extends SspController<Member> {
 
     private final MessageSource messageSource;
 
@@ -224,14 +224,14 @@ public class MembershipController {
                                                 || m.getLastSubscription().contains(search))
                         .sorted(comparator)
                         .collect(Collectors.toList());
-        return SspResponse.builder(Member.class)
-                .withDraw(request.getDraw())
-                .withData(
+        return SspResponse.<Member>builder()
+                .draw(request.getDraw())
+                .data(
                         members.subList(
                                 request.getStart(),
                                 min(request.getStart() + request.getLength(), members.size())))
-                .withRecordsTotal(members.size())
-                .withRecordsFiltered(members.size())
+                .recordsTotal(members.size())
+                .recordsFiltered(members.size())
                 .build();
     }
 

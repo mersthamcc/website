@@ -46,6 +46,8 @@
             <!-- CSS Front Template -->
             <link rel="stylesheet" href="${resourcePrefix}/front/assets/css/theme.min.css">
 
+            <link rel="stylesheet" href="${resourcePrefix}/mcc/css/custom.css">
+
             <#if headers?is_directive><@headers /><#else>${headers}</#if>
         </head>
 

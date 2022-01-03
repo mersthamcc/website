@@ -7,6 +7,7 @@ import cricket.merstham.website.frontend.model.datatables.SspBaseResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.net.URI;
 @AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
+@EqualsAndHashCode(callSuper = false)
 public class Member extends SspBaseResponseData implements Serializable {
     private static final long serialVersionUID = 20210927233800L;
 
