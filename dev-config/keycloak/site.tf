@@ -79,6 +79,16 @@ resource "keycloak_role" "role_membership" {
   ]
 }
 
+resource "keycloak_role" "role_news" {
+  realm_id    = keycloak_realm.dev_realm.id
+  name        = "ROLE_NEWS"
+  description = "Users with this role to manage new stories"
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+  ]
+}
+
 resource "keycloak_role" "role_trusted_application" {
   realm_id    = keycloak_realm.dev_realm.id
   name        = "TRUSTED_APPLICATION"
@@ -111,6 +121,30 @@ resource "keycloak_group_roles" "role_membership_group_roles" {
     keycloak_group.role_membership_group,
     keycloak_role.role_admin,
     keycloak_role.role_membership,
+  ]
+}
+
+resource "keycloak_group" "role_news_group" {
+  realm_id = keycloak_realm.dev_realm.id
+  name     = "ROLE_NEWS"
+
+  depends_on = [keycloak_realm.dev_realm]
+}
+
+resource "keycloak_group_roles" "role_news_group_roles" {
+  realm_id = keycloak_realm.dev_realm.id
+  group_id = keycloak_group.role_news_group.id
+
+  role_ids = [
+    keycloak_role.role_admin.id,
+    keycloak_role.role_news.id,
+  ]
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+    keycloak_group.role_news_group,
+    keycloak_role.role_admin,
+    keycloak_role.role_news,
   ]
 }
 
@@ -160,7 +194,6 @@ resource "keycloak_authentication_subflow" "otp_browser_flow" {
     keycloak_authentication_execution.idp_execution,
   ]
 }
-
 
 resource "keycloak_authentication_execution" "login_form_execution" {
   realm_id          = keycloak_realm.dev_realm.id
@@ -292,6 +325,21 @@ resource "keycloak_user" "keycloak_user_dev" {
 resource "keycloak_group_memberships" "role_membership_members" {
   realm_id = keycloak_realm.dev_realm.id
   group_id = keycloak_group.role_membership_group.id
+
+  members = [
+    keycloak_user.keycloak_user_dev.username,
+  ]
+
+  depends_on = [
+    keycloak_realm.dev_realm,
+    keycloak_group.role_membership_group,
+    keycloak_user.keycloak_user_dev,
+  ]
+}
+
+resource "keycloak_group_memberships" "role_news_members" {
+  realm_id = keycloak_realm.dev_realm.id
+  group_id = keycloak_group.role_news_group.id
 
   members = [
     keycloak_user.keycloak_user_dev.username,

@@ -60,14 +60,14 @@ CREATE
     TABLE
         member_category(
             id SERIAL,
-            KEY VARCHAR(64) NOT NULL,
+            "key" VARCHAR(64) NOT NULL,
             registration_code VARCHAR(64) NULL,
             PRIMARY KEY(id)
         );
 
 CREATE
     UNIQUE INDEX IDX_USER_KEY ON
-    member_category(KEY);
+    member_category("key");
 
 CREATE
     TABLE
