@@ -1,0 +1,49 @@
+server:
+  port: 8090
+
+spring:
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/${DATABASE_NAME:}"
+    username: ${DATABASE_USER:}
+    password: ${DATABASE_PASSWORD:}
+  graphql:
+    graphiql:
+      enabled: true
+    schema:
+      printer:
+        enabled: true
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+  cache:
+    redis:
+      time-to-live: 300s
+      key-prefix: "graph-cache:"
+      use-key-prefix: true
+      enable-statistics: false
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:https://login.new.mersthamcc.co.uk/auth}
+  realm: ${KEYCLOAK_REALM:new.mersthamcc.co.uk}
+  resource: ${KEYCLOAK_CLIENT_ID:dummy}
+  ssl-required: external
+  credentials:
+    secret: "${KEYCLOAK_CLIENT_SECRET:dummy}" #pragma: allowlist secret
+  use-resource-role-mappings: false
+  principal-attribute: preferred_username
+  bearer-only: true
+
+debug: false
+
+configuration:
+  database-secret: ${DATABASE_SECRET:}

@@ -1,0 +1,39 @@
+scalar DateTime
+
+scalar Date
+
+scalar Json
+
+type User {
+    username: String!
+    subjectId: String!
+    roles: [String!]
+}
+
+input IntFilter {
+    equals: Int
+    in: [Int!]
+    notIn: [Int!]
+    lt: Int
+    lte: Int
+    gt: Int
+    gte: Int
+    not: IntFilter
+}
+
+input StringFilter {
+    equals: String
+    in: [String!]
+    notIn: [String!]
+    contains: String
+    startsWith: String
+    endsWith: String
+}
+
+type Query {
+    userInfo: User
+}
+
+type Mutation {
+    userInfo: User
+}

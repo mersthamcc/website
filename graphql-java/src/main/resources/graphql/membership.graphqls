@@ -1,0 +1,169 @@
+enum AttributeType {
+    String
+    Number
+    Boolean
+    Date
+    Time
+    Timestamp
+    List
+    Option
+    Email
+}
+
+type AttributeDefinition {
+    key: String!
+    type: AttributeType!
+    choices: Json
+}
+
+type Member {
+    attributes: [MemberAttribute!]!
+    id: Int!
+    ownerUserId: String!
+    registrationDate: DateTime!
+    subscription: [MemberSubscription!]!
+}
+
+type MemberAttribute {
+    createdDate: DateTime!
+    definition: AttributeDefinition!
+    member: Member!
+    updatedDate: DateTime!
+    value: Json
+}
+
+input AttributeInput {
+    key: String
+    value: Json
+}
+
+type MemberCategory {
+    key: String!
+    registrationCode: String
+    form: [MemberCategoryFormSection!]!
+    pricelistItem: [PricelistItem!]!
+}
+
+input MemberCategoryWhereInput {
+    AND: [MemberCategoryWhereInput!]
+    OR: [MemberCategoryWhereInput!]
+    NOT: [MemberCategoryWhereInput!]
+    id: IntFilter
+    key: StringFilter
+    registrationCode: StringFilter
+}
+
+type MemberCategoryFormSection {
+    sortOrder: Int!
+    section: MemberFormSection!
+    category: MemberCategory!
+}
+
+type MemberFormSection {
+    key: String!
+    attribute: [MemberFormSectionAttribute!]!
+}
+
+type MemberFormSectionAttribute {
+    sortOrder: Int!
+    mandatory: Boolean!
+    definition: AttributeDefinition!
+    section: MemberFormSection!
+}
+
+input MemberInput {
+    registrationDate: DateTime
+    attributes: [AttributeInput]
+    subscription: MemberSubscriptionInput
+}
+
+type MemberSubscription {
+    member: Member!
+    year: Int!
+    price: Float!
+    addedDate: DateTime
+    pricelistItem: PricelistItem!
+    order: Order
+}
+
+input MemberSubscriptionInput {
+    addedDate: Date
+    year: Int
+    price: Float
+    pricelistItemId: Int
+    orderId: Int
+}
+
+type Order {
+    id: Int!
+    ownerUserId: String!
+    accountingId: String
+    uuid: String
+    createDate: Date
+    memberSubscription: [MemberSubscription!]!
+    payment: [Payment!]!
+}
+
+type Payment {
+    id: Int!
+    date: Date
+    type: String!
+    reference: String!
+    amount: Float!
+    processingFees: Float!
+    accountingId: String
+    feesAccountingId: String
+    collected: Boolean
+    reconciled: Boolean
+    order: Order!
+}
+
+input PaymentInput {
+    id: String
+    date: Date
+    type: String
+    reference: String
+    amount: Float
+    processingFees: Float
+    collected: Boolean
+    reconciled: Boolean
+}
+
+input PaymentWhereUniqueInput {
+    id: Int
+}
+
+type PriceList {
+    pricelistItem: PricelistItem!
+    dateFrom: Date
+    dateTo: Date
+    price: Float!
+}
+
+type PricelistItem {
+    id: Int!
+    description: String!
+    minAge: Int!
+    maxAge: Int
+    includesMatchFees: Boolean
+    memberCategory: MemberCategory!
+    pricelist: [PriceList!]!
+    currentPrice: Float
+}
+
+extend type Query {
+    attributes: [AttributeDefinition]
+    member(id: Int!): Member
+    members: [Member]
+    memberSummary(start: Int!, length: Int!): [Member]
+    membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
+    myOrders: [Order]
+    orders(year: Int): [Order]
+}
+
+extend type Mutation {
+    createMember(data: MemberInput!): Member
+    updateMember(id: Int!, data: [AttributeInput]!): Member
+    createOrder(uuid: String!): Order
+    addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
+}
