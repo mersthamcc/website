@@ -1,0 +1,8 @@
+type Totals {
+    totalRecords: Int!
+    totalMatching: Int!
+}
+
+extend type Query {
+    newsTotals(searchString: String): Totals!
+}

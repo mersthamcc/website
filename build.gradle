@@ -45,12 +45,6 @@ spotless {
         dbeaver()
     }
 
-    typescript {
-        target 'graphql/src/**/*.ts'
-
-        prettier()
-    }
-
     groovyGradle {
         target '**/*.gradle'
     }
@@ -60,5 +54,6 @@ group 'cricket.merstham'
 
 repositories {
     mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
 }
-

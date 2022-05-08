@@ -1,0 +1,52 @@
+type News {
+    id: Int!
+    uuid: String
+    title: String!
+    path: String
+    createdDate: DateTime!
+    publishDate: DateTime
+    body: String!
+    socialSummary: String
+    author: String
+    draft: Boolean
+    attributes: [NewsAttribute]
+}
+
+type NewsAttribute {
+    news: News!
+    name: String!
+    value: String
+    newsId: Int!
+}
+
+input NewsInput {
+    id: Int
+    uuid: String
+    title: String
+    createdDate: DateTime
+    publishDate: DateTime
+    body: String
+    author: String
+    path: String
+    draft: Boolean
+    socialSummary: String
+    attributes: [NewsAttributeInput]
+}
+
+input NewsAttributeInput {
+    name: String
+    value: String
+}
+
+extend type Query {
+    feed(page: Int): [News]
+    newsItemByPath(path: String!): News
+    newsItem(id: Int!): News
+    news(start: Int!, length: Int!, searchString: String): [News]
+}
+
+extend type Mutation {
+    saveNews(news: NewsInput!): News
+    deleteNews(id: Int!): News
+    saveNewsAttributes(id: Int!, attributes: [NewsAttributeInput]!): News
+}
