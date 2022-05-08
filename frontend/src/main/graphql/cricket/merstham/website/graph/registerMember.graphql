@@ -1,0 +1,19 @@
+mutation createMember($member: MemberInput!) {
+  createMember(data: $member) {
+    id
+    registrationDate
+    attributes {
+      definition {
+        key
+      }
+      value
+    }
+    subscription {
+      price
+      pricelistItem {
+        id
+      }
+      year
+    }
+  }
+}

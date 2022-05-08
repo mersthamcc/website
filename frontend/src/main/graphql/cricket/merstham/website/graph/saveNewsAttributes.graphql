@@ -1,0 +1,18 @@
+mutation saveNewsAttributes ($id: Int!, $attributes: [NewsAttributeInput]!) {
+    saveNewsAttributes(id: $id, attributes: $attributes) {
+        id
+        uuid
+        draft
+        title
+        body
+        author
+        path
+        createdDate
+        publishDate
+        socialSummary
+        attributes {
+            name
+            value
+        }
+    }
+}

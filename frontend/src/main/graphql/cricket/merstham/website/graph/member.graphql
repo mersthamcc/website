@@ -1,0 +1,64 @@
+query member($id: Int!) {
+    member(id: $id) {
+        id
+        ownerUserId
+        registrationDate
+        attributes {
+            createdDate
+            updatedDate
+            definition {
+                key
+                type
+                choices
+            }
+            value
+        }
+        subscription {
+            addedDate
+            price
+            order {
+                id
+                accountingId
+                createDate
+                payment {
+                    id
+                    accountingId
+                    amount
+                    collected
+                    date
+                    processingFees
+                    reconciled
+                    reference
+                    type
+                }
+                uuid
+            }
+            pricelistItem {
+                id
+                description
+                includesMatchFees
+                maxAge
+                minAge
+                memberCategory {
+                    key
+                    form {
+                        sortOrder
+                        section {
+                            key
+                            attribute {
+                                sortOrder
+                                mandatory
+                                definition {
+                                    choices
+                                    key
+                                    type
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            year
+        }
+    }
+}
