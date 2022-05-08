@@ -7,7 +7,14 @@ plugins {
 }
 
 group = "cricket.merstham.graphql"
-sourceCompatibility = "14"
+sourceCompatibility = JavaVersion.VERSION_15
+targetCompatibility = JavaVersion.VERSION_15
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
+}
 
 configurations {
     compileOnly {
@@ -60,4 +67,3 @@ dependencyManagement {
 test {
     useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_14
