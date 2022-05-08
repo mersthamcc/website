@@ -1,0 +1,63 @@
+plugins {
+    id "org.springframework.boot" version "2.7.0-SNAPSHOT"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+    id 'jacoco'
+    id "org.sonarqube" version "3.2.0"
+}
+
+group = "cricket.merstham.graphql"
+sourceCompatibility = "14"
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    set("testcontainersVersion", "1.16.2")
+}
+
+def dependencyVersions = [
+        spring_boot: "2.4.5",
+        spring_sessions: "2.4.3",
+        keycloak: "17.0.0",
+        lombok: "1.18.20"
+]
+dependencies {
+    compileOnly "org.projectlombok:lombok:${dependencyVersions.lombok}"
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor "org.projectlombok:lombok:${dependencyVersions.lombok}"
+
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation 'org.postgresql:postgresql:42.3.4'
+    implementation "org.springframework.boot:spring-boot-starter-graphql"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+    implementation "commons-codec:commons-codec:1.15"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework:spring-webflux"
+    testImplementation "org.springframework.graphql:spring-graphql-test"
+    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation "org.testcontainers:junit-jupiter"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+targetCompatibility = JavaVersion.VERSION_14
