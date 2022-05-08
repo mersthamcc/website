@@ -7,5 +7,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public abstract class SspController<T extends SspBaseResponseData> {
-    public abstract SspResponse getData(OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request);
+    public abstract SspResponse getData(
+            OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request);
 }

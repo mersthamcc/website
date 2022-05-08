@@ -85,7 +85,8 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView checkout(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         List<PaymentSchedule> schedules = new ArrayList<>();
         for (var i = 1; i <= 10; i++) {
             BigDecimal monthly = order.getTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
@@ -105,7 +106,8 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView authorise(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
         var principal = (OidcUser) request.getUserPrincipal();
@@ -137,7 +139,8 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView execute(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         int dayOfMonth = (int) request.getSession().getAttribute(SESSION_DAY_OF_MONTH);
         int numberOfPayments = (int) request.getSession().getAttribute(SESSION_NUMBER_OF_PAYMENTS);
         String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
@@ -220,12 +223,14 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/gocardless/confirmation");
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView cancel(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 }

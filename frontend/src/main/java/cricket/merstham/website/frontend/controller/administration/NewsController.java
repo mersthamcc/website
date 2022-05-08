@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -75,7 +76,9 @@ public class NewsController extends SspController<News> {
 
     @GetMapping(value = ADMIN_NEWS_NEW_ROUTE, name = "admin-news-new")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public ModelAndView newPost(HttpServletRequest request, @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
+    public ModelAndView newPost(
+            HttpServletRequest request,
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
             var now = LocalDateTime.now();
@@ -99,7 +102,9 @@ public class NewsController extends SspController<News> {
 
     @GetMapping(value = ADMIN_NEWS_EDIT_ROUTE, name = "admin-news-edit")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public ModelAndView editPost(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @PathVariable("id") int id)
+    public ModelAndView editPost(
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            @PathVariable("id") int id)
             throws IOException {
         News news = newsService.get(authorizedClient.getAccessToken(), id);
         return new ModelAndView(ADMINISTRATION_NEWS_EDIT, Map.of(NEWS, news));
@@ -107,7 +112,9 @@ public class NewsController extends SspController<News> {
 
     @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public RedirectView deletePost(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @PathVariable("id") int id)
+    public RedirectView deletePost(
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            @PathVariable("id") int id)
             throws IOException {
         newsService.delete(authorizedClient.getAccessToken(), id);
         return new RedirectView(ADMIN_NEWS_BASE);
@@ -115,7 +122,10 @@ public class NewsController extends SspController<News> {
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public RedirectView save(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, News news, RedirectAttributes redirectAttributes)
+    public RedirectView save(
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            News news,
+            RedirectAttributes redirectAttributes)
             throws IOException {
         try {
             newsService.saveNewsItem(authorizedClient.getAccessToken(), news);
@@ -133,7 +143,8 @@ public class NewsController extends SspController<News> {
             produces = APPLICATION_JSON_VALUE,
             path = ADMIN_NEWS_AJAX_ROUTE)
     public @ResponseBody SspResponse<News> getData(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request) {
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            @RequestBody SspRequest request) {
         try {
             var data =
                     newsService.getItems(

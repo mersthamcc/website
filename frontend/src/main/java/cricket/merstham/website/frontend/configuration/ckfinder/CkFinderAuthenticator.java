@@ -5,6 +5,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.Locale;
 
 import static java.lang.String.format;

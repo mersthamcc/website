@@ -25,6 +25,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Collection;
@@ -97,7 +98,8 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
                         .stream()
                                 .map(SimpleGrantedAuthority::getAuthority)
                                 .collect(Collectors.toList());
-        return new UserView((OidcUser)((OAuth2AuthenticationToken) principal).getPrincipal(), roles);
+        return new UserView(
+                (OidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal(), roles);
     }
 
     private CurrentRoute getCurrentRoute(HttpServletRequest request, Object handler) {

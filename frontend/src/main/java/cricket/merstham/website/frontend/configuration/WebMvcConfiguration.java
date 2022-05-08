@@ -27,7 +27,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     private final OAuth2AuthorizedClientRepository authorizedClientRepository;
 
     @Autowired
-    public WebMvcConfiguration(ViewConfiguration viewConfiguration, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository authorizedClientRepository) {
+    public WebMvcConfiguration(
+            ViewConfiguration viewConfiguration,
+            ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientRepository authorizedClientRepository) {
         this.viewConfiguration = viewConfiguration;
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.authorizedClientRepository = authorizedClientRepository;
@@ -50,7 +53,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Bean
     public OAuth2AuthorizedClientArgumentResolver auth2AuthorizedClientArgumentResolver() {
-        return new OAuth2AuthorizedClientArgumentResolver(clientRegistrationRepository, authorizedClientRepository);
+        return new OAuth2AuthorizedClientArgumentResolver(
+                clientRegistrationRepository, authorizedClientRepository);
     }
 
     @Override

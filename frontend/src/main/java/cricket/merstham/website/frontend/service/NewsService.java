@@ -42,7 +42,8 @@ public class NewsService {
     }
 
     public SspGraphResponse<News> getItems(
-            OAuth2AccessToken accessToken, int start, int length, String search) throws IOException {
+            OAuth2AccessToken accessToken, int start, int length, String search)
+            throws IOException {
         var query = new AdminNewsQuery(start, length, Input.optional(search));
         Response<AdminNewsQuery.Data> result = graphService.executeQuery(query, accessToken);
         var data = result.getData();

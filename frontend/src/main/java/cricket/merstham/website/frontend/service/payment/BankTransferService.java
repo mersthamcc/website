@@ -52,22 +52,26 @@ public class BankTransferService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView checkout(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView authorise(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView execute(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView(
                 "payments/bank/confirmation",
                 Map.of(
@@ -77,7 +81,8 @@ public class BankTransferService implements PaymentService {
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView cancel(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 }

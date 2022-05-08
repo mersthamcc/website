@@ -12,6 +12,6 @@ public class RoleHelper {
     public static boolean hasRole(Principal principal, final String role) {
         if (isNull(principal)) return false;
         return true; // ((KeycloakAuthenticationToken) principal)
-//                .getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(role));
+        //                .getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(role));
     }
 }

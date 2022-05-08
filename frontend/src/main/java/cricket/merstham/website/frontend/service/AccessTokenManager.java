@@ -31,7 +31,8 @@ public class AccessTokenManager {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
-    public AccessTokenManager(TokenCache tokenCache, ClientRegistrationRepository clientRegistrationRepository) {
+    public AccessTokenManager(
+            TokenCache tokenCache, ClientRegistrationRepository clientRegistrationRepository) {
         this.tokenCache = tokenCache;
         this.clientRegistrationRepository = clientRegistrationRepository;
     }
@@ -45,9 +46,7 @@ public class AccessTokenManager {
                             return tokenCache
                                     .updateToken(
                                             accessToken.getValue(),
-                                            Duration.of(
-                                                    accessToken.getLifetime() - 60,
-                                                    SECONDS))
+                                            Duration.of(accessToken.getLifetime() - 60, SECONDS))
                                     .getAccessToken()
                                     .get();
                         });
@@ -57,11 +56,14 @@ public class AccessTokenManager {
         LOG.info("Getting new client credentials access token");
 
         var client = clientRegistrationRepository.findByRegistrationId("website");
-        TokenRequest request = new TokenRequest(
-                URI.create(client.getProviderDetails().getTokenUri()),
-                new ClientSecretBasic(new ClientID(client.getClientId()), new Secret(client.getClientSecret())),
-                new ClientCredentialsGrant(),
-                Scope.parse(client.getScopes()));
+        TokenRequest request =
+                new TokenRequest(
+                        URI.create(client.getProviderDetails().getTokenUri()),
+                        new ClientSecretBasic(
+                                new ClientID(client.getClientId()),
+                                new Secret(client.getClientSecret())),
+                        new ClientCredentialsGrant(),
+                        Scope.parse(client.getScopes()));
 
         try {
             TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
@@ -70,7 +72,9 @@ public class AccessTokenManager {
                 LOG.debug("Successfully got client access token: {}", accessToken.toJSONString());
                 return accessToken;
             }
-            LOG.error("Failed to get client credentials access token: {}", response.toHTTPResponse().getContent());
+            LOG.error(
+                    "Failed to get client credentials access token: {}",
+                    response.toHTTPResponse().getContent());
             throw new AccessTokenRequestException(response.toHTTPResponse().getContent());
         } catch (IOException | ParseException e) {
             LOG.error("Failed to get client credentials access token", e);

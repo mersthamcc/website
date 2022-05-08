@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -50,13 +51,11 @@ public class GraphService {
         this.objectMapper = objectMapper;
     }
 
-    public <T extends Query, R> R executeQuery(T query, OAuth2AccessToken accessToken, TypeReference<R> clazz)
-            throws IOException {
+    public <T extends Query, R> R executeQuery(
+            T query, OAuth2AccessToken accessToken, TypeReference<R> clazz) throws IOException {
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
-        byte[] response =
-                getRawResult(
-                        query, accessToken.getTokenValue());
+        byte[] response = getRawResult(query, accessToken.getTokenValue());
         return objectMapper.readValue(response, clazz);
     }
 
@@ -84,9 +83,7 @@ public class GraphService {
 
     public <T extends Mutation, R> R executeMutation(
             T mutation, OAuth2AccessToken accessToken, Class<R> clazz) throws IOException {
-        byte[] response =
-                getRawResult(
-                        mutation, accessToken.getTokenValue());
+        byte[] response = getRawResult(mutation, accessToken.getTokenValue());
         return objectMapper.readValue(response, clazz);
     }
 

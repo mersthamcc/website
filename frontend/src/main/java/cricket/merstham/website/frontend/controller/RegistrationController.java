@@ -22,6 +22,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -133,7 +134,9 @@ public class RegistrationController {
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             HttpSession session,
             SessionStatus status) {
-        var order = membershipService.registerMembersFromBasket(basket, authorizedClient.getAccessToken());
+        var order =
+                membershipService.registerMembersFromBasket(
+                        basket, authorizedClient.getAccessToken());
         status.setComplete();
         session.setAttribute("order", order);
         return new ModelAndView(

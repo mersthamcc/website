@@ -1,14 +1,11 @@
-name: PR Checker
+name: On Merge
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - ready_for_review
-      - synchronize
+  push:
+    branches:
+      - main
 
 jobs:
-  test-and-analyse:
+  analyse:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -24,14 +21,14 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          key: ${{ runner.os }}-sonar-on-merge
+          restore-keys: ${{ runner.os }}-sonar-on-merge
 
       - name: Prepare
         shell: bash
         run: |
           echo "Removing symbolic link to assets..."
-          rm src/main/resources/static
+          rm frontend/src/main/resources/static
 
       - name: Build and analyze
         env:

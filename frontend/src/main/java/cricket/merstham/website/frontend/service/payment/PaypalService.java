@@ -82,12 +82,14 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView checkout(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/paypal/checkout");
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView authorise(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent(CAPTURE_INTENT);
 
@@ -163,7 +165,8 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView execute(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var captureRequest =
                 new OrdersCaptureRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
@@ -198,7 +201,8 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var ordersGetRequest =
                 new OrdersGetRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
@@ -217,7 +221,8 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView cancel(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 }

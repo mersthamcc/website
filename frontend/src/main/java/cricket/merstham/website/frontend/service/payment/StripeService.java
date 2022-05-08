@@ -68,7 +68,8 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView checkout(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
 
@@ -133,12 +134,14 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView authorise(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView execute(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         try {
             var session =
                     Session.retrieve(
@@ -170,12 +173,14 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/stripe/confirmation");
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+    public ModelAndView cancel(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 

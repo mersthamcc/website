@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+  web:
+    image: mersthamcc/frontend:development
+    build:
+      dockerfile: Dockerfile
+      context: frontend
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.www.rule=Host(`www.${DEVDOMAIN}`)
+      - traefik.http.services.www.loadbalancer.server.port=8080
+      - traefik.http.routers.www.entrypoints=web
+      - traefik.http.routers.www.middlewares=forcehttps
+      - traefik.http.routers.www-tls.tls=true
+      - traefik.http.routers.www-tls.rule=Host(`www.${DEVDOMAIN}`)
+      - traefik.http.routers.www-tls.entrypoints=websecure
+      - traefik.http.routers.www-tls.tls.certresolver=le
+      - traefik.http.routers.www-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=www
+      - tls-cert-host-check=www.${DEVDOMAIN}
+    extra_hosts:
+      - "graph.${DEVDOMAIN}:host-gateway"
+    environment:
+      KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      DEVDOMAIN: ${DEVDOMAIN}
+      CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
+      CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
+      API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
+      COOKIE_CONTROL_KEY: ${COOKIE_CONTROL_KEY}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
+      KEYCLOAK_CLIENT_ID: website
+      GRAPH_URI: https://graph.${DEVDOMAIN}/graphql
+      REDIS_HOST: redis
+    ports:
+      - 8081:8081
+    networks:
+      - dmz
+      - backendnetwork
+    restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:8080/actuator/health
+      interval: 5s
+      retries: 30
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  graph:
+    image: mersthamcc/graphql:development
+    build:
+      dockerfile: Dockerfile
+      context: graphql
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.www.rule=Host(`graph.${DEVDOMAIN}`)
+      - traefik.http.services.www.loadbalancer.server.port=8090
+      - traefik.http.routers.www.entrypoints=web
+      - traefik.http.routers.www.middlewares=forcehttps
+      - traefik.http.routers.www-tls.tls=true
+      - traefik.http.routers.www-tls.rule=Host(`graph.${DEVDOMAIN}`)
+      - traefik.http.routers.www-tls.entrypoints=websecure
+      - traefik.http.routers.www-tls.tls.certresolver=le
+      - traefik.http.routers.www-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=www
+      - tls-cert-host-check=www.${DEVDOMAIN}
+    environment:
+      DEVDOMAIN: ${DEVDOMAIN}
+      REDIS_HOST: redis
+    networks:
+      - dmz
+      - backendnetwork
+    restart: unless-stopped
+    healthcheck:
+      test: curl http://localhost:8090/actuator/health
+      interval: 5s
+      retries: 30
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"

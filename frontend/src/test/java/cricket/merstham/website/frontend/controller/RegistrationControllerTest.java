@@ -29,8 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class RegistrationControllerTest {
 
     @Configuration
-    static class UnitTestContextConfiguration {
-    }
+    static class UnitTestContextConfiguration {}
 
     @Autowired private MockMvc mockMvc;
 

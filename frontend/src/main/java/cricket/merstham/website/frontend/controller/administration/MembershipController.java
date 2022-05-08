@@ -53,7 +53,8 @@ public class MembershipController extends SspController<Member> {
     @GetMapping(value = "/administration/membership", name = "admin-membership-list")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     @CacheEvict(value = MEMBER_SUMMARY_CACHE, key = "#authorizedClient.accessToken.tokenValue")
-    public ModelAndView list(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
+    public ModelAndView list(
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
         return new ModelAndView(
                 "administration/membership/list",
                 Map.of(
@@ -75,7 +76,10 @@ public class MembershipController extends SspController<Member> {
 
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public ModelAndView edit(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, Locale locale, @PathVariable int id) {
+    public ModelAndView edit(
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            Locale locale,
+            @PathVariable int id) {
         var member = membershipService.get(id, authorizedClient.getAccessToken()).orElseThrow();
         return new ModelAndView("administration/membership/edit", buildModelData(member, locale));
     }
@@ -212,7 +216,8 @@ public class MembershipController extends SspController<Member> {
             produces = "application/json",
             path = "/administration/membership/get-data")
     public @ResponseBody SspResponse<Member> getData(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request) {
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            @RequestBody SspRequest request) {
         Comparator<Member> comparator = createComparator(request);
         String search = request.getSearch().getValue().toLowerCase();
         List<Member> members =

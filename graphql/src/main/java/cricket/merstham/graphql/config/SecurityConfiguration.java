@@ -24,20 +24,25 @@ import java.util.stream.Collectors;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/graphiql**").anonymous()
+        http.cors()
                 .and()
-                .oauth2ResourceServer().jwt().jwtAuthenticationConverter(grantedAuthoritiesExtractor());
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                .antMatchers("/graphiql**")
+                .anonymous()
+                .and()
+                .oauth2ResourceServer()
+                .jwt()
+                .jwtAuthenticationConverter(grantedAuthoritiesExtractor());
     }
 
     @Bean
     public Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor() {
-        JwtAuthenticationConverter jwtAuthenticationConverter =
-                new JwtAuthenticationConverter();
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new GrantedAuthoritiesExtractor());
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                new GrantedAuthoritiesExtractor());
 
         return jwtAuthenticationConverter;
     }
@@ -46,8 +51,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             implements Converter<Jwt, Collection<GrantedAuthority>> {
 
         public Collection<GrantedAuthority> convert(Jwt jwt) {
-            Collection<String> authorities = (Collection<String>)
-                    jwt.getClaims().get("cognito:groups");
+            Collection<String> authorities =
+                    (Collection<String>) jwt.getClaims().get("cognito:groups");
 
             if (authorities == null) return List.of();
             return authorities.stream()

@@ -51,7 +51,8 @@ public class MembershipService {
         this.graphService = graphService;
     }
 
-    public Order registerMembersFromBasket(RegistrationBasket basket, OAuth2AccessToken accessToken) {
+    public Order registerMembersFromBasket(
+            RegistrationBasket basket, OAuth2AccessToken accessToken) {
         var createOrder = new CreateOrderMutation(basket.getId());
         var order = new Order();
         try {
