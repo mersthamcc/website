@@ -1,7 +1,6 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.website.frontend.exception.EntitySaveException;
-import cricket.merstham.website.frontend.helpers.UserHelper;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
@@ -11,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +25,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -51,15 +51,17 @@ public class NewsController extends SspController<News> {
     public static final String ERRORS = "errors";
 
     private final NewsService newsService;
+    private final OAuth2AuthorizedClientService clientService;
 
     @Autowired
-    public NewsController(NewsService newsService) {
+    public NewsController(NewsService newsService, OAuth2AuthorizedClientService clientService) {
         this.newsService = newsService;
+        this.clientService = clientService;
     }
 
     @GetMapping(value = ADMIN_NEWS_BASE, name = "admin-news-list")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public ModelAndView list(Principal principal) {
+    public ModelAndView list() {
         return new ModelAndView(
                 ADMINISTRATION_NEWS_LIST,
                 Map.of(
@@ -73,13 +75,13 @@ public class NewsController extends SspController<News> {
 
     @GetMapping(value = ADMIN_NEWS_NEW_ROUTE, name = "admin-news-new")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public ModelAndView newPost(HttpServletRequest request, Principal principal) {
+    public ModelAndView newPost(HttpServletRequest request, @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
             var now = LocalDateTime.now();
             var news =
                     News.builder()
-                            .author(UserHelper.getUserFullName(principal))
+                            .author(authorizedClient.getPrincipalName())
                             .createdDate(now)
                             .publishDate(now)
                             .draft(false)
@@ -97,26 +99,26 @@ public class NewsController extends SspController<News> {
 
     @GetMapping(value = ADMIN_NEWS_EDIT_ROUTE, name = "admin-news-edit")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public ModelAndView editPost(Principal principal, @PathVariable("id") int id)
+    public ModelAndView editPost(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @PathVariable("id") int id)
             throws IOException {
-        News news = newsService.get(principal, id);
+        News news = newsService.get(authorizedClient.getAccessToken(), id);
         return new ModelAndView(ADMINISTRATION_NEWS_EDIT, Map.of(NEWS, news));
     }
 
     @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public RedirectView deletePost(Principal principal, @PathVariable("id") int id)
+    public RedirectView deletePost(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @PathVariable("id") int id)
             throws IOException {
-        newsService.delete(principal, id);
+        newsService.delete(authorizedClient.getAccessToken(), id);
         return new RedirectView(ADMIN_NEWS_BASE);
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
-    public RedirectView save(Principal principal, News news, RedirectAttributes redirectAttributes)
+    public RedirectView save(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, News news, RedirectAttributes redirectAttributes)
             throws IOException {
         try {
-            newsService.saveNewsItem(principal, news);
+            newsService.saveNewsItem(authorizedClient.getAccessToken(), news);
             return new RedirectView(ADMIN_NEWS_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
@@ -131,11 +133,11 @@ public class NewsController extends SspController<News> {
             produces = APPLICATION_JSON_VALUE,
             path = ADMIN_NEWS_AJAX_ROUTE)
     public @ResponseBody SspResponse<News> getData(
-            Principal principal, @RequestBody SspRequest request) {
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request) {
         try {
             var data =
                     newsService.getItems(
-                            principal,
+                            authorizedClient.getAccessToken(),
                             request.getStart(),
                             request.getLength(),
                             request.getSearch().getValue());

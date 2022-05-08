@@ -1,21 +1,38 @@
 base-url: https://www.new.mersthamcc.co.uk
 spring:
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
   freemarker:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-
-keycloak:
-  auth-server-url: ${KEYCLOAK_URL:https://login.new.mersthamcc.co.uk/auth}
-  realm: ${KEYCLOAK_REALM:new.mersthamcc.co.uk}
-  resource: ${KEYCLOAK_CLIENT_ID:dummy}
-  ssl-required: external
-  credentials:
-    secret: "${KEYCLOAK_CLIENT_SECRET:dummy}" #pragma: allowlist secret
-  use-resource-role-mappings: false
-  principal-attribute: preferred_username
+  security:
+    oauth2:
+      client:
+        registration:
+          login:
+            client-id: "${KEYCLOAK_CLIENT_ID:dummy}"
+            client-secret: "${KEYCLOAK_CLIENT_SECRET:}"
+            scope: openid, email, profile
+            authorization-grant-type: authorization_code
+            client-name: website
+          website:
+            client-id: "${WEBSITE_CLIENT_CREDENTIALS_ID:dummy}"
+            client-secret: "${WEBSITE_CLIENT_CREDENTIALS_SECRET:}"
+            scope: "graphql/trusted-client"
+            authorization-grant-type: client_credentials
+            client-name: website-client
+        provider:
+          login:
+            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
+            user-name-attribute: email
+          website:
+            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
 
 debug: false
 server:
@@ -48,7 +65,7 @@ club:
           - "_utma"
           - "gid"
 graph:
-  graph-uri: ${GRAPH_URI}
+  graph-uri: http://localhost:8090/graphql # ${GRAPH_URI}
 
 resources:
   base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"

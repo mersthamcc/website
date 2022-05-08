@@ -36,7 +36,7 @@
                 }
             })
             .then(editor => {
-                console.log(editor);
+                CKEditorInspector.attach(editor);
             })
             .catch( error => {
                 console.error(error);

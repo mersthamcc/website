@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.security.Principal;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -51,8 +52,8 @@ public class MembershipController extends SspController<Member> {
 
     @GetMapping(value = "/administration/membership", name = "admin-membership-list")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    @CacheEvict(value = MEMBER_SUMMARY_CACHE, key = "#principal.name")
-    public ModelAndView list(Principal principal) {
+    @CacheEvict(value = MEMBER_SUMMARY_CACHE, key = "#authorizedClient.accessToken.tokenValue")
+    public ModelAndView list(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
         return new ModelAndView(
                 "administration/membership/list",
                 Map.of(
@@ -74,8 +75,8 @@ public class MembershipController extends SspController<Member> {
 
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public ModelAndView edit(Principal principal, Locale locale, @PathVariable int id) {
-        var member = membershipService.get(id, principal).orElseThrow();
+    public ModelAndView edit(@RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, Locale locale, @PathVariable int id) {
+        var member = membershipService.get(id, authorizedClient.getAccessToken()).orElseThrow();
         return new ModelAndView("administration/membership/edit", buildModelData(member, locale));
     }
 
@@ -185,7 +186,7 @@ public class MembershipController extends SspController<Member> {
     @PostMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-update")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public ModelAndView update(
-            Principal principal,
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             Locale locale,
             @PathVariable int id,
             @ModelAttribute("data") GenericForm formData) {
@@ -193,7 +194,7 @@ public class MembershipController extends SspController<Member> {
         var member =
                 membershipService.update(
                         id,
-                        principal,
+                        authorizedClient.getAccessToken(),
                         formData.getData().entrySet().stream()
                                 .collect(
                                         Collectors.toMap(
@@ -211,11 +212,11 @@ public class MembershipController extends SspController<Member> {
             produces = "application/json",
             path = "/administration/membership/get-data")
     public @ResponseBody SspResponse<Member> getData(
-            Principal principal, @RequestBody SspRequest request) {
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient, @RequestBody SspRequest request) {
         Comparator<Member> comparator = createComparator(request);
         String search = request.getSearch().getValue().toLowerCase();
         List<Member> members =
-                membershipService.getMemberSummary(principal).stream()
+                membershipService.getMemberSummary(authorizedClient.getAccessToken()).stream()
                         .filter(
                                 m ->
                                         m.getFamilyName().toLowerCase().contains(search)

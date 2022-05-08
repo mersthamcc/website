@@ -1,28 +1,26 @@
 package cricket.merstham.website.frontend.service;
 
+import com.nimbusds.oauth2.sdk.ClientCredentialsGrant;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.token.AccessToken;
 import cricket.merstham.website.frontend.exception.AccessTokenRequestException;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import org.keycloak.authorization.client.representation.ServerConfiguration;
-import org.keycloak.common.util.KeycloakUriBuilder;
-import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.keycloak.constants.ServiceUrlConstants.AUTHZ_DISCOVERY_URL;
 
 @Service
 public class AccessTokenManager {
@@ -30,23 +28,12 @@ public class AccessTokenManager {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenManager.class);
 
     private final TokenCache tokenCache;
-    private String realm;
-    private String authServerUrl;
-    private String clientId;
-    private String clientSecret;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
-    public AccessTokenManager(
-            TokenCache tokenCache,
-            @Value("${keycloak.realm}") String realm,
-            @Value("${keycloak.auth-server-url}") String authServerUrl,
-            @Value("${keycloak.resource}") String clientId,
-            @Value("${keycloak.credentials.secret}") String clientSecret) {
+    public AccessTokenManager(TokenCache tokenCache, ClientRegistrationRepository clientRegistrationRepository) {
         this.tokenCache = tokenCache;
-        this.realm = realm;
-        this.authServerUrl = authServerUrl;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     public String getAccessToken() {
@@ -54,53 +41,40 @@ public class AccessTokenManager {
                 .getAccessToken()
                 .orElseGet(
                         () -> {
-                            var accessTokenResponse = requestAccessToken();
+                            var accessToken = requestAccessToken();
                             return tokenCache
                                     .updateToken(
-                                            accessTokenResponse.getToken(),
+                                            accessToken.getValue(),
                                             Duration.of(
-                                                    accessTokenResponse.getExpiresIn() - 60,
+                                                    accessToken.getLifetime() - 60,
                                                     SECONDS))
                                     .getAccessToken()
                                     .get();
                         });
     }
 
-    private AccessTokenResponse requestAccessToken() {
+    private AccessToken requestAccessToken() {
         LOG.info("Getting new client credentials access token");
 
-        var configuration = getServerConfiguration();
+        var client = clientRegistrationRepository.findByRegistrationId("website");
+        TokenRequest request = new TokenRequest(
+                URI.create(client.getProviderDetails().getTokenUri()),
+                new ClientSecretBasic(new ClientID(client.getClientId()), new Secret(client.getClientSecret())),
+                new ClientCredentialsGrant(),
+                Scope.parse(client.getScopes()));
 
-        var client = ClientBuilder.newClient();
-        client.register(HttpAuthenticationFeature.basic(clientId, clientSecret));
-        WebTarget target = client.target(configuration.getTokenEndpoint());
-        var requestBuilder = target.request(MediaType.APPLICATION_JSON_TYPE);
-
-        var form = new Form();
-        form.param("grant_type", "client_credentials");
-
-        var response = requestBuilder.build(HttpMethod.POST, Entity.form(form)).invoke();
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            var accessToken = response.readEntity(AccessTokenResponse.class);
-            LOG.debug("Successfully got client access token: {}", accessToken.getToken());
-            return accessToken;
+        try {
+            TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
+            if (response.indicatesSuccess()) {
+                var accessToken = response.toSuccessResponse().getTokens().getAccessToken();
+                LOG.debug("Successfully got client access token: {}", accessToken.toJSONString());
+                return accessToken;
+            }
+            LOG.error("Failed to get client credentials access token: {}", response.toHTTPResponse().getContent());
+            throw new AccessTokenRequestException(response.toHTTPResponse().getContent());
+        } catch (IOException | ParseException e) {
+            LOG.error("Failed to get client credentials access token", e);
+            throw new AccessTokenRequestException("Failed to get client credentials access token");
         }
-        LOG.error("Failed to get client credentials access token");
-        throw new AccessTokenRequestException("Failed to get client credentials access token");
-    }
-
-    private ServerConfiguration getServerConfiguration() {
-        var configurationUrl =
-                KeycloakUriBuilder.fromUri(authServerUrl)
-                        .clone()
-                        .path(AUTHZ_DISCOVERY_URL)
-                        .build(realm)
-                        .toString();
-        var client = ClientBuilder.newClient();
-        var target = client.target(configurationUrl);
-        return target.request(MediaType.APPLICATION_JSON_TYPE)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get()
-                .readEntity(ServerConfiguration.class);
     }
 }

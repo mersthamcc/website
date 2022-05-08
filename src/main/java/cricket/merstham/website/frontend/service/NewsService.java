@@ -19,10 +19,10 @@ import cricket.merstham.website.graph.type.NewsInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +42,9 @@ public class NewsService {
     }
 
     public SspGraphResponse<News> getItems(
-            Principal principal, int start, int length, String search) throws IOException {
+            OAuth2AccessToken accessToken, int start, int length, String search) throws IOException {
         var query = new AdminNewsQuery(start, length, Input.optional(search));
-        Response<AdminNewsQuery.Data> result = graphService.executeQuery(query, principal);
+        Response<AdminNewsQuery.Data> result = graphService.executeQuery(query, accessToken);
         var data = result.getData();
         return SspGraphResponse.<News>builder()
                 .data(
@@ -91,7 +91,7 @@ public class NewsService {
                 .build();
     }
 
-    public News saveNewsItem(Principal principal, News news) throws IOException {
+    public News saveNewsItem(OAuth2AccessToken accessToken, News news) throws IOException {
         var validationErrors =
                 processors.stream()
                         .map(p -> p.preSave(news))
@@ -116,7 +116,7 @@ public class NewsService {
                         .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result =
-                graphService.executeMutation(saveRequest, principal);
+                graphService.executeMutation(saveRequest, accessToken);
         if (result.hasErrors()) {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
@@ -125,6 +125,7 @@ public class NewsService {
                             .map(e -> e.getMessage())
                             .collect(Collectors.toList()));
         }
+        news.setId(result.getData().saveNews().id());
         news.setAttributes(
                 result.getData().saveNews().attributes().stream()
                         .collect(Collectors.toMap(o -> o.name(), o -> o.value())));
@@ -145,7 +146,7 @@ public class NewsService {
                         .attributes(attributes)
                         .build();
         Response<SaveNewsAttributesMutation.Data> attributeResult =
-                graphService.executeMutation(saveAttributesRequest, principal);
+                graphService.executeMutation(saveAttributesRequest, accessToken);
         if (attributeResult.hasErrors()) {
             attributeResult.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
@@ -173,13 +174,13 @@ public class NewsService {
         return saved;
     }
 
-    public News get(Principal principal, int id) throws IOException {
+    public News get(OAuth2AccessToken accessToken, int id) throws IOException {
         var query = new GetNewsItemQuery(id);
         Response<GetNewsItemQuery.Data> news;
-        if (isNull(principal)) {
+        if (isNull(accessToken)) {
             news = graphService.executeQuery(query);
         } else {
-            news = graphService.executeQuery(query, principal);
+            news = graphService.executeQuery(query, accessToken);
         }
         if (isNull(news.getData().newsItem())) throw new ResourceNotFoundException();
         var result =
@@ -228,9 +229,9 @@ public class NewsService {
         return result;
     }
 
-    public boolean delete(Principal principal, int id) throws IOException {
+    public boolean delete(OAuth2AccessToken accessToken, int id) throws IOException {
         var query = new DeleteNewsMutation(id);
-        Response<DeleteNewsMutation.Data> result = graphService.executeMutation(query, principal);
+        Response<DeleteNewsMutation.Data> result = graphService.executeMutation(query, accessToken);
         if (result.hasErrors()) {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
         }

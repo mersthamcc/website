@@ -10,6 +10,7 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -67,7 +68,7 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order) {
+    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
 
@@ -132,12 +133,12 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order) {
+    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order) {
+    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         try {
             var session =
                     Session.retrieve(
@@ -159,7 +160,7 @@ public class StripeService implements PaymentService {
                     BigDecimal.ZERO,
                     false,
                     false,
-                    request.getUserPrincipal());
+                    accessToken);
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
 
         } catch (StripeException e) {
@@ -169,12 +170,12 @@ public class StripeService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order) {
+    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/stripe/confirmation");
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order) {
+    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 

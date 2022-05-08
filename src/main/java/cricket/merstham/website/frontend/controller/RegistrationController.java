@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,9 +22,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
-
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -130,10 +130,10 @@ public class RegistrationController {
     @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
-            Principal principal,
+            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             HttpSession session,
             SessionStatus status) {
-        var order = membershipService.registerMembersFromBasket(basket, principal);
+        var order = membershipService.registerMembersFromBasket(basket, authorizedClient.getAccessToken());
         status.setComplete();
         session.setAttribute("order", order);
         return new ModelAndView(

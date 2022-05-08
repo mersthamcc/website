@@ -23,12 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,12 +51,12 @@ public class MembershipService {
         this.graphService = graphService;
     }
 
-    public Order registerMembersFromBasket(RegistrationBasket basket, Principal principal) {
+    public Order registerMembersFromBasket(RegistrationBasket basket, OAuth2AccessToken accessToken) {
         var createOrder = new CreateOrderMutation(basket.getId());
         var order = new Order();
         try {
             Response<CreateOrderMutation.Data> orderResult =
-                    graphService.executeMutation(createOrder, principal);
+                    graphService.executeMutation(createOrder, accessToken);
             if (orderResult.hasErrors()) {
                 throw new RuntimeException(
                         "GraphQL error(s) registering member: "
@@ -99,7 +99,7 @@ public class MembershipService {
 
             var createMemberMutation = new CreateMemberMutation(memberInput);
             try {
-                var result = graphService.executeMutation(createMemberMutation, principal);
+                var result = graphService.executeMutation(createMemberMutation, accessToken);
                 if (result.hasErrors()) {
                     throw new RuntimeException(
                             "GraphQL error(s) registering member: "
@@ -124,7 +124,7 @@ public class MembershipService {
             BigDecimal fees,
             boolean collected,
             boolean reconciled,
-            Principal principal) {
+            OAuth2AccessToken accessToken) {
         var addPaymentToOrderMutation =
                 new AddPaymentToOrderMutation(
                         order.getId(),
@@ -139,7 +139,7 @@ public class MembershipService {
                                 .build());
         try {
             Response<AddPaymentToOrderMutation.Data> result =
-                    graphService.executeMutation(addPaymentToOrderMutation, principal);
+                    graphService.executeMutation(addPaymentToOrderMutation, accessToken);
             if (result.hasErrors()) {
                 throw new RuntimeException(
                         "GraphQL error(s) creating payment: "
@@ -175,19 +175,19 @@ public class MembershipService {
         }
     }
 
-    public List<MembersQuery.Member> getAllMembers(Principal principal) {
+    public List<MembersQuery.Member> getAllMembers(OAuth2AccessToken accessToken) {
         var query = new MembersQuery();
         try {
-            Response<MembersQuery.Data> result = graphService.executeQuery(query, principal);
+            Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
             return result.getData().members();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#principal.name")
-    public List<Member> getMemberSummary(Principal principal) {
-        return getAllMembers(principal).stream()
+    @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
+    public List<Member> getMemberSummary(OAuth2AccessToken accessToken) {
+        return getAllMembers(accessToken).stream()
                 .map(
                         m ->
                                 Member.builder()
@@ -217,10 +217,10 @@ public class MembershipService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<MemberQuery.Member> get(int id, Principal principal) {
+    public Optional<MemberQuery.Member> get(int id, OAuth2AccessToken accessToken) {
         var query = new MemberQuery(id);
         try {
-            Response<MemberQuery.Data> result = graphService.executeQuery(query, principal);
+            Response<MemberQuery.Data> result = graphService.executeQuery(query, accessToken);
 
             return Optional.of(result.getData().member());
         } catch (IOException e) {
@@ -229,7 +229,7 @@ public class MembershipService {
     }
 
     public UpdateMemberMutation.UpdateMember update(
-            int id, Principal principal, Map<String, Object> data) {
+            int id, OAuth2AccessToken accessToken, Map<String, Object> data) {
         var request =
                 new UpdateMemberMutation(
                         id,
@@ -243,7 +243,7 @@ public class MembershipService {
                                 .collect(Collectors.toList()));
         try {
             Response<UpdateMemberMutation.Data> result =
-                    graphService.executeMutation(request, principal);
+                    graphService.executeMutation(request, accessToken);
 
             return result.getData().updateMember();
         } catch (IOException e) {
