@@ -1,4 +1,12 @@
-include 'acceptance-tests'
-include 'frontend'
-include 'shared'
-include 'graphql'
+pluginManagement {
+    repositories {
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://repo.spring.io/snapshot" }
+        gradlePluginPortal()
+    }
+}
+
+include "acceptance-tests"
+include "frontend"
+include "shared"
+include "graphql"
