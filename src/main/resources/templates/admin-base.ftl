@@ -261,7 +261,7 @@
 														 alt="Image Description">
 												</div>
 												<div class="media-body">
-													<span class="card-title h5">${user.givenName} ${user.familyName}</span>
+													<span class="card-title h5">${user.givenName!""} ${user.familyName!""}</span>
 													<span class="card-text">${user.email}</span>
 												</div>
 											</div>
@@ -1048,6 +1048,8 @@
 			<script src="${resourcePrefix}/front/admin/assets/js/theme.min.js"></script>
 			<script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
 			<script src="${resourcePrefix}/mcc/js/ckeditor/ckeditor.js"></script>
+			<script src="${resourcePrefix}/mcc/js/node_modules/@ckeditor/ckeditor5-inspector/build/inspector.js"></script>
+
 			<#if script?is_directive><@script /><#else>${script}</#if>
 
 			<!-- JS Plugins Init. -->

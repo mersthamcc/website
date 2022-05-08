@@ -3,7 +3,7 @@
 <#import "../components.ftl" as components />
 <@layout.mainLayout formName="menu.register">
     <@components.panel>
-        <form class="form-horizontal" method="post" name="action">
+        <form class="form-horizontal" method="post" name="action" action="/register">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             <@components.section title="Members">
                 <table class="table table-hover">
@@ -20,11 +20,11 @@
                     <tbody>
                         <#list basket.subscriptions as id, subscription>
                             <tr scope="row">
-                                <td>${subscription.member["given-name"]}</td>
-                                <td>${subscription.member["family-name"]}</td>
+                                <td>${subscription.member["given-name"]!""}</td>
+                                <td>${subscription.member["family-name"]!""}</td>
                                 <td><@spring.message code="membership.${subscription.action}" /></td>
-                                <td><@spring.message code="membership.${subscription.category}" /></td>
-                                <td align="right">${subscription.price?string.currency}</td>
+                                <td><@spring.message code="membership.${subscription.category!'unknown'}" /></td>
+                                <td text-align="right">${subscription.price!0?string.currency}</td>
                                 <td>
                                     <button type="submit" class="btn btn-info btn-xs" name="edit-member" value="${id}">
                                         <i class="fa fa-edit"></i>
@@ -46,7 +46,7 @@
                             <td></td>
                             <td></td>
                             <th>Total:</th>
-                            <td align="right">${basket.basketTotal?string.currency}</td>
+                            <td text-align="right">${basket.basketTotal?string.currency}</td>
                             <td></td>
                         </tr>
                     </tfoot>

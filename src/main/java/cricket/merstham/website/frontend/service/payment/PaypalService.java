@@ -10,6 +10,7 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -81,12 +82,12 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order) {
+    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/paypal/checkout");
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order) {
+    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent(CAPTURE_INTENT);
 
@@ -162,7 +163,7 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order) {
+    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var captureRequest =
                 new OrdersCaptureRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
@@ -187,7 +188,7 @@ public class PaypalService implements PaymentService {
                                                     .value()),
                                     false,
                                     false,
-                                    request.getUserPrincipal()));
+                                    accessToken));
 
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
         } catch (IOException e) {
@@ -197,7 +198,7 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order) {
+    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var ordersGetRequest =
                 new OrdersGetRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
@@ -216,7 +217,7 @@ public class PaypalService implements PaymentService {
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order) {
+    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 }

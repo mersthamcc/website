@@ -1,20 +1,13 @@
 package cricket.merstham.website.frontend.helpers;
 
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.IDToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.security.Principal;
 
 public class UserHelper {
     public static String getUserFullName(Principal principal) {
-        IDToken idToken = getIdToken(principal);
-        return idToken.getName();
-    }
-
-    private static IDToken getIdToken(Principal principal) {
-        return ((KeycloakPrincipal) ((KeycloakAuthenticationToken) principal).getPrincipal())
-                .getKeycloakSecurityContext()
-                .getIdToken();
+        OidcUser user = (OidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal();
+        return user.getFullName();
     }
 }

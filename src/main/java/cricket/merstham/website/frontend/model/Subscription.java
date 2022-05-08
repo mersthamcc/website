@@ -27,7 +27,7 @@ public class Subscription implements Serializable {
 
     @JsonProperty private Map<String, AttributeDefinition> attributes = new HashMap<>();
 
-    @JsonProperty private BigDecimal price;
+    @JsonProperty private BigDecimal price = BigDecimal.ZERO;
 
     @JsonProperty private RegistrationAction action = RegistrationAction.NEW;
 

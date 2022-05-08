@@ -7,12 +7,20 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 
 import static java.text.MessageFormat.format;
 
 public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDateTime> {
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private DateTimeFormatter formatter =
+            new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                    .appendZoneOrOffsetId()
+                    .toFormatter();
+    // DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
 
     @Override
     public LocalDateTime decode(@NotNull CustomTypeValue<?> value) {

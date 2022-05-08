@@ -12,18 +12,15 @@ import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
 import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.LocalDateTimeCustomTypeAdapter;
 import okio.ByteString;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -53,25 +50,21 @@ public class GraphService {
         this.objectMapper = objectMapper;
     }
 
-    public <T extends Query, R> R executeQuery(T query, Principal principal, TypeReference<R> clazz)
+    public <T extends Query, R> R executeQuery(T query, OAuth2AccessToken accessToken, TypeReference<R> clazz)
             throws IOException {
-        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
         byte[] response =
                 getRawResult(
-                        query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                        query, accessToken.getTokenValue());
         return objectMapper.readValue(response, clazz);
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(
-            T query, Principal principal) throws IOException {
-        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+            T query, OAuth2AccessToken accessToken) throws IOException {
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
-        return getResult(query, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        return getResult(query, accessToken.getTokenValue());
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(T query)
@@ -84,21 +77,16 @@ public class GraphService {
     }
 
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
-            T mutation, Principal principal) throws IOException {
-        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
+            T mutation, OAuth2AccessToken accessToken) throws IOException {
 
-        return getResult(mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        return getResult(mutation, accessToken.getTokenValue());
     }
 
     public <T extends Mutation, R> R executeMutation(
-            T mutation, Principal principal, Class<R> clazz) throws IOException {
-        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
-        var keycloakPrincipal = (KeycloakPrincipal) token.getPrincipal();
-
+            T mutation, OAuth2AccessToken accessToken, Class<R> clazz) throws IOException {
         byte[] response =
                 getRawResult(
-                        mutation, keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                        mutation, accessToken.getTokenValue());
         return objectMapper.readValue(response, clazz);
     }
 

@@ -391,7 +391,7 @@
                                 <input type="hidden" name="category" value="${category.key()}" />
                                 <input type="hidden" name="uuid" value="${subscription.uuid}" />
                                 <button
-                                        type="sumbit"
+                                        type="submit"
                                         class="btn btn-soft-primary btn-block transition-3d-hover"
                                         value="${item.id()}"
                                         name="pricelistItemId"

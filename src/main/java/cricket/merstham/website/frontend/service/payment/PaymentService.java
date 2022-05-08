@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.service.payment;
 
 import cricket.merstham.website.frontend.model.Order;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,13 +15,13 @@ public interface PaymentService {
 
     Optional<String> getDisabledReason();
 
-    ModelAndView checkout(HttpServletRequest request, Order order);
+    ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken);
 
-    ModelAndView authorise(HttpServletRequest request, Order order);
+    ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken);
 
-    ModelAndView execute(HttpServletRequest request, Order order);
+    ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken);
 
-    ModelAndView confirm(HttpServletRequest request, Order order);
+    ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken);
 
-    ModelAndView cancel(HttpServletRequest request, Order order);
+    ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken);
 }

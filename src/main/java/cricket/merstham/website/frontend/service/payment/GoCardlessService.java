@@ -6,11 +6,11 @@ import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
 import cricket.merstham.website.frontend.service.MembershipService;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,7 +21,11 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.gocardless.GoCardlessClient.Environment.LIVE;
@@ -81,7 +85,7 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView checkout(HttpServletRequest request, Order order) {
+    public ModelAndView checkout(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         List<PaymentSchedule> schedules = new ArrayList<>();
         for (var i = 1; i <= 10; i++) {
             BigDecimal monthly = order.getTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
@@ -101,11 +105,10 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView authorise(HttpServletRequest request, Order order) {
+    public ModelAndView authorise(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-        var keycloakAuthenticationToken = (KeycloakAuthenticationToken) request.getUserPrincipal();
-        var keycloakPrincipal = (KeycloakPrincipal) keycloakAuthenticationToken.getPrincipal();
+        var principal = (OidcUser) request.getUserPrincipal();
         var redirectFlow =
                 client.redirectFlows()
                         .create()
@@ -115,16 +118,8 @@ public class GoCardlessService implements PaymentService {
                         .withSuccessRedirectUrl(
                                 format("{0}/payments/{1}/execute", baseUri, SERVICE_NAME))
                         .withPrefilledCustomerEmail(request.getUserPrincipal().getName())
-                        .withPrefilledCustomerGivenName(
-                                keycloakPrincipal
-                                        .getKeycloakSecurityContext()
-                                        .getIdToken()
-                                        .getGivenName())
-                        .withPrefilledCustomerFamilyName(
-                                keycloakPrincipal
-                                        .getKeycloakSecurityContext()
-                                        .getIdToken()
-                                        .getFamilyName())
+                        .withPrefilledCustomerGivenName(principal.getGivenName())
+                        .withPrefilledCustomerFamilyName(principal.getFamilyName())
                         .withScheme(RedirectFlowService.RedirectFlowCreateRequest.Scheme.BACS)
                         .execute();
 
@@ -142,7 +137,7 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, Order order) {
+    public ModelAndView execute(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         int dayOfMonth = (int) request.getSession().getAttribute(SESSION_DAY_OF_MONTH);
         int numberOfPayments = (int) request.getSession().getAttribute(SESSION_NUMBER_OF_PAYMENTS);
         String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
@@ -195,7 +190,7 @@ public class GoCardlessService implements PaymentService {
                     BigDecimal.ZERO,
                     false,
                     false,
-                    request.getUserPrincipal());
+                    accessToken);
             remaining = remaining.subtract(chargeAmount);
         }
 
@@ -225,12 +220,12 @@ public class GoCardlessService implements PaymentService {
     }
 
     @Override
-    public ModelAndView confirm(HttpServletRequest request, Order order) {
+    public ModelAndView confirm(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/gocardless/confirmation");
     }
 
     @Override
-    public ModelAndView cancel(HttpServletRequest request, Order order) {
+    public ModelAndView cancel(HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         return null;
     }
 }
