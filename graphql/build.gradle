@@ -10,6 +10,13 @@ group = "cricket.merstham.graphql"
 sourceCompatibility = JavaVersion.VERSION_15
 targetCompatibility = JavaVersion.VERSION_15
 
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mersthamcc_website"
+        property "sonar.organization", "mersthamcc"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
 
 repositories {
     mavenCentral()
