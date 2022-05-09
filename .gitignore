@@ -1,7 +1,6 @@
 .env
 .jpb/
 .run/
-acceptance-tests/
 
 dev-config/cognito/.terraform
 dev-config/cognito/terraform.tfstate*

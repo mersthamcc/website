@@ -1,10 +1,5 @@
 package cricket.merstham.graphql.services;
 
-import cricket.merstham.graphql.dto.AttributeDefinition;
-import cricket.merstham.graphql.dto.Member;
-import cricket.merstham.graphql.dto.MemberCategory;
-import cricket.merstham.graphql.dto.Order;
-import cricket.merstham.graphql.dto.Payment;
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
 import cricket.merstham.graphql.entity.MemberEntity;
@@ -20,6 +15,11 @@ import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
+import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.Payment;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

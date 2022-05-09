@@ -30,19 +30,11 @@ function stop_docker_services() {
 echo "Shutting down environment..."
 docker-compose down --volumes --rmi local --remove-orphans
 
-echo "Removing Terraform state..."
-rm -f dev-config/keycloak/terraform.*
-
 echo "Initialising new environment..."
 start_docker_services loki postgres
 wait_for_docker_services loki postgres
 
-docker-compose build flyway keycloak-terraform
+docker-compose build flyway
 docker-compose run flyway
 
-start_docker_services keycloak
-wait_for_docker_services keycloak
-
-docker-compose run --rm keycloak-terraform
-
-stop_docker_services keycloak postgres loki
+stop_docker_services postgres loki

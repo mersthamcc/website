@@ -1,7 +1,7 @@
-package cricket.merstham.graphql.dto;
+package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cricket.merstham.graphql.entity.AttributeType;
+import cricket.merstham.shared.types.AttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

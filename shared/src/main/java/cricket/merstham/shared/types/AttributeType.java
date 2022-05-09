@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.entity;
+package cricket.merstham.shared.types;
 
 public enum AttributeType {
     String,

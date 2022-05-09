@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.dto;
+package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.dto;
+package cricket.merstham.shared.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

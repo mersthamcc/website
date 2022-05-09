@@ -376,7 +376,6 @@ services:
     restart: unless-stopped
     depends_on:
       - loki
-      - web
     logging:
       driver: loki
       options:
@@ -399,7 +398,7 @@ services:
       - tls-cert-host-check=postgres.${DEVDOMAIN}
     environment:
       PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False" # pragma: allowlist secret
       PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAILADDRESS}
       PGADMIN_DEFAULT_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:

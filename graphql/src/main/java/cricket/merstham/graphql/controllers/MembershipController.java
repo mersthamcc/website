@@ -1,14 +1,14 @@
 package cricket.merstham.graphql.controllers;
 
-import cricket.merstham.graphql.dto.AttributeDefinition;
-import cricket.merstham.graphql.dto.Member;
-import cricket.merstham.graphql.dto.MemberCategory;
-import cricket.merstham.graphql.dto.Order;
-import cricket.merstham.graphql.dto.Payment;
 import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.services.MembershipService;
+import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.Payment;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;

@@ -2,14 +2,17 @@ package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class MenuTest {
 
     private static final List<Menu> menuTree =
@@ -234,8 +237,8 @@ class MenuTest {
     private ViewConfiguration.CurrentRoute createMockCurrentRoute(
             String name, LinkedHashMap<String, String> pathVariables) {
         ViewConfiguration.CurrentRoute currentRoute = mock(ViewConfiguration.CurrentRoute.class);
-        when(currentRoute.getName()).thenReturn(name);
-        when(currentRoute.getPathVariables()).thenReturn(pathVariables);
+        lenient().when(currentRoute.getName()).thenReturn(name);
+        lenient().when(currentRoute.getPathVariables()).thenReturn(pathVariables);
         return currentRoute;
     }
 }

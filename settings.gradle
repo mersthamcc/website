@@ -8,5 +8,5 @@ pluginManagement {
 
 include "acceptance-tests"
 include "frontend"
-include "shared"
 include "graphql"
+include "shared"
