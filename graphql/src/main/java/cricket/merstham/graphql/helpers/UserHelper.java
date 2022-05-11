@@ -19,6 +19,8 @@ public class UserHelper {
 
     public static List<String> getRoles(Principal principal) {
         var user = ((JwtAuthenticationToken) principal);
-        return user.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList());
+        return user.getAuthorities().stream()
+                .map(a -> a.getAuthority())
+                .collect(Collectors.toList());
     }
 }

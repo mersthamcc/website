@@ -100,55 +100,6 @@ services:
       options:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
-  web:
-    image: mersthamcc/frontend:development
-    build:
-      dockerfile: Dockerfile
-      context: frontend
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.www.rule=Host(`www.${DEVDOMAIN}`)
-      - traefik.http.services.www.loadbalancer.server.port=8080
-      - traefik.http.routers.www.entrypoints=web
-      - traefik.http.routers.www.middlewares=forcehttps
-      - traefik.http.routers.www-tls.tls=true
-      - traefik.http.routers.www-tls.rule=Host(`www.${DEVDOMAIN}`)
-      - traefik.http.routers.www-tls.entrypoints=websecure
-      - traefik.http.routers.www-tls.tls.certresolver=le
-      - traefik.http.routers.www-tls.tls.domains[0].main=*.${DEVDOMAIN}
-      - com_docker_swarm_service_name=www
-      - tls-cert-host-check=www.${DEVDOMAIN}
-    extra_hosts:
-      - "login.${DEVDOMAIN}:host-gateway"
-      - "graph.${DEVDOMAIN}:host-gateway"
-    environment:
-      KEYCLOAK_COMMON_SECRET: ${KEYCLOAK_COMMON_SECRET}
-      DEVDOMAIN: ${DEVDOMAIN}
-      CKFINDER_LICENCE_NAME: ${CKFINDER_LICENCE_NAME}
-      CKFINDER_LICENCE_KEY: ${CKFINDER_LICENCE_KEY}
-      API_SERVER_URL: "https://graph.${DEVDOMAIN}/graphql"
-      COOKIE_CONTROL_KEY: ${COOKIE_CONTROL_KEY}
-      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
-      KEYCLOAK_CLIENT_ID: website
-      GRAPH_URI: https://graph.${DEVDOMAIN}/graphql
-      REDIS_HOST: redis
-    ports:
-      - 8081:8081
-    networks:
-      - dmz
-      - backendnetwork
-    restart: unless-stopped
-    healthcheck:
-      test: curl http://localhost:8080/actuator/health
-      interval: 5s
-      retries: 30
-    depends_on:
-      - loki
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
-
   postgres:
     image: postgres:12
     ports:
@@ -280,58 +231,6 @@ services:
     depends_on:
       - redis
       - loki
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
-
-  graph:
-    image: graphql:local
-    build:
-      context: graphql
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.graph.rule=Host(`graph.${DEVDOMAIN}`)
-      - traefik.http.services.graph.loadbalancer.server.port=4000
-      - traefik.http.routers.graph.entrypoints=web
-      - traefik.http.routers.graph.middlewares=forcehttps
-      - traefik.http.routers.graph-tls.tls=true
-      - traefik.http.routers.graph-tls.rule=Host(`graph.${DEVDOMAIN}`)
-      - traefik.http.routers.graph-tls.entrypoints=websecure
-      - traefik.http.routers.graph-tls.tls.certresolver=le
-      - traefik.http.routers.graph-tls.tls.domains[0].main=*.${DEVDOMAIN}
-      - com_docker_swarm_service_name=graph
-      - tls-cert-host-check=graph.${DEVDOMAIN}
-    entrypoint: npm run start
-    extra_hosts:
-      - "login.${DEVDOMAIN}:host-gateway"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      LISTEN_PORT: 4000
-      KEYCLOAK_URL: https://login.${DEVDOMAIN}/auth
-      KEYCLOAK_REALM: ${DEVDOMAIN}
-      KEYCLOAK_CLIENT_ID: graphql
-      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
-      GRAPHQL_PLAYGROUND: "true"
-      NODE_ENV: dev
-      GRAPHQL_DEBUG: "true"
-      APOLLO_KEY: "service:My-Graph-rw9emt:Vkk4Oij9mWtUL0ZmFnymKw"
-      APOLLO_GRAPH_VARIANT: current
-      APOLLO_SCHEMA_REPORTING: "true"
-      DATABASE_SECRET: ${DATABASE_SECRET}
-    ports:
-      - 4000:4000
-    networks:
-      - dmz
-      - backendnetwork
-    restart: unless-stopped
-    healthcheck:
-      test: curl http://localhost:4000
-      interval: 5s
-      retries: 30
-    depends_on:
-      - loki
-      - postgres
     logging:
       driver: loki
       options:
@@ -477,7 +376,6 @@ services:
     restart: unless-stopped
     depends_on:
       - loki
-      - web
     logging:
       driver: loki
       options:
@@ -500,7 +398,7 @@ services:
       - tls-cert-host-check=postgres.${DEVDOMAIN}
     environment:
       PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False" # pragma: allowlist secret
       PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAILADDRESS}
       PGADMIN_DEFAULT_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
@@ -552,78 +450,6 @@ services:
       driver: loki
       options:
         loki-url: "http://localhost:3100/loki/api/v1/push"
-
-  keycloak:
-    image: mersthamcc/keycloak:latest
-    build:
-      context: keycloak
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.login.rule=Host(`login.${DEVDOMAIN}`)
-      - traefik.http.services.login.loadbalancer.server.port=8080
-      - traefik.http.routers.login.entrypoints=web
-      - traefik.http.routers.login.middlewares=forcehttps
-      - traefik.http.routers.login-tls.tls=true
-      - traefik.http.routers.login-tls.rule=Host(`login.${DEVDOMAIN}`)
-      - traefik.http.routers.login-tls.entrypoints=websecure
-      - traefik.http.routers.login-tls.tls.certresolver=le
-      - traefik.http.routers.login-tls.tls.domains[0].main=*.${DEVDOMAIN}
-      - com_docker_swarm_service_name=login
-      - tls-cert-host-check=login.${DEVDOMAIN}
-    environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_SCHEMA: public
-      DB_PASSWORD: ${DATABASE_ROOT_PASSWORD}
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
-      KEYCLOAK_FRONTEND_URL: https://login.${DEVDOMAIN}/auth
-      PROXY_ADDRESS_FORWARDING: "true"
-      MESSAGEBIRD_API_TOKEN: ${MESSAGEBIRD_API_TOKEN}
-      SMS_OTP_ORIGINATOR: ${SMS_OTP_ORIGINATOR}
-      SMS_OTP_PROVIDER: ${SMS_OTP_PROVIDER}
-    depends_on:
-      - postgres
-      - loki
-    networks:
-      - backendnetwork
-    healthcheck:
-      test: curl http://localhost:8080
-      interval: 5s
-      retries: 30
-    restart: on-failure
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
-
-  keycloak-terraform:
-    image: chrisclayson/terraform-toolbox:latest
-    working_dir: /src
-    command: ./deploy.sh --validate
-    restart: on-failure
-    extra_hosts:
-      - "login.${DEVDOMAIN}:host-gateway"
-    volumes:
-      - ./dev-config/keycloak:/src
-    environment:
-      TF_VAR_keycloak_administrator_username: admin
-      TF_VAR_keycloak_administrator_password: ${KEYCLOAK_PASSWORD}
-      TF_VAR_keycloak_url: http://keycloak:8080
-      TF_VAR_realm_name: ${DEVDOMAIN}
-      TF_VAR_website_client_secret: ${KEYCLOAK_COMMON_SECRET}
-      TF_VAR_base_url: https://www.${DEVDOMAIN}
-      TF_VAR_graphql_base_url: https://graph.${DEVDOMAIN}
-      TF_VAR_keycloak_family_name: ${FAMILYNAME}
-      TF_VAR_keycloak_given_name: ${FIRSTNAME}
-      TF_VAR_clubname: ${CLUBNAME}
-      TF_VAR_keycloak_email_address: ${ADMIN_EMAILADDRESS}
-    networks:
-      - backendnetwork
-    depends_on:
-      - keycloak
 
   vault:
     image: vault:latest

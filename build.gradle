@@ -1,6 +1,8 @@
 plugins {
     id "com.avast.gradle.docker-compose" version "0.14.3"
     id "com.diffplug.spotless" version "5.8.2"
+    id "org.sonarqube" version "3.2.0"
+    id "jacoco"
 }
 
 apply plugin: 'application'
@@ -8,6 +10,18 @@ apply plugin: 'idea'
 apply plugin: 'com.avast.gradle.docker-compose'
 
 group 'cricket.merstham'
+
+ext {
+    dependencyVersions = [
+            spring_boot    : "2.6.7",
+            spring_sessions: "2.6.3",
+            apollo         : "2.5.11",
+            prometheus     : "1.8.5",
+            lombok         : "1.18.24",
+            testcontainers : "1.16.2",
+            jackson        : "2.13.2",
+    ]
+}
 
 dockerCompose {
     buildBeforeUp = true
@@ -52,7 +66,23 @@ spotless {
     }
 }
 
-
 repositories {
     mavenCentral()
 }
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mersthamcc_website"
+        property "sonar.organization", "mersthamcc"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+    dependsOn "test"
+}
+
+tasks["sonarqube"].dependsOn test

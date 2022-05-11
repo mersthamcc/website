@@ -1,18 +1,32 @@
 plugins {
-    id 'java'
+    id "java"
+    id "jacoco"
 }
 
-group 'cricket.merstham'
+group "cricket.merstham"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    annotationProcessor "org.projectlombok:lombok:${dependencyVersions.lombok}"
+
+    compileOnly "org.projectlombok:lombok:${dependencyVersions.lombok}"
+    compileOnly "com.fasterxml.jackson.core:jackson-core:${dependencyVersions.jackson}"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${dependencyVersions.jackson}"
+    compileOnly "com.fasterxml.jackson.core:jackson-databind:${dependencyVersions.jackson}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 }
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
 }

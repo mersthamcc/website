@@ -1,6 +1,6 @@
 package cricket.merstham.graphql.controllers;
 
-import cricket.merstham.graphql.dto.User;
+import cricket.merstham.shared.dto.User;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.shared.types.AttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

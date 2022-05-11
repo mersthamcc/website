@@ -1,0 +1,112 @@
+base-url: https://www.new.mersthamcc.co.uk
+spring:
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
+  freemarker:
+    template-loader-path: "classpath:/templates"
+    suffix: .ftl
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+  security:
+    oauth2:
+      client:
+        registration:
+          login:
+            client-id: "${KEYCLOAK_CLIENT_ID:dummy}"
+            client-secret: "${KEYCLOAK_CLIENT_SECRET:}"
+            scope: openid, email, profile
+            authorization-grant-type: authorization_code
+            client-name: website
+          website:
+            client-id: "${WEBSITE_CLIENT_CREDENTIALS_ID:dummy}"
+            client-secret: "${WEBSITE_CLIENT_CREDENTIALS_SECRET:}"
+            scope: "graphql/trusted-client"
+            authorization-grant-type: client_credentials
+            client-name: website-client
+        provider:
+          login:
+            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
+            user-name-attribute: email
+          website:
+            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
+
+debug: false
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+club:
+  club-name: ${CLUBNAME:Merstham Cricket Club}
+  logo: "/mcc/img/logos/mcc-logo-header.svg"
+  favicon: "/mcc/img/logos/mcc-logo-favicon.svg"
+  phone-number: "(01737) 645485"
+  google-analytics-key: "UA-48714932-4"
+  play-cricket:
+    enabled: true
+    site: merstham
+  social:
+    twitter:
+      handle: ${TWITTER_HANDLE:mersthammagics}
+    facebook:
+      handle: ${FACEBOOK_HANDLE:MersthamCC}
+  cookies:
+    api-key: ${COOKIE_CONTROL_KEY:}
+    product-code: ${COOKIE_CONTROL_PRODUCT:PRO}
+    optional-cookie-categories:
+      - name: social
+        label: Social Media
+        enabled: true
+        description: Blah
+        cookieNames:
+          - "_utma"
+          - "gid"
+graph:
+  graph-uri: http://localhost:8090/graphql # ${GRAPH_URI}
+
+resources:
+  base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"
+  base-directory: "${RESOURCES_BASE_DIRECTORY:../infrastructure/spaces-data}"
+
+payments:
+  pay-later:
+    enabled: true
+    disabled-reason: ~
+  paypal:
+    enabled: true
+    disabled-reason: ~
+    client-id: ${PAYPAL_CLIENT_ID:}
+    client-secret: ${PAYPAL_CLIENT_SECRET:}
+    sandbox: true
+  stripe:
+    enabled: true
+    disabled-reason: ~
+    api-key: ${STRIPE_API_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+  gocardless:
+    enabled: true
+    disabled-reason: ~
+    access-token: ${GOCARDLESS_ACCESS_TOKEN:}
+    sandbox: true
+    mandate-description: Membership and Match Fees
+  bank:
+    enabled: true
+    disabled-reason: ~
+    account-name: ${BANK_ACCOUNT_NAME:Merstham Cricket Club}
+    account-number: ${BANK_ACCOUNT_NUMBER:49244507}
+    sort-code: ${BANK_ACCOUNT_SORT_CODE:56-00-46}
+
+facebook:
+  application-id: ${FACEBOOK_APP_ID}
+  application-secret: ${FACEBOOK_APP_SECRET}
+  page-id: ${FACEBOOK_PAGE_ID}
+  access-token: ${FACEBOOK_PAGE_ACCESS_TOKEN}
+
+twitter:
+  api-key: ${TWITTER_API_KEY}
+  api-secret: ${TWITTER_API_SECRET}
+  oauth-access-token: ${TWITTER_OAUTH_ACCESS_TOKEN}
+  oauth-access-token-secret: ${TWITTER_OAUTH_ACCESS_TOKEN_SECRET}

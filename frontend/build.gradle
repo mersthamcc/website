@@ -1,0 +1,83 @@
+plugins {
+    id "org.springframework.boot" version "2.4.5"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+    id "com.apollographql.apollo" version "2.5.11"
+    id "jacoco"
+}
+
+group = "cricket.merstham.website"
+sourceCompatibility = JavaVersion.VERSION_15
+targetCompatibility = JavaVersion.VERSION_15
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://maven.cksource.com/"
+    }
+}
+
+dependencies {
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${dependencyVersions.spring_boot}"
+    annotationProcessor "org.projectlombok:lombok:${dependencyVersions.lombok}"
+    implementation "org.springframework.boot:spring-boot-starter-freemarker:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-mail:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-quartz:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.session:spring-session-data-redis:${dependencyVersions.spring_sessions}"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
+    implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
+    implementation "com.paypal.sdk:checkout-sdk:1.0.5"
+    implementation "com.stripe:stripe-java:20.117.0"
+    implementation "com.gocardless:gocardless-pro:5.4.0"
+    implementation "org.projectlombok:lombok:${dependencyVersions.lombok}"
+    implementation "com.cksource:ckfinder3:3.5.2"
+    implementation "org.jsoup:jsoup:1.14.3"
+    implementation "com.facebook.business.sdk:facebook-java-business-sdk:13.0.0"
+    implementation "org.twitter4j:twitter4j-core:4.0.7"
+    implementation "no.api.freemarker:freemarker-java8:2.0.0"
+    implementation project(":shared")
+
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
+    testImplementation "org.springframework.security:spring-security-test:5.6.3"
+    testImplementation "org.assertj:assertj-core:3.22.0"
+    testImplementation "com.c4-soft.springaddons:spring-security-oauth2-test-addons:4.1.9"
+}
+
+apollo {
+    service("graph") {
+        sourceFolder.set("src/main/graphql/cricket/merstham/website/graph")
+        schemaFile.set(file("src/main/graphql/cricket/merstham/website/graph/schema.json"))
+        rootPackageName.set("cricket.merstham.website.graph")
+
+        customTypeMapping = [
+                "Date" : "java.time.LocalDate",
+                "DateTime" : "java.time.LocalDateTime"
+        ]
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = "frontend.jar"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+test.finalizedBy jacocoTestReport
+

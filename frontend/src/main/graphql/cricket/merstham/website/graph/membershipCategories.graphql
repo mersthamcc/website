@@ -1,0 +1,31 @@
+query membershipCategories($key: StringFilter!) {
+  membershipCategories(where: {
+    key: $key
+  }) {
+    key
+    registrationCode
+    pricelistItem {
+      id
+      description
+      minAge
+      maxAge
+      includesMatchFees
+      currentPrice
+    }
+    form {
+      sortOrder
+      section {
+        key
+        attribute {
+          sortOrder
+          mandatory
+          definition {
+            key
+            type
+            choices
+          }
+        }
+      }
+    }
+  }
+}

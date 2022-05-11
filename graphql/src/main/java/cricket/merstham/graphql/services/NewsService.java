@@ -1,11 +1,11 @@
 package cricket.merstham.graphql.services;
 
-import cricket.merstham.graphql.dto.News;
-import cricket.merstham.graphql.dto.NewsAttribute;
-import cricket.merstham.graphql.dto.Totals;
 import cricket.merstham.graphql.entity.NewsAttributeEntity;
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.repository.NewsEntityRepository;
+import cricket.merstham.shared.dto.News;
+import cricket.merstham.shared.dto.NewsAttribute;
+import cricket.merstham.shared.dto.Totals;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

@@ -1,7 +1,7 @@
 repos:
   - repo: git@github.com:Yelp/detect-secrets
-    rev: v0.13.1
+    rev: v1.1.0
     hooks:
       - id: detect-secrets
-        args: ['--use-all-plugins', '--baseline', '.secrets.baseline']
-        exclude: web/public/assets/(admin|base|plugins)/.*|Brewfile.lock.json|web/composer.lock|.*/installed.json|.*/package-lock.json|web/symfony.lock
+        args: ['--baseline', '.secrets.baseline']
+        exclude: Brewfile.lock.json|.*/installed.json|.*/package-lock.json|src/main/resources/static/assets/.*
