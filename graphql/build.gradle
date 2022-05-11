@@ -3,20 +3,11 @@ plugins {
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "java"
     id "jacoco"
-    id "org.sonarqube" version "3.2.0"
 }
 
 group = "cricket.merstham.graphql"
 sourceCompatibility = JavaVersion.VERSION_15
 targetCompatibility = JavaVersion.VERSION_15
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "mersthamcc_website"
-        property "sonar.organization", "mersthamcc"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
 
 repositories {
     mavenCentral()
@@ -78,4 +69,3 @@ jacocoTestReport {
 }
 
 test.finalizedBy jacocoTestReport
-tasks["sonarqube"].dependsOn test
