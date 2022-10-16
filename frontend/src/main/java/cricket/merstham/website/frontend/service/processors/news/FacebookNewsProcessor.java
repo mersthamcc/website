@@ -1,8 +1,8 @@
 package cricket.merstham.website.frontend.service.processors.news;
 
 import com.facebook.ads.sdk.APIException;
+import cricket.merstham.shared.dto.News;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
-import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.service.FacebookPageService;
 import cricket.merstham.website.frontend.service.processors.ItemProcessor;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static java.time.ZoneOffset.UTC;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
@@ -67,8 +68,8 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                                     isBlank(item.getSocialSummary())
                                             ? item.getTitle()
                                             : item.getSocialSummary(),
-                                    baseUrl + item.getLink().toString(),
-                                    item.getPublishDate());
+                                    baseUrl + item.getPath().toString(),
+                                    item.getPublishDate().atZone(UTC).toLocalDateTime());
                     item.getAttributes().put(FACEBOOK_ID, id);
                 } else if (!item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
@@ -79,7 +80,7 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                             isBlank(item.getSocialSummary())
                                     ? item.getTitle()
                                     : item.getSocialSummary(),
-                            item.getPublishDate());
+                            item.getPublishDate().atZone(UTC).toLocalDateTime());
                 }
             } else if (hasFacebookPost(item)) {
                 facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));

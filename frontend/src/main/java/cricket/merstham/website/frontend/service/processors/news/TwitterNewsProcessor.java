@@ -1,7 +1,7 @@
 package cricket.merstham.website.frontend.service.processors.news;
 
+import cricket.merstham.shared.dto.News;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
-import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.service.TweetService;
 import cricket.merstham.website.frontend.service.processors.ItemProcessor;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class TwitterNewsProcessor implements ItemProcessor<News> {
                                     isBlank(item.getSocialSummary())
                                             ? item.getTitle()
                                             : item.getSocialSummary(),
-                                    baseUrl + item.getLink().toString());
+                                    baseUrl + item.getPath().toString());
                     item.getAttributes().put(TWEET_ID, Long.toString(id));
                 } else if (!item.isPublishToTwitter() && hasTweet(item)) {
                     tweetService.unTweet(Long.parseLong(item.getAttributes().get(TWEET_ID)));

@@ -2,7 +2,7 @@ package cricket.merstham.website.frontend.extensions;
 
 import org.junit.jupiter.api.Test;
 
-import static cricket.merstham.website.frontend.extensions.StringExtensions.toSlug;
+import static cricket.merstham.shared.extensions.StringExtensions.toSlug;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;

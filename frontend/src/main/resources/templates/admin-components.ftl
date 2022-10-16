@@ -56,54 +56,54 @@
 </#macro>
 
 <#macro memberAdminField attribute data localeCategory="membership">
-    <#if attribute.mandatory()>
+    <#if attribute.mandatory>
         <#assign required>required="required"</#assign>
     <#else>
         <#assign required></#assign>
     </#if>
     <div class="row form-group">
-        <label class="col-md-4 control-label"><@spring.message code="${localeCategory}.${attribute.definition().key()}" /></label>
+        <label class="col-md-4 control-label"><@spring.message code="${localeCategory}.${attribute.definition.key}" /></label>
         <div class="col-md-6">
-            <#switch attribute.definition().type().rawValue()>
+            <#switch attribute.definition.type.toString()>
                 <#case "String">
                     <@memberAdminInputField type="text"
                     required=required
                     data=data
-                    key=attribute.definition().key()
+                    key=attribute.definition.key
                     localeCategory=localeCategory />
                     <#break>
                 <#case "Number">
                     <@memberAdminInputField type="number"
                     required=required
                     data=data
-                    key=attribute.definition().key()
+                    key=attribute.definition.key
                     localeCategory=localeCategory />
                     <#break>
                 <#case "Email">
                     <@memberAdminInputField type="email"
                     required=required
                     data=data
-                    key=attribute.definition().key()
+                    key=attribute.definition.key
                     localeCategory=localeCategory />
                     <#break>
                 <#case "Date">
                     <@memberAdminInputField type="date"
                     required=required
                     data=data
-                    key=attribute.definition().key()
+                    key=attribute.definition.key
                     localeCategory=localeCategory />
                     <#break>
                 <#case "Option">
-                    <#list attribute.definition().choices() as choice>
+                    <#list attribute.definition.choices as choice>
                         <div class="radio">
-                            <label for="data-${attribute.definition().key()}-${choice}">
+                            <label for="data-${attribute.definition.key}-${choice}">
                                 <input
                                         type="radio"
-                                        name="data[${attribute.definition().key()}]"
-                                        id="data-${attribute.definition().key()}-${choice}"
+                                        name="data[${attribute.definition.key}]"
+                                        id="data-${attribute.definition.key}-${choice}"
                                         value="${choice}"
-                                        <#if data?keys?seq_contains(attribute.definition().key())
-                                        && choice == data[attribute.definition().key()]>
+                                        <#if data?keys?seq_contains(attribute.definition.key)
+                                        && choice == data[attribute.definition.key]>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -113,16 +113,16 @@
                     </#list>
                     <#break>
                 <#case "List">
-                    <#list attribute.definition().choices() as choice>
+                    <#list attribute.definition.choices as choice>
                         <div class="checkbox">
-                            <label for="data-${attribute.definition().key()}-${choice}">
+                            <label for="data-${attribute.definition.key}-${choice}">
                                 <input
                                         type="checkbox"
-                                        name="data[${attribute.definition().key()}]"
-                                        id="data-${attribute.definition().key()}-${choice}"
+                                        name="data[${attribute.definition.key}]"
+                                        id="data-${attribute.definition.key}-${choice}"
                                         value="${choice}"
-                                        <#if data?keys?seq_contains(attribute.definition().key())
-                                        && data[attribute.definition().key()]?seq_contains(choice)>
+                                        <#if data?keys?seq_contains(attribute.definition.key)
+                                        && data[attribute.definition.key]?seq_contains(choice)>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -132,7 +132,7 @@
                     </#list>
                     <#break>
             </#switch>
-            <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition().key()}-help" text="" /></span>
+            <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition.key}-help" text="" /></span>
         </div>
     </div>
 </#macro>
@@ -147,7 +147,7 @@
     />
 </#macro>
 
-<#macro adminFormField name localeCategory data required=false type="text">
+<#macro adminFormField name localeCategory data required=false type="text" additionalClasses="">
     <#if required>
         <#assign requiredAttribute>required="required"</#assign>
     <#else>
@@ -158,19 +158,17 @@
             <@spring.message code="${localeCategory}.${name}" />
         </label>
         <div class="col-md-10">
-            <input class="form-control c-square c-theme"
+            <input class="form-control c-square c-theme ${additionalClasses}"
                    name="${name}"
                    type="${type}"
                    placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
                    value="${data}"
-                   ${requiredAttribute}
-            />
+                   ${requiredAttribute} />
         </div>
     </div>
 </#macro>
 
 <#macro adminDateField name localeCategory data>
-    <!-- Form Group -->
     <div class="row form-group">
         <label for="${name}Label" class="col-md-2 control-label text-right align-middle">
             <@spring.message code="${localeCategory}.${name}" />
@@ -201,7 +199,42 @@
             </div>
         </div>
     </div>
-    <!-- End Form Group -->
+</#macro>
+
+<#macro adminDateTimeField name localeCategory data>
+    <div class="row form-group">
+        <label for="${name}Label" class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+
+        <div class="col-md-10">
+            <div id="${name}Flatpickr"
+                 class="js-flatpickr flatpickr-custom input-group input-group-merge"
+                 data-hs-flatpickr-options='{
+                    "appendTo": "#${name}Flatpickr",
+                    "enableTime": true,
+                    "dateFormat": "Z",
+                    "altInput": true,
+                    "altFormat": "d/m/Y h:i K",
+                    "wrap": true
+                  }'>
+                <div class="input-group-prepend" data-toggle>
+                    <div class="input-group-text">
+                        <i class="tio-date-range"></i>
+                    </div>
+                </div>
+
+                <input
+                        type="text"
+                        name="${name}"
+                        class="flatpickr-custom-form-control form-control"
+                        id="${name}Label"
+                        placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
+                        data-input
+                        value=${data.format()} />
+            </div>
+        </div>
+    </div>
 </#macro>
 
 <#macro adminFormDisplayField name localeCategory data>
@@ -617,16 +650,16 @@
                                 <div class="custom-control custom-checkbox"> \
                                     <input type="checkbox" \
                                            class="custom-control-input" \
-                                           id="${id}Check' + row.id + '" \
+                                           id="${id}Check' + row.data.id + '" \
                                            name="selected" \
-                                           value="' + row.id + '"> \
-                                    <label class="custom-control-label" for="${id}Check' + row.id + '"></label> \
+                                           value="' + row.data.id + '"> \
+                                    <label class="custom-control-label" for="${id}Check' + row.data.id + '"></label> \
                                 </div> \
                             </td>';
                 } },
             </#if>
             <#list columns as column>
-                { "data": "${column.fieldName}" },
+                { "data": "data.${column.fieldName}" },
             </#list>
             { "data": function(row, type, set, meta) {
                 let actions = "";

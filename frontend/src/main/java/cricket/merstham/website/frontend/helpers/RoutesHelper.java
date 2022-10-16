@@ -7,6 +7,10 @@ import java.net.URI;
 import java.util.Map;
 
 public class RoutesHelper {
+
+    public static final String ADMIN_MEMBER_BASE = "/administration/membership";
+
+    public static final String ADMIN_MEMBER_EDIT_ROUTE = ADMIN_MEMBER_BASE + "/edit/{id}";
     public static final String ADMIN_NEWS_BASE = "/administration/news";
     public static final String ADMIN_NEWS_SAVE_ROUTE = ADMIN_NEWS_BASE + "/save";
     public static final String ADMIN_NEWS_NEW_ROUTE = ADMIN_NEWS_BASE + "/new";

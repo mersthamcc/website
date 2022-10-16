@@ -49,7 +49,7 @@ public class NewsController {
     @GetMapping(value = NEWS_ITEM_LEGACY_ROUTE, name = "news-item-legacy")
     public RedirectView legacyRedirect(Principal principal, @PathVariable("id") int id)
             throws IOException {
-        return new RedirectView(newsService.get(id).getLink().toString());
+        return new RedirectView(newsService.get(id).getPath().toString());
     }
 
     @GetMapping(value = NEWS_ITEM_ROUTE, name = "news")

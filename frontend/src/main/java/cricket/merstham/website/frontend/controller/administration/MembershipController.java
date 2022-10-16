@@ -6,6 +6,7 @@ import cricket.merstham.website.frontend.model.GenericForm;
 import cricket.merstham.website.frontend.model.admintables.Member;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
+import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.graph.MemberQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_MEMBER_EDIT_ROUTE;
 import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
 
@@ -87,14 +90,15 @@ public class MembershipController extends SspController<Member> {
     private Map<String, ?> buildModelData(MemberQuery.Member member, Locale locale) {
         return Map.of(
                 "member", member,
-                "subscription", member.subscription().get(0),
+                "subscription", member.getSubscription().get(0),
                 "data",
-                        member.attributes().stream()
+                        member.getAttributes().stream()
                                 .collect(
                                         Collectors.toMap(
-                                                a -> a.definition().key(), a -> a.value())),
+                                                a -> a.getDefinition().getKey(),
+                                                a -> a.getValue())),
                 "subscriptionHistory",
-                        member.subscription().stream()
+                        member.getSubscription().stream()
                                 .map(
                                         s ->
                                                 Map.of(
@@ -102,12 +106,13 @@ public class MembershipController extends SspController<Member> {
                                                                 new DataTableValue()
                                                                         .setValue(
                                                                                 Integer.toString(
-                                                                                        s.year())),
+                                                                                        s
+                                                                                                .getYear())),
                                                         "membership.description",
                                                                 new DataTableValue()
                                                                         .setValue(
-                                                                                s.pricelistItem()
-                                                                                        .description()),
+                                                                                s.getPricelistItem()
+                                                                                        .getDescription()),
                                                         "membership.category",
                                                                 new DataTableValue()
                                                                         .setValue(
@@ -115,9 +120,9 @@ public class MembershipController extends SspController<Member> {
                                                                                         .getMessage(
                                                                                                 format(
                                                                                                         "membership.{0}",
-                                                                                                        s.pricelistItem()
-                                                                                                                .memberCategory()
-                                                                                                                .key()),
+                                                                                                        s.getPricelistItem()
+                                                                                                                .getMemberCategory()
+                                                                                                                .getKey()),
                                                                                                 null,
                                                                                                 locale)),
                                                         "membership.price",
@@ -127,7 +132,7 @@ public class MembershipController extends SspController<Member> {
                                                                                         .getCurrencyInstance()
                                                                                         .format(
                                                                                                 s
-                                                                                                        .price()))))
+                                                                                                        .getPrice()))))
                                 .collect(Collectors.toList()),
                 "subscriptionHistoryColumns",
                         List.of(
@@ -136,14 +141,14 @@ public class MembershipController extends SspController<Member> {
                                 new DataTableColumn().setKey("membership.category"),
                                 new DataTableColumn().setKey("membership.price")),
                 "payments",
-                        member.subscription().get(0).order().payment().stream()
+                        member.getSubscription().get(0).getOrder().getPayment().stream()
                                 .map(
                                         p ->
                                                 Map.of(
                                                         "payments.date",
                                                                 new DataTableValue()
                                                                         .setValue(
-                                                                                p.date()
+                                                                                p.getDate()
                                                                                         .format(
                                                                                                 DateTimeFormatter
                                                                                                         .ofLocalizedDate(
@@ -157,16 +162,16 @@ public class MembershipController extends SspController<Member> {
                                                                                                 format(
                                                                                                         "payments.{0}-short",
                                                                                                         p
-                                                                                                                .type()),
+                                                                                                                .getType()),
                                                                                                 null,
                                                                                                 locale)),
                                                         "payments.reference",
                                                                 new DataTableValue()
-                                                                        .setValue(p.reference()),
+                                                                        .setValue(p.getReference()),
                                                         "payments.collected",
                                                                 new DataTableValue()
                                                                         .setValue(
-                                                                                p.collected()
+                                                                                p.getCollected()
                                                                                         ? "Yes"
                                                                                         : "No"),
                                                         "payments.amount",
@@ -176,7 +181,7 @@ public class MembershipController extends SspController<Member> {
                                                                                         .getCurrencyInstance()
                                                                                         .format(
                                                                                                 p
-                                                                                                        .amount()))))
+                                                                                                        .getAmount()))))
                                 .collect(Collectors.toList()),
                 "paymentsColumns",
                         List.of(
@@ -215,7 +220,7 @@ public class MembershipController extends SspController<Member> {
             consumes = "application/json",
             produces = "application/json",
             path = "/administration/membership/get-data")
-    public @ResponseBody SspResponse<Member> getData(
+    public @ResponseBody SspResponse<SspResponseDataWrapper<Member>> getData(
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             @RequestBody SspRequest request) {
         Comparator<Member> comparator = createComparator(request);
@@ -230,12 +235,31 @@ public class MembershipController extends SspController<Member> {
                                                 || m.getLastSubscription().contains(search))
                         .sorted(comparator)
                         .collect(Collectors.toList());
-        return SspResponse.<Member>builder()
+        return SspResponse.<SspResponseDataWrapper<Member>>builder()
                 .draw(request.getDraw())
                 .data(
-                        members.subList(
-                                request.getStart(),
-                                min(request.getStart() + request.getLength(), members.size())))
+                        members
+                                .subList(
+                                        request.getStart(),
+                                        min(
+                                                request.getStart() + request.getLength(),
+                                                members.size()))
+                                .stream()
+                                .map(
+                                        m ->
+                                                SspResponseDataWrapper.<Member>builder()
+                                                        .data(m)
+                                                        .editRouteTemplate(
+                                                                Optional.of(
+                                                                        ADMIN_MEMBER_EDIT_ROUTE))
+                                                        .deleteRouteTemplate(Optional.empty())
+                                                        .mapFunction(
+                                                                member ->
+                                                                        Map.of(
+                                                                                "id",
+                                                                                member.getId()))
+                                                        .build())
+                                .collect(Collectors.toList()))
                 .recordsTotal(members.size())
                 .recordsFiltered(members.size())
                 .build();

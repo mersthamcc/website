@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
 import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
+import cricket.merstham.website.frontend.mappers.InstantCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
-import cricket.merstham.website.frontend.mappers.LocalDateTimeCustomTypeAdapter;
 import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class GraphService {
             new ScalarTypeAdapters(
                     Map.of(
                             CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
-                            CustomGraphQLScalars.DATETIME, new LocalDateTimeCustomTypeAdapter()));
+                            CustomGraphQLScalars.DATETIME, new InstantCustomTypeAdapter()));
 
     @Autowired
     public GraphService(

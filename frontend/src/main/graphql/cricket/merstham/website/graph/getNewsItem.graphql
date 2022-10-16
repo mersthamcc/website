@@ -10,9 +10,6 @@ query getNewsItem($id: Int!) {
         publishDate
         socialSummary
         body
-        attributes {
-            name
-            value
-        }
+        attributes
     }
 }

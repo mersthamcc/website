@@ -2,15 +2,27 @@ package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import cricket.merstham.website.graph.MembershipCategoriesQuery;
+import cricket.merstham.shared.dto.MemberCategory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 @JsonSerialize
 @RedisHash
 public class Subscription implements Serializable {
@@ -21,78 +33,15 @@ public class Subscription implements Serializable {
 
     @JsonProperty private String category;
 
-    @JsonProperty private int pricelistItemId = 0;
+    @JsonProperty private int pricelistItemId;
 
     @JsonProperty private Map<String, Object> member;
 
-    @JsonProperty private Map<String, AttributeDefinition> attributes = new HashMap<>();
+    @JsonProperty private Map<String, AttributeDefinition> attributes;
 
-    @JsonProperty private BigDecimal price = BigDecimal.ZERO;
+    @JsonProperty private BigDecimal price;
 
-    @JsonProperty private RegistrationAction action = RegistrationAction.NEW;
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public Subscription setUuid(UUID uuid) {
-        this.uuid = uuid;
-        return this;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public Subscription setCategory(String category) {
-        this.category = category;
-        return this;
-    }
-
-    public int getPricelistItemId() {
-        return pricelistItemId;
-    }
-
-    public Subscription setPricelistItemId(int pricelistItemId) {
-        this.pricelistItemId = pricelistItemId;
-        return this;
-    }
-
-    public Map<String, Object> getMember() {
-        return member;
-    }
-
-    public Subscription setMember(Map<String, Object> member) {
-        this.member = member;
-        return this;
-    }
-
-    public Map<String, AttributeDefinition> getAttributes() {
-        return attributes;
-    }
-
-    public Subscription setAttributes(Map<String, AttributeDefinition> attributes) {
-        this.attributes = attributes;
-        return this;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public Subscription setPrice(BigDecimal price) {
-        this.price = price;
-        return this;
-    }
-
-    public RegistrationAction getAction() {
-        return action;
-    }
-
-    public Subscription setAction(RegistrationAction action) {
-        this.action = action;
-        return this;
-    }
+    @JsonProperty private RegistrationAction action;
 
     public Subscription updateFrom(Subscription subscription) {
         if (subscription.member != null) {
@@ -110,19 +59,19 @@ public class Subscription implements Serializable {
         return this;
     }
 
-    public Subscription updateDefinition(MembershipCategoriesQuery.MembershipCategory category) {
+    public Subscription updateDefinition(MemberCategory category) {
         Map<String, AttributeDefinition> attrs = new HashMap<>();
-        for (var section : category.form()) {
-            for (var attr : section.section().attribute()) {
+        for (var section : category.getForm()) {
+            for (var attr : section.getSection().getAttribute()) {
                 attrs.put(
-                        attr.definition().key(),
+                        attr.getDefinition().getKey(),
                         (new AttributeDefinition())
-                                .setSection(section.section().key())
-                                .setMandatory(attr.mandatory())
-                                .setType(attr.definition().type().rawValue())
-                                .setChoices((List<String>) attr.definition().choices()));
+                                .setSection(section.getSection().getKey())
+                                .setMandatory(attr.getMandatory())
+                                .setType(attr.getDefinition().getType().name())
+                                .setChoices(attr.getDefinition().getChoices()));
             }
         }
-        return this.setCategory(category.key()).setAttributes(attrs);
+        return this.setCategory(category.getKey()).setAttributes(attrs);
     }
 }

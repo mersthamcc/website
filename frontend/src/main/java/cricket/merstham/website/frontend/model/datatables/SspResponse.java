@@ -18,7 +18,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SspResponse<T extends SspBaseResponseData> {
+public class SspResponse<T extends SspResponseDataWrapper> {
 
     @JsonProperty private int draw;
     @JsonProperty private int recordsTotal;

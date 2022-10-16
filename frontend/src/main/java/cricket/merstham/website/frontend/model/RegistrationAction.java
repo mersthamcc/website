@@ -10,7 +10,7 @@ public enum RegistrationAction implements Serializable {
     RENEW("RENEW"),
     NONE("NONE");
 
-    String action;
+    private String action;
 
     RegistrationAction(String action) {
         this.action = action;

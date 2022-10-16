@@ -315,7 +315,7 @@
 
 <#macro membershipCategories categories _csrf uuid>
     <#list categories as category>
-        <@section title="membership.${category.key()}">
+        <@section title="membership.${category.key}">
             <div class="w-lg-80 mx-lg-auto position-relative">
                 <@categoryPricelist category=category _csrf=_csrf uuid=uuid />
             </div>
@@ -325,19 +325,19 @@
 
 <#macro categoryPricelist category _csrf uuid>
     <div class="row position-relative z-index-2 mx-n2 mb-5">
-        <#list category.pricelistItem() as item>
+        <#list category.pricelistItem as item>
             <div class="col-md-4 col-sm-3">
                 <div class="px-2 mb-3">
                     <div class="card h-100">
                         <div class="card-header text-center">
                             <span class="d-block h3">
-                                ${item.description()}
+                                ${item.description}
                             </span>
                             <span class="d-block mb-2">
                                 <span class="text-dark align-top">&pound;</span>
                                 <span class="font-size-4 text-dark font-weight-bold mr-n2">
                                 <span id="pricingCount1">
-                                    ${item.currentPrice()}
+                                    ${item.currentPrice}
                                 </span>
                                 </span>
                                 <span class="font-size-1">/ year</span>
@@ -350,9 +350,9 @@
                             <div class="media font-size-1 text-body mb-3">
                                 <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
                                 <div class="media-body">
-                                    Ages ${item.minAge()}
-                                    <#if item.maxAge()??>
-                                        ${item.maxAge()}
+                                    Ages ${item.minAge}
+                                    <#if item.maxAge??>
+                                        ${item.maxAge}
                                     <#else>
                                         and up
                                     </#if>
@@ -361,9 +361,9 @@
                             <div class="media font-size-1 text-body mb-3">
                                 <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
                                 <div class="media-body">
-                                    <#if (item.includesMatchFees())?? && item.includesMatchFees()>
+                                    <#if (item.includesMatchFees)?? && item.includesMatchFees>
                                         <i class="fa fa-check c-font-20"></i>
-                                    <#elseif (item.includesMatchFees())??>
+                                    <#elseif (item.includesMatchFees)??>
                                         <i class="fa fa-times c-font-20"></i>
                                     <#else>
                                         N/A
@@ -388,14 +388,14 @@
                         <div class="card-footer border-0">
                             <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
                                 <input type="hidden" name="_csrf" value="${_csrf.token}" />
-                                <input type="hidden" name="category" value="${category.key()}" />
+                                <input type="hidden" name="category" value="${category.key}" />
                                 <input type="hidden" name="uuid" value="${subscription.uuid}" />
                                 <button
                                         type="submit"
                                         class="btn btn-soft-primary btn-block transition-3d-hover"
-                                        value="${item.id()}"
+                                        value="${item.id}"
                                         name="pricelistItemId"
-                                        id="pricelistItemId-${item.id()}">
+                                        id="pricelistItemId-${item.id}">
                                     <@spring.message code="membership.select" />
                                 </button>
                             </form>
@@ -440,54 +440,54 @@
 </#macro>
 
 <#macro memberField attribute subscription localeCategory="membership">
-    <#if attribute.mandatory()>
+    <#if attribute.mandatory>
         <#assign required>required="required"</#assign>
     <#else>
         <#assign required></#assign>
     </#if>
     <div class="row form-group">
-        <label class="col-md-4 control-label"><@spring.message code="${localeCategory}.${attribute.definition().key()}" /></label>
+        <label class="col-md-4 control-label"><@spring.message code="${localeCategory}.${attribute.definition.key}" /></label>
         <div class="col-md-6">
-            <#switch attribute.definition().type().rawValue()>
+            <#switch attribute.definition.type.toString()>
                 <#case "String">
                     <@memberInputField type="text"
                         required=required
                         subscription=subscription
-                        key=attribute.definition().key()
+                        key=attribute.definition.key
                         localeCategory=localeCategory />
                     <#break>
                 <#case "Number">
                     <@memberInputField type="number"
                         required=required
                         subscription=subscription
-                        key=attribute.definition().key()
+                        key=attribute.definition.key
                         localeCategory=localeCategory />
                     <#break>
                 <#case "Email">
                     <@memberInputField type="email"
                         required=required
                         subscription=subscription
-                        key=attribute.definition().key()
+                        key=attribute.definition.key
                         localeCategory=localeCategory />
                     <#break>
                 <#case "Date">
                     <@memberInputField type="date"
                         required=required
                         subscription=subscription
-                        key=attribute.definition().key()
+                        key=attribute.definition.key
                         localeCategory=localeCategory />
                     <#break>
                 <#case "Option">
-                    <#list attribute.definition().choices() as choice>
+                    <#list attribute.definition.choices as choice>
                         <div class="radio">
                             <label>
                                 <input
                                         type="radio"
-                                        name="member[${attribute.definition().key()}]"
-                                        id="member-${attribute.definition().key()}"
+                                        name="member[${attribute.definition.key}]"
+                                        id="member-${attribute.definition.key}"
                                         value="${choice}"
-                                        <#if subscription.member?keys?seq_contains(attribute.definition().key())
-                                            && choice == subscription.member[attribute.definition().key()]>
+                                        <#if subscription.member?keys?seq_contains(attribute.definition.key)
+                                            && choice == subscription.member[attribute.definition.key]>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -497,16 +497,16 @@
                     </#list>
                     <#break>
                 <#case "List">
-                    <#list attribute.definition().choices() as choice>
+                    <#list attribute.definition.choices as choice>
                         <div class="checkbox">
                             <label>
                                 <input
                                         type="checkbox"
-                                        name="member[${attribute.definition().key()}]"
-                                        id="member-${attribute.definition().key()}"
+                                        name="member[${attribute.definition.key}]"
+                                        id="member-${attribute.definition.key}"
                                         value="${choice}"
-                                        <#if subscription.member?keys?seq_contains(attribute.definition().key())
-                                            && subscription.member[attribute.definition().key()]?seq_contains(choice)>
+                                        <#if subscription.member?keys?seq_contains(attribute.definition.key)
+                                            && subscription.member[attribute.definition.key]?seq_contains(choice)>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -516,7 +516,7 @@
                     </#list>
                     <#break>
             </#switch>
-            <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition().key()}-help" text="" /></span>
+            <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition.key}-help" text="" /></span>
         </div>
     </div>
 </#macro>

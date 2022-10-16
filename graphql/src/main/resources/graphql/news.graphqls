@@ -9,7 +9,7 @@ type News {
     socialSummary: String
     author: String
     draft: Boolean
-    attributes: [NewsAttribute]
+    attributes: JsonMap
 }
 
 type NewsAttribute {

@@ -1,6 +1,5 @@
 package cricket.merstham.graphql.services;
 
-import cricket.merstham.graphql.entity.NewsAttributeEntity;
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.repository.NewsEntityRepository;
 import cricket.merstham.shared.dto.News;
@@ -38,9 +37,10 @@ public class NewsService {
     }
 
     @Cacheable(value = NEWS_SUMMARY_CACHE, key = "#page")
-    public List<NewsEntity> getNewsFeed(int page) {
+    public List<News> getNewsFeed(int page) {
         return repository
                 .findAll(PageRequest.of(page, 10, Sort.by("publishDate").descending()))
+                .map(this::convertToDto)
                 .stream()
                 .collect(Collectors.toList());
     }
@@ -52,19 +52,20 @@ public class NewsService {
     }
 
     @Cacheable(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
-    public NewsEntity getNewsItemById(int id) {
-        return repository.findById(id).orElseThrow();
+    public News getNewsItemById(int id) {
+        return convertToDto(repository.findById(id).orElseThrow());
     }
 
     @Cacheable(value = NEWS_ITEM_BY_PATH_CACHE, key = "#path")
-    public NewsEntity getNewsItemByPath(String path) {
+    public News getNewsItemByPath(String path) {
         Example<NewsEntity> example = Example.of(NewsEntity.builder().path(path).build());
-        return repository.findOne(example).orElseThrow();
+        return convertToDto(repository.findOne(example).orElseThrow());
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")
-    public List<NewsEntity> getAdminNewsList(int start, int length, String searchString) {
+    public List<News> getAdminNewsList(int start, int length, String searchString) {
         return repository.adminSearch(start, length, searchString).stream()
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
@@ -76,36 +77,19 @@ public class NewsService {
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)
             })
-    public NewsEntity save(News news) {
+    public News save(News news) {
         var entity = repository.findById(news.getId()).orElseGet(() -> new NewsEntity());
         mapper.map(news, entity);
-        entity = repository.saveAndFlush(entity);
-        return entity;
+        return convertToDto(repository.saveAndFlush(entity));
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")
     @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
-    public NewsEntity saveAttributes(int id, List<NewsAttribute> attributes) {
+    public News saveAttributes(int id, List<NewsAttribute> attributes) {
         var news = repository.findById(id).orElseThrow();
-        attributes.forEach(
-                a -> {
-                    news.getAttributes().stream()
-                            .filter(attr -> attr.getName().equalsIgnoreCase(a.getName()))
-                            .findFirst()
-                            .orElseGet(
-                                    () -> {
-                                        var newsAttribute =
-                                                NewsAttributeEntity.builder()
-                                                        .name(a.getName())
-                                                        .news(news)
-                                                        .build();
-                                        news.getAttributes().add(newsAttribute);
-                                        return newsAttribute;
-                                    })
-                            .setValue(a.getValue());
-                });
+        attributes.forEach(a -> news.getAttributes().put(a.getName(), a.getValue()));
         var saved = repository.saveAndFlush(news);
-        return saved;
+        return convertToDto(saved);
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")
@@ -116,9 +100,13 @@ public class NewsService {
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)
             })
-    public NewsEntity delete(int id) {
+    public News delete(int id) {
         var news = repository.findById(id).orElseThrow();
         repository.delete(news);
-        return news;
+        return convertToDto(news);
+    }
+
+    private News convertToDto(NewsEntity news) {
+        return mapper.map(news, News.class);
     }
 }

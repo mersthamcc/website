@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.website.frontend.model.AttributeDefinition;
 import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
@@ -19,6 +20,7 @@ import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
 import cricket.merstham.website.graph.type.PaymentInput;
 import cricket.merstham.website.graph.type.StringFilter;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,17 +39,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
-import static java.text.MessageFormat.format;
 
 @Service
 public class MembershipService {
     private static final Logger LOG = LoggerFactory.getLogger(MembershipService.class);
 
-    private GraphService graphService;
+    private final GraphService graphService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public MembershipService(GraphService graphService) {
+    public MembershipService(GraphService graphService, ModelMapper modelMapper) {
         this.graphService = graphService;
+        this.modelMapper = modelMapper;
     }
 
     public Order registerMembersFromBasket(
@@ -67,8 +69,8 @@ public class MembershipService {
                                                 .map(error -> error.getMessage())
                                                 .collect(Collectors.toList())));
             }
-            order.setId(orderResult.getData().createOrder().id())
-                    .setUuid(UUID.fromString(orderResult.getData().createOrder().uuid()))
+            order.setId(orderResult.getData().getCreateOrder().getId())
+                    .setUuid(UUID.fromString(orderResult.getData().getCreateOrder().getUuid()))
                     .setTotal(basket.getBasketTotal())
                     .setSubscriptions(basket.getSubscriptions());
         } catch (IOException e) {
@@ -148,29 +150,33 @@ public class MembershipService {
                                         .map(Error::getMessage)
                                         .collect(Collectors.joining("\n")));
             }
-            return result.getData().addPaymentToOrder();
+            return result.getData().getAddPaymentToOrder();
         } catch (IOException e) {
             LOG.error("Error registering payment", e);
             throw new RuntimeException("Error registering payment", e);
         }
     }
 
-    public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
+    public List<MemberCategory> getMembershipCategories() {
         var query = new MembershipCategoriesQuery(StringFilter.builder().build());
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            return result.getData().membershipCategories();
+            var categories = result.getData().getMembershipCategories();
+            return categories.stream()
+                    .map(c -> modelMapper.map(c, MemberCategory.class))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
+    public MemberCategory getMembershipCategory(String categoryName) {
         var query =
                 new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            return result.getData().membershipCategories().get(0);
+            return modelMapper.map(
+                    result.getData().getMembershipCategories().get(0), MemberCategory.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -180,7 +186,7 @@ public class MembershipService {
         var query = new MembersQuery();
         try {
             Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
-            return result.getData().members();
+            return result.getData().getMembers();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -192,28 +198,26 @@ public class MembershipService {
                 .map(
                         m ->
                                 Member.builder()
-                                        .id(Integer.toString(m.id()))
+                                        .id(Integer.toString(m.getId()))
                                         .familyName(
                                                 getMemberAttributeString(
-                                                        m.attributes(), "family-name", ""))
+                                                        m.getAttributes(), "family-name", ""))
                                         .givenName(
                                                 getMemberAttributeString(
-                                                        m.attributes(), "given-name", ""))
+                                                        m.getAttributes(), "given-name", ""))
                                         .category(
-                                                m.subscription().stream()
+                                                m.getSubscription().stream()
                                                         .findFirst()
-                                                        .map(s -> s.pricelistItem().description())
+                                                        .map(
+                                                                s ->
+                                                                        s.getPricelistItem()
+                                                                                .getDescription())
                                                         .orElse("unknown"))
                                         .lastSubscription(
-                                                m.subscription().stream()
+                                                m.getSubscription().stream()
                                                         .findFirst()
-                                                        .map(s -> Integer.toString(s.year()))
+                                                        .map(s -> Integer.toString(s.getYear()))
                                                         .orElse("unknown"))
-                                        .editLink(
-                                                URI.create(
-                                                        format(
-                                                                "/administration/membership/edit/{0}",
-                                                                m.id())))
                                         .build())
                 .collect(Collectors.toList());
     }
@@ -223,7 +227,7 @@ public class MembershipService {
         try {
             Response<MemberQuery.Data> result = graphService.executeQuery(query, accessToken);
 
-            return Optional.of(result.getData().member());
+            return Optional.of(result.getData().getMember());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -231,22 +235,20 @@ public class MembershipService {
 
     public UpdateMemberMutation.UpdateMember update(
             int id, OAuth2AccessToken accessToken, Map<String, Object> data) {
-        var request =
-                new UpdateMemberMutation(
-                        id,
-                        data.entrySet().stream()
-                                .map(
-                                        f ->
-                                                AttributeInput.builder()
-                                                        .key(f.getKey())
-                                                        .value(f.getValue())
-                                                        .build())
-                                .collect(Collectors.toList()));
+        var request = new UpdateMemberMutation(id, List.of());
+        //                        data.entrySet().stream()
+        //                                .map(
+        //                                        f ->
+        //                                                AttributeInput.builder()
+        //                                                        .key(f.getKey())
+        //                                                        .value(f.getValue())
+        //                                                        .build())
+        //                                .collect(Collectors.toList()));
         try {
             Response<UpdateMemberMutation.Data> result =
                     graphService.executeMutation(request, accessToken);
 
-            return result.getData().updateMember();
+            return result.getData().getUpdateMember();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -257,14 +259,14 @@ public class MembershipService {
         try {
             Response<AttributesQuery.Data> result = graphService.executeQuery(query);
 
-            return result.getData().attributes().stream()
+            return result.getData().getAttributes().stream()
                     .collect(
                             Collectors.toMap(
-                                    a -> a.key(),
+                                    a -> a.getKey(),
                                     a ->
                                             new AttributeDefinition()
-                                                    .setKey(a.key())
-                                                    .setType(a.type().rawValue())));
+                                                    .setKey(a.getKey())
+                                                    .setType(a.getType().rawValue())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -273,9 +275,9 @@ public class MembershipService {
     private String getMemberAttributeString(
             List<MembersQuery.Attribute> attributeList, String field, String defaultValue) {
         return attributeList.stream()
-                .filter(a -> a.definition().key().equals(field))
+                .filter(a -> a.getDefinition().getKey().equals(field))
                 .findFirst()
-                .map(f -> (String) f.value())
+                .map(f -> f.getValue().toString())
                 .orElse(defaultValue);
     }
 }

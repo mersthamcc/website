@@ -1,9 +1,7 @@
-package cricket.merstham.website.frontend.extensions;
-
-import org.jetbrains.annotations.NotNull;
+package cricket.merstham.shared.extensions;
 
 public class StringExtensions {
-    public static String toSlug(@NotNull String in) {
+    public static String toSlug(String in) {
         if (in == null || in.trim().length() == 0) {
             throw new IllegalArgumentException();
         }

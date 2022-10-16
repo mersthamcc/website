@@ -10,9 +10,5 @@ mutation saveNewsAttributes ($id: Int!, $attributes: [NewsAttributeInput]!) {
         createdDate
         publishDate
         socialSummary
-        attributes {
-            name
-            value
-        }
     }
 }

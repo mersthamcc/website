@@ -3,8 +3,7 @@ package cricket.merstham.website.frontend.mappers;
 import com.apollographql.apollo.api.ScalarType;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public enum CustomGraphQLScalars implements ScalarType {
     DATETIME,
@@ -15,9 +14,8 @@ public enum CustomGraphQLScalars implements ScalarType {
     public String className() {
         switch (this) {
             case DATE:
-                return LocalDate.class.getCanonicalName();
             case DATETIME:
-                return LocalDateTime.class.getCanonicalName();
+                return Instant.class.getCanonicalName();
             default:
                 throw new IllegalArgumentException();
         }

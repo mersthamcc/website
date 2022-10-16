@@ -4,6 +4,8 @@ scalar Date
 
 scalar Json
 
+scalar JsonMap
+
 type User {
     username: String!
     subjectId: String!

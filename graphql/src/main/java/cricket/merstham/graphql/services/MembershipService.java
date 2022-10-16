@@ -15,6 +15,7 @@ import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
+import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
@@ -29,7 +30,6 @@ import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +44,8 @@ public class MembershipService {
     private final MemberCategoryEntityRepository memberCategoryEntityRepository;
     private final OrderEntityRepository orderEntityRepository;
     private final PaymentEntityRepository paymentEntityRepository;
+
+    private final PriceListItemEntityRepository priceListItemEntityRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -53,12 +55,14 @@ public class MembershipService {
             MemberCategoryEntityRepository memberCategoryEntityRepository,
             OrderEntityRepository orderEntityRepository,
             PaymentEntityRepository paymentEntityRepository,
+            PriceListItemEntityRepository priceListItemEntityRepository,
             ModelMapper modelMapper) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.memberCategoryEntityRepository = memberCategoryEntityRepository;
         this.orderEntityRepository = orderEntityRepository;
         this.paymentEntityRepository = paymentEntityRepository;
+        this.priceListItemEntityRepository = priceListItemEntityRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -111,46 +115,52 @@ public class MembershipService {
     @PreAuthorize("isAuthenticated()")
     public Member createMember(MemberInput data, Principal principal) {
         var now = Instant.now();
+        var currentDate = LocalDate.ofInstant(now, ZoneId.systemDefault());
         OrderEntity order =
                 orderEntityRepository.findById(data.getSubscription().getOrderId()).orElseThrow();
-        var member =
+        var priceListItem =
+                priceListItemEntityRepository
+                        .findById(data.getSubscription().getPricelistItemId())
+                        .orElseThrow();
+        final var member =
                 MemberEntity.builder()
                         .registrationDate(now)
                         .ownerUserId(getSubject(principal))
                         .type("member")
-                        .attributes(
-                                data.getAttributes().stream()
-                                        .map(
-                                                a ->
-                                                        MemberAttributeEntity.builder()
-                                                                .primaryKey(
-                                                                        MemberAttributeEntityId
-                                                                                .builder()
-                                                                                .definition(
-                                                                                        attributeRepository
-                                                                                                .findByKey(
-                                                                                                        a
-                                                                                                                .getKey()))
-                                                                                .build())
-                                                                .createdDate(now)
-                                                                .updatedDate(now)
-                                                                .value(a.getValue())
-                                                                .build())
-                                        .collect(Collectors.toList()))
-                        .subscription(
-                                List.of(
-                                        MemberSubscriptionEntity.builder()
-                                                .addedDate(
-                                                        LocalDate.ofInstant(
-                                                                now, ZoneId.systemDefault()))
-                                                .price(data.getSubscription().getPrice())
-                                                .order(order)
-                                                .primaryKey(
-                                                        MemberSubscriptionEntityId.builder()
-                                                                .year(now.get(ChronoField.YEAR))
-                                                                .build())
-                                                .build()))
                         .build();
+
+        member.setAttributes(
+                data.getAttributes().stream()
+                        .map(
+                                a ->
+                                        MemberAttributeEntity.builder()
+                                                .primaryKey(
+                                                        MemberAttributeEntityId.builder()
+                                                                .member(member)
+                                                                .definition(
+                                                                        attributeRepository
+                                                                                .findByKey(
+                                                                                        a.getKey()))
+                                                                .build())
+                                                .createdDate(now)
+                                                .updatedDate(now)
+                                                .value(a.getValue())
+                                                .build())
+                        .collect(Collectors.toList()));
+
+        member.setSubscription(
+                List.of(
+                        MemberSubscriptionEntity.builder()
+                                .addedDate(currentDate)
+                                .price(data.getSubscription().getPrice())
+                                .pricelistItem(priceListItem)
+                                .order(order)
+                                .primaryKey(
+                                        MemberSubscriptionEntityId.builder()
+                                                .member(member)
+                                                .year(currentDate.getYear())
+                                                .build())
+                                .build()));
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 

@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class MemberSubscription implements Serializable {
     @Serial private static final long serialVersionUID = 2389409542358861969L;
 
-    private PricelistItem pricelistItem;
+    private PriceListItem pricelistItem;
     private BigDecimal price;
     private LocalDate addedDate;
     private Member member;

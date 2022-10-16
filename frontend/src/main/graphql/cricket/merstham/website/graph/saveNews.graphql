@@ -10,9 +10,6 @@ mutation saveNews ($news: NewsInput!) {
         createdDate
         publishDate
         socialSummary
-        attributes {
-            name
-            value
-        }
+        attributes
     }
 }

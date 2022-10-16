@@ -20,5 +20,4 @@ public class Order implements Serializable {
     private String ownerUserId;
     private List<Payment> payment = new ArrayList<>();
     private List<MemberSubscription> memberSubscription = new ArrayList<>();
-    ;
 }

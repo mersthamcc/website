@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.configuration;
 
+import cricket.merstham.website.frontend.formatters.InstantFormatFactory;
 import cricket.merstham.website.frontend.formatters.LocalDateTimeDateOnlyFormatFactory;
 import cricket.merstham.website.frontend.formatters.LocalDateTimeFormatFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         super.addFormatters(registry);
         registry.addFormatterForFieldAnnotation(new LocalDateTimeFormatFactory());
         registry.addFormatterForFieldAnnotation(new LocalDateTimeDateOnlyFormatFactory());
+        registry.addFormatterForFieldAnnotation(new InstantFormatFactory());
     }
 
     @Override

@@ -9,8 +9,8 @@
             <input type="hidden" name="uuid" value="${subscription.uuid}" />
             <input type="hidden" name="action" value="${subscription.action}" />
             <#list form as section>
-                <@components.section title="membership.${section.section().key()}">
-                    <#list section.section().attribute() as attribute>
+                <@components.section title="membership.${section.section.key}">
+                    <#list section.section.attribute as attribute>
                         <@components.memberField attribute=attribute subscription=subscription />
                     </#list>
                 </@components.section>

@@ -20,5 +20,5 @@ public class MemberCategory implements Serializable {
     private String key;
     private String registrationCode;
     private List<MemberCategoryFormSection> form;
-    private List<PricelistItem> pricelistItem;
+    private List<PriceListItem> pricelistItem;
 }

@@ -43,7 +43,8 @@ public class MembershipController {
 
     @QueryMapping
     public List<MemberCategory> membershipCategories(@Argument MemberCategoryWhereInput where) {
-        return membershipService.getCategories(where);
+        var result = membershipService.getCategories(where);
+        return result;
     }
 
     @QueryMapping

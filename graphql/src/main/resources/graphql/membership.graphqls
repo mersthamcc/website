@@ -13,7 +13,7 @@ enum AttributeType {
 type AttributeDefinition {
     key: String!
     type: AttributeType!
-    choices: Json
+    choices: [String]
 }
 
 type Member {

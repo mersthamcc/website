@@ -23,7 +23,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -102,20 +101,20 @@ public class RegistrationController {
         var membershipCategory =
                 membershipService.getMembershipCategory(subscription.getCategory());
         var pricelistItem =
-                membershipCategory.pricelistItem().stream()
-                        .filter(p -> p.id() == subscription.getPricelistItemId())
+                membershipCategory.getPricelistItem().stream()
+                        .filter(p -> p.getId() == subscription.getPricelistItemId())
                         .findFirst()
                         .orElseThrow();
 
         subscription
-                .setPricelistItemId(pricelistItem.id())
-                .setPrice(BigDecimal.valueOf(pricelistItem.currentPrice()))
+                .setPricelistItemId(pricelistItem.getId())
+                .setPrice(pricelistItem.getCurrentPrice())
                 .updateDefinition(membershipCategory);
 
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
-                        "form", membershipCategory.form(),
+                        "form", membershipCategory.getForm(),
                         "subscription", basket.updateSubscription(subscription)));
     }
 

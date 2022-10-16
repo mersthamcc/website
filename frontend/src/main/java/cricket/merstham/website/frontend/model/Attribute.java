@@ -3,10 +3,12 @@ package cricket.merstham.website.frontend.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @JsonSerialize
+@Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attribute {
 
@@ -14,20 +16,4 @@ public class Attribute {
     @JsonProperty private LocalDateTime createdDate;
     @JsonProperty private LocalDateTime updatedDate;
     @JsonProperty private Object value;
-
-    public AttributeDefinition getDefinition() {
-        return definition;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public Object getValue() {
-        return value;
-    }
 }

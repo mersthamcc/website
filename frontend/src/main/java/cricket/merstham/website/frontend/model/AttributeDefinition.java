@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AttributeDefinition implements Serializable {
 
-    private static final long serialVersionUID = 20210522173300L;
+    @Serial private static final long serialVersionUID = 20210522173300L;
 
     @JsonProperty private String section;
 

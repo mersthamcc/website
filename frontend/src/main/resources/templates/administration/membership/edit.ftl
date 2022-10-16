@@ -22,9 +22,9 @@
 <@layout.mainLayout script=dataScript>
     <div class="row">
         <div class="col-lg-8">
-            <#list subscription.pricelistItem().memberCategory().form() as section>
-                <@admin.section title="membership.${section.section().key()}" action="" buttons=detailsFormButtons>
-                    <#list section.section().attribute() as attribute>
+            <#list subscription.pricelistItem.memberCategory.form as section>
+                <@admin.section title="membership.${section.section.key}" action="" buttons=detailsFormButtons>
+                    <#list section.section.attribute as attribute>
                         <@admin.memberAdminField attribute=attribute data=data />
                     </#list>
                 </@admin.section>
@@ -76,15 +76,15 @@
                     </h1>
                     <ul class="list-unstyled">
                         <li class="list-item">
-                            <#if subscription.pricelistItem().memberCategory().key() == "social">
+                            <#if subscription.pricelistItem.memberCategory.key == "social">
                                 <i class="tio-beer-bottle mr-1"></i>
                             <#else>
                                 <i class="tio-cricket mr-1"></i>
                             </#if>
                             <span>
                                 <@spring.messageText
-                                    code="membership.${subscription.pricelistItem().memberCategory().key()}"
-                                    text=subscription.pricelistItem().memberCategory().key() />
+                                    code="membership.${subscription.pricelistItem.memberCategory.key}"
+                                    text=subscription.pricelistItem.memberCategory.key />
                             </span>
                         </li>
 
@@ -104,7 +104,7 @@
 
                         <li class="list-item">
                             <i class="tio-date-range mr-1"></i>
-                            <span>Last Renewal: ${subscription.year()?c}</span>
+                            <span>Last Renewal: ${subscription.year?c}</span>
                         </li>
                     </ul>
                     <div class="mb-3">

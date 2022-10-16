@@ -10,9 +10,6 @@ mutation deleteNews($id: Int!) {
         publishDate
         body
         socialSummary
-        attributes {
-            name
-            value
-        }
+        attributes
     }
 }
