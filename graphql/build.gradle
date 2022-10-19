@@ -44,6 +44,7 @@ dependencies {
     implementation "org.modelmapper.extensions:modelmapper-jackson:3.1.0"
     implementation "org.modelmapper.extensions:modelmapper-spring:3.1.0"
     implementation "commons-codec:commons-codec:1.15"
+    implementation 'com.graphql-java:graphql-java-extended-scalars:19.0'
     implementation project(":shared")
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"

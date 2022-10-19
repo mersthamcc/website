@@ -64,14 +64,14 @@ public class TwitterNewsProcessor implements ItemProcessor<News> {
                                             ? item.getTitle()
                                             : item.getSocialSummary(),
                                     baseUrl + item.getPath().toString());
-                    item.getAttributes().put(TWEET_ID, Long.toString(id));
+                    item.setAttribute(TWEET_ID, Long.toString(id));
                 } else if (!item.isPublishToTwitter() && hasTweet(item)) {
-                    tweetService.unTweet(Long.parseLong(item.getAttributes().get(TWEET_ID)));
-                    item.getAttributes().put(TWEET_ID, "");
+                    tweetService.unTweet(Long.parseLong(item.getAttribute(TWEET_ID)));
+                    item.setAttribute(TWEET_ID, null);
                 }
             } else if (hasTweet(item)) {
-                tweetService.unTweet(Long.parseLong(item.getAttributes().get(TWEET_ID)));
-                item.getAttributes().put(TWEET_ID, "");
+                tweetService.unTweet(Long.parseLong(item.getAttribute(TWEET_ID)));
+                item.setAttribute(TWEET_ID, null);
             }
         } catch (TwitterException ex) {
             throw new EntitySaveException("Error processing Tweet", List.of(ex.getMessage()));
@@ -79,7 +79,6 @@ public class TwitterNewsProcessor implements ItemProcessor<News> {
     }
 
     private boolean hasTweet(News item) {
-        return item.getAttributes().containsKey(TWEET_ID)
-                && isNotBlank(item.getAttributes().get(TWEET_ID));
+        return isNotBlank(item.getAttribute(TWEET_ID));
     }
 }

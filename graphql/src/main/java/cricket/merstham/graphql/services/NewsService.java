@@ -2,8 +2,8 @@ package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.repository.NewsEntityRepository;
+import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
-import cricket.merstham.shared.dto.NewsAttribute;
 import cricket.merstham.shared.dto.Totals;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,11 +85,11 @@ public class NewsService {
 
     @PreAuthorize("hasRole('ROLE_NEWS')")
     @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
-    public News saveAttributes(int id, List<NewsAttribute> attributes) {
+    public News saveAttributes(int id, List<KeyValuePair> attributes) {
         var news = repository.findById(id).orElseThrow();
-        attributes.forEach(a -> news.getAttributes().put(a.getName(), a.getValue()));
-        var saved = repository.saveAndFlush(news);
-        return convertToDto(saved);
+
+        attributes.forEach(a -> news.getAttributes().put(a.getKey(), a.getValue()));
+        return convertToDto(repository.saveAndFlush(news));
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")

@@ -6,8 +6,8 @@ import cricket.merstham.graphql.config.ModelMapperConfiguration;
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.helpers.RandomDateTimes;
 import cricket.merstham.graphql.repository.NewsEntityRepository;
+import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
-import cricket.merstham.shared.dto.NewsAttribute;
 import cricket.merstham.shared.extensions.StringExtensions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -152,7 +152,7 @@ class NewsServiceTest {
         assertThat(result.get(0).getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.get(0).getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.get(0).isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.get(0).getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.get(0).getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.get(0).getId(), equalTo(entity.getId()));
     }
 
@@ -179,7 +179,7 @@ class NewsServiceTest {
         assertThat(result.get(4).getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.get(4).getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.get(4).isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.get(4).getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.get(4).getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.get(4).getId(), equalTo(entity.getId()));
     }
 
@@ -206,7 +206,7 @@ class NewsServiceTest {
         assertThat(result.getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.getId(), equalTo(entity.getId()));
     }
 
@@ -231,7 +231,7 @@ class NewsServiceTest {
         assertThat(result.getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.getId(), equalTo(entity.getId()));
     }
 
@@ -258,7 +258,7 @@ class NewsServiceTest {
             assertThat(result.get(i).getPublishDate(), equalTo(entity.getPublishDate()));
             assertThat(result.get(i).getCreatedDate(), equalTo(entity.getCreatedDate()));
             assertThat(result.get(i).isDraft(), equalTo(entity.getDraft()));
-            assertThat(result.get(i).getAttributes(), equalTo(entity.getAttributes()));
+            assertThat(result.get(i).getAttributeMap(), equalTo(entity.getAttributes()));
             assertThat(result.get(i).getId(), equalTo(entity.getId()));
         }
     }
@@ -292,7 +292,7 @@ class NewsServiceTest {
         assertThat(result.getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.getId(), equalTo(entity.getId()));
     }
 
@@ -321,9 +321,15 @@ class NewsServiceTest {
                         .publishDate(RandomDateTimes.between(Instant.EPOCH, Instant.now()))
                         .draft(false)
                         .attributes(
-                                Map.of(
-                                        "ATTRIBUTE_ONE", LOREM.getWords(1),
-                                        "ATTRIBUTE_TWO", LOREM.getWords(1)))
+                                List.of(
+                                        KeyValuePair.builder()
+                                                .key("ATTRIBUTE_ONE")
+                                                .value(LOREM.getWords(1))
+                                                .build(),
+                                        KeyValuePair.builder()
+                                                .key("ATTRIBUTE_TWO")
+                                                .value(LOREM.getWords(1))
+                                                .build()))
                         .build();
 
         var result = service.save(news);
@@ -349,12 +355,12 @@ class NewsServiceTest {
                 service.saveAttributes(
                         0,
                         List.of(
-                                NewsAttribute.builder()
-                                        .name("ATTRIBUTE_TWO")
+                                KeyValuePair.builder()
+                                        .key("ATTRIBUTE_TWO")
                                         .value("a new value")
                                         .build(),
-                                NewsAttribute.builder()
-                                        .name("ATTRIBUTE_THREE")
+                                KeyValuePair.builder()
+                                        .key("ATTRIBUTE_THREE")
                                         .value("a new entry")
                                         .build()));
 
@@ -369,7 +375,7 @@ class NewsServiceTest {
         assertThat(result.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.isDraft(), equalTo(entity.getDraft()));
         assertThat(
-                result.getAttributes(),
+                result.getAttributeMap(),
                 equalTo(
                         Map.of(
                                 "ATTRIBUTE_ONE", originalAttributeOne,
@@ -386,12 +392,12 @@ class NewsServiceTest {
                         service.saveAttributes(
                                 NEWS_STORY_COUNT,
                                 List.of(
-                                        NewsAttribute.builder()
-                                                .name("ATTRIBUTE_TWO")
+                                        KeyValuePair.builder()
+                                                .key("ATTRIBUTE_TWO")
                                                 .value("a new value")
                                                 .build(),
-                                        NewsAttribute.builder()
-                                                .name("ATTRIBUTE_THREE")
+                                        KeyValuePair.builder()
+                                                .key("ATTRIBUTE_THREE")
                                                 .value("a new entry")
                                                 .build())));
     }
@@ -410,7 +416,7 @@ class NewsServiceTest {
         assertThat(result.getPublishDate(), equalTo(entity.getPublishDate()));
         assertThat(result.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(result.isDraft(), equalTo(entity.getDraft()));
-        assertThat(result.getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(result.getAttributeMap(), equalTo(entity.getAttributes()));
         assertThat(result.getId(), equalTo(entity.getId()));
     }
 

@@ -1,8 +1,8 @@
 package cricket.merstham.graphql.controllers;
 
 import cricket.merstham.graphql.services.NewsService;
+import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
-import cricket.merstham.shared.dto.NewsAttribute;
 import cricket.merstham.shared.dto.Totals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -59,7 +59,7 @@ public class NewsController {
 
     @MutationMapping
     public News saveNewsAttributes(
-            @Argument("id") int id, @Argument("attributes") List<NewsAttribute> attributes) {
+            @Argument("id") int id, @Argument("attributes") List<KeyValuePair> attributes) {
         return newsService.saveAttributes(id, attributes);
     }
 

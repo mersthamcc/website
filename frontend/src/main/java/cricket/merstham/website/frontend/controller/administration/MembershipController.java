@@ -207,7 +207,7 @@ public class MembershipController extends SspController<Member> {
                         formData.getData().entrySet().stream()
                                 .collect(
                                         Collectors.toMap(
-                                                a -> a.getKey(),
+                                                Map.Entry::getKey,
                                                 a ->
                                                         convert(
                                                                 attributes,

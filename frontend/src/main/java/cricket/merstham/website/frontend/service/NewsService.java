@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.exception.ResourceNotFoundException;
@@ -15,7 +16,7 @@ import cricket.merstham.website.graph.GetNewsItemQuery;
 import cricket.merstham.website.graph.NewsFeedQuery;
 import cricket.merstham.website.graph.SaveNewsAttributesMutation;
 import cricket.merstham.website.graph.SaveNewsMutation;
-import cricket.merstham.website.graph.type.NewsAttributeInput;
+import cricket.merstham.website.graph.type.KeyValuePairInput;
 import cricket.merstham.website.graph.type.NewsInput;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -127,22 +128,34 @@ public class NewsService {
                             .collect(Collectors.toList()));
         }
         news.setId(result.getData().getSaveNews().getId());
-        news.setAttributes(result.getData().getSaveNews().getAttributes());
+        news.setAttributes(
+                result.getData().getSaveNews().getAttributes().stream()
+                        .map(
+                                a ->
+                                        KeyValuePair.builder()
+                                                .key(a.getKey())
+                                                .value(a.getValue())
+                                                .build())
+                        .collect(Collectors.toList()));
 
         processors.forEach(p -> p.postSave(news));
-        var attributes =
-                news.getAttributes().entrySet().stream()
-                        .map(
-                                e ->
-                                        NewsAttributeInput.builder()
-                                                .name(e.getKey())
-                                                .value(e.getValue())
-                                                .build())
-                        .collect(Collectors.toList());
+
+        return saveAttributes(accessToken, news);
+    }
+
+    public News saveAttributes(OAuth2AccessToken accessToken, News news) throws IOException {
         var saveAttributesRequest =
                 SaveNewsAttributesMutation.builder()
                         .id(news.getId())
-                        .attributes(attributes)
+                        .attributes(
+                                news.getAttributes().stream()
+                                        .map(
+                                                a ->
+                                                        KeyValuePairInput.builder()
+                                                                .key(a.getKey())
+                                                                .value(a.getValue())
+                                                                .build())
+                                        .collect(Collectors.toList()))
                         .build();
         Response<SaveNewsAttributesMutation.Data> attributeResult =
                 graphService.executeMutation(saveAttributesRequest, accessToken);
@@ -154,31 +167,7 @@ public class NewsService {
                             .map(e -> e.getMessage())
                             .collect(Collectors.toList()));
         }
-        var saved = modelMapper.map(attributeResult.getData().getSaveNewsAttributes(), News.class);
-        //                News.builder()
-        //                        .id(attributeResult.getData().getSaveNewsAttributes().getId())
-        //
-        // .title(attributeResult.getData().getSaveNewsAttributes().getTitle())
-        //                        .body(attributeResult.getData().getSaveNewsAttributes().getBody())
-        //
-        // .publishDate(attributeResult.getData().getSaveNewsAttributes().getPublishDate())
-        //
-        // .createdDate(attributeResult.getData().getSaveNewsAttributes().getCreatedDate())
-        //
-        // .author(attributeResult.getData().getSaveNewsAttributes().getAuthor())
-        //
-        // .draft(attributeResult.getData().getSaveNewsAttributes().getDraft())
-        //                        .uuid(attributeResult.getData().getSaveNewsAttributes().getUuid())
-        //                        .socialSummary(
-        //
-        // attributeResult.getData().getSaveNewsAttributes().getSocialSummary())
-        //                        .attributes(
-        //
-        // attributeResult.getData().getSaveNewsAttributes().getAttributes().stream()
-        //                                        .collect(Collectors.toMap(o -> o.getName(), o ->
-        // o.getValue())))
-        //                        .build();
-        return saved;
+        return modelMapper.map(attributeResult.getData().getSaveNewsAttributes(), News.class);
     }
 
     public News get(OAuth2AccessToken accessToken, int id) throws IOException {
@@ -191,21 +180,6 @@ public class NewsService {
         }
         if (isNull(news.getData().getNewsItem())) throw new ResourceNotFoundException();
         var result = modelMapper.map(news.getData().getNewsItem(), News.class);
-        //                News.builder()
-        //                        .id(news.getData().newsItem().id())
-        //                        .author(news.getData().newsItem().author())
-        //                        .title(news.getData().newsItem().title())
-        //                        .createdDate(news.getData().newsItem().createdDate())
-        //                        .publishDate(news.getData().newsItem().publishDate())
-        //                        .body(news.getData().newsItem().body())
-        //                        .draft(news.getData().newsItem().draft())
-        //                        .uuid(news.getData().newsItem().uuid())
-        //                        .socialSummary(news.getData().newsItem().socialSummary())
-        //                        .attributes(
-        //                                news.getData().newsItem().attributes().stream()
-        //                                        .collect(Collectors.toMap(a -> a.name(), a ->
-        // a.value())))
-        //                        .build();
         processors.forEach(p -> p.postOpen(result));
         return result;
     }
@@ -219,21 +193,6 @@ public class NewsService {
         Response<GetNewsItemByPathQuery.Data> news = graphService.executeQuery(query);
         if (isNull(news.getData().getNewsItemByPath())) throw new ResourceNotFoundException();
         var result = modelMapper.map(news.getData().getNewsItemByPath(), News.class);
-        //                News.builder()
-        //                        .id(news.getData().newsItemByPath().id())
-        //                        .author(news.getData().newsItemByPath().author())
-        //                        .title(news.getData().newsItemByPath().title())
-        //                        .createdDate(news.getData().newsItemByPath().createdDate())
-        //                        .publishDate(news.getData().newsItemByPath().publishDate())
-        //                        .body(news.getData().newsItemByPath().body())
-        //                        .draft(news.getData().newsItemByPath().draft())
-        //                        .uuid(news.getData().newsItemByPath().uuid())
-        //                        .socialSummary(news.getData().newsItemByPath().socialSummary())
-        //                        .attributes(
-        //                                news.getData().newsItemByPath().attributes().stream()
-        //                                        .collect(Collectors.toMap(a -> a.name(), a ->
-        // a.value())))
-        //                        .build();
         processors.forEach(p -> p.postOpen(result));
         return result;
     }

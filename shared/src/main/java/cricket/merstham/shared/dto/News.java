@@ -63,7 +63,7 @@ public class News implements Serializable {
 
     @JsonProperty private String socialSummary;
 
-    @JsonProperty private Map<String, String> attributes;
+    @JsonProperty private List<KeyValuePair> attributes;
 
     @JsonProperty("formattedPublishDate")
     public String getFormattedPublishDate() {
@@ -106,5 +106,36 @@ public class News implements Serializable {
 
     public String getSlug() {
         return title.toSlug();
+    }
+
+    public String getAttribute(String key) {
+        return isNull(attributes)
+                ? null
+                : getAttributes().stream()
+                        .filter(a -> a.getKey().equals(key))
+                        .findFirst()
+                        .map(a -> a.getValue())
+                        .orElse(null);
+    }
+
+    public News setAttribute(String key, String value) {
+        var existing = getAttributes().stream().filter(a -> a.getKey().equals(key)).findFirst();
+        existing.ifPresentOrElse(
+                keyValuePair -> keyValuePair.setValue(value),
+                () -> {
+                    getAttributes().add(KeyValuePair.builder().key(key).value(value).build());
+                });
+        return this;
+    }
+
+    public boolean hasAttribute(String key) {
+        return isNull(attributes) && getAttributes().stream().anyMatch(a -> a.getKey().equals(key));
+    }
+
+    public Map<String, String> getAttributeMap() {
+        return isNull(attributes)
+                ? Map.of()
+                : getAttributes().stream()
+                        .collect(Collectors.toMap(KeyValuePair::getKey, KeyValuePair::getValue));
     }
 }

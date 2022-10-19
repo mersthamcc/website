@@ -44,7 +44,7 @@ public class JsonCoercing implements Coercing<JsonNode, Object> {
     @Override
     public JsonNode parseValue(Object input) throws CoercingParseValueException {
         try {
-            return objectMapper.convertValue(input, JsonNode.class);
+            return objectMapper.valueToTree(input);
         } catch (IllegalArgumentException e) {
             throw CoercingParseValueException.newCoercingParseValueException()
                     .cause(e)

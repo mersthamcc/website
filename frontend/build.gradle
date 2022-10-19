@@ -50,6 +50,7 @@ dependencies {
     testImplementation "org.springframework.security:spring-security-test:5.6.3"
     testImplementation "org.assertj:assertj-core:3.22.0"
     testImplementation "com.c4-soft.springaddons:spring-security-oauth2-test-addons:4.1.9"
+    testImplementation 'com.thedeanda:lorem:2.1'
 }
 
 apollo {

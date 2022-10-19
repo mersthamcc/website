@@ -9,6 +9,10 @@ query newsFeed ($page: Int!){
         body
         createdDate
         publishDate
+        attributes {
+            key
+            value
+        }
     }
 
     newsTotals {

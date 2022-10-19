@@ -7,7 +7,7 @@ import org.modelmapper.MappingException;
 import org.modelmapper.ModelMapper;
 
 import java.time.Instant;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,7 +34,7 @@ class ModelMapperConfigurationTest {
                         .publishDate(now)
                         .createdDate(now)
                         .uuid(UUID.randomUUID().toString())
-                        .attributes(Map.of())
+                        .attributes(List.of())
                         .socialSummary("A summary")
                         .build();
 

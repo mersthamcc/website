@@ -4,12 +4,20 @@ scalar Date
 
 scalar Json
 
-scalar JsonMap
-
 type User {
     username: String!
     subjectId: String!
     roles: [String!]
+}
+
+type KeyValuePair {
+    key: String!,
+    value: String!
+}
+
+input KeyValuePairInput {
+    key: String!,
+    value: String!
 }
 
 input IntFilter {

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
+
 public class AttributeConverter {
     public static Object convert(
             Map<String, AttributeDefinition> attributes, String key, Object value) {
@@ -20,6 +22,9 @@ public class AttributeConverter {
                     case DATE:
                         var formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                         try {
+                            if (isBlank((String) value)) {
+                                return "";
+                            }
                             return formatter.parse((String) value);
                         } catch (ParseException e) {
                             throw new RuntimeException("Error parsing date string", e);

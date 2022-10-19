@@ -1,4 +1,4 @@
-mutation saveNewsAttributes ($id: Int!, $attributes: [NewsAttributeInput]!) {
+mutation saveNewsAttributes ($id: Int!, $attributes: [KeyValuePairInput]!) {
     saveNewsAttributes(id: $id, attributes: $attributes) {
         id
         uuid
@@ -10,5 +10,9 @@ mutation saveNewsAttributes ($id: Int!, $attributes: [NewsAttributeInput]!) {
         createdDate
         publishDate
         socialSummary
+        attributes {
+            key
+            value
+        }
     }
 }

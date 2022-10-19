@@ -16,15 +16,6 @@ public class GraphQLScalars implements RuntimeWiringConfigurer {
         builder.scalar(dateTimeScalar());
         builder.scalar(dateScalar());
         builder.scalar(jsonScalar());
-        builder.scalar(jsonMapScalar());
-    }
-
-    private GraphQLScalarType jsonMapScalar() {
-        return GraphQLScalarType.newScalar()
-                .name("JsonMap")
-                .description("JsonNode map.")
-                .coercing(new JsonCoercing())
-                .build();
     }
 
     private GraphQLScalarType jsonScalar() {

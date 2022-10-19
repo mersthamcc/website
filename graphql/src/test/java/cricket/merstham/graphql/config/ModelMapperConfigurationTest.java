@@ -1,11 +1,13 @@
 package cricket.merstham.graphql.config;
 
 import cricket.merstham.graphql.entity.NewsEntity;
+import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,7 +51,7 @@ class ModelMapperConfigurationTest {
         assertThat(dto.getSocialSummary(), equalTo(entity.getSocialSummary()));
         assertThat(dto.getCreatedDate(), equalTo(entity.getCreatedDate()));
         assertThat(dto.getPublishDate(), equalTo(entity.getPublishDate()));
-        assertThat(dto.getAttributes(), equalTo(entity.getAttributes()));
+        assertThat(dto.getAttributeMap(), equalTo(entity.getAttributes()));
     }
 
     @Test
@@ -66,7 +68,16 @@ class ModelMapperConfigurationTest {
                         .author("Test Author")
                         .body("This is the body")
                         .socialSummary("Social body")
-                        .attributes(Map.of("facebook_id", "123456", "twitter_id", "654321"))
+                        .attributes(
+                                List.of(
+                                        KeyValuePair.builder()
+                                                .key("facebook_id")
+                                                .value("123456")
+                                                .build(),
+                                        KeyValuePair.builder()
+                                                .key("twitter_id")
+                                                .value("654321")
+                                                .build()))
                         .build();
         NewsEntity entity = NewsEntity.builder().build();
 
@@ -82,6 +93,6 @@ class ModelMapperConfigurationTest {
         assertThat(entity.getSocialSummary(), equalTo(dto.getSocialSummary()));
         assertThat(entity.getCreatedDate(), equalTo(dto.getCreatedDate()));
         assertThat(entity.getPublishDate(), equalTo(dto.getPublishDate()));
-        assertThat(entity.getAttributes(), equalTo(dto.getAttributes()));
+        assertThat(entity.getAttributes(), equalTo(dto.getAttributeMap()));
     }
 }

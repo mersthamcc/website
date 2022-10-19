@@ -70,21 +70,21 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                                             : item.getSocialSummary(),
                                     baseUrl + item.getPath().toString(),
                                     item.getPublishDate().atZone(UTC).toLocalDateTime());
-                    item.getAttributes().put(FACEBOOK_ID, id);
+                    item.setAttribute(FACEBOOK_ID, id);
                 } else if (!item.isPublishToFacebook() && hasFacebookPost(item)) {
-                    facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
-                    item.getAttributes().put(FACEBOOK_ID, "");
+                    facebookPageService.deletePost(item.getAttribute(FACEBOOK_ID));
+                    item.setAttribute(FACEBOOK_ID, null);
                 } else if (item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.updateFacebookPost(
-                            item.getAttributes().get(FACEBOOK_ID),
+                            item.getAttribute(FACEBOOK_ID),
                             isBlank(item.getSocialSummary())
                                     ? item.getTitle()
                                     : item.getSocialSummary(),
                             item.getPublishDate().atZone(UTC).toLocalDateTime());
                 }
             } else if (hasFacebookPost(item)) {
-                facebookPageService.deletePost(item.getAttributes().get(FACEBOOK_ID));
-                item.getAttributes().put(FACEBOOK_ID, "");
+                facebookPageService.deletePost(item.getAttribute(FACEBOOK_ID));
+                item.setAttribute(FACEBOOK_ID, null);
             }
         } catch (APIException ex) {
             throw new EntitySaveException(
@@ -93,7 +93,6 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
     }
 
     private boolean hasFacebookPost(News item) {
-        return item.getAttributes().containsKey(FACEBOOK_ID)
-                && isNotBlank(item.getAttributes().get(FACEBOOK_ID));
+        return isNotBlank(item.getAttribute(FACEBOOK_ID));
     }
 }
