@@ -18,7 +18,7 @@ import static java.util.Objects.isNull;
 
 @Service("NewsDefaults")
 public class SetDefaultsProcessor implements ItemProcessor<News> {
-    private static Logger LOG = LoggerFactory.getLogger(SetDefaultsProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SetDefaultsProcessor.class);
 
     @Override
     public List<String> preSave(News item) {

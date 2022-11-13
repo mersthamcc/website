@@ -21,7 +21,7 @@ import static org.apache.logging.log4j.util.Strings.isNotBlank;
 @Service("NewsTwitter")
 public class TwitterNewsProcessor implements ItemProcessor<News> {
     public static final String TWEET_ID = "tweet_id";
-    private static Logger LOG = LoggerFactory.getLogger(TwitterNewsProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TwitterNewsProcessor.class);
 
     private final String baseUrl;
     private final TweetService tweetService;

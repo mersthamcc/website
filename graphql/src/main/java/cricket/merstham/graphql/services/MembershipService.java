@@ -7,6 +7,7 @@ import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
+import cricket.merstham.graphql.inputs.AttributeInput;
 import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
@@ -120,7 +121,7 @@ public class MembershipService {
                 orderEntityRepository.findById(data.getSubscription().getOrderId()).orElseThrow();
         var priceListItem =
                 priceListItemEntityRepository
-                        .findById(data.getSubscription().getPricelistItemId())
+                        .findById(data.getSubscription().getPriceListItemId())
                         .orElseThrow();
         final var member =
                 MemberEntity.builder()
@@ -192,5 +193,40 @@ public class MembershipService {
                                 .order(order)
                                 .build()),
                 Payment.class);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Member updateMember(int id, List<AttributeInput> attributes) {
+        var member = memberRepository.findById(id).orElseThrow();
+        attributes.forEach(
+                input ->
+                        member.getAttributes().stream()
+                                .filter(a -> a.getDefinition().getKey().equals(input.getKey()))
+                                .findFirst()
+                                .ifPresentOrElse(
+                                        a -> {
+                                            a.setValue(input.getValue());
+                                            a.setUpdatedDate(Instant.now());
+                                        },
+                                        () -> {
+                                            var a =
+                                                    MemberAttributeEntity.builder()
+                                                            .createdDate(Instant.now())
+                                                            .updatedDate(Instant.now())
+                                                            .value(input.getValue())
+                                                            .primaryKey(
+                                                                    MemberAttributeEntityId
+                                                                            .builder()
+                                                                            .definition(
+                                                                                    attributeRepository
+                                                                                            .findByKey(
+                                                                                                    input
+                                                                                                            .getKey()))
+                                                                            .build())
+                                                            .build();
+                                            member.getAttributes().add(a);
+                                        }));
+
+        return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 }

@@ -4,8 +4,8 @@ import com.paypal.core.PayPalEnvironment;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.*;
+import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.configuration.ClubConfiguration;
-import cricket.merstham.website.frontend.model.Order;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,8 +95,7 @@ public class PaypalService implements PaymentService {
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
         List<Item> items = new ArrayList<>();
-        order.getSubscriptions()
-                .values()
+        order.getMemberSubscription()
                 .forEach(
                         subscription ->
                                 items.add(
@@ -106,12 +105,17 @@ public class PaypalService implements PaymentService {
                                                                 "{0} {1}",
                                                                 subscription
                                                                         .getMember()
+                                                                        .getAttributeMap()
                                                                         .get("given-name"),
                                                                 subscription
                                                                         .getMember()
+                                                                        .getAttributeMap()
                                                                         .get("family-name")))
                                                 .quantity("1")
-                                                .sku(subscription.getCategory())
+                                                .sku(
+                                                        subscription
+                                                                .getPriceListItem()
+                                                                .getDescription())
                                                 .unitAmount(
                                                         new Money()
                                                                 .currencyCode("GBP")

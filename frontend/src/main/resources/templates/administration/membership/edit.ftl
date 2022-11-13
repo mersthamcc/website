@@ -22,7 +22,7 @@
 <@layout.mainLayout script=dataScript>
     <div class="row">
         <div class="col-lg-8">
-            <#list subscription.pricelistItem.memberCategory.form as section>
+            <#list subscription.priceListItem.memberCategory.form as section>
                 <@admin.section title="membership.${section.section.key}" action="" buttons=detailsFormButtons>
                     <#list section.section.attribute as attribute>
                         <@admin.memberAdminField attribute=attribute data=data />
@@ -76,15 +76,15 @@
                     </h1>
                     <ul class="list-unstyled">
                         <li class="list-item">
-                            <#if subscription.pricelistItem.memberCategory.key == "social">
+                            <#if subscription.priceListItem.memberCategory.key == "social">
                                 <i class="tio-beer-bottle mr-1"></i>
                             <#else>
                                 <i class="tio-cricket mr-1"></i>
                             </#if>
                             <span>
                                 <@spring.messageText
-                                    code="membership.${subscription.pricelistItem.memberCategory.key}"
-                                    text=subscription.pricelistItem.memberCategory.key />
+                                    code="membership.${subscription.priceListItem.memberCategory.key}"
+                                    text=subscription.priceListItem.memberCategory.key />
                             </span>
                         </li>
 

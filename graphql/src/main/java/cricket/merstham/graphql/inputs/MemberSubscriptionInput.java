@@ -1,19 +1,24 @@
 package cricket.merstham.graphql.inputs;
 
-import org.springframework.data.web.ProjectedPayload;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@ProjectedPayload
-public interface MemberSubscriptionInput {
-    LocalDate getAddedDate();
+@JsonSerialize
+@Getter
+@Builder
+public class MemberSubscriptionInput {
+    @JsonProperty private LocalDate addedDate;
 
-    int getYear();
+    @JsonProperty private int year;
 
-    BigDecimal getPrice();
+    @JsonProperty private BigDecimal price;
 
-    int getPricelistItemId();
+    @JsonProperty private int priceListItemId;
 
-    int getOrderId();
+    @JsonProperty private int orderId;
 }

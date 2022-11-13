@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.model;
+package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

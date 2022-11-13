@@ -1,25 +1,30 @@
 package cricket.merstham.graphql.inputs;
 
-import org.springframework.data.web.ProjectedPayload;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@ProjectedPayload
-public interface PaymentInput {
-    String getId();
+@JsonSerialize
+@Getter
+@Builder
+public class PaymentInput {
+    @JsonProperty private String id;
 
-    LocalDate getDate();
+    @JsonProperty private LocalDate date;
 
-    String getType();
+    @JsonProperty private String type;
 
-    String getReference();
+    @JsonProperty private String reference;
 
-    BigDecimal getAmount();
+    @JsonProperty private BigDecimal amount;
 
-    BigDecimal getProcessingFees();
+    @JsonProperty private BigDecimal processingFees;
 
-    boolean isCollected();
+    @JsonProperty private boolean collected;
 
-    boolean isReconciled();
+    @JsonProperty private boolean reconciled;
 }

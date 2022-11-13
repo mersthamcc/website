@@ -665,7 +665,7 @@
               "deprecationReason": null
             },
             {
-              "name": "pricelistItem",
+              "name": "priceListItem",
               "description": null,
               "args": [],
               "type": {
@@ -679,7 +679,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "PricelistItem",
+                      "name": "PriceListItem",
                       "ofType": null
                     }
                   }
@@ -1085,7 +1085,7 @@
               "deprecationReason": null
             },
             {
-              "name": "pricelistItem",
+              "name": "priceListItem",
               "description": null,
               "args": [],
               "type": {
@@ -1093,7 +1093,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "PricelistItem",
+                  "name": "PriceListItem",
                   "ofType": null
                 }
               },
@@ -1155,7 +1155,7 @@
               "defaultValue": null
             },
             {
-              "name": "pricelistItemId",
+              "name": "priceListItemId",
               "description": null,
               "type": {
                 "kind": "SCALAR",
@@ -2137,11 +2137,11 @@
         },
         {
           "kind": "OBJECT",
-          "name": "PriceList",
+          "name": "Price",
           "description": null,
           "fields": [
             {
-              "name": "pricelistItem",
+              "name": "priceListItem",
               "description": null,
               "args": [],
               "type": {
@@ -2149,7 +2149,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "PricelistItem",
+                  "name": "PriceListItem",
                   "ofType": null
                 }
               },
@@ -2204,7 +2204,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "PricelistItem",
+          "name": "PriceListItem",
           "description": null,
           "fields": [
             {
@@ -2296,7 +2296,7 @@
               "deprecationReason": null
             },
             {
-              "name": "pricelist",
+              "name": "priceList",
               "description": null,
               "args": [],
               "type": {
@@ -2310,7 +2310,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "PriceList",
+                      "name": "Price",
                       "ofType": null
                     }
                   }

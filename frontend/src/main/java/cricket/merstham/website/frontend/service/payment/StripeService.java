@@ -5,7 +5,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
-import cricket.merstham.website.frontend.model.Order;
+import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +83,7 @@ public class StripeService implements PaymentService {
                         .setCancelUrl(format("{0}/payments/{1}/cancel", baseUri, SERVICE_NAME))
                         .setLocale(SessionCreateParams.Locale.EN_GB);
 
-        order.getSubscriptions()
-                .values()
+        order.getMemberSubscription()
                 .forEach(
                         subscription ->
                                 params.addLineItem(
@@ -108,10 +107,12 @@ public class StripeService implements PaymentService {
                                                                                                 "{0} {1}",
                                                                                                 subscription
                                                                                                         .getMember()
+                                                                                                        .getAttributeMap()
                                                                                                         .get(
                                                                                                                 "given-name"),
                                                                                                 subscription
                                                                                                         .getMember()
+                                                                                                        .getAttributeMap()
                                                                                                         .get(
                                                                                                                 "family-name")))
                                                                                 .build())

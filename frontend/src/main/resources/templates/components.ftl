@@ -313,19 +313,19 @@
     </div>
 </#macro>
 
-<#macro membershipCategories categories _csrf uuid>
+<#macro membershipCategories categories _csrf subscriptionId>
     <#list categories as category>
         <@section title="membership.${category.key}">
             <div class="w-lg-80 mx-lg-auto position-relative">
-                <@categoryPricelist category=category _csrf=_csrf uuid=uuid />
+                <@categoryPricelist category=category _csrf=_csrf subscriptionId=subscriptionId />
             </div>
         </@section>
     </#list>
 </#macro>
 
-<#macro categoryPricelist category _csrf uuid>
+<#macro categoryPricelist category _csrf subscriptionId>
     <div class="row position-relative z-index-2 mx-n2 mb-5">
-        <#list category.pricelistItem as item>
+        <#list category.priceListItem as item>
             <div class="col-md-4 col-sm-3">
                 <div class="px-2 mb-3">
                     <div class="card h-100">
@@ -389,13 +389,13 @@
                             <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
                                 <input type="hidden" name="_csrf" value="${_csrf.token}" />
                                 <input type="hidden" name="category" value="${category.key}" />
-                                <input type="hidden" name="uuid" value="${subscription.uuid}" />
+                                <input type="hidden" name="uuid" value="${subscriptionId}" />
                                 <button
                                         type="submit"
                                         class="btn btn-soft-primary btn-block transition-3d-hover"
                                         value="${item.id}"
-                                        name="pricelistItemId"
-                                        id="pricelistItemId-${item.id}">
+                                        name="priceListItemId"
+                                        id="priceListItemId-${item.id}">
                                     <@spring.message code="membership.select" />
                                 </button>
                             </form>
@@ -439,7 +439,7 @@
     </div>
 </#macro>
 
-<#macro memberField attribute subscription localeCategory="membership">
+<#macro memberField attribute subscription data localeCategory="membership">
     <#if attribute.mandatory>
         <#assign required>required="required"</#assign>
     <#else>
@@ -454,28 +454,32 @@
                         required=required
                         subscription=subscription
                         key=attribute.definition.key
-                        localeCategory=localeCategory />
+                        localeCategory=localeCategory
+                        data=data />
                     <#break>
                 <#case "Number">
                     <@memberInputField type="number"
                         required=required
                         subscription=subscription
                         key=attribute.definition.key
-                        localeCategory=localeCategory />
+                        localeCategory=localeCategory
+                        data=data />
                     <#break>
                 <#case "Email">
                     <@memberInputField type="email"
                         required=required
                         subscription=subscription
                         key=attribute.definition.key
-                        localeCategory=localeCategory />
+                        localeCategory=localeCategory
+                        data=data />
                     <#break>
                 <#case "Date">
                     <@memberInputField type="date"
                         required=required
                         subscription=subscription
                         key=attribute.definition.key
-                        localeCategory=localeCategory />
+                        localeCategory=localeCategory
+                        data=data />
                     <#break>
                 <#case "Option">
                     <#list attribute.definition.choices as choice>
@@ -483,11 +487,11 @@
                             <label>
                                 <input
                                         type="radio"
-                                        name="member[${attribute.definition.key}]"
+                                        name="${attribute.definition.key}"
                                         id="member-${attribute.definition.key}"
                                         value="${choice}"
-                                        <#if subscription.member?keys?seq_contains(attribute.definition.key)
-                                            && choice == subscription.member[attribute.definition.key]>
+                                        <#if data?keys?seq_contains(attribute.definition.key)
+                                            && choice == data[attribute.definition.key]?first>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -502,11 +506,11 @@
                             <label>
                                 <input
                                         type="checkbox"
-                                        name="member[${attribute.definition.key}]"
+                                        name="${attribute.definition.key}"
                                         id="member-${attribute.definition.key}"
                                         value="${choice}"
-                                        <#if subscription.member?keys?seq_contains(attribute.definition.key)
-                                            && subscription.member[attribute.definition.key]?seq_contains(choice)>
+                                        <#if data?keys?seq_contains(attribute.definition.key)
+                                            && data[attribute.definition.key]?seq_contains(choice)>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -521,12 +525,11 @@
     </div>
 </#macro>
 
-<#macro memberInputField type required subscription key localeCategory>
+<#macro memberInputField type required subscription key localeCategory data>
     <input class="form-control  c-square c-theme"
-           name="member[${key}]"
+           name="${key}"
            type="${type}"
            placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
-           value="${subscription.member[key]!""}"
-            ${required}
-    />
+           value="${(data[key]?first)!""}"
+            ${required} />
 </#macro>

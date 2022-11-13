@@ -16,7 +16,7 @@ query members {
         subscription {
             addedDate
             price
-            pricelistItem {
+            priceListItem {
                 description
             }
             year

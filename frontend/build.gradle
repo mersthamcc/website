@@ -64,9 +64,9 @@ apollo {
             endpointUrl.set("http://localhost:8090/graphql")
         }
         customTypeMapping = [
-                "Date" : "java.time.LocalDate",
-                "DateTime" : "java.time.Instant",
-                "JsonMap" : "java.util.Map",
+            "Date" : "java.time.LocalDate",
+            "DateTime" : "java.time.Instant",
+            "Json": "com.fasterxml.jackson.databind.JsonNode",
         ]
     }
 }

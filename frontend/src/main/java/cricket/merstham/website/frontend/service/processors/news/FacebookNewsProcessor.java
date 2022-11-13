@@ -23,7 +23,7 @@ import static org.apache.logging.log4j.util.Strings.isNotBlank;
 @Service("NewsFacebook")
 public class FacebookNewsProcessor implements ItemProcessor<News> {
     public static final String FACEBOOK_ID = "facebook_id";
-    private static Logger LOG = LoggerFactory.getLogger(FacebookNewsProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FacebookNewsProcessor.class);
 
     private final String baseUrl;
     private final FacebookPageService facebookPageService;

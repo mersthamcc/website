@@ -2,6 +2,7 @@ package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,10 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Data
 @Builder
@@ -29,4 +34,14 @@ public class Member implements Serializable {
     @JsonProperty private String ownerUserId;
     @JsonProperty private List<MemberAttribute> attributes;
     @JsonProperty private List<MemberSubscription> subscription;
+
+    public Map<String, JsonNode> getAttributeMap() {
+        return isNull(attributes)
+                ? Map.of()
+                : getAttributes().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        a -> a.getDefinition().getKey(),
+                                        MemberAttribute::getValue));
+    }
 }

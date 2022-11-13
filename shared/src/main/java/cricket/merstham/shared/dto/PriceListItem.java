@@ -29,5 +29,5 @@ public class PriceListItem implements Serializable {
     @JsonProperty private String description;
     @JsonProperty private Boolean includesMatchFees;
     @JsonProperty private BigDecimal currentPrice;
-    @JsonProperty private List<Price> priceList;
+    @JsonProperty private List<Price> price;
 }

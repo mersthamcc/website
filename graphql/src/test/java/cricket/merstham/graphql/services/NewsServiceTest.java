@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -113,9 +115,16 @@ class NewsServiceTest {
                                             .collect(Collectors.toList())));
         }
         when(repository.count()).thenReturn((long) NEWS_STORY_COUNT);
-        for (int i = 0; i < NEWS_STORY_COUNT; i++) {
-            when(repository.findById(i)).thenReturn(Optional.of(NEWS_ENTITIES.get(i)));
-        }
+        when(repository.findById(anyInt()))
+                .then(
+                        invocation ->
+                                NEWS_ENTITIES.stream()
+                                        .filter(
+                                                n ->
+                                                        Objects.equals(
+                                                                n.getId(),
+                                                                invocation.getArgument(0)))
+                                        .findFirst());
 
         NEWS_ENTITIES.forEach(
                 n -> {
@@ -196,7 +205,9 @@ class NewsServiceTest {
     void shouldReturnCorrectItemUsingId(int id) {
         var result = service.getNewsItemById(id);
 
-        var entity = NEWS_ENTITIES.get(id);
+        var entity =
+                NEWS_ENTITIES.stream().filter(n -> n.getId().equals(id)).findFirst().orElseThrow();
+
         assertThat(result.getTitle(), equalTo(entity.getTitle()));
         assertThat(result.getBody(), equalTo(entity.getBody()));
         assertThat(result.getAuthor(), equalTo(entity.getAuthor()));
@@ -242,7 +253,7 @@ class NewsServiceTest {
     }
 
     @Test
-    void shouldReturnCorrectValuesForAdminListWhemMatches() {
+    void shouldReturnCorrectValuesForAdminListWhenMatches() {
         var result = service.getAdminNewsList(1, 25, "test search");
 
         assertThat(result.size(), equalTo(25));
@@ -282,7 +293,8 @@ class NewsServiceTest {
 
         var result = service.save(news);
 
-        var entity = NEWS_ENTITIES.get(1);
+        var entity =
+                NEWS_ENTITIES.stream().filter(n -> n.getId().equals(1)).findFirst().orElseThrow();
         assertThat(result.getTitle(), equalTo("a new title"));
         assertThat(result.getBody(), equalTo("a new body"));
         assertThat(result.getAuthor(), equalTo(entity.getAuthor()));
@@ -349,11 +361,12 @@ class NewsServiceTest {
 
     @Test
     void shouldCorrectlyUpdateNewsAttributes() {
-        var originalAttributeOne = NEWS_ENTITIES.get(0).getAttributes().get("ATTRIBUTE_ONE");
+        var entity = NEWS_ENTITIES.get(10);
+        var originalAttributeOne = entity.getAttributes().get("ATTRIBUTE_ONE");
 
         var result =
                 service.saveAttributes(
-                        0,
+                        entity.getId(),
                         List.of(
                                 KeyValuePair.builder()
                                         .key("ATTRIBUTE_TWO")
@@ -364,7 +377,6 @@ class NewsServiceTest {
                                         .value("a new entry")
                                         .build()));
 
-        var entity = NEWS_ENTITIES.get(0);
         assertThat(result.getTitle(), equalTo(entity.getTitle()));
         assertThat(result.getBody(), equalTo(entity.getBody()));
         assertThat(result.getAuthor(), equalTo(entity.getAuthor()));
@@ -406,7 +418,9 @@ class NewsServiceTest {
     void shouldReturnDeletedEntityOnDelete() {
         var result = service.delete(10);
 
-        var entity = NEWS_ENTITIES.get(10);
+        var entity =
+                NEWS_ENTITIES.stream().filter(n -> n.getId().equals(10)).findFirst().orElseThrow();
+
         assertThat(result.getTitle(), equalTo(entity.getTitle()));
         assertThat(result.getBody(), equalTo(entity.getBody()));
         assertThat(result.getAuthor(), equalTo(entity.getAuthor()));

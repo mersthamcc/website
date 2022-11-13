@@ -1,14 +1,15 @@
 package cricket.merstham.website.frontend.controller.administration;
 
+import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.DataTableValue;
-import cricket.merstham.website.frontend.model.GenericForm;
 import cricket.merstham.website.frontend.model.admintables.Member;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.service.MembershipService;
-import cricket.merstham.website.graph.MemberQuery;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.MessageSource;
@@ -16,13 +17,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -43,6 +46,7 @@ import static java.text.MessageFormat.format;
 @Controller("AdminMembershipController")
 public class MembershipController extends SspController<Member> {
 
+    private static final Logger LOG = LogManager.getLogger(MembershipController.class);
     private final MessageSource messageSource;
 
     private final MembershipService membershipService;
@@ -87,7 +91,8 @@ public class MembershipController extends SspController<Member> {
         return new ModelAndView("administration/membership/edit", buildModelData(member, locale));
     }
 
-    private Map<String, ?> buildModelData(MemberQuery.Member member, Locale locale) {
+    private Map<String, ?> buildModelData(
+            cricket.merstham.shared.dto.Member member, Locale locale) {
         return Map.of(
                 "member", member,
                 "subscription", member.getSubscription().get(0),
@@ -96,7 +101,11 @@ public class MembershipController extends SspController<Member> {
                                 .collect(
                                         Collectors.toMap(
                                                 a -> a.getDefinition().getKey(),
-                                                a -> a.getValue())),
+                                                a ->
+                                                        convert(
+                                                                a.getDefinition(),
+                                                                a.getValue(),
+                                                                locale))),
                 "subscriptionHistory",
                         member.getSubscription().stream()
                                 .map(
@@ -111,7 +120,7 @@ public class MembershipController extends SspController<Member> {
                                                         "membership.description",
                                                                 new DataTableValue()
                                                                         .setValue(
-                                                                                s.getPricelistItem()
+                                                                                s.getPriceListItem()
                                                                                         .getDescription()),
                                                         "membership.category",
                                                                 new DataTableValue()
@@ -120,7 +129,7 @@ public class MembershipController extends SspController<Member> {
                                                                                         .getMessage(
                                                                                                 format(
                                                                                                         "membership.{0}",
-                                                                                                        s.getPricelistItem()
+                                                                                                        s.getPriceListItem()
                                                                                                                 .getMemberCategory()
                                                                                                                 .getKey()),
                                                                                                 null,
@@ -194,26 +203,19 @@ public class MembershipController extends SspController<Member> {
 
     @PostMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-update")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public ModelAndView update(
+    public RedirectView update(
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             Locale locale,
+            RedirectAttributes redirectAttributes,
             @PathVariable int id,
-            @ModelAttribute("data") GenericForm formData) {
-        var attributes = membershipService.getAttributes();
-        var member =
-                membershipService.update(
-                        id,
-                        authorizedClient.getAccessToken(),
-                        formData.getData().entrySet().stream()
-                                .collect(
-                                        Collectors.toMap(
-                                                Map.Entry::getKey,
-                                                a ->
-                                                        convert(
-                                                                attributes,
-                                                                a.getKey(),
-                                                                a.getValue()))));
-        return new ModelAndView(format("redirect:/administration/membership/edit/{0}", id));
+            @RequestBody MultiValueMap<String, Object> data) {
+        try {
+            membershipService.update(id, authorizedClient.getAccessToken(), locale, data);
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return new RedirectView(format("/administration/membership/edit/{0}", id));
     }
 
     @PostMapping(

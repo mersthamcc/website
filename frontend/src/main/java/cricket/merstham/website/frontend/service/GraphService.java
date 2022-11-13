@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
 import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
 import cricket.merstham.website.frontend.mappers.InstantCustomTypeAdapter;
+import cricket.merstham.website.frontend.mappers.JsonNodeCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
 import okio.ByteString;
 import org.slf4j.Logger;
@@ -18,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.client.ClientBuilder;
+import javax.inject.Named;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 
 import java.io.IOException;
@@ -35,20 +37,24 @@ public class GraphService {
     private final GraphConfiguration graphConfiguration;
     private final AccessTokenManager accessTokenManager;
     private final ObjectMapper objectMapper;
+    private final Client client;
     private final ScalarTypeAdapters adapters =
             new ScalarTypeAdapters(
                     Map.of(
                             CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
-                            CustomGraphQLScalars.DATETIME, new InstantCustomTypeAdapter()));
+                            CustomGraphQLScalars.DATETIME, new InstantCustomTypeAdapter(),
+                            CustomGraphQLScalars.JSON, new JsonNodeCustomTypeAdapter()));
 
     @Autowired
     public GraphService(
             GraphConfiguration graphConfiguration,
             AccessTokenManager accessTokenManager,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            @Named("graphql-client") Client client) {
         this.graphConfiguration = graphConfiguration;
         this.accessTokenManager = accessTokenManager;
         this.objectMapper = objectMapper;
+        this.client = client;
     }
 
     public <T extends Query, R> R executeQuery(
@@ -94,7 +100,6 @@ public class GraphService {
 
     private <T extends Operation> byte[] getRawResult(T query, String accessToken)
             throws IOException {
-        var client = ClientBuilder.newClient();
         var webTarget = client.target(graphConfiguration.getGraphUri());
 
         var invocation =

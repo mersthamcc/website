@@ -10,7 +10,7 @@ mutation createMember($member: MemberInput!) {
     }
     subscription {
       price
-      pricelistItem {
+      priceListItem {
         id
       }
       year

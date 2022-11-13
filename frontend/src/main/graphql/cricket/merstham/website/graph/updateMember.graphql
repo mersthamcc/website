@@ -33,7 +33,7 @@ mutation updateMember($id: Int!, $data: [AttributeInput]!) {
                 }
                 uuid
             }
-            pricelistItem {
+            priceListItem {
                 id
                 description
                 includesMatchFees

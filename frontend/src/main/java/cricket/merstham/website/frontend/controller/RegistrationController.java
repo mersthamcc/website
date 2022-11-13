@@ -1,20 +1,25 @@
 package cricket.merstham.website.frontend.controller;
 
-import cricket.merstham.website.frontend.model.RegistrationAction;
+import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberAttribute;
+import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
-import cricket.merstham.website.frontend.model.Subscription;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,9 +28,13 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
 
-import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static cricket.merstham.shared.dto.RegistrationAction.NEW;
+import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 
 @Controller
 @SessionAttributes("basket")
@@ -70,23 +79,28 @@ public class RegistrationController {
                             "categories",
                             membershipService.getMembershipCategories(),
                             "subscription",
-                            subscription));
+                            subscription,
+                            "subscriptionId",
+                            editMember));
         } else {
             switch (action) {
                 case "add-member":
-                    var subscription = new Subscription();
-                    subscription
-                            .setUuid(UUID.randomUUID())
-                            .setAction(RegistrationAction.NEW)
-                            .setMember(new HashMap<>());
-                    basket.addSubscription(subscription);
+                    var subscription =
+                            MemberSubscription.builder()
+                                    .member(Member.builder().build())
+                                    .action(NEW)
+                                    .build();
+                    UUID subscriptionId = UUID.randomUUID();
+                    basket.putSubscription(subscriptionId, subscription);
                     return new ModelAndView(
                             "registration/select-membership",
                             Map.of(
                                     "categories",
                                     membershipService.getMembershipCategories(),
                                     "subscription",
-                                    subscription));
+                                    subscription,
+                                    "subscriptionId",
+                                    subscriptionId.toString()));
                 case "next":
                     return new RedirectView("/register/confirmation");
             }
@@ -94,48 +108,93 @@ public class RegistrationController {
         return new RedirectView("/register");
     }
 
+    private MultiValueMap<String, Object> memberToFormData(MemberSubscription subscription) {
+        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+        subscription.getMember().getAttributeMap().entrySet().stream()
+                .forEachOrdered(
+                        a -> {
+                            if (a.getValue().isArray()) {
+                                for (var node : a.getValue()) {
+                                    form.add(a.getKey(), node.asText());
+                                }
+                            } else {
+                                form.add(a.getKey(), a.getValue().asText());
+                            }
+                        });
+        return form;
+    }
+
     @PostMapping(value = "/register/select-membership", name = "member-details")
     public ModelAndView membershipForm(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @ModelAttribute("subscription") Subscription subscription) {
-        var membershipCategory =
-                membershipService.getMembershipCategory(subscription.getCategory());
-        var pricelistItem =
-                membershipCategory.getPricelistItem().stream()
-                        .filter(p -> p.getId() == subscription.getPricelistItemId())
+            @ModelAttribute("category") String category,
+            @ModelAttribute("uuid") UUID uuid,
+            @ModelAttribute("priceListItemId") Integer priceListItemId) {
+        var membershipCategory = membershipService.getMembershipCategory(category);
+        var priceListItem =
+                membershipCategory.getPriceListItem().stream()
+                        .filter(p -> p.getId() == priceListItemId)
                         .findFirst()
                         .orElseThrow();
 
-        subscription
-                .setPricelistItemId(pricelistItem.getId())
-                .setPrice(pricelistItem.getCurrentPrice())
-                .updateDefinition(membershipCategory);
-
+        var subscription =
+                basket.getSubscription(uuid)
+                        .setPriceListItem(priceListItem)
+                        .setPrice(priceListItem.getCurrentPrice())
+                        .setCategory(membershipCategory.getKey());
+        basket.putSubscription(uuid, subscription);
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
                         "form", membershipCategory.getForm(),
-                        "subscription", basket.updateSubscription(subscription)));
+                        "subscription", subscription,
+                        "category", membershipCategory,
+                        "subscriptionId", uuid.toString(),
+                        "data", memberToFormData(subscription)));
     }
 
-    @PostMapping(value = "/register/add-member", name = "member-details")
+    @PostMapping(
+            value = "/register/add-member",
+            name = "member-details",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public View membershipFormProcess(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @ModelAttribute("subscription") Subscription subscription) {
-        basket.updateSubscription(subscription);
-
+            @RequestBody MultiValueMap<String, Object> body) {
+        var uuid = UUID.fromString((String) body.getFirst("uuid"));
+        var subscription = basket.getSubscription(uuid).setMember(memberFromPost(body));
+        basket.putSubscription(uuid, subscription);
         return new RedirectView("/register");
+    }
+
+    private Member memberFromPost(MultiValueMap<String, Object> body) {
+        var attributes = membershipService.getAttributes();
+        return Member.builder()
+                .attributes(
+                        attributes.entrySet().stream()
+                                .filter(a -> body.containsKey(a.getKey()))
+                                .map(
+                                        a ->
+                                                MemberAttribute.builder()
+                                                        .definition(a.getValue())
+                                                        .value(
+                                                                convert(
+                                                                        a.getValue(),
+                                                                        body.get(a.getKey())))
+                                                        .build())
+                                .collect(Collectors.toList()))
+                .build();
     }
 
     @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            Locale locale,
             HttpSession session,
             SessionStatus status) {
         var order =
                 membershipService.registerMembersFromBasket(
-                        basket, authorizedClient.getAccessToken());
+                        basket, authorizedClient.getAccessToken(), locale);
         status.setComplete();
         session.setAttribute("order", order);
         return new ModelAndView(

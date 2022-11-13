@@ -99,7 +99,7 @@
                             <label for="data-${attribute.definition.key}-${choice}">
                                 <input
                                         type="radio"
-                                        name="data[${attribute.definition.key}]"
+                                        name="${attribute.definition.key}"
                                         id="data-${attribute.definition.key}-${choice}"
                                         value="${choice}"
                                         <#if data?keys?seq_contains(attribute.definition.key)
@@ -113,12 +113,16 @@
                     </#list>
                     <#break>
                 <#case "List">
+                    <input
+                            type="hidden"
+                            name="${attribute.definition.key}"
+                            value="nothing-checked" />
                     <#list attribute.definition.choices as choice>
                         <div class="checkbox">
                             <label for="data-${attribute.definition.key}-${choice}">
                                 <input
                                         type="checkbox"
-                                        name="data[${attribute.definition.key}]"
+                                        name="${attribute.definition.key}"
                                         id="data-${attribute.definition.key}-${choice}"
                                         value="${choice}"
                                         <#if data?keys?seq_contains(attribute.definition.key)
@@ -139,7 +143,7 @@
 
 <#macro memberAdminInputField type required data key localeCategory>
     <input class="form-control c-square c-theme"
-           name="data[${key}]"
+           name="${key}"
            type="${type}"
            placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
            value="${data[key]!""}"
