@@ -11,7 +11,7 @@ query getNewsItemByPath($path: String!) {
         body
         socialSummary
         attributes {
-            name
+            key
             value
         }
     }

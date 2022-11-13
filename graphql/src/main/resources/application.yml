@@ -2,6 +2,9 @@ server:
   port: 8090
 
 spring:
+#  mvc:
+#    log-request-details: true
+
   devtools:
     livereload:
       enabled: false
@@ -11,7 +14,9 @@ spring:
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
+    show-sql: true
+
+
   datasource:
     url: "jdbc:postgresql://localhost:5432/${DATABASE_NAME:}"
     username: ${DATABASE_USER:}
@@ -36,7 +41,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
-
 
 debug: true
 

@@ -5,21 +5,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(
@@ -68,10 +70,9 @@ public class NewsEntity implements Serializable {
     @Column(name = "social_summary")
     private String socialSummary;
 
-    @OneToMany(
-            fetch = FetchType.EAGER,
-            mappedBy = "news",
-            orphanRemoval = true,
-            cascade = CascadeType.ALL)
-    private List<NewsAttributeEntity> attributes = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "name")
+    @Column(name = "value")
+    @CollectionTable(name = "news_attribute", joinColumns = @JoinColumn(name = "news_id"))
+    private Map<String, String> attributes = new HashMap<>();
 }

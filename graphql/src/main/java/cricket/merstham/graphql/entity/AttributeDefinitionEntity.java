@@ -1,12 +1,14 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.jpa.PostgresSqlEnumType;
 import cricket.merstham.shared.types.AttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -32,6 +34,7 @@ import static cricket.merstham.graphql.config.HibernateConfiguration.JSON_TYPE;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@TypeDef(name = "attribute_type", typeClass = PostgresSqlEnumType.class)
 public class AttributeDefinitionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +46,7 @@ public class AttributeDefinitionEntity {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Type(type = "attribute_type")
     private AttributeType type;
 
     @Column(name = "choices", columnDefinition = "jsonb")

@@ -1,6 +1,6 @@
 package cricket.merstham.website.frontend.service.payment;
 
-import cricket.merstham.website.frontend.model.Order;
+import cricket.merstham.shared.dto.Order;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.servlet.ModelAndView;
 

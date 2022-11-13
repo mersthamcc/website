@@ -43,14 +43,14 @@
 <#macro itemBody n width=7>
     <div class="card col-md-${width}">
         <div class="card-header-title">
-            <h3><a class="text-inherit" href="/news${n.link}">${n.title}</a></h3>
+            <h3><a class="text-inherit" href="/news${n.path}">${n.title}</a></h3>
         </div>
         <div class="card-body d-flex flex-column h-100 px-0">
             <div>
                 ${n.abstract}
             </div>
             <div class="text-right">
-                <a href="/news${n.link}#readmore">Read more...</a>
+                <a href="/news${n.path}#readmore">Read more...</a>
             </div>
         </div>
         <div class="card-footer">

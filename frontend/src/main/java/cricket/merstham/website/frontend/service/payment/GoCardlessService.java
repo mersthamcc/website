@@ -3,7 +3,7 @@ package cricket.merstham.website.frontend.service.payment;
 import com.gocardless.GoCardlessClient;
 import com.gocardless.resources.Mandate;
 import com.gocardless.services.RedirectFlowService;
-import cricket.merstham.website.frontend.model.Order;
+import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;

@@ -1,16 +1,18 @@
 package cricket.merstham.website.frontend.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import java.util.Map;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Accessors(chain = true)
 public class GenericForm {
     private Map<String, Object> data;
-
-    public Map<String, Object> getData() {
-        return data;
-    }
-
-    public GenericForm setData(Map<String, Object> data) {
-        this.data = data;
-        return this;
-    }
 }

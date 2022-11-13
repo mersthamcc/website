@@ -1,37 +1,37 @@
-query ordersForYear ($year: Int!) {
-    orders (where: {
-        memberSubscription: {
-            every: {
-                year: {
-                    equals: $year
-                }
-            }
-        }
-    }) {
-        id
-        uuid
-        createDate
-        ownerUserId
-        memberSubscription {
-            member {
-                id
-                registrationDate
-            }
-            year
-            price
-            pricelistItem {
-                memberCategory {
-                    key
-                }
-                description
-            }
-        }
-        payment {
-            date
-            type
-            reference
-            amount
-            processingFees
-        }
-    }
-}
+#query ordersForYear ($year: Int!) {
+#    orders (where: {
+#        memberSubscription: {
+#            every: {
+#                year: {
+#                    equals: $year
+#                }
+#            }
+#        }
+#    }) {
+#        id
+#        uuid
+#        createDate
+#        ownerUserId
+#        memberSubscription {
+#            member {
+#                id
+#                registrationDate
+#            }
+#            year
+#            price
+#            pricelistItem {
+#                memberCategory {
+#                    key
+#                }
+#                description
+#            }
+#        }
+#        payment {
+#            date
+#            type
+#            reference
+#            amount
+#            processingFees
+#        }
+#    }
+#}

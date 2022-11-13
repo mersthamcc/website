@@ -33,7 +33,7 @@ query member($id: Int!) {
                 }
                 uuid
             }
-            pricelistItem {
+            priceListItem {
                 id
                 description
                 includesMatchFees

@@ -4,7 +4,7 @@
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
-        "url": "https://graph.new.mersthamcc.co.uk/graphql",
+        "url": "http://localhost:8090/graphql",
         "headers": {
           "user-agent": "JS GraphQL"
         },

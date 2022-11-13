@@ -6,12 +6,12 @@
     <@components.panel>
         <form class="form-horizontal" method="post" name="action" action="/register/add-member">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
-            <input type="hidden" name="uuid" value="${subscription.uuid}" />
-            <input type="hidden" name="action" value="${subscription.action}" />
+            <input type="hidden" name="uuid" value="${subscriptionId}" />
+            <input type="hidden" name="action" value="${subscription.action!"huh"}" />
             <#list form as section>
-                <@components.section title="membership.${section.section().key()}">
-                    <#list section.section().attribute() as attribute>
-                        <@components.memberField attribute=attribute subscription=subscription />
+                <@components.section title="membership.${section.section.key}">
+                    <#list section.section.attribute as attribute>
+                        <@components.memberField attribute=attribute data=data subscription=subscription />
                     </#list>
                 </@components.section>
             </#list>

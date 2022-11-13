@@ -20,11 +20,11 @@
                     <tbody>
                         <#list basket.subscriptions as id, subscription>
                             <tr scope="row">
-                                <td>${subscription.member["given-name"]!""}</td>
-                                <td>${subscription.member["family-name"]!""}</td>
+                                <td>${subscription.member.attributeMap["given-name"].asText()!""}</td>
+                                <td>${subscription.member.attributeMap["family-name"].asText()!""}</td>
                                 <td><@spring.message code="membership.${subscription.action}" /></td>
                                 <td><@spring.message code="membership.${subscription.category!'unknown'}" /></td>
-                                <td text-align="right">${subscription.price!0?string.currency}</td>
+                                <td text-align="right">${subscription.price?string.currency}</td>
                                 <td>
                                     <button type="submit" class="btn btn-info btn-xs" name="edit-member" value="${id}">
                                         <i class="fa fa-edit"></i>
@@ -35,7 +35,6 @@
                                         <i class="fa fa-minus"></i>
                                         <@spring.message code="membership.delete-member" />
                                     </button>&nbsp;
-
                                 </td>
                             </tr>
                         </#list>

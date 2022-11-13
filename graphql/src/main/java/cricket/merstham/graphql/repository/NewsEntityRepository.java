@@ -15,7 +15,7 @@ public interface NewsEntityRepository
             value =
                     "SELECT *  FROM news "
                             + "WHERE title ILIKE '%' || :searchString  || '%' "
-                            + "OR body ILIKE '%' || :searchString  || '%' "
+                            + "   OR body ILIKE '%' || :searchString  || '%' "
                             + "ORDER BY publish_date DESC "
                             + "LIMIT :length OFFSET :start")
     List<NewsEntity> adminSearch(int start, int length, String searchString);

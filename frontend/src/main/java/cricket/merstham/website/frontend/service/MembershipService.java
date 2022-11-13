@@ -2,10 +2,14 @@ package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
-import cricket.merstham.website.frontend.model.AttributeDefinition;
-import cricket.merstham.website.frontend.model.Order;
+import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberAttribute;
+import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.types.AttributeType;
+import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
-import cricket.merstham.website.frontend.model.admintables.Member;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
 import cricket.merstham.website.graph.CreateMemberMutation;
@@ -19,40 +23,45 @@ import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
 import cricket.merstham.website.graph.type.PaymentInput;
 import cricket.merstham.website.graph.type.StringFilter;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
-import static java.text.MessageFormat.format;
+import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class MembershipService {
     private static final Logger LOG = LoggerFactory.getLogger(MembershipService.class);
 
-    private GraphService graphService;
+    private final GraphService graphService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public MembershipService(GraphService graphService) {
+    public MembershipService(GraphService graphService, ModelMapper modelMapper) {
         this.graphService = graphService;
+        this.modelMapper = modelMapper;
     }
 
     public Order registerMembersFromBasket(
-            RegistrationBasket basket, OAuth2AccessToken accessToken) {
+            RegistrationBasket basket, OAuth2AccessToken accessToken, Locale locale) {
         var createOrder = new CreateOrderMutation(basket.getId());
         var order = new Order();
         try {
@@ -67,10 +76,9 @@ public class MembershipService {
                                                 .map(error -> error.getMessage())
                                                 .collect(Collectors.toList())));
             }
-            order.setId(orderResult.getData().createOrder().id())
-                    .setUuid(UUID.fromString(orderResult.getData().createOrder().uuid()))
-                    .setTotal(basket.getBasketTotal())
-                    .setSubscriptions(basket.getSubscriptions());
+            order.setId(orderResult.getData().getCreateOrder().getId())
+                    .setUuid(orderResult.getData().getCreateOrder().getUuid())
+                    .setTotal(basket.getBasketTotal());
         } catch (IOException e) {
             LOG.error("Error creating order", e);
             throw new RuntimeException("Error creating order", e);
@@ -80,21 +88,25 @@ public class MembershipService {
             var memberInput =
                     MemberInput.builder()
                             .attributes(
-                                    subscription.getValue().getMember().entrySet().stream()
+                                    subscription.getValue().getMember().getAttributes().stream()
                                             .map(
                                                     a ->
                                                             AttributeInput.builder()
-                                                                    .key(a.getKey())
+                                                                    .key(a.getDefinition().getKey())
                                                                     .value(a.getValue())
                                                                     .build())
                                             .collect(Collectors.toList()))
                             .subscription(
                                     MemberSubscriptionInput.builder()
                                             .year(LocalDate.now().getYear())
-                                            .pricelistItemId(
-                                                    subscription.getValue().getPricelistItemId())
+                                            .priceListItemId(
+                                                    subscription
+                                                            .getValue()
+                                                            .getPriceListItem()
+                                                            .getId())
                                             .price(subscription.getValue().getPrice().doubleValue())
                                             .orderId(order.getId())
+                                            .addedDate(LocalDate.now())
                                             .build())
                             .build();
 
@@ -148,105 +160,134 @@ public class MembershipService {
                                         .map(Error::getMessage)
                                         .collect(Collectors.joining("\n")));
             }
-            return result.getData().addPaymentToOrder();
+            return result.getData().getAddPaymentToOrder();
         } catch (IOException e) {
             LOG.error("Error registering payment", e);
             throw new RuntimeException("Error registering payment", e);
         }
     }
 
-    public List<MembershipCategoriesQuery.MembershipCategory> getMembershipCategories() {
+    public List<MemberCategory> getMembershipCategories() {
         var query = new MembershipCategoriesQuery(StringFilter.builder().build());
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            return result.getData().membershipCategories();
+            var categories = result.getData().getMembershipCategories();
+            return categories.stream()
+                    .map(c -> modelMapper.map(c, MemberCategory.class))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public MembershipCategoriesQuery.MembershipCategory getMembershipCategory(String categoryName) {
+    public MemberCategory getMembershipCategory(String categoryName) {
         var query =
                 new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            return result.getData().membershipCategories().get(0);
+            return modelMapper.map(
+                    result.getData().getMembershipCategories().get(0), MemberCategory.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<MembersQuery.Member> getAllMembers(OAuth2AccessToken accessToken) {
+    public List<Member> getAllMembers(OAuth2AccessToken accessToken) {
         var query = new MembersQuery();
         try {
             Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
-            return result.getData().members();
+            return result.getData().getMembers().stream()
+                    .map(m -> modelMapper.map(m, Member.class))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
-    public List<Member> getMemberSummary(OAuth2AccessToken accessToken) {
+    public List<cricket.merstham.website.frontend.model.admintables.Member> getMemberSummary(
+            OAuth2AccessToken accessToken) {
         return getAllMembers(accessToken).stream()
                 .map(
                         m ->
-                                Member.builder()
-                                        .id(Integer.toString(m.id()))
+                                cricket.merstham.website.frontend.model.admintables.Member.builder()
+                                        .id(Integer.toString(m.getId()))
                                         .familyName(
                                                 getMemberAttributeString(
-                                                        m.attributes(), "family-name", ""))
+                                                        m.getAttributes(), "family-name", ""))
                                         .givenName(
                                                 getMemberAttributeString(
-                                                        m.attributes(), "given-name", ""))
+                                                        m.getAttributes(), "given-name", ""))
                                         .category(
-                                                m.subscription().stream()
+                                                m.getSubscription().stream()
                                                         .findFirst()
-                                                        .map(s -> s.pricelistItem().description())
+                                                        .map(
+                                                                s ->
+                                                                        s.getPriceListItem()
+                                                                                .getDescription())
                                                         .orElse("unknown"))
                                         .lastSubscription(
-                                                m.subscription().stream()
+                                                m.getSubscription().stream()
                                                         .findFirst()
-                                                        .map(s -> Integer.toString(s.year()))
+                                                        .map(s -> Integer.toString(s.getYear()))
                                                         .orElse("unknown"))
-                                        .editLink(
-                                                URI.create(
-                                                        format(
-                                                                "/administration/membership/edit/{0}",
-                                                                m.id())))
                                         .build())
                 .collect(Collectors.toList());
     }
 
-    public Optional<MemberQuery.Member> get(int id, OAuth2AccessToken accessToken) {
+    public Optional<Member> get(int id, OAuth2AccessToken accessToken) {
         var query = new MemberQuery(id);
         try {
             Response<MemberQuery.Data> result = graphService.executeQuery(query, accessToken);
-
-            return Optional.of(result.getData().member());
+            if (isNull(result.getData().getMember())) {
+                return Optional.empty();
+            }
+            return Optional.of(
+                    modelMapper.map(
+                            result.getData().getMember(),
+                            cricket.merstham.shared.dto.Member.class));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public UpdateMemberMutation.UpdateMember update(
-            int id, OAuth2AccessToken accessToken, Map<String, Object> data) {
+    public Member update(
+            int id,
+            OAuth2AccessToken accessToken,
+            Locale locale,
+            MultiValueMap<String, Object> data) {
+        var attributes = getAttributes();
         var request =
                 new UpdateMemberMutation(
                         id,
                         data.entrySet().stream()
+                                .filter(a -> attributes.containsKey(a.getKey()))
                                 .map(
                                         f ->
                                                 AttributeInput.builder()
                                                         .key(f.getKey())
-                                                        .value(f.getValue())
+                                                        .value(
+                                                                convert(
+                                                                        attributes.get(f.getKey()),
+                                                                        f.getValue()))
                                                         .build())
                                 .collect(Collectors.toList()));
         try {
             Response<UpdateMemberMutation.Data> result =
                     graphService.executeMutation(request, accessToken);
 
-            return result.getData().updateMember();
+            if (result.hasErrors()) {
+                throw new GraphException(
+                        result.getErrors().stream()
+                                .map(Error::getMessage)
+                                .reduce((error, error2) -> error.concat("\n").concat(error2))
+                                .orElse("Unknown GraphQL Error"),
+                        result.getErrors());
+            }
+
+            return modelMapper.map(
+                    requireNonNull(result.getData()).getUpdateMember(),
+                    cricket.merstham.shared.dto.Member.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -257,25 +298,29 @@ public class MembershipService {
         try {
             Response<AttributesQuery.Data> result = graphService.executeQuery(query);
 
-            return result.getData().attributes().stream()
+            return result.getData().getAttributes().stream()
                     .collect(
                             Collectors.toMap(
-                                    a -> a.key(),
+                                    a -> a.getKey(),
                                     a ->
-                                            new AttributeDefinition()
-                                                    .setKey(a.key())
-                                                    .setType(a.type().rawValue())));
+                                            AttributeDefinition.builder()
+                                                    .key(a.getKey())
+                                                    .choices(a.getChoices())
+                                                    .type(
+                                                            AttributeType.valueOf(
+                                                                    a.getType().rawValue()))
+                                                    .build()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private String getMemberAttributeString(
-            List<MembersQuery.Attribute> attributeList, String field, String defaultValue) {
+            List<MemberAttribute> attributeList, String field, String defaultValue) {
         return attributeList.stream()
-                .filter(a -> a.definition().key().equals(field))
+                .filter(a -> a.getDefinition().getKey().equals(field))
                 .findFirst()
-                .map(f -> (String) f.value())
+                .map(f -> f.getValue().asText())
                 .orElse(defaultValue);
     }
 }

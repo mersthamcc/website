@@ -1,10 +1,11 @@
 package cricket.merstham.website.frontend.controller.administration;
 
+import cricket.merstham.shared.dto.News;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
-import cricket.merstham.website.frontend.model.News;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
+import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.service.NewsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,7 +82,7 @@ public class NewsController extends SspController<News> {
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
-            var now = LocalDateTime.now();
+            var now = Instant.now();
             var news =
                     News.builder()
                             .author(authorizedClient.getPrincipalName())
@@ -142,7 +143,7 @@ public class NewsController extends SspController<News> {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE,
             path = ADMIN_NEWS_AJAX_ROUTE)
-    public @ResponseBody SspResponse<News> getData(
+    public @ResponseBody SspResponse<SspResponseDataWrapper<News>> getData(
             @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
             @RequestBody SspRequest request) {
         try {
@@ -152,7 +153,7 @@ public class NewsController extends SspController<News> {
                             request.getStart(),
                             request.getLength(),
                             request.getSearch().getValue());
-            return SspResponse.<News>builder()
+            return SspResponse.<SspResponseDataWrapper<News>>builder()
                     .draw(request.getDraw())
                     .data(data.getData())
                     .recordsFiltered(data.getRecordsFiltered())
@@ -160,7 +161,9 @@ public class NewsController extends SspController<News> {
                     .build();
         } catch (IOException e) {
             LOG.error("Error getting news items from graph service", e);
-            return SspResponse.<News>builder().error(Optional.of(List.of(e.getMessage()))).build();
+            return SspResponse.<SspResponseDataWrapper<News>>builder()
+                    .error(Optional.of(List.of(e.getMessage())))
+                    .build();
         }
     }
 }

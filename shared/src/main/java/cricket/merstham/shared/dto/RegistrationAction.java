@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.model;
+package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -10,7 +10,7 @@ public enum RegistrationAction implements Serializable {
     RENEW("RENEW"),
     NONE("NONE");
 
-    String action;
+    private String action;
 
     RegistrationAction(String action) {
         this.action = action;

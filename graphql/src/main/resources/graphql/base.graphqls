@@ -10,6 +10,16 @@ type User {
     roles: [String!]
 }
 
+type KeyValuePair {
+    key: String!,
+    value: String!
+}
+
+input KeyValuePairInput {
+    key: String!,
+    value: String!
+}
+
 input IntFilter {
     equals: Int
     in: [Int!]

@@ -1,6 +1,5 @@
 package cricket.merstham.graphql.scalars;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -45,8 +44,8 @@ public class JsonCoercing implements Coercing<JsonNode, Object> {
     @Override
     public JsonNode parseValue(Object input) throws CoercingParseValueException {
         try {
-            return objectMapper.readTree((String) input);
-        } catch (JsonProcessingException e) {
+            return objectMapper.valueToTree(input);
+        } catch (IllegalArgumentException e) {
             throw CoercingParseValueException.newCoercingParseValueException()
                     .cause(e)
                     .message("Error parsing value")

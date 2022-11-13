@@ -3,6 +3,6 @@
 
 <@layout.mainLayout formName="membership.choose-membership-type">
     <@components.panel>
-        <@components.membershipCategories categories=categories _csrf=_csrf uuid=subscription.uuid/>
+        <@components.membershipCategories categories=categories _csrf=_csrf subscriptionId=subscriptionId/>
     </@components.panel>
 </@layout.mainLayout>

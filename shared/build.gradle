@@ -16,6 +16,8 @@ dependencies {
     compileOnly "com.fasterxml.jackson.core:jackson-core:${dependencyVersions.jackson}"
     compileOnly "com.fasterxml.jackson.core:jackson-annotations:${dependencyVersions.jackson}"
     compileOnly "com.fasterxml.jackson.core:jackson-databind:${dependencyVersions.jackson}"
+    compileOnly "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
+    implementation "org.jsoup:jsoup:1.14.3"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"

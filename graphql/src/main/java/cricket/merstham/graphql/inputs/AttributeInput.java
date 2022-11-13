@@ -1,11 +1,15 @@
 package cricket.merstham.graphql.inputs;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.data.web.ProjectedPayload;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Builder;
+import lombok.Getter;
 
-@ProjectedPayload
-public interface AttributeInput {
-    String getKey();
-
-    JsonNode getValue();
+@JsonSerialize
+@Getter
+@Builder
+public class AttributeInput {
+    @JsonProperty private String key;
+    @JsonProperty private JsonNode value;
 }

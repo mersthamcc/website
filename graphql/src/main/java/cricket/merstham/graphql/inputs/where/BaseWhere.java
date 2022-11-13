@@ -18,17 +18,12 @@ public interface BaseWhere<T> extends Filter<T> {
     @Override
     default boolean matches(T value) {
         boolean result = true;
-        if (nonNull(getAnd())) {
+        if (nonNull(getAnd()) && !getAnd().isEmpty()) {
             result &=
-                    getAnd().stream()
-                            .map(f -> Boolean.valueOf(f.matches(value)))
-                            .allMatch(r -> r.booleanValue() == true);
+                    getAnd().stream().map(f -> Boolean.valueOf(f.matches(value))).allMatch(r -> r);
         }
-        if (nonNull(getOr())) {
-            result &=
-                    getOr().stream()
-                            .map(f -> Boolean.valueOf(f.matches(value)))
-                            .anyMatch(r -> r.booleanValue() == true);
+        if (nonNull(getOr()) && !getOr().isEmpty()) {
+            result &= getOr().stream().map(f -> Boolean.valueOf(f.matches(value))).anyMatch(r -> r);
         }
         if (nonNull(getNot())) {
             result &= !getNot().matches(value);

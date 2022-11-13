@@ -1,15 +1,21 @@
 package cricket.merstham.graphql.inputs;
 
-import org.springframework.data.web.ProjectedPayload;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.List;
 
-@ProjectedPayload
-public interface MemberInput {
-    Instant getRegistrationDate();
+@JsonSerialize
+@Getter
+@Builder
+public class MemberInput {
 
-    List<AttributeInput> getAttributes();
+    @JsonProperty private Instant registrationDate;
 
-    MemberSubscriptionInput getSubscription();
+    @JsonProperty private List<AttributeInput> attributes;
+
+    @JsonProperty private MemberSubscriptionInput subscription;
 }

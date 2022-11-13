@@ -12,11 +12,13 @@ CREATE
 CREATE
     TABLE
         news_attribute(
-            id SERIAL NOT NULL,
             news_id INT NOT NULL,
             name VARCHAR(64) NOT NULL,
             value VARCHAR(1024) DEFAULT NULL,
-            PRIMARY KEY(id)
+            PRIMARY KEY(
+                news_id,
+                name
+            )
         );
 
 CREATE

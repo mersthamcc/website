@@ -13,7 +13,7 @@ group 'cricket.merstham'
 
 ext {
     dependencyVersions = [
-            spring_boot    : "2.6.7",
+            spring_boot    : "2.7.5",
             spring_sessions: "2.6.3",
             apollo         : "2.5.11",
             prometheus     : "1.8.5",

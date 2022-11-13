@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.controllers;
 
+import cricket.merstham.graphql.inputs.AttributeInput;
 import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
@@ -43,7 +44,8 @@ public class MembershipController {
 
     @QueryMapping
     public List<MemberCategory> membershipCategories(@Argument MemberCategoryWhereInput where) {
-        return membershipService.getCategories(where);
+        var result = membershipService.getCategories(where);
+        return result;
     }
 
     @QueryMapping
@@ -72,6 +74,9 @@ public class MembershipController {
         return membershipService.addPaymentToOrder(orderId, payment, principal);
     }
 
-    //    updateMember(id: Int!, data: [AttributeInput]!): Member
-
+    @MutationMapping
+    public Member updateMember(
+            @Argument int id, @Argument List<AttributeInput> data, Principal principal) {
+        return membershipService.updateMember(id, data);
+    }
 }

@@ -13,7 +13,7 @@ enum AttributeType {
 type AttributeDefinition {
     key: String!
     type: AttributeType!
-    choices: Json
+    choices: [String]
 }
 
 type Member {
@@ -41,7 +41,7 @@ type MemberCategory {
     key: String!
     registrationCode: String
     form: [MemberCategoryFormSection!]!
-    pricelistItem: [PricelistItem!]!
+    priceListItem: [PriceListItem!]!
 }
 
 input MemberCategoryWhereInput {
@@ -82,7 +82,7 @@ type MemberSubscription {
     year: Int!
     price: Float!
     addedDate: Date
-    pricelistItem: PricelistItem!
+    priceListItem: PriceListItem!
     order: Order
 }
 
@@ -90,7 +90,7 @@ input MemberSubscriptionInput {
     addedDate: Date
     year: Int
     price: Float
-    pricelistItemId: Int
+    priceListItemId: Int
     orderId: Int
 }
 
@@ -133,21 +133,21 @@ input PaymentWhereUniqueInput {
     id: Int
 }
 
-type PriceList {
-    pricelistItem: PricelistItem!
+type Price {
+    priceListItem: PriceListItem!
     dateFrom: Date
     dateTo: Date
     price: Float!
 }
 
-type PricelistItem {
+type PriceListItem {
     id: Int!
     description: String!
     minAge: Int!
     maxAge: Int
     includesMatchFees: Boolean
     memberCategory: MemberCategory!
-    pricelist: [PriceList!]!
+    priceList: [Price!]!
     currentPrice: Float
 }
 

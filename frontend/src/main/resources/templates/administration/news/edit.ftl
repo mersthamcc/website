@@ -51,12 +51,12 @@
                 <@admin.card title="menu.admin-news-new">
                     <input type="hidden" name="id" value="${news.id?long?c}" />
                     <input type="hidden" name="uuid" value="${news.uuid}" />
-                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSS")}" />
+                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZ")}" />
                     <@admin.formErrors errors=errors![] errorKey="news.errorSaving"/>
-                    <@admin.adminFormDisplayField name="createdDate" data=news.createdDate.format('MEDIUM_DATETIME') localeCategory="news" />
+                    <@admin.adminFormDisplayField name="createdDate" data=news.createdDate.format()?datetime.iso?string["dd/MM/yyyy HH:mm"] localeCategory="news" />
                     <@admin.adminFormField name="title" data=news.title!"" required=true type="text" localeCategory="news" />
                     <@admin.adminFormField name="author" data=news.author!"" required=true type="text" localeCategory="news" />
-                    <@admin.adminFormField name="publishDate" data=news.publishDate.format("yyyy-MM-dd'T'HH:mm")!"" required=true type="datetime-local" localeCategory="news" />
+                    <@admin.adminDateTimeField name="publishDate" data=news.publishDate localeCategory="news" />
                     <@admin.adminCkEditorField name="body" data=news.body!"" required=true type="text" localeCategory="news" rows=40/>
                     <@admin.adminSwitchField name="draft" checked=news.draft!false localeCategory="news" />
                 </@admin.card>

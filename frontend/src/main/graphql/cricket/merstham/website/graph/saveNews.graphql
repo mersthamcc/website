@@ -11,7 +11,7 @@ mutation saveNews ($news: NewsInput!) {
         publishDate
         socialSummary
         attributes {
-            name
+            key
             value
         }
     }

@@ -3,7 +3,6 @@ package cricket.merstham.website.frontend.model.admintables;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import cricket.merstham.website.frontend.model.datatables.SspBaseResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +19,7 @@ import java.net.URI;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper = false)
-public class Member extends SspBaseResponseData implements Serializable {
+public class Member implements Serializable {
     private static final long serialVersionUID = 20210927233800L;
 
     @JsonProperty private String id;

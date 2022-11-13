@@ -4,7 +4,7 @@ query membershipCategories($key: StringFilter!) {
   }) {
     key
     registrationCode
-    pricelistItem {
+    priceListItem {
       id
       description
       minAge
