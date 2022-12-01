@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.config;
+package cricket.merstham.graphql.configuration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import cricket.merstham.shared.dto.KeyValuePair;

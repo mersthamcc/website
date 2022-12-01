@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.config;
+package cricket.merstham.graphql.configuration;
 
 import cricket.merstham.graphql.jpa.JpaEncryptedJsonbType;
 import cricket.merstham.graphql.jpa.JpaJsonbType;

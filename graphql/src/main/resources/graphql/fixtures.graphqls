@@ -1,0 +1,10 @@
+type Team {
+    id: Int!,
+    name: String!
+    status: String
+}
+
+extend type Query {
+    teams: [Team]
+    activeTeams: [Team]
+}

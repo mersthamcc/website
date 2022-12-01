@@ -1,22 +1,26 @@
 CREATE
     TABLE
         team(
-            id INT,
+            id INT NOT NULL,
+            sort_order INT NOT NULL,
             slug TEXT NOT NULL,
-            details JSONB,
+            name TEXT NOT NULL,
+            status TEXT NOT NULL,
+            captain TEXT,
             PRIMARY KEY(id)
         );
 
 CREATE
-    UNIQUE INDEX IDX_UNIQUE_TEAM_SLUG ON
-    team(slug);
-
-CREATE
     TABLE
         fixture(
-            id INT,
+            id INT NOT NULL,
             team_id INT NOT NULL,
-            DATE DATE,
+            opposition_team_id INT NULL,
+            opposition TEXT NOT NULL,
+            home_away VARCHAR(4),
+            ground_id INT NULL,
+            DATE DATE NULL,
+            start TIME NULL,
             detail JSONB,
             PRIMARY KEY(id)
         );
