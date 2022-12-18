@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 public interface LastUpdateRepository
-        extends CrudRepository<LastUpdateEntity, String>,
-        JpaRepository<LastUpdateEntity, String> {
-}
+        extends CrudRepository<LastUpdateEntity, String>, JpaRepository<LastUpdateEntity, String> {}

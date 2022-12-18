@@ -110,16 +110,32 @@ public class PlayCricketMatch {
 
     @Override
     public String toString() {
-        return "PlayCricketMatch{" +
-                "id=" + id +
-                ", status='" + status + '\'' +
-                ", lastUpdated=" + lastUpdated +
-                ", season='" + season + '\'' +
-                ", homeClubName='" + homeClubName + '\'' +
-                ", homeTeamName='" + homeTeamName + '\'' +
-                ", awayClubName='" + awayClubName + '\'' +
-                ", awayTeamName='" + awayTeamName + '\'' +
-                ", homeAway='" + homeAway + '\'' +
-                '}';
+        return "PlayCricketMatch{"
+                + "id="
+                + id
+                + ", status='"
+                + status
+                + '\''
+                + ", lastUpdated="
+                + lastUpdated
+                + ", season='"
+                + season
+                + '\''
+                + ", homeClubName='"
+                + homeClubName
+                + '\''
+                + ", homeTeamName='"
+                + homeTeamName
+                + '\''
+                + ", awayClubName='"
+                + awayClubName
+                + '\''
+                + ", awayTeamName='"
+                + awayTeamName
+                + '\''
+                + ", homeAway='"
+                + homeAway
+                + '\''
+                + '}';
     }
 }

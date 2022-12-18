@@ -1,10 +1,44 @@
+type Player {
+    id: Int!
+    name: String!
+}
+
 type Team {
-    id: Int!,
+    id: Int!
     name: String!
     status: String
+
+    league (season: Int!): [League!]
+    fixtures (season: Int!): [Fixture!]
+
+    captain: Player
+}
+
+type Fixture {
+    id: Int!
+    team: Team!
+    opposition: String!
+    date: Date
+    start: String
+    detail: Json
+}
+
+type League {
+    id: Int!,
+    name: String!,
+    lastUpdate: DateTime,
+    table: Json
 }
 
 extend type Query {
+    team(id: Int!): Team
     teams: [Team]
     activeTeams: [Team]
+    fixtures(season: Int!): [Fixture]
+#    fixturesByTeam(season: Int!, team: Int!): [Fixture]
+#    leaguesForTeam(season: Int!, team: Int!): [League]
+}
+
+extend type Mutation {
+    refreshFixtures(season: Int!): [Fixture]
 }

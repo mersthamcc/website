@@ -15,5 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @JsonSerialize
 public class PlayCricketTeamResponse {
-    @JsonProperty("teams") private List<PlayCricketTeam> teams;
+    @JsonProperty("teams")
+    private List<PlayCricketTeam> teams;
 }

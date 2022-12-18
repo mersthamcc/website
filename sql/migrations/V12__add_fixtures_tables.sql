@@ -20,7 +20,7 @@ CREATE
             home_away VARCHAR(4),
             ground_id INT NULL,
             DATE DATE NULL,
-            start TIME NULL,
+            START TIME NULL,
             detail JSONB,
             PRIMARY KEY(id)
         );

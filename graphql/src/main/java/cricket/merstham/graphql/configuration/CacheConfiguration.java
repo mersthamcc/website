@@ -25,17 +25,18 @@ public class CacheConfiguration {
 
     @Bean
     public RedisCacheManagerBuilderCustomizer customizer() {
-        return builder -> builder
-                .initialCacheNames(Set.of(
-                        MEMBER_SUMMARY_CACHE,
-                        NEWS_SUMMARY_CACHE,
-                        NEWS_SUMMARY_TOTAL_CACHE,
-                        NEWS_ITEM_BY_ID_CACHE,
-                        NEWS_ITEM_BY_PATH_CACHE,
-                        TEAM_CACHE,
-                        ACTIVE_TEAM_CACHE,
-                        FIXTURE_CACHE))
-                .enableStatistics()
-                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig());
+        return builder ->
+                builder.initialCacheNames(
+                                Set.of(
+                                        MEMBER_SUMMARY_CACHE,
+                                        NEWS_SUMMARY_CACHE,
+                                        NEWS_SUMMARY_TOTAL_CACHE,
+                                        NEWS_ITEM_BY_ID_CACHE,
+                                        NEWS_ITEM_BY_PATH_CACHE,
+                                        TEAM_CACHE,
+                                        ACTIVE_TEAM_CACHE,
+                                        FIXTURE_CACHE))
+                        .enableStatistics()
+                        .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig());
     }
 }

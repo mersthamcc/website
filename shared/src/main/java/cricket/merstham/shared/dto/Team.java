@@ -1,5 +1,6 @@
 package cricket.merstham.shared.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 import java.beans.Transient;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
@@ -18,18 +20,35 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonSerialize
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Team implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 8541193766005290892L;
+    @Serial private static final long serialVersionUID = 8541193766005290892L;
     private static final String ACTIVE = "active";
 
-    @JsonProperty("id") private int id;
-    @JsonProperty("sort_order") private long sortOrder;
-    @JsonProperty("name") private String name;
-    @JsonProperty("status") private String status;
-    @JsonProperty("slug") private String slug;
-    @JsonProperty("captain") private String captain;
+    @JsonProperty("id")
+    private int id;
+
+    @JsonProperty("sort_order")
+    private long sortOrder;
+
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("slug")
+    private String slug;
+
+    @JsonProperty("captain")
+    private Player captain;
+
+    @JsonProperty("league")
+    private List<League> league;
+
+    @JsonProperty("fixture")
+    private List<Fixture> fixtures;
 
     @Transient
     public boolean isActive() {

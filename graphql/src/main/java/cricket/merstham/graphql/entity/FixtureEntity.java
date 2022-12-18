@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -56,7 +57,7 @@ public class FixtureEntity {
     @Column(name = "home_away", nullable = false)
     private String homeAway;
 
-    @Column(name = "start", nullable = false)
+    @Column(name = "start")
     private LocalTime start;
 
     @Column(name = "detail", nullable = false)

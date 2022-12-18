@@ -13,11 +13,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "team")
@@ -29,6 +30,8 @@ import java.util.List;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class TeamEntity implements Serializable {
+
+    @Serial private static final long serialVersionUID = -2578639139599530115L;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -46,12 +49,9 @@ public class TeamEntity implements Serializable {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "captain", nullable = false)
-    private String captain;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "teamId")
-    @ToString.Exclude
-    private List<FixtureEntity> fixtures  = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "captain_id")
+    private PlayerEntity captain;
 
     @Override
     public boolean equals(Object o) {

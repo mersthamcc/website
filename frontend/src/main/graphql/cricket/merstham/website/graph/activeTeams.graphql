@@ -1,0 +1,6 @@
+query activeTeams {
+    activeTeams {
+        name
+        id
+    }
+}

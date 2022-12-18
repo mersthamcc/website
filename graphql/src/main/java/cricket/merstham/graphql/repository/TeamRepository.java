@@ -8,9 +8,8 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 
 public interface TeamRepository
-        extends CrudRepository<TeamEntity, Integer>,
-        JpaRepository<TeamEntity, Integer> {
-    List<TeamEntity> findByStatusAllIgnoreCaseOrderBySortOrderAsc(
-            @NonNull String status);
+        extends CrudRepository<TeamEntity, Integer>, JpaRepository<TeamEntity, Integer> {
+    List<TeamEntity> findByStatusAllIgnoreCaseOrderBySortOrderAsc(@NonNull String status);
+
     TeamEntity findBySlugEqualsIgnoreCase(@NonNull String slug);
 }

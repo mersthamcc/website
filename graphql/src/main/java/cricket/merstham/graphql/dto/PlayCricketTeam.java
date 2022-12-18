@@ -45,11 +45,18 @@ public class PlayCricketTeam {
 
     @Override
     public String toString() {
-        return "PlayCricketTeam{" +
-                "id=" + id +
-                ", status='" + status + '\'' +
-                ", teamName='" + teamName + '\'' +
-                ", otherTeamName='" + otherTeamName + '\'' +
-                '}';
+        return "PlayCricketTeam{"
+                + "id="
+                + id
+                + ", status='"
+                + status
+                + '\''
+                + ", teamName='"
+                + teamName
+                + '\''
+                + ", otherTeamName='"
+                + otherTeamName
+                + '\''
+                + '}';
     }
 }
