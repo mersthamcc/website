@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import cricket.merstham.graphql.config.ModelMapperConfiguration;
+import cricket.merstham.graphql.configuration.ModelMapperConfiguration;
 import cricket.merstham.graphql.entity.AttributeDefinitionEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;

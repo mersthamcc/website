@@ -22,7 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-import static cricket.merstham.graphql.config.HibernateConfiguration.JSON_TYPE;
+import static cricket.merstham.graphql.configuration.HibernateConfiguration.JSON_TYPE;
 
 @Entity
 @Table(

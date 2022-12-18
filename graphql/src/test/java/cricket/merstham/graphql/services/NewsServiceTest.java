@@ -2,7 +2,7 @@ package cricket.merstham.graphql.services;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import cricket.merstham.graphql.config.ModelMapperConfiguration;
+import cricket.merstham.graphql.configuration.ModelMapperConfiguration;
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.helpers.RandomDateTimes;
 import cricket.merstham.graphql.repository.NewsEntityRepository;

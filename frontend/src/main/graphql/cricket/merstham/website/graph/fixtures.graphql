@@ -1,0 +1,13 @@
+query fixtures ($season: Int!) {
+    fixtures(season: $season) {
+        id
+        date
+        start
+        team {
+            id
+            name
+        }
+        opposition
+        detail
+    }
+}

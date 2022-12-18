@@ -17,7 +17,7 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 import java.time.Instant;
 
-import static cricket.merstham.graphql.config.HibernateConfiguration.ENCRYPTED_JSON_TYPE;
+import static cricket.merstham.graphql.configuration.HibernateConfiguration.ENCRYPTED_JSON_TYPE;
 
 @Entity
 @Table(

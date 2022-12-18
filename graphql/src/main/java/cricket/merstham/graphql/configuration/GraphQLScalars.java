@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.config;
+package cricket.merstham.graphql.configuration;
 
 import cricket.merstham.graphql.scalars.DateCoercing;
 import cricket.merstham.graphql.scalars.DateTimeCoercing;

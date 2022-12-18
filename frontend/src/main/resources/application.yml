@@ -65,7 +65,7 @@ club:
           - "_utma"
           - "gid"
 graph:
-  graph-uri: http://localhost:8090/graphql # ${GRAPH_URI}
+  graph-uri: ${GRAPH_URI:http://localhost:8090/graphql}
 
 resources:
   base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"

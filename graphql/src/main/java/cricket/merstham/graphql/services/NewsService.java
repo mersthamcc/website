@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static cricket.merstham.graphql.config.CacheConfiguration.NEWS_ITEM_BY_ID_CACHE;
-import static cricket.merstham.graphql.config.CacheConfiguration.NEWS_ITEM_BY_PATH_CACHE;
-import static cricket.merstham.graphql.config.CacheConfiguration.NEWS_SUMMARY_CACHE;
-import static cricket.merstham.graphql.config.CacheConfiguration.NEWS_SUMMARY_TOTAL_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITEM_BY_ID_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITEM_BY_PATH_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_TOTAL_CACHE;
 
 @Component
 public class NewsService {

@@ -3,6 +3,8 @@ package cricket.merstham.website.frontend.mappers;
 import com.apollographql.apollo.api.CustomTypeAdapter;
 import com.apollographql.apollo.api.CustomTypeValue;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 
 public class JsonNodeCustomTypeAdapter implements CustomTypeAdapter<JsonNode> {
     private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    private final ObjectMapper mapper = new JsonMapper();
 
     @Override
     public JsonNode decode(@NotNull CustomTypeValue<?> customTypeValue) {
@@ -27,6 +30,8 @@ public class JsonNodeCustomTypeAdapter implements CustomTypeAdapter<JsonNode> {
             case "GraphQLNumber":
                 var value = (CustomTypeValue.GraphQLNumber) customTypeValue;
                 return JSON.numberNode(value.value.longValue());
+            case "GraphQLJsonObject":
+                return mapper.convertValue(customTypeValue.value, JsonNode.class);
         }
         return JSON.nullNode();
     }

@@ -14,8 +14,7 @@ spring:
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-
+    show-sql: false
 
   datasource:
     url: "jdbc:postgresql://localhost:5432/${DATABASE_NAME:}"
@@ -42,7 +41,19 @@ spring:
         jwt:
           issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
 
-debug: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+debug: false
 
 configuration:
   database-secret: ${DATABASE_SECRET:}
+  play-cricket:
+    api-token: ${PLAY_CRICKET_API_TOKEN:}
+    site-id: ${PLAY_CRICKET_SITE_ID:}
+    team-refresh-cron: "0 0/10 * * * ?"
+    fixture-refresh-cron: "0 */10 * * * ?"
+    scheduler-zone: "Europe/London"

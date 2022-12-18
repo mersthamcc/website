@@ -1,0 +1,26 @@
+query fixturesByTeam ($season: Int!, $team: Int!) {
+    team (id: $team) {
+        id
+        name
+        status
+
+        captain {
+            id
+            name
+        }
+        league(season: $season) {
+            id
+            name
+            lastUpdate
+            table
+        }
+
+        fixtures(season: $season) {
+            id
+            opposition
+            date
+            start
+            detail
+        }
+    }
+}
