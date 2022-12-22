@@ -77,12 +77,14 @@ public class FixtureService {
     @Cacheable(value = ACTIVE_TEAM_CACHE)
     public List<Team> getActiveTeams() {
         return teamRepository.findByStatusAllIgnoreCaseOrderBySortOrderAsc("active").stream()
+                .filter(t -> !t.isHidden())
                 .map(t -> modelMapper.map(t, Team.class))
                 .collect(Collectors.toList());
     }
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll(Sort.by(Sort.Direction.ASC, "sortOrder")).stream()
+                .filter(t -> !t.isHidden())
                 .map(t -> modelMapper.map(t, Team.class))
                 .collect(Collectors.toList());
     }

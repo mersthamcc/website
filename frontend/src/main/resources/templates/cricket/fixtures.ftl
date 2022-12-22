@@ -1,4 +1,7 @@
-<#import "../base.ftl" as layout>
+<#import "/spring.ftl" as spring />
+<#import "../base.ftl" as layout />
+<#import "../components.ftl" as components />
+
 <#macro headers>
 </#macro>
 <#macro imageScripts>
@@ -11,17 +14,7 @@
     <div class="container space-2">
         <div class="row justify-content-lg-between">
             <div class="col-md-3">
-                <div class="mb-7">
-                    <ul class="list-group">
-                        <#list teams as team>
-                            <a
-                                    class="list-group-item <#if team.id == activeTeam.id>active</#if>"
-                                    href="/fixtures/${season?c}/${team.id?c}">
-                                ${team.name}
-                            </a>
-                        </#list>
-                    </ul>
-                </div>
+                <@components.teamList activeTeam=activeTeam season=season teams=teams />
             </div>
 
             <div class="col-md-9">
@@ -115,7 +108,7 @@
                                                 <i class="fa fa-compass"></i>&nbsp;
                                                 ${fixture.venue}
                                             </li>
-                                            <#if fixture.result??>
+                                            <#if fixture.result?? && fixture.result != "">
                                                 <li class="list-group-item">
                                                     <i class="fa fa-medal"></i>&nbsp;
                                                     ${fixture.result}
@@ -129,11 +122,15 @@
                                                             <ul class="list-group list-group-flush">
                                                                 <li class="list-group-item">
                                                                     ${fixture.firstInningsTeamName} ${fixture.firstInningsRuns?c}-${fixture.firstInningsWickets?c} (${fixture.firstInningsOvers?c} overs)
-                                                                    <#if fixture.firstInningsDeclared>(declared)</#if>
+                                                                    <#if fixture.firstInningsDeclared>
+                                                                        <@spring.message code="fixtures.declared" />
+                                                                    </#if>
                                                                 </li>
                                                                 <li class="list-group-item">
                                                                     ${fixture.secondInningsTeamName} ${fixture.secondInningsRuns?c}-${fixture.secondInningsWickets?c} (${fixture.secondInningsOvers?c} overs)
-                                                                    <#if fixture.secondInningsDeclared>(declared)</#if>
+                                                                    <#if fixture.secondInningsDeclared>
+                                                                        <@spring.message code="fixtures.declared" />
+                                                                    </#if>
                                                                 </li>
                                                             </ul>
                                                         </div>
