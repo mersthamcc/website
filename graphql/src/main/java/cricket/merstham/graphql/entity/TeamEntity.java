@@ -53,6 +53,9 @@ public class TeamEntity implements Serializable {
     @JoinColumn(name = "captain_id")
     private PlayerEntity captain;
 
+    @Column(name = "hidden")
+    private boolean hidden = false;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

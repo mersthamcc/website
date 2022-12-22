@@ -37,6 +37,30 @@ public class CricketController {
         return getFixtures(season, teamId);
     }
 
+    @GetMapping(path = "/fixtures/{season:[\\d]{4}}/{teamId:[\\d]*}/{fixtureId:[\\d]*}")
+    public ModelAndView fixtureDetails(
+            @PathVariable int season, @PathVariable int teamId, @PathVariable int fixtureId) {
+        try {
+            var teams = fixtureService.getActiveTeams();
+            var activeTeam = fixtureService.getFixtures(season, teamId);
+            var fixture =
+                    activeTeam.getFixtures().stream()
+                            .filter(f -> f.getId() == fixtureId)
+                            .findFirst()
+                            .orElseThrow();
+
+            return new ModelAndView(
+                    "cricket/fixture_detail",
+                    Map.of(
+                            "teams", teams,
+                            "season", season,
+                            "activeTeam", activeTeam,
+                            "fixture", fixture));
+        } catch (IOException e) {
+            throw new RuntimeException("Error getting fixture data", e);
+        }
+    }
+
     @GetMapping(path = "/results", name = "results")
     public String results() {
         return "home/home";

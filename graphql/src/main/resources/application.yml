@@ -42,6 +42,8 @@ spring:
           issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
 
 management:
+  server:
+    port: 8091
   endpoints:
     web:
       exposure:
@@ -54,6 +56,6 @@ configuration:
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
-    team-refresh-cron: "0 0/10 * * * ?"
+    team-refresh-cron: "0 0 */2 * * ?"
     fixture-refresh-cron: "0 */10 * * * ?"
     scheduler-zone: "Europe/London"

@@ -39,6 +39,14 @@ server:
   port: 8080
   forward-headers-strategy: framework
 
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
 club:
   club-name: ${CLUBNAME:Merstham Cricket Club}
   logo: "/mcc/img/logos/mcc-logo-header.svg"

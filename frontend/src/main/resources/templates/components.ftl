@@ -533,3 +533,226 @@
            value="${(data[key]?first)!""}"
             ${required} />
 </#macro>
+
+<#macro teamList activeTeam season teams=[]>
+    <div class="mb-7">
+        <ul class="list-group">
+            <#list teams as team>
+                <a
+                        class="list-group-item <#if team.id == activeTeam.id>active</#if>"
+                        href="/fixtures/${season?c}/${team.id?c}">
+                    ${team.name}
+                </a>
+            </#list>
+        </ul>
+    </div>
+</#macro>
+
+<#macro inningsScoreCard fixture innings>
+    <#if fixture.inningsBattingPresent(innings)>
+        <table class="table table-align-middle">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">
+                    <@spring.message code="fixtures.batsman" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.runs" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.howout" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.bowler" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.fielder" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.fours" />
+                </th>
+                <th scope="col">
+                    <@spring.message code="fixtures.sixes" />
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        <#assign x=fixture.getNumberOfBats(innings)>
+        <#assign runsWithBat=0>
+        <#list 1..x as i>
+            <tr>
+                <th scope="row">${i}</th>
+                <td>${fixture.getBatsmanName(innings, i)}</td>
+                <td class="text-right">
+                    <#assign runs=fixture.getBatsmanRuns(innings, i)>
+                    <#assign runsWithBat=runsWithBat + runs>
+                    ${runs}
+                </td>
+                <td>${fixture.getBatsmanHowOut(innings, i)!""}</td>
+                <td>${fixture.getBatsmanWicketBowler(innings, i)!""}</td>
+                <td>${fixture.getBatsmanWicketFielder(innings, i)!""}</td>
+                <td class="text-right">${fixture.getBatsmanFours(innings, i)}</td>
+                <td class="text-right">${fixture.getBatsmanSixes(innings, i)}</td>
+            </tr>
+        </#list>
+        </tbody>
+        <tfoot class="thead-light">
+            <tr>
+                <th scope="col">&nbsp;</th>
+                <th scope="col" class="text-right">
+                    <@spring.message code="fixtures.total" />
+                </th>
+                <th scope="col" class="text-right">${runsWithBat}</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+            </tr>
+            <tr>
+                <th scope="col">&nbsp;</th>
+                <th scope="col" class="text-right">
+                    <@spring.message code="fixtures.extras" />
+                </th>
+                <th scope="col" class="text-right">${fixture.getInningsExtras(innings)}</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+            </tr>
+            <tr>
+                <th scope="col">&nbsp;</th>
+                <th scope="col" class="text-right">
+                    <@spring.message code="fixtures.innings_total" />
+                </th>
+                <th scope="col" class="text-right">${fixture.getInningsRuns(innings)}</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">&nbsp;</th>
+            </tr>
+        </tfoot>
+    </table>
+    <#else>
+        <h6>Innings not recorded on PlayCricket</h6>
+    </#if>
+</#macro>
+
+<#macro inningsBowlingSummary fixture innings>
+    <#if fixture.inningsBowlingPresent(innings)>
+        <table class="table table-align-middle">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">
+                <@spring.message code="fixtures.bowler" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.overs" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.wickets" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.maidens" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.runs" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.noballs" />
+            </th>
+            <th scope="col">
+                <@spring.message code="fixtures.wides" />
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <#assign x=fixture.getNumberOfBowlers(innings)>
+        <#assign totalOvers=0>
+        <#assign totalWickets=0>
+        <#assign totalMaidens=0>
+        <#assign totalRuns=0>
+        <#assign totalWides=0>
+        <#assign totalNoBalls=0>
+        <#list 1..x as i>
+            <tr>
+                <th scope="row">${i}</th>
+                <td>${fixture.getBowlerName(innings, i)}</td>
+                <td class="text-right">
+                    <#assign overs=fixture.getBowlerOvers(innings, i)>
+                    <#assign totalOvers=totalOvers + overs>
+                    ${overs}
+                </td>
+                <td class="text-right">
+                    <#assign wickets=fixture.getBowlerWickets(innings, i)>
+                    <#assign totalWickets=totalWickets + wickets>
+                    ${wickets}
+                </td>
+                <td class="text-right">
+                    <#assign maidens=fixture.getBowlerMaidens(innings, i)>
+                    <#assign totalMaidens=totalMaidens + maidens>
+                    ${maidens}
+                </td>
+                <td class="text-right">
+                    <#assign runs=fixture.getBowlerRuns(innings, i)>
+                    <#assign totalRuns=totalRuns + runs>
+                    ${runs}
+                </td>
+                <td class="text-right">
+                    <#assign noBalls=fixture.getBowlerNoBalls(innings, i)>
+                    <#assign totalNoBalls=totalNoBalls + noBalls>
+                    ${noBalls}
+                </td>
+                <td class="text-right">
+                    <#assign wides=fixture.getBowlerWides(innings, i)>
+                    <#assign totalWides=totalWides + wides>
+                    ${wides}
+                </td>
+            </tr>
+        </#list>
+        </tbody>
+        <tfoot class="thead-light">
+        <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col" class="text-right">
+                <@spring.message code="fixtures.total" />
+            </th>
+            <th scope="col" class="text-right">${totalOvers}</th>
+            <th scope="col" class="text-right">${totalWickets}</th>
+            <th scope="col" class="text-right">${totalMaidens}</th>
+            <th scope="col" class="text-right">${totalRuns}</th>
+            <th scope="col" class="text-right">${totalNoBalls}</th>
+            <th scope="col" class="text-right">${totalWides}</th>
+        </tr>
+        <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col" class="text-right">
+                <@spring.message code="fixtures.byes" />
+            </th>
+            <th scope="col" class="text-right">${fixture.getInningsByes(innings)}</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+        </tr>
+        <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col" class="text-right">
+                <@spring.message code="fixtures.leg_byes" />
+            </th>
+            <th scope="col" class="text-right">${fixture.getInningsLegByes(innings)}</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+        </tr>
+        </tfoot>
+    </table>
+    </#if>
+</#macro>
