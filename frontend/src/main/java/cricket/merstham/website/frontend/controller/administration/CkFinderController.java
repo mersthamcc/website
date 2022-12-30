@@ -34,6 +34,7 @@ import cricket.merstham.website.frontend.service.S3Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,6 +98,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=Init"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public InitResponse init(@RequestParam Map<String, String> params) {
         String ln = "";
         String lc = config.getLicenseKey().replace("-", "");
@@ -164,6 +166,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=GetFolders"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public GetFoldersResponse getFolders(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -188,6 +191,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=GetFiles"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public GetFilesResponse getFiles(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -212,6 +216,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=GetResizedImages"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public GetResizedImagesResponse getResizedImages(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -239,6 +244,7 @@ public class CkFinderController {
     @RequestMapping(
             method = GET,
             params = {"command=ImagePreview"})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public byte[] preview(@RequestParam Map<String, String> params) throws IOException {
         return executeCommand(
                 params,
@@ -256,6 +262,7 @@ public class CkFinderController {
     @RequestMapping(
             method = GET,
             params = {"command=Thumbnail"})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public byte[] thumbnail(@RequestParam Map<String, String> params) throws IOException {
         return preview(params);
     }
@@ -263,6 +270,7 @@ public class CkFinderController {
     @RequestMapping(
             method = GET,
             params = {"command=DownloadFile"})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public byte[] downloadFile(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -276,6 +284,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=CreateFolder"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public CreateFolderResponse createFolder(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -300,16 +309,11 @@ public class CkFinderController {
                 });
     }
 
-    private static void validateRequest(Map<String, String> params, String csrfToken) {
-        if (!Objects.equals(csrfToken, params.get(CK_CSRF_TOKEN))) {
-            throw new CKFinderException("Invalid Request");
-        }
-    }
-
     @RequestMapping(
             method = POST,
             params = {"command=DeleteFolder"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public DeleteFolderResponse deleteFolder(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -334,6 +338,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=DeleteFiles"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public DeleteFilesResponse deleteFiles(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -370,6 +375,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=RenameFile"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public RenameFileResponse renameFile(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -398,6 +404,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=SaveImage"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public SaveImageResponse saveImage(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -432,6 +439,7 @@ public class CkFinderController {
             params = {"command=FileUpload"},
             consumes = {MULTIPART_FORM_DATA_VALUE},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public FileUploadResponse fileUpload(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken,
@@ -461,6 +469,7 @@ public class CkFinderController {
             params = {"command=QuickUpload"},
             consumes = {MULTIPART_FORM_DATA_VALUE},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public FileUploadResponse quickUpload(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken,
@@ -472,6 +481,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=GetFileUrl"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public GetFileUrlResponse getFileUrl(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -495,6 +505,7 @@ public class CkFinderController {
             method = GET,
             params = {"command=ImageInfo"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public ImageInfoResponse imageInfo(@RequestParam Map<String, String> params) {
         return executeCommand(
                 params,
@@ -519,6 +530,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=CopyFiles"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public CopyFilesResponse copyFiles(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -544,6 +556,7 @@ public class CkFinderController {
             method = POST,
             params = {"command=MoveFiles"},
             produces = {APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasRole('ROLE_' + #params.get(\"section\").toUpperCase())")
     public MoveFilesResponse moveFiles(
             @RequestParam Map<String, String> params,
             @CookieValue(CK_CSRF_TOKEN) String csrfToken) {
@@ -687,6 +700,12 @@ public class CkFinderController {
                 || imageSize.getHeight() < requestedSize.getHeight());
 
         return imageSize;
+    }
+
+    private static void validateRequest(Map<String, String> params, String csrfToken) {
+        if (!Objects.equals(csrfToken, params.get(CK_CSRF_TOKEN))) {
+            throw new CKFinderException("Invalid Request");
+        }
     }
 
     private JsonNode getAndValidateJson(Map<String, String> params, String csrfToken)
