@@ -488,11 +488,11 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   resources:
-    image: nginx:latest
+    image: minio/minio:RELEASE.2020-07-22T00-26-33Z
     labels:
       - traefik.enable=true
       - traefik.http.routers.resources.rule=Host(`resources.${DEVDOMAIN}`)
-      - traefik.http.services.resources.loadbalancer.server.port=80
+      - traefik.http.services.resources.loadbalancer.server.port=9000
       - traefik.http.routers.resources.entrypoints=web
       - traefik.http.routers.resources.middlewares=forcehttps
       - traefik.http.routers.resources-tls.tls=true
@@ -502,16 +502,18 @@ services:
       - traefik.http.routers.resources-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=resources
       - tls-cert-host-check=resources.${DEVDOMAIN}
+    command: server /data
     environment:
-      NGINX_HOST: resources.${DEVDOMAIN}
-      NGINX_PORT: 80
+      MINIO_DOMAIN: resources.${DEVDOMAIN},localhost:9000
+      MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
     volumes:
-      - ./infrastructure/spaces-data:/usr/share/nginx/html
+      - ./infrastructure/spaces-data:/data
     networks:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: service nginx status
+      test: curl http://localhost:9000
       interval: 5s
       retries: 30
     depends_on:

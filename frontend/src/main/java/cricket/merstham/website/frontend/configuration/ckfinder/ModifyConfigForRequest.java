@@ -1,60 +1,31 @@
 package cricket.merstham.website.frontend.configuration.ckfinder;
 
 import com.cksource.ckfinder.config.Config;
-import com.cksource.ckfinder.event.GetConfigForRequestEvent;
 import com.cksource.ckfinder.exception.InvalidRequestException;
-import com.cksource.ckfinder.listener.Listener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.String.format;
 
 @Named
-public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent> {
+public class ModifyConfigForRequest {
 
     private static final List<String> ALLOWED_SECTIONS = List.of("news");
     public static final String DEFAULT_BACKEND = "default";
 
-    private final HttpServletRequest request;
-    private final String baseDirectory;
+    public List<Config.ResourceType> resourcesForRequest(Map<String, String> request) {
 
-    @Autowired
-    public ModifyConfigForRequest(
-            HttpServletRequest request,
-            @Value("${resources.base-directory}") String baseDirectory) {
-        this.request = request;
-        this.baseDirectory = baseDirectory;
-    }
-
-    @Override
-    public void onApplicationEvent(GetConfigForRequestEvent event) {
-
-        var uuid = request.getParameter("uuid");
-        var section = request.getParameter("section");
+        var uuid = request.get("uuid");
+        var section = request.get("section");
 
         if (!(ALLOWED_SECTIONS.contains(section) && isValidUniqueId(uuid))) {
             throw new InvalidRequestException("Invalid request");
         } else {
-            var baseDir = Paths.get(format("%s/resources/%s/%s", baseDirectory, section, uuid));
-            if (Files.notExists(baseDir)) {
-                try {
-                    Files.createDirectory(baseDir);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            Config config = event.getConfig();
-
             ArrayList<Config.ResourceType> resourceTypes = new ArrayList<>();
             int i = 0;
             resourceTypes.add(
@@ -63,7 +34,7 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
                             "Images",
                             format("This %s item's images", section),
                             DEFAULT_BACKEND,
-                            format("/resources/%s/%s/images", section, uuid),
+                            format("/%s/%s/images", section, uuid),
                             "jpeg,jpg,png,gif,svg",
                             null,
                             0));
@@ -74,7 +45,7 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
                             "Files",
                             format("This %s item's attachments", section),
                             DEFAULT_BACKEND,
-                            format("/resources/%s/%s/files", section, uuid),
+                            format("/%s/%s/files", section, uuid),
                             "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
                             null,
                             0));
@@ -85,7 +56,7 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
                             "WebGlobalImages",
                             "Website Global Images",
                             DEFAULT_BACKEND,
-                            "/resources/statics/images",
+                            "/statics/images",
                             "jpeg,jpg,png,gif",
                             null,
                             0));
@@ -97,11 +68,11 @@ public class ModifyConfigForRequest implements Listener<GetConfigForRequestEvent
                             "WebGlobalFiles",
                             "Website Global Attachments",
                             DEFAULT_BACKEND,
-                            "/resources/statics/files",
+                            "/statics/files",
                             "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
                             null,
                             0));
-            config.setResourceTypes(resourceTypes);
+            return resourceTypes;
         }
     }
 

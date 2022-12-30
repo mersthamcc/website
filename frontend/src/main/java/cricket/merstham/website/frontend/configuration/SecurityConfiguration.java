@@ -58,6 +58,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                                 new NegatedRequestMatcher(
                                         new AntPathRequestMatcher(CONNECTOR_PATH))))
                 .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin()
+                .and()
                 .sessionManagement()
                 .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
                 .and()

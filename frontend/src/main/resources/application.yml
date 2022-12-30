@@ -76,8 +76,11 @@ graph:
   graph-uri: ${GRAPH_URI:http://localhost:8090/graphql}
 
 resources:
-  base-url: "${RESOURCES_BASE_URL:https://resources.new.mersthamcc.co.uk}"
+  base-url: "${RESOURCES_BASE_URL}"
   base-directory: "${RESOURCES_BASE_DIRECTORY:../infrastructure/spaces-data}"
+  bucket: "${RESOURCES_BUCKET_NAME:resources}"
+  region: "${RESOURCES_BUCKET_REGION:eu-west-2}"
+  api-endpoint: ${RESOURCES_BASE_URL:~}
 
 payments:
   pay-later:
