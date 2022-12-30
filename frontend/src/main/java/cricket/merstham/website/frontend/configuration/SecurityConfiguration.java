@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static cricket.merstham.website.frontend.configuration.CkFinderRegistration.CONNECTOR_PATH;
+import static cricket.merstham.website.frontend.controller.administration.CkFinderController.CONNECTOR_PATH;
 import static java.util.Objects.nonNull;
 
 @Configuration

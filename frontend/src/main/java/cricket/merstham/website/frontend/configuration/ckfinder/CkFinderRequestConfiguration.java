@@ -13,7 +13,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 @Named
-public class ModifyConfigForRequest {
+public class CkFinderRequestConfiguration {
 
     private static final List<String> ALLOWED_SECTIONS = List.of("news");
     public static final String DEFAULT_BACKEND = "default";
@@ -81,7 +81,7 @@ public class ModifyConfigForRequest {
             UUID.fromString(uuid);
             return true;
         } catch (IllegalArgumentException ignored) {
-            return uuid.matches("[0-9a-f]{1,14}.[0-9]{1,8}");
+            return uuid.matches("[0-9a-f]{1,14}.\\d{1,8}");
         }
     }
 
