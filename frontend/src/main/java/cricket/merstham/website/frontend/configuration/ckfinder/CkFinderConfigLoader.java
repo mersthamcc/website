@@ -85,7 +85,7 @@ public class CkFinderConfigLoader implements ConfigLoader {
 
         Config.Backend backend = new Config.Backend();
         backend.setName("default");
-        backend.setAdapter("local");
+        backend.setAdapter("s3");
         backend.setBaseUrl(resourceUrl);
         backend.setRoot(resourcePath);
         backend.setDisallowUnsafeCharacters(true);
