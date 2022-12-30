@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.shared.utils.DataURI;
-import cricket.merstham.website.frontend.configuration.ckfinder.ModifyConfigForRequest;
+import cricket.merstham.website.frontend.configuration.ckfinder.CkFinderRequestConfiguration;
 import cricket.merstham.website.frontend.model.ckfinder.CopyFilesResponse;
 import cricket.merstham.website.frontend.model.ckfinder.CreateFolderResponse;
 import cricket.merstham.website.frontend.model.ckfinder.CurrentFolder;
@@ -64,7 +64,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static cricket.merstham.website.frontend.configuration.ckfinder.ModifyConfigForRequest.DEFAULT_BACKEND;
+import static cricket.merstham.website.frontend.configuration.ckfinder.CkFinderRequestConfiguration.DEFAULT_BACKEND;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -73,17 +73,20 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping(path = "/administration/components/ckfinder/connector")
+@RequestMapping(path = CkFinderController.CONNECTOR_PATH)
 public class CkFinderController {
 
     private static final Logger LOG = LogManager.getLogger(CkFinderController.class);
+
+    public static final String CONNECTOR_PATH = "/administration/components/ckfinder/connector";
+
     private static final String CHARS =
             "123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // pragma: allowlist secret
     private static final int[] POSITIONS = new int[] {1, 8, 17, 22, 3, 13, 11, 20, 5, 24, 27};
     public static final String CK_CSRF_TOKEN = "ckCsrfToken";
 
     private final Config config;
-    private final ModifyConfigForRequest modifyConfigForRequest;
+    private final CkFinderRequestConfiguration ckFinderRequestConfiguration;
     private final S3Service service;
 
     private final ObjectMapper objectMapper;
@@ -91,12 +94,12 @@ public class CkFinderController {
     @Autowired
     public CkFinderController(
             ConfigLoader configLoader,
-            ModifyConfigForRequest modifyConfigForRequest,
+            CkFinderRequestConfiguration ckFinderRequestConfiguration,
             S3Service service,
             ObjectMapper objectMapper)
             throws Exception {
         this.config = configLoader.loadConfig();
-        this.modifyConfigForRequest = modifyConfigForRequest;
+        this.ckFinderRequestConfiguration = ckFinderRequestConfiguration;
         this.service = service;
         this.objectMapper = objectMapper;
     }
@@ -116,7 +119,7 @@ public class CkFinderController {
             }
         }
 
-        var resourceTypes = modifyConfigForRequest.resourcesForRequest(params);
+        var resourceTypes = ckFinderRequestConfiguration.resourcesForRequest(params);
         resourceTypes.forEach(
                 resourceType -> service.createFolderIfNotExist(resourceType.getDirectory()));
         return InitResponse.builder()
@@ -651,7 +654,7 @@ public class CkFinderController {
     }
 
     private Config.ResourceType getResourceType(Map<String, String> params, String name) {
-        var resourceTypes = modifyConfigForRequest.resourcesForRequest(params);
+        var resourceTypes = ckFinderRequestConfiguration.resourcesForRequest(params);
         var resourceType =
                 resourceTypes.stream()
                         .filter(t -> t.getName().equals(name))
