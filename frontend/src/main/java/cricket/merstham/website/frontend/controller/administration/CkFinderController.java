@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.controller.administration;
 
 import com.cksource.ckfinder.config.Config;
 import com.cksource.ckfinder.config.loader.ConfigLoader;
+import com.cksource.ckfinder.error.ErrorCode;
 import com.cksource.ckfinder.exception.CKFinderException;
 import com.cksource.ckfinder.image.Image;
 import com.cksource.ckfinder.image.ImageSize;
@@ -17,6 +18,8 @@ import cricket.merstham.website.frontend.model.ckfinder.CreateFolderResponse;
 import cricket.merstham.website.frontend.model.ckfinder.CurrentFolder;
 import cricket.merstham.website.frontend.model.ckfinder.DeleteFilesResponse;
 import cricket.merstham.website.frontend.model.ckfinder.DeleteFolderResponse;
+import cricket.merstham.website.frontend.model.ckfinder.Error;
+import cricket.merstham.website.frontend.model.ckfinder.ErrorResponse;
 import cricket.merstham.website.frontend.model.ckfinder.File;
 import cricket.merstham.website.frontend.model.ckfinder.FileUploadResponse;
 import cricket.merstham.website.frontend.model.ckfinder.GetFileUrlResponse;
@@ -34,11 +37,15 @@ import cricket.merstham.website.frontend.service.S3Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.core.UriBuilder;
@@ -578,6 +585,29 @@ public class CkFinderController {
                 });
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(Exception ex, WebRequest request) {
+        int errorCode = ErrorCode.UNKNOWN;
+        var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        if (ex instanceof CKFinderException) {
+            var ckfinderException = (CKFinderException) ex;
+            errorCode = ckfinderException.getErrorCode();
+            httpStatus = ckfinderException.getHttpStatus();
+        }
+
+        return ResponseEntity.status(httpStatus)
+                .body(
+                        ErrorResponse.builder()
+                                .error(
+                                        Error.builder()
+                                                .message(ex.getMessage())
+                                                .number(errorCode)
+                                                .exceptionName(ex.getClass().getSimpleName())
+                                                .build())
+                                .build());
+    }
+
     private Map<String, String> getFilesToCopyOrMove(
             @RequestParam Map<String, String> params, @CookieValue(CK_CSRF_TOKEN) String csrfToken)
             throws JsonProcessingException {
@@ -704,7 +734,7 @@ public class CkFinderController {
 
     private static void validateRequest(Map<String, String> params, String csrfToken) {
         if (!Objects.equals(csrfToken, params.get(CK_CSRF_TOKEN))) {
-            throw new CKFinderException("Invalid Request");
+            throw new CKFinderException("Bad CSRF Token", ErrorCode.ACCESS_DENIED);
         }
     }
 
@@ -713,12 +743,12 @@ public class CkFinderController {
         var jsonData = params.get("jsonData");
 
         if (isNull(jsonData) || jsonData.isBlank()) {
-            throw new CKFinderException("JsonData missing from request");
+            throw new CKFinderException("JsonData missing from request", ErrorCode.INVALID_REQUEST);
         }
 
         var json = objectMapper.readValue(jsonData, JsonNode.class);
         if (!Objects.equals(csrfToken, json.get(CK_CSRF_TOKEN).asText())) {
-            throw new CKFinderException("Invalid Request");
+            throw new CKFinderException("Bad CSRF Token", ErrorCode.ACCESS_DENIED);
         }
         return json;
     }

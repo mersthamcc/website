@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class DataURI {
 
     private static final Pattern PATTERN =
-            Pattern.compile("^data:((?:\\w+\\/(?:(?!;).)+)?)((?:;[\\w\\W]*?[^;])*),(.+)$");
+            Pattern.compile("data:(?<type>\\w+\\/\\w+);(?<encoding>\\w+),(?<data>.+)$");
     private final byte[] content;
     private final String mediaType;
 
@@ -25,9 +25,9 @@ public class DataURI {
         }
         var result = PATTERN.matcher(src);
         if (result.matches()) {
-            if (Objects.equals(result.group(2), ";base64")) {
-                var bytes = Base64.getDecoder().decode(result.group(3));
-                return new DataURI(result.group(1), bytes);
+            if (Objects.equals(result.group("encoding"), "base64")) {
+                var bytes = Base64.getDecoder().decode(result.group("data"));
+                return new DataURI(result.group("type"), bytes);
             }
             throw new IllegalArgumentException("Encoding scheme not supported");
         }
