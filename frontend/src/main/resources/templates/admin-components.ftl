@@ -5,7 +5,7 @@
 
 <#macro section title action buttons="">
     <form class="form-horizontal" method="post" name="action" action="${action}">
-        <input type="hidden" name="_csrf" value="${_csrf.token}" />
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <!-- Card -->
         <div class="card mb-3 mb-lg-5">
             <div class="card-header">
@@ -29,7 +29,7 @@
 
 <#macro form action>
     <form class="form-horizontal" method="post" name="action" action="${action}">
-        <input type="hidden" name="_csrf" value="${_csrf.token}" />
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <#nested />
     </form>
 </#macro>

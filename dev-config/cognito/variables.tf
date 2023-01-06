@@ -17,3 +17,7 @@ variable "developer_given_name" {
 variable "developer_family_name" {
   type = string
 }
+
+variable "email_domain" {
+  type = string
+}

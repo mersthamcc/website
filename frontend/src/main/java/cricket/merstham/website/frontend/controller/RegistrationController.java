@@ -4,6 +4,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import org.slf4j.Logger;
@@ -11,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -188,13 +187,13 @@ public class RegistrationController {
     @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
     public ModelAndView confirmation(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            CognitoAuthentication cognitoAuthentication,
             Locale locale,
             HttpSession session,
             SessionStatus status) {
         var order =
                 membershipService.registerMembersFromBasket(
-                        basket, authorizedClient.getAccessToken(), locale);
+                        basket, cognitoAuthentication.getOAuth2AccessToken(), locale);
         status.setComplete();
         session.setAttribute("order", order);
         return new ModelAndView(

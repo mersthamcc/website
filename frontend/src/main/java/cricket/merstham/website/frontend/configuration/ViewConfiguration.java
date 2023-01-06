@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.configuration;
 
 import cricket.merstham.website.frontend.menu.MenuBuilder;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import no.api.freemarker.java8.Java8ObjectWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -91,15 +89,11 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
 
     private UserView createUserView(Principal principal) {
         List<String> roles =
-                ((Collection<SimpleGrantedAuthority>)
-                                SecurityContextHolder.getContext()
-                                        .getAuthentication()
-                                        .getAuthorities())
-                        .stream()
-                                .map(SimpleGrantedAuthority::getAuthority)
+                ((CognitoAuthentication) principal)
+                        .getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList());
-        return new UserView(
-                (OidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal(), roles);
+        return new UserView((OidcUser) ((CognitoAuthentication) principal).getPrincipal(), roles);
     }
 
     private CurrentRoute getCurrentRoute(HttpServletRequest request, Object handler) {
@@ -125,8 +119,8 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     }
 
     public static class UserView {
-        private OidcUser principal;
-        private List<String> roles;
+        private final OidcUser principal;
+        private final List<String> roles;
 
         public UserView(OidcUser principal, List<String> roles) {
             this.principal = principal;

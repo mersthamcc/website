@@ -387,7 +387,7 @@
 
                         <div class="card-footer border-0">
                             <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
-                                <input type="hidden" name="_csrf" value="${_csrf.token}" />
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <input type="hidden" name="category" value="${category.key}" />
                                 <input type="hidden" name="uuid" value="${subscriptionId}" />
                                 <button

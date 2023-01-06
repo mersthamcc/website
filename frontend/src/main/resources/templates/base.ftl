@@ -472,7 +472,7 @@
                         $.HSCore.components.HSValidation.init($(this), {
                             rules: {
                                 confirmPassword: {
-                                    equalTo: '#signupPassword'
+                                    equalTo: '#password'
                                 }
                             }
                         });
@@ -503,7 +503,7 @@
 
 
             <!-- Global site tag (gtag.js) - Google Analytics -->
-            <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.googleAnalyticsKey }}"></script>
+            <script async src="https://www.googletagmanager.com/gtag/js?id=${config.googleAnalyticsKey}"></script>
 
             <!--  GOOGLE reCAPTCHA -->
             <script src='//www.google.com/recaptcha/api.js'></script>
@@ -518,8 +518,6 @@
                     src="//mersthamcricketclub.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/sb53l8/b/24/bc54840da492f9ca037209037ef0522a/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=e8e9adb2">
 
             </script>
-
-
 
             <#if script?is_directive><@script /><#else>${script}</#if>
         </body>

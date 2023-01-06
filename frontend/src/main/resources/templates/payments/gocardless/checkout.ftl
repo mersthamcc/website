@@ -86,7 +86,7 @@
 <@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.confirmation">
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <input type="hidden" name="id" value="${order.id}" />
             <input type="hidden" name="uuid" value="${order.uuid}" />
 

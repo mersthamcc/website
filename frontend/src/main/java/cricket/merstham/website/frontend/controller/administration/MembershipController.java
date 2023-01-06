@@ -7,6 +7,7 @@ import cricket.merstham.website.frontend.model.admintables.Member;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +58,10 @@ public class MembershipController extends SspController<Member> {
 
     @GetMapping(value = "/administration/membership", name = "admin-membership-list")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    @CacheEvict(value = MEMBER_SUMMARY_CACHE, key = "#authorizedClient.accessToken.tokenValue")
-    public ModelAndView list(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
+    @CacheEvict(
+            value = MEMBER_SUMMARY_CACHE,
+            key = "#cognitoAuthentication.OAuth2AccessToken.tokenValue")
+    public ModelAndView list(CognitoAuthentication cognitoAuthentication) {
         return new ModelAndView(
                 "administration/membership/list",
                 Map.of(
@@ -84,10 +84,11 @@ public class MembershipController extends SspController<Member> {
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public ModelAndView edit(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
-            Locale locale,
-            @PathVariable int id) {
-        var member = membershipService.get(id, authorizedClient.getAccessToken()).orElseThrow();
+            CognitoAuthentication cognitoAuthentication, Locale locale, @PathVariable int id) {
+        var member =
+                membershipService
+                        .get(id, cognitoAuthentication.getOAuth2AccessToken())
+                        .orElseThrow();
         return new ModelAndView("administration/membership/edit", buildModelData(member, locale));
     }
 
@@ -204,13 +205,14 @@ public class MembershipController extends SspController<Member> {
     @PostMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-update")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public RedirectView update(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            CognitoAuthentication cognitoAuthentication,
             Locale locale,
             RedirectAttributes redirectAttributes,
             @PathVariable int id,
             @RequestBody MultiValueMap<String, Object> data) {
         try {
-            membershipService.update(id, authorizedClient.getAccessToken(), locale, data);
+            membershipService.update(
+                    id, cognitoAuthentication.getOAuth2AccessToken(), locale, data);
         } catch (GraphException ex) {
             LOG.error("Error performing update!", ex);
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -223,12 +225,13 @@ public class MembershipController extends SspController<Member> {
             produces = "application/json",
             path = "/administration/membership/get-data")
     public @ResponseBody SspResponse<SspResponseDataWrapper<Member>> getData(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
-            @RequestBody SspRequest request) {
+            CognitoAuthentication cognitoAuthentication, @RequestBody SspRequest request) {
         Comparator<Member> comparator = createComparator(request);
         String search = request.getSearch().getValue().toLowerCase();
         List<Member> members =
-                membershipService.getMemberSummary(authorizedClient.getAccessToken()).stream()
+                membershipService
+                        .getMemberSummary(cognitoAuthentication.getOAuth2AccessToken())
+                        .stream()
                         .filter(
                                 m ->
                                         m.getFamilyName().toLowerCase().contains(search)

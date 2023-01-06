@@ -4,7 +4,7 @@
 <@layout.mainLayout formName="membership.confirmation">
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/paypal/authorise">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <input type="hidden" name="id" value="${order.id}" />
             <input type="hidden" name="uuid" value="${order.uuid}" />
 
