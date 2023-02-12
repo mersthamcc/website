@@ -41,17 +41,15 @@ public class CognitoAuthentication implements Authentication {
     private final String refreshToken;
     private final String idToken;
     private final JWT idTokenJwt;
-    private final String challenge;
     private final List<GrantedAuthority> authorities;
     private final OidcUser oidcUser;
 
     public CognitoAuthentication(
-            String accessToken, String refreshToken, String idToken, String challenge) {
+            String accessToken, String refreshToken, String idToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.idToken = idToken;
 
-        this.challenge = challenge;
         try {
             this.accessTokenJwt = SignedJWT.parse(accessToken);
             this.idTokenJwt = SignedJWT.parse(idToken);

@@ -4,62 +4,49 @@
 
 <#macro headers>
 </#macro>
-<#macro imageScripts>
-    <script>
-
-    </script>
+<#macro pageScripts>
+    <@components.otpScript />
 </#macro>
 
-<@layout.mainLayout script=imageScripts headers=headers>
-    <div class="container space-2 space-lg-3">
-        <form class="js-validate w-md-75 w-lg-50 mx-md-auto" novalidate="novalidate" method="post">
+<@layout.mainLayout script=pageScripts headers=headers formName="verification.title">
+    <@components.panel>
+        <form class="form-horizontal w-md-75 w-lg-60 mx-md-auto align-content-center" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <input type="hidden" name="verificationAttribute" value="${pendingUser.attributeName}" />
             <input type="hidden" name="userId" value="${pendingUser.userId}" />
-            <!-- Title -->
-            <div class="mb-5 mb-md-7">
-                <h1 class="h2 mb-0">
-                    <@spring.message code="verification.title" />
-                </h1>
-                <p>
-                    <@spring.messageArgs code="verification.subtitle" args=[pendingUser.destination] />
-                </p>
-            </div>
-            <!-- End Title -->
+            <@components.section title="">
+                <div class="mb-4 card-body-centered">
+                    <img class="avatar avatar-xxl avatar-4by3" src="${resourcePrefix}/front/assets/svg/illustrations/account-creation.svg" alt="Verification">
+                </div>
 
-            <div class="form-group">
-                <label class="input-label" for="code">
-                    <@spring.message code="verification.code" />
-                </label>
-                <div class="input-group input-group-merge">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i class="far fa-keyboard"></i>
-                        </span>
+                <div class="mb-5">
+                    <p>
+                        <@spring.messageArgs code="verification.subtitle" args=[pendingUser.destination] />
+                    </p>
+                </div>
+
+                <@components.otpCode />
+
+                <button type="submit" class="btn btn-primary transition-3d-hover">
+                    <@spring.message code="verification.verify" />
+                </button>
+                <div class="row mb-5">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <a class="font-size-1 font-weight-bold" href="/logout">
+                            <@spring.message code="login.logout" />
+                        </a>
                     </div>
-                    <input
-                            type="number"
-                            name="code"
-                            id="code"
-                            class="form-control"
-                            placeholder="<@spring.message code="verification.code_placeholder" />"
-                            aria-label="<@spring.message code="verification.code" />">
-                </div>
-            </div>
 
-            <!-- Button -->
-            <div class="row align-items-center mb-5">
-                <div class="col-sm-6 mb-3 mb-sm-0">
-
+                    <div class="col-sm-6 text-sm-right">
+                        <p>
+                            <@spring.message code="login.sms_code_not_received" />
+                            <a href="#">
+                                <@spring.message code="login.sms_code_resend" />
+                            </a>
+                        </p>
+                    </div>
                 </div>
-
-                <div class="col-sm-6 text-sm-right">
-                    <button type="submit" class="btn btn-primary transition-3d-hover">
-                        <@spring.message code="verification.verify" />
-                    </button>
-                </div>
-            </div>
-            <!-- End Button -->
+            </@components.section>
         </form>
-    </div>
+    </@components.panel>
 </@layout.mainLayout>

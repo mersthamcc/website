@@ -1,9 +1,14 @@
 package cricket.merstham.website.frontend.configuration;
 
-import cricket.merstham.website.frontend.security.CognitoAuthenticationManager;
+import cricket.merstham.website.frontend.security.CognitoChallengeFilter;
+import cricket.merstham.website.frontend.security.CognitoChallengeResponseFilter;
+import cricket.merstham.website.frontend.security.CognitoRefreshTokenAuthenticationProvider;
+import cricket.merstham.website.frontend.security.CognitoUsernamePasswordAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,12 +22,15 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +49,13 @@ import static java.util.Objects.nonNull;
 public class SecurityConfiguration {
 
     @Bean
+    public CognitoIdentityProviderClient cognitoIdentityProviderClient(@Value("${spring.security.oauth2.client.registration.login.region:#{null}}") String region) {
+        return CognitoIdentityProviderClient
+                .builder()
+                .region(Region.of(region))
+                .build();
+    }
+    @Bean
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
@@ -51,12 +66,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authManager() {
-        return new CognitoAuthenticationManager();
+    public AuthenticationManager authManager(
+            CognitoUsernamePasswordAuthenticationProvider cognitoUsernamePasswordAuthenticationProvider,
+            CognitoRefreshTokenAuthenticationProvider cognitoRefreshTokenAuthenticationProvider
+    ) {
+        return new ProviderManager(cognitoUsernamePasswordAuthenticationProvider, cognitoRefreshTokenAuthenticationProvider);
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            CognitoChallengeFilter cognitoChallengeFilter,
+            CognitoChallengeResponseFilter cognitoChallengeProcessingFilter) throws Exception {
         http.csrf()
                 .requireCsrfProtectionMatcher(
                         new AndRequestMatcher(
@@ -83,6 +104,8 @@ public class SecurityConfiguration {
                 .failureForwardUrl("/bad")
                 .defaultSuccessUrl("/")
                 .and()
+                .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .permitAll();

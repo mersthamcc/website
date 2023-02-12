@@ -1,20 +1,23 @@
 package cricket.merstham.website.frontend.security;
 
-import org.springframework.security.core.token.Token;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
-public class MfaAuthenticationToken implements Token {
+import java.util.Collection;
+
+public class MfaAuthenticationToken extends AbstractAuthenticationToken {
+
+    public MfaAuthenticationToken(Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
+    }
+
     @Override
-    public String getKey() {
+    public Object getCredentials() {
         return null;
     }
 
     @Override
-    public long getKeyCreationTime() {
-        return 0;
-    }
-
-    @Override
-    public String getExtendedInformation() {
+    public Object getPrincipal() {
         return null;
     }
 }

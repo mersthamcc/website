@@ -65,7 +65,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
         if (handler instanceof HandlerMethod && modelAndView != null) {
             Map<String, Object> model = new HashMap<>();
             var principal = request.getUserPrincipal();
-            if (principal != null) {
+            if (principal != null && principal instanceof CognitoAuthentication) {
                 model.put("user", createUserView(principal));
             }
             model.put("config", clubConfiguration);
