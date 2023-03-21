@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class EmailNotInUseValidator
-        implements ConstraintValidator<EmailNotInUse, String> {
+public class EmailNotInUseValidator implements ConstraintValidator<EmailNotInUse, String> {
 
     private final CognitoService service;
 
@@ -17,11 +16,10 @@ public class EmailNotInUseValidator
     }
 
     @Override
-    public void initialize(EmailNotInUse constraintAnnotation) {
-    }
+    public void initialize(EmailNotInUse constraintAnnotation) {}
 
     @Override
-    public boolean isValid(String email, ConstraintValidatorContext context){
+    public boolean isValid(String email, ConstraintValidatorContext context) {
         return !service.userExists(email);
     }
 }

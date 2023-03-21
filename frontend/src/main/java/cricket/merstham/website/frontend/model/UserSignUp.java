@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -24,24 +25,20 @@ import java.io.Serializable;
 @PasswordsMatch(message = "passwordsDoNotMatch")
 public class UserSignUp implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -1613276657017310873L;
+    @Serial private static final long serialVersionUID = -1613276657017310873L;
 
     @NotEmpty(message = "emailNotProvided")
     @Email(message = "emailNotValid")
     @EmailNotInUse(message = "emailAlreadyExists")
     private String email;
 
-
     @NotEmpty(message = "passwordNotProvided")
     @Length(min = 8, message = "passwordNotLongEnough")
     @Password(message = "passwordNotStrongEnough")
     private String password;
 
-
     @NotEmpty(message = "confirmationPasswordNotProvided")
     private String confirmPassword;
-
 
     @NotEmpty(message = "familyNameNotProvided")
     private String familyName;

@@ -17,6 +17,9 @@
                     <img class="avatar avatar-xxl avatar-4by3" src="${resourcePrefix}/front/admin/assets/svg/illustrations/unlock.svg" alt="Image Description">
                 </div>
 
+                <#if errors??>
+                    <@components.formErrors errors=errors errorKey="login.errors.title" />
+                </#if>
                 <div class="mb-5">
                     <p>
                         <#if challengeName == "SMS_MFA">

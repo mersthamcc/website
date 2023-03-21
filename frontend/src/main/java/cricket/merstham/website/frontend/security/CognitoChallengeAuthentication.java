@@ -1,7 +1,5 @@
 package cricket.merstham.website.frontend.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.AllArgsConstructor;
@@ -17,29 +15,46 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class CognitoChallengeAuthentication implements Authentication {
 
-    @Serial
-    private static final long serialVersionUID = -8005659880146143771L;
+    @Serial private static final long serialVersionUID = -8005659880146143771L;
 
     public enum Step {
         DEFAULT,
         SETUP_SOFTWARE_MFA,
         SETUP_SMS_MFA,
-        SETUP_SMS_MFA_VERIFY
+        SETUP_SMS_MFA_VERIFY,
+        VERIFY_SOFTWARE_MFA,
+        VERIFY_SMS_MFA
     }
+
+    @AllArgsConstructor
+    @Getter
+    public enum Error {
+        WRONG_CODE("wrong_code"),
+        EXPIRED_CODE("expired_code");
+
+        private String code;
+    }
+
     private static final ObjectMapper JSON = new JsonMapper();
     private final String sessionId;
     private final String email;
     private final ChallengeNameType challengeName;
     private final Map<String, String> challengeParameters;
-    private final List<GrantedAuthority> grantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_PRE_AUTH"));
+
+    private final String userId;
+    private final List<GrantedAuthority> grantedAuthorities =
+            List.of(new SimpleGrantedAuthority("ROLE_PRE_AUTH"));
     private final Object credentials;
-    @Builder.Default
-    private final Step step = Step.DEFAULT;
+
+    private final Error error;
+    @Builder.Default private final Step step = Step.DEFAULT;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,7 +73,7 @@ public class CognitoChallengeAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return challengeParameters.get("USER_ID_FOR_SRP");
+        return isNull(userId) ? challengeParameters.get("USER_ID_FOR_SRP") : userId;
     }
 
     @Override
@@ -67,26 +82,25 @@ public class CognitoChallengeAuthentication implements Authentication {
     }
 
     @Override
-    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
-    }
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}
 
     @Override
     public String getName() {
         return email;
     }
 
-    public List<String> getAllowedMfaTypes() {
+    public String getAllowedMfaTypes() {
         if (challengeParameters.containsKey("MFAS_CAN_SETUP")) {
-            try {
-                return JSON.readValue(
-                        challengeParameters.get("MFAS_CAN_SETUP"),
-                        new TypeReference<>() {});
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            return challengeParameters.get("MFAS_CAN_SETUP");
         }
-        return List.of();
+        if (challengeParameters.containsKey("MFAS_CAN_CHOOSE")) {
+            return challengeParameters.get("MFAS_CAN_CHOOSE");
+        }
+        return "[]";
+    }
+
+    public boolean isMfaSetup() {
+        return challengeParameters.containsKey("MFAS_CAN_SETUP");
     }
 
     public String getMfaDestination() {

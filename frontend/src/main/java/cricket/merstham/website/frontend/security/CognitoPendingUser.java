@@ -12,13 +12,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PendingUser implements Serializable {
+public class CognitoPendingUser implements Serializable {
     @Serial private static final long serialVersionUID = -637404223903477834L;
 
     private String userId;

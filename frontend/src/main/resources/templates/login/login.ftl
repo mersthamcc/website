@@ -15,6 +15,9 @@
         <form class="form-horizontal w-md-75 w-lg-60 mx-md-auto" novalidate="novalidate" action="${processingUrl}" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <@components.section title="login.subtitle">
+                <#if errors??>
+                    <@components.formErrors errors=errors errorKey="login.errors.title" />
+                </#if>
                 <!-- Form Group -->
                 <div class="js-form-message form-group">
                     <label class="input-label" for="email">

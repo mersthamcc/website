@@ -1,33 +1,36 @@
-package cricket.merstham.website.frontend.security;
+package cricket.merstham.website.frontend.security.providers;
 
 import cricket.merstham.website.frontend.service.CognitoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CognitoRefreshTokenAuthenticationProvider implements AuthenticationProvider {
-    private static final Logger LOG = LoggerFactory.getLogger(CognitoRefreshTokenAuthenticationProvider.class);
+public class CognitoUsernamePasswordAuthenticationProvider implements AuthenticationProvider {
+    private static final Logger LOG =
+            LoggerFactory.getLogger(CognitoUsernamePasswordAuthenticationProvider.class);
 
     private final CognitoService cognitoService;
 
     @Autowired
-    public CognitoRefreshTokenAuthenticationProvider(CognitoService cognitoService) {
+    public CognitoUsernamePasswordAuthenticationProvider(CognitoService cognitoService) {
         this.cognitoService = cognitoService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
-        return cognitoService.refresh((CognitoAuthentication) authentication);
+        return cognitoService.login(
+                authentication.getName(), authentication.getCredentials().toString());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(CognitoAuthentication.class);
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }

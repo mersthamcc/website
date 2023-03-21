@@ -1,5 +1,6 @@
-package cricket.merstham.website.frontend.security;
+package cricket.merstham.website.frontend.security.filters;
 
+import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 import static cricket.merstham.website.frontend.controller.LoginController.CHALLENGE_PROCESSING_URL;
@@ -25,8 +28,8 @@ import static cricket.merstham.website.frontend.security.CognitoChallengeAuthent
 public class CognitoChallengeResponseFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(CognitoChallengeResponseFilter.class);
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher(CHALLENGE_PROCESSING_URL,
-            "POST");
+    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
+            new AntPathRequestMatcher(CHALLENGE_PROCESSING_URL, "POST");
     public static final String MFA_TYPE_FIELD = "mfa-type";
 
     private final CognitoService service;
@@ -37,18 +40,23 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
     }
 
     @Autowired
-    public CognitoChallengeResponseFilter(AuthenticationManager authenticationManager, CognitoService service) {
+    public CognitoChallengeResponseFilter(
+            AuthenticationManager authenticationManager, CognitoService service) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
         this.service = service;
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException {
+    public Authentication attemptAuthentication(
+            HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException, IOException, ServletException {
         if (!request.getMethod().equals("POST")) {
-            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+            throw new AuthenticationServiceException(
+                    "Authentication method not supported: " + request.getMethod());
         }
-        var authentication = (CognitoChallengeAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        var authentication =
+                (CognitoChallengeAuthentication)
+                        SecurityContextHolder.getContext().getAuthentication();
         switch (authentication.getChallengeName()) {
             case MFA_SETUP -> {
                 return mfaSetup(request, response, authentication);
@@ -62,35 +70,44 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
             case NEW_PASSWORD_REQUIRED -> {
                 return handlePasswordChange(request, authentication);
             }
+            case SELECT_MFA_TYPE -> {
+                return chooseMfaType(request, response, authentication);
+            }
             default -> {
-                LOG.error("Unsupported Cognito challenge experienced: {}", authentication.getChallengeName());
+                LOG.error(
+                        "Unsupported Cognito challenge experienced: {}",
+                        authentication.getChallengeName());
                 return null;
             }
         }
     }
 
-    private Authentication handlePasswordChange(HttpServletRequest request, CognitoChallengeAuthentication authentication) {
+    private Authentication handlePasswordChange(
+            HttpServletRequest request, CognitoChallengeAuthentication authentication) {
         return null;
     }
 
-    private Authentication verifySmsMfa(HttpServletRequest request, CognitoChallengeAuthentication authentication) {
+    private Authentication verifySmsMfa(
+            HttpServletRequest request, CognitoChallengeAuthentication authentication) {
         var code = getCodeFromRequestParameters(request.getParameterMap());
         return service.verifySmsMfa(authentication, code);
     }
 
-    private Authentication mfaSetup(HttpServletRequest request, HttpServletResponse response, CognitoChallengeAuthentication authentication) throws IOException {
+    private Authentication mfaSetup(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            CognitoChallengeAuthentication authentication)
+            throws IOException {
         switch (authentication.getStep()) {
             case DEFAULT -> {
-                return chooseMfaType(request, response, authentication);
+                return chooseMfaTypeToSetup(request, response, authentication);
             }
             case SETUP_SOFTWARE_MFA -> {
-                return service.verifyAppSetup(authentication, getCodeFromRequestParameters(request.getParameterMap()));
+                return service.verifyAppSetup(
+                        authentication, getCodeFromRequestParameters(request.getParameterMap()));
             }
             case SETUP_SMS_MFA -> {
                 return service.setPhoneNumber(authentication, request.getParameter("phoneNumber"));
-            }
-            case SETUP_SMS_MFA_VERIFY -> {
-                return null;
             }
             default -> {
                 LOG.error("Unexpected challenge step experienced: {}", authentication.getStep());
@@ -99,22 +116,25 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
         }
     }
 
-    private Authentication chooseMfaType(HttpServletRequest request, HttpServletResponse response, CognitoChallengeAuthentication authentication) throws IOException {
+    private Authentication chooseMfaType(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            CognitoChallengeAuthentication authentication) {
+        var mfaType = request.getParameter(MFA_TYPE_FIELD);
+        return service.selectMfaType(authentication, mfaType);
+    }
+
+    private Authentication chooseMfaTypeToSetup(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            CognitoChallengeAuthentication authentication) {
         var mfaType = request.getParameter(MFA_TYPE_FIELD);
         switch (mfaType) {
             case "SOFTWARE_TOKEN_MFA" -> {
                 return service.getAppToken(authentication);
             }
             case "SMS_MFA" -> {
-                return CognitoChallengeAuthentication
-                        .builder()
-                        .sessionId(authentication.getSessionId())
-                        .email(authentication.getEmail())
-                        .challengeName(authentication.getChallengeName())
-                        .challengeParameters(authentication.getChallengeParameters())
-                        .step(SETUP_SMS_MFA)
-                        .credentials(authentication.getCredentials())
-                        .build();
+                return authentication.toBuilder().step(SETUP_SMS_MFA).build();
             }
             default -> {
                 LOG.error("Unexpected MFA type in request: {}", mfaType);
@@ -123,7 +143,8 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
         }
     }
 
-    private Authentication verifySoftwareMfa(HttpServletRequest request, CognitoChallengeAuthentication authentication) {
+    private Authentication verifySoftwareMfa(
+            HttpServletRequest request, CognitoChallengeAuthentication authentication) {
         var code = getCodeFromRequestParameters(request.getParameterMap());
         return service.verifySoftwareMfa(authentication, code);
     }

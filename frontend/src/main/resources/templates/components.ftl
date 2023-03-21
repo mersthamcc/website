@@ -845,5 +845,20 @@
             </#list>
         </div>
     </fieldset>
+</#macro>
 
+<#macro formErrors errors errorKey="An error occured">
+    <#if (errors?size > 0)>
+        <div class="alert alert-soft-danger" role="alert">
+            <h5 class="alert-heading">
+                <@spring.messageText code=errorKey text=errorKey />
+            </h5>
+
+            <#list errors as error>
+                <p class="text-inherit">
+                    <@spring.messageText code=error text=error />
+                </p>
+            </#list>
+        </div>
+    </#if>
 </#macro>

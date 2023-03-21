@@ -10,10 +10,9 @@ public class OtpHelper {
     public static String getCodeFromMap(Map<String, String> parameters) {
         return getCodeFromMap(parameters, OTP_CODE_FIELD_PREFIX);
     }
+
     public static String getCodeFromMap(Map<String, String> parameters, String fieldPrefix) {
-        return parameters
-                .entrySet()
-                .stream()
+        return parameters.entrySet().stream()
                 .filter(p -> p.getKey().startsWith(fieldPrefix))
                 .sorted(Map.Entry.comparingByKey())
                 .map(p -> p.getValue())
@@ -24,12 +23,11 @@ public class OtpHelper {
         return getCodeFromRequestParameters(parameters, OTP_CODE_FIELD_PREFIX);
     }
 
-    public static String getCodeFromRequestParameters(Map<String, String[]> parameters, String fieldPrefix) {
-        return getCodeFromMap(parameters
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        o -> o.getKey(),
-                        o -> o.getValue()[0])), fieldPrefix);
+    public static String getCodeFromRequestParameters(
+            Map<String, String[]> parameters, String fieldPrefix) {
+        return getCodeFromMap(
+                parameters.entrySet().stream()
+                        .collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()[0])),
+                fieldPrefix);
     }
 }

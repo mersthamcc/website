@@ -44,8 +44,7 @@ public class CognitoAuthentication implements Authentication {
     private final List<GrantedAuthority> authorities;
     private final OidcUser oidcUser;
 
-    public CognitoAuthentication(
-            String accessToken, String refreshToken, String idToken) {
+    public CognitoAuthentication(String accessToken, String refreshToken, String idToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.idToken = idToken;

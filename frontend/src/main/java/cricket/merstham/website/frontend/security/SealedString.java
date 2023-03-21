@@ -7,8 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 public class SealedString implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 3713044937468880046L;
+    @Serial private static final long serialVersionUID = 3713044937468880046L;
     private final String cipherText;
 
     @SneakyThrows()
@@ -18,7 +17,7 @@ public class SealedString implements Serializable {
     }
 
     @SneakyThrows()
-    public String decrypt(String password, String salt)  {
+    public String decrypt(String password, String salt) {
         var encryptor = Encryptors.text(password, salt);
         return encryptor.decrypt(this.cipherText);
     }

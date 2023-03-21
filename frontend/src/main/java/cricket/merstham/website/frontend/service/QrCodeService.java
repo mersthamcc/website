@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,13 +33,7 @@ public class QrCodeService {
     public BufferedImage getQrCode(String data) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
-            BitMatrix bitMatrix =
-                    writer
-                            .encode(
-                                    data,
-                                    QR_CODE,
-                                    300,
-                                    300);
+            BitMatrix bitMatrix = writer.encode(data, QR_CODE, 300, 300);
 
             return MatrixToImageWriter.toBufferedImage(bitMatrix);
         } catch (WriterException e) {
@@ -50,19 +45,18 @@ public class QrCodeService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ImageIO.write(qrCode, "png", baos);
-            return "data:image/png;base64," +
-                    Base64.getEncoder().encodeToString(baos.toByteArray());
+            return "data:image/png;base64,"
+                    + Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public String getTotpSecretQrCode(String secret, String email) {
-        var qrData = format(
-                "otpauth://totp/{0}:{1}?secret={2}&issuer={0}",
-                URLEncoder.encode(configuration.getClubName(), UTF_8),
-                email,
-                secret);
+        var qrData =
+                format(
+                        "otpauth://totp/{0}:{1}?secret={2}&issuer={0}",
+                        URLEncoder.encode(configuration.getClubName(), UTF_8), email, secret);
 
         return asDataUrl(getQrCode(qrData));
     }

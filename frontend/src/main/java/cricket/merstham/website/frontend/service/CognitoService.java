@@ -1,10 +1,15 @@
 package cricket.merstham.website.frontend.service;
 
+import cricket.merstham.shared.extensions.StringExtensions;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
-import cricket.merstham.website.frontend.security.PendingUser;
+import cricket.merstham.website.frontend.security.CognitoPasswordResetAuthentication;
+import cricket.merstham.website.frontend.security.CognitoPendingUser;
 import cricket.merstham.website.frontend.security.SealedString;
+import cricket.merstham.website.frontend.security.exceptions.CognitoCodeException;
+import cricket.merstham.website.frontend.security.exceptions.CognitoSessionExpiredException;
+import lombok.experimental.ExtensionMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +22,24 @@ import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityPr
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminRespondToAuthChallengeRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminRespondToAuthChallengeResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AssociateSoftwareTokenRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CodeMismatchException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCodeException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.PasswordResetRequiredException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenRequest;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -38,6 +50,7 @@ import static java.util.Objects.isNull;
 import static software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenResponseType.SUCCESS;
 
 @Service
+@ExtensionMethod({StringExtensions.class})
 public class CognitoService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CognitoService.class);
@@ -50,6 +63,7 @@ public class CognitoService {
     private static final String COGNITO_USERNAME_CLAIM = "cognito:username";
     private static final String GIVEN_NAME_CLAIM = "given_name";
     private static final String FAMILY_NAME_CLAIM = "family_name";
+    public static final String ANSWER = "ANSWER";
 
     private final String salt;
     private final CognitoIdentityProviderClient client;
@@ -67,7 +81,7 @@ public class CognitoService {
             @Value("${spring.security.oauth2.client.registration.login.client-secret:#{null}}")
                     String clientSecret,
             @Value("${spring.security.oauth2.client.registration.login.session-salt:#{null}}")
-            String salt) {
+                    String salt) {
         this.client = client;
         this.userPoolId = userPoolId;
         this.clientId = clientId;
@@ -97,16 +111,20 @@ public class CognitoService {
                         result.authenticationResult().refreshToken(),
                         result.authenticationResult().idToken());
             } else {
-                return CognitoChallengeAuthentication
-                        .builder()
+                return CognitoChallengeAuthentication.builder()
                         .sessionId(result.session())
                         .email(username)
                         .challengeName(result.challengeName())
                         .challengeParameters(result.challengeParameters())
                         .credentials(
-                                Map.of(PASSWORD, new SealedString(password, result.session(), salt)))
+                                Map.of(
+                                        PASSWORD,
+                                        new SealedString(password, result.session(), salt)))
                         .build();
             }
+        } catch (PasswordResetRequiredException ex) {
+            LOG.warn("Password reset required for user {}, requesting code.", username);
+            return resetPasswordRequest(username);
         } catch (Exception ex) {
             LOG.error("Error calling Cognito", ex);
         }
@@ -148,8 +166,7 @@ public class CognitoService {
     public boolean userExists(String username) {
         try {
             client.adminGetUser(
-                    AdminGetUserRequest
-                            .builder()
+                    AdminGetUserRequest.builder()
                             .userPoolId(userPoolId)
                             .username(username)
                             .build());
@@ -160,24 +177,28 @@ public class CognitoService {
         }
     }
 
-    public PendingUser register(UserSignUp signUp) {
+    public CognitoPendingUser register(UserSignUp signUp) {
         var result =
                 client.signUp(
                         SignUpRequest.builder()
                                 .clientId(clientId)
-                                .secretHash(calculateSecretHash(clientId, clientSecret, signUp.getEmail()))
+                                .secretHash(
+                                        calculateSecretHash(
+                                                clientId, clientSecret, signUp.getEmail()))
                                 .username(signUp.getEmail())
                                 .password(signUp.getPassword())
                                 .userAttributes(
                                         builder ->
-                                                builder.name(GIVEN_NAME_CLAIM).value(signUp.getGivenName()).build(),
+                                                builder.name(GIVEN_NAME_CLAIM)
+                                                        .value(signUp.getGivenName())
+                                                        .build(),
                                         builder ->
                                                 builder.name(FAMILY_NAME_CLAIM)
                                                         .value(signUp.getFamilyName())
                                                         .build())
                                 .build());
 
-        return PendingUser.builder()
+        return CognitoPendingUser.builder()
                 .userId(result.userSub())
                 .attributeName(result.codeDeliveryDetails().attributeName())
                 .destination(result.codeDeliveryDetails().destination())
@@ -203,157 +224,180 @@ public class CognitoService {
     }
 
     public Authentication getAppToken(CognitoChallengeAuthentication authentication) {
-        var result = client.associateSoftwareToken(
-                AssociateSoftwareTokenRequest
-                        .builder()
-                        .session(authentication.getSessionId())
-                        .build());
+        var result =
+                client.associateSoftwareToken(
+                        AssociateSoftwareTokenRequest.builder()
+                                .session(authentication.getSessionId())
+                                .build());
 
-        return CognitoChallengeAuthentication
-                .builder()
+        return CognitoChallengeAuthentication.builder()
                 .sessionId(result.session())
                 .email(authentication.getEmail())
                 .challengeName(authentication.getChallengeName())
                 .challengeParameters(authentication.getChallengeParameters())
                 .credentials(
                         Map.of(
-                                PASSWORD, new SealedString(getPassword(authentication), result.session(), salt),
-                                SOFTWARE_TOKEN_MFA_CODE, result.secretCode()))
+                                PASSWORD,
+                                new SealedString(
+                                        getPassword(authentication), result.session(), salt),
+                                SOFTWARE_TOKEN_MFA_CODE,
+                                result.secretCode()))
                 .step(SETUP_SOFTWARE_MFA)
                 .build();
     }
 
-    public Authentication verifyAppSetup(CognitoChallengeAuthentication authentication, String code) {
-        var verifySoftwareTokenResponse = client.verifySoftwareToken(
-                VerifySoftwareTokenRequest
-                        .builder()
-                        .session(authentication.getSessionId())
-                        .userCode(code)
-                        .build());
+    public Authentication verifyAppSetup(
+            CognitoChallengeAuthentication authentication, String code) {
+        var verifySoftwareTokenResponse =
+                client.verifySoftwareToken(
+                        VerifySoftwareTokenRequest.builder()
+                                .session(authentication.getSessionId())
+                                .userCode(code)
+                                .build());
 
         var userId = getUserId(authentication);
         if (verifySoftwareTokenResponse.status().equals(SUCCESS)) {
-            var result = client.adminRespondToAuthChallenge(
-                    AdminRespondToAuthChallengeRequest
-                            .builder()
-                            .clientId(clientId)
-                            .challengeName(authentication.getChallengeName())
-                            .session(verifySoftwareTokenResponse.session())
-                            .userPoolId(userPoolId)
-                            .challengeResponses(
-                                    Map.of(
-                                            USERNAME, userId,
-                                            SECRET_HASH, calculateSecretHash(clientId, clientSecret, userId)))
-                            .build());
+            var result =
+                    client.adminRespondToAuthChallenge(
+                            AdminRespondToAuthChallengeRequest.builder()
+                                    .clientId(clientId)
+                                    .challengeName(authentication.getChallengeName())
+                                    .session(verifySoftwareTokenResponse.session())
+                                    .userPoolId(userPoolId)
+                                    .challengeResponses(
+                                            Map.of(
+                                                    USERNAME,
+                                                    userId,
+                                                    SECRET_HASH,
+                                                    calculateSecretHash(
+                                                            clientId, clientSecret, userId)))
+                                    .build());
 
-            if (isNull(result.challengeName())) {
-                return new CognitoAuthentication(
-                        result.authenticationResult().accessToken(),
-                        result.authenticationResult().refreshToken(),
-                        result.authenticationResult().idToken());
-            } else {
-                return CognitoChallengeAuthentication
-                        .builder()
-                        .challengeName(result.challengeName())
-                        .challengeParameters(result.challengeParameters())
-                        .sessionId(result.session())
-                        .email(authentication.getEmail())
-                        .credentials(
-                                Map.of(
-                                        PASSWORD, new SealedString(getPassword(authentication), result.session(), salt)))
-                        .build();
-            }
+            return resultToAuthentication(authentication, result, null);
         }
         throw new BadCredentialsException("invalid_code");
     }
 
-    public Authentication verifySoftwareMfa(CognitoChallengeAuthentication authentication, String code) {
+    public Authentication verifySoftwareMfa(
+            CognitoChallengeAuthentication authentication, String code) {
         var userId = getUserId(authentication);
-        var result = client.adminRespondToAuthChallenge(
-                AdminRespondToAuthChallengeRequest
-                        .builder()
-                        .clientId(clientId)
-                        .challengeName(authentication.getChallengeName())
-                        .session(authentication.getSessionId())
-                        .userPoolId(userPoolId)
-                        .challengeResponses(
-                                Map.of(
-                                        USERNAME, userId,
-                                        SOFTWARE_TOKEN_MFA_CODE, code,
-                                        SECRET_HASH, calculateSecretHash(clientId, clientSecret, userId)))
-                        .build());
+        var result =
+                client.adminRespondToAuthChallenge(
+                        AdminRespondToAuthChallengeRequest.builder()
+                                .clientId(clientId)
+                                .challengeName(authentication.getChallengeName())
+                                .session(authentication.getSessionId())
+                                .userPoolId(userPoolId)
+                                .challengeResponses(
+                                        Map.of(
+                                                USERNAME, userId,
+                                                SOFTWARE_TOKEN_MFA_CODE, code,
+                                                SECRET_HASH,
+                                                        calculateSecretHash(
+                                                                clientId, clientSecret, userId)))
+                                .build());
 
-        if (isNull(result.challengeName())) {
-            return new CognitoAuthentication(
-                    result.authenticationResult().accessToken(),
-                    result.authenticationResult().refreshToken(),
-                    result.authenticationResult().idToken());
-        } else {
-            return CognitoChallengeAuthentication
-                    .builder()
-                    .challengeName(result.challengeName())
-                    .challengeParameters(result.challengeParameters())
-                    .sessionId(result.session())
-                    .email(authentication.getEmail())
-                    .credentials(
-                            Map.of(
-                                    PASSWORD, new SealedString(getPassword(authentication), result.session(), salt)))
-                    .build();
-        }
+        return resultToAuthentication(authentication, result, userId);
     }
 
     public Authentication verifySmsMfa(CognitoChallengeAuthentication authentication, String code) {
         var userId = getUserId(authentication);
-        var result = client.adminRespondToAuthChallenge(
-                AdminRespondToAuthChallengeRequest
-                        .builder()
-                        .clientId(clientId)
-                        .challengeName(authentication.getChallengeName())
-                        .session(authentication.getSessionId())
-                        .userPoolId(userPoolId)
-                        .challengeResponses(
-                                Map.of(
-                                        USERNAME, userId,
-                                        SMS_MFA_CODE, code,
-                                        SECRET_HASH, calculateSecretHash(clientId, clientSecret, userId)))
-
-                        .build());
-
-        if (isNull(result.challengeName())) {
-            return new CognitoAuthentication(
-                    result.authenticationResult().accessToken(),
-                    result.authenticationResult().refreshToken(),
-                    result.authenticationResult().idToken());
-        } else {
-            return CognitoChallengeAuthentication
-                    .builder()
-                    .challengeName(result.challengeName())
-                    .challengeParameters(result.challengeParameters())
-                    .sessionId(result.session())
-                    .email(authentication.getEmail())
-                    .credentials(
+        if (code.length() != 6 || !code.isNumeric()) {
+            return errorAuthentication(
+                    CognitoChallengeAuthentication.Error.WRONG_CODE, authentication);
+        }
+        try {
+            var result =
+                    respondToChallenge(
+                            authentication,
                             Map.of(
-                                    PASSWORD, new SealedString(getPassword(authentication), result.session(), salt)))
-                    .build();
+                                    SMS_MFA_CODE,
+                                    code,
+                                    USERNAME,
+                                    userId,
+                                    SECRET_HASH,
+                                    calculateSecretHash(clientId, clientSecret, userId)));
+
+            return resultToAuthentication(authentication, result, userId);
+        } catch (CodeMismatchException ex) {
+            LOG.warn(ex.getMessage());
+            return errorAuthentication(
+                    CognitoChallengeAuthentication.Error.WRONG_CODE, authentication);
+        } catch (ExpiredCodeException ex) {
+            LOG.warn(ex.getMessage());
+            return errorAuthentication(
+                    CognitoChallengeAuthentication.Error.EXPIRED_CODE, authentication);
+        } catch (NotAuthorizedException ex) {
+            throw new CognitoSessionExpiredException(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            throw new CognitoCodeException(ex.getMessage(), ex);
         }
     }
 
-    public Authentication setPhoneNumber(CognitoChallengeAuthentication authentication, String phoneNumber) {
+    public Authentication selectMfaType(
+            CognitoChallengeAuthentication authentication, String mfaType) {
+        try {
+            var userId = getUserId(authentication);
+            var result =
+                    respondToChallenge(
+                            authentication,
+                            Map.of(
+                                    ANSWER,
+                                    mfaType,
+                                    USERNAME,
+                                    userId,
+                                    SECRET_HASH,
+                                    calculateSecretHash(clientId, clientSecret, userId)));
+            return resultToAuthentication(authentication, result, userId);
+        } catch (NotAuthorizedException ex) {
+            throw new CognitoSessionExpiredException(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            throw new CognitoCodeException(ex.getMessage(), ex);
+        }
+    }
+
+    public Authentication setPhoneNumber(
+            CognitoChallengeAuthentication authentication, String phoneNumber) {
         client.adminUpdateUserAttributes(
-                AdminUpdateUserAttributesRequest
-                        .builder()
+                AdminUpdateUserAttributesRequest.builder()
                         .username(getUserId(authentication))
                         .userPoolId(userPoolId)
                         .userAttributes(
                                 List.of(
-                                        AttributeType
-                                                .builder()
+                                        AttributeType.builder()
                                                 .name("phone_number")
                                                 .value(phoneNumber)
                                                 .build()))
                         .build());
 
         return login(authentication.getEmail(), getPassword(authentication));
+    }
+
+    public CognitoPasswordResetAuthentication resetPasswordRequest(String username) {
+        var result =
+                client.forgotPassword(
+                        ForgotPasswordRequest.builder()
+                                .clientId(clientId)
+                                .username(username)
+                                .build());
+
+        return CognitoPasswordResetAuthentication.builder()
+                .userId(username)
+                .email(username)
+                .credentials(result.codeDeliveryDetails())
+                .build();
+    }
+
+    private AdminRespondToAuthChallengeResponse respondToChallenge(
+            CognitoChallengeAuthentication authentication, Map<String, String> challengeResponses) {
+        return client.adminRespondToAuthChallenge(
+                AdminRespondToAuthChallengeRequest.builder()
+                        .clientId(clientId)
+                        .challengeName(authentication.getChallengeName())
+                        .session(authentication.getSessionId())
+                        .userPoolId(userPoolId)
+                        .challengeResponses(challengeResponses)
+                        .build());
     }
 
     private static String calculateSecretHash(
@@ -388,5 +432,36 @@ public class CognitoService {
             }
         }
         return null;
+    }
+
+    private Authentication resultToAuthentication(
+            CognitoChallengeAuthentication authentication,
+            AdminRespondToAuthChallengeResponse result,
+            String userId) {
+        if (isNull(result.challengeName())) {
+            return new CognitoAuthentication(
+                    result.authenticationResult().accessToken(),
+                    result.authenticationResult().refreshToken(),
+                    result.authenticationResult().idToken());
+        } else {
+            return CognitoChallengeAuthentication.builder()
+                    .challengeName(result.challengeName())
+                    .challengeParameters(result.challengeParameters())
+                    .sessionId(result.session())
+                    .email(authentication.getEmail())
+                    .userId(userId)
+                    .credentials(
+                            Map.of(
+                                    PASSWORD,
+                                    new SealedString(
+                                            getPassword(authentication), result.session(), salt)))
+                    .build();
+        }
+    }
+
+    private Authentication errorAuthentication(
+            CognitoChallengeAuthentication.Error error,
+            CognitoChallengeAuthentication authentication) {
+        return authentication.toBuilder().error(error).build();
     }
 }

@@ -1,9 +1,11 @@
 package cricket.merstham.website.frontend.configuration;
 
-import cricket.merstham.website.frontend.security.CognitoChallengeFilter;
-import cricket.merstham.website.frontend.security.CognitoChallengeResponseFilter;
-import cricket.merstham.website.frontend.security.CognitoRefreshTokenAuthenticationProvider;
-import cricket.merstham.website.frontend.security.CognitoUsernamePasswordAuthenticationProvider;
+import cricket.merstham.website.frontend.security.filters.CognitoAuthenticationFailureHandler;
+import cricket.merstham.website.frontend.security.filters.CognitoChallengeFilter;
+import cricket.merstham.website.frontend.security.filters.CognitoChallengeResponseFilter;
+import cricket.merstham.website.frontend.security.filters.CognitoExceptionTranslationFilter;
+import cricket.merstham.website.frontend.security.providers.CognitoRefreshTokenAuthenticationProvider;
+import cricket.merstham.website.frontend.security.providers.CognitoUsernamePasswordAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,12 +51,12 @@ import static java.util.Objects.nonNull;
 public class SecurityConfiguration {
 
     @Bean
-    public CognitoIdentityProviderClient cognitoIdentityProviderClient(@Value("${spring.security.oauth2.client.registration.login.region:#{null}}") String region) {
-        return CognitoIdentityProviderClient
-                .builder()
-                .region(Region.of(region))
-                .build();
+    public CognitoIdentityProviderClient cognitoIdentityProviderClient(
+            @Value("${spring.security.oauth2.client.registration.login.region:#{null}}")
+                    String region) {
+        return CognitoIdentityProviderClient.builder().region(Region.of(region)).build();
     }
+
     @Bean
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
@@ -67,17 +69,22 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationManager authManager(
-            CognitoUsernamePasswordAuthenticationProvider cognitoUsernamePasswordAuthenticationProvider,
-            CognitoRefreshTokenAuthenticationProvider cognitoRefreshTokenAuthenticationProvider
-    ) {
-        return new ProviderManager(cognitoUsernamePasswordAuthenticationProvider, cognitoRefreshTokenAuthenticationProvider);
+            CognitoUsernamePasswordAuthenticationProvider
+                    cognitoUsernamePasswordAuthenticationProvider,
+            CognitoRefreshTokenAuthenticationProvider cognitoRefreshTokenAuthenticationProvider) {
+        return new ProviderManager(
+                cognitoUsernamePasswordAuthenticationProvider,
+                cognitoRefreshTokenAuthenticationProvider);
     }
 
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             CognitoChallengeFilter cognitoChallengeFilter,
-            CognitoChallengeResponseFilter cognitoChallengeProcessingFilter) throws Exception {
+            CognitoChallengeResponseFilter cognitoChallengeProcessingFilter,
+            CognitoAuthenticationFailureHandler failureHandler,
+            CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter)
+            throws Exception {
         http.csrf()
                 .requireCsrfProtectionMatcher(
                         new AndRequestMatcher(
@@ -88,6 +95,9 @@ public class SecurityConfiguration {
                 .headers()
                 .frameOptions()
                 .sameOrigin()
+                .and()
+                .exceptionHandling()
+                .accessDeniedPage("/login?error=access_denied")
                 .and()
                 .sessionManagement()
                 .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
@@ -101,11 +111,13 @@ public class SecurityConfiguration {
                 .loginProcessingUrl(LOGIN_PROCESSING_URL)
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .failureForwardUrl("/bad")
                 .defaultSuccessUrl("/")
+                .failureHandler(failureHandler)
                 .and()
                 .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
+                .addFilterBefore(
+                        cognitoExceptionTranslationFilter, CognitoChallengeResponseFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .permitAll();
