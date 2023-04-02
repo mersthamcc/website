@@ -5,7 +5,7 @@
 <@layout.mainLayout formName="membership.member-details">
     <@components.panel>
         <form class="form-horizontal" method="post" name="action" action="/register/add-member">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <input type="hidden" name="uuid" value="${subscriptionId}" />
             <input type="hidden" name="action" value="${subscription.action!"huh"}" />
             <#list form as section>

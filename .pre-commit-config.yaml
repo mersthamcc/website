@@ -4,4 +4,4 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: Brewfile.lock.json|.*/installed.json|.*/package-lock.json|src/main/resources/static/assets/.*
+        exclude: Brewfile.lock.json|.*/installed.json|.*/package-lock.json|src/main/resources/static/assets/.*|.*/messages.properties

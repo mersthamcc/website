@@ -6,14 +6,13 @@ import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.NewsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,14 +77,13 @@ public class NewsController extends SspController<News> {
     @GetMapping(value = ADMIN_NEWS_NEW_ROUTE, name = "admin-news-new")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public ModelAndView newPost(
-            HttpServletRequest request,
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient) {
+            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
             var now = Instant.now();
             var news =
                     News.builder()
-                            .author(authorizedClient.getPrincipalName())
+                            .author(cognitoAuthentication.getOidcUser().getName())
                             .createdDate(now)
                             .publishDate(now)
                             .draft(false)
@@ -104,32 +102,30 @@ public class NewsController extends SspController<News> {
     @GetMapping(value = ADMIN_NEWS_EDIT_ROUTE, name = "admin-news-edit")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public ModelAndView editPost(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
-            @PathVariable("id") int id)
+            CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
-        News news = newsService.get(authorizedClient.getAccessToken(), id);
+        News news = newsService.get(cognitoAuthentication.getOAuth2AccessToken(), id);
         return new ModelAndView(ADMINISTRATION_NEWS_EDIT, Map.of(NEWS, news));
     }
 
     @GetMapping(value = ADMIN_NEWS_DELETE_ROUTE, name = "admin-news-delete")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public RedirectView deletePost(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
-            @PathVariable("id") int id)
+            CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
-        newsService.delete(authorizedClient.getAccessToken(), id);
+        newsService.delete(cognitoAuthentication.getOAuth2AccessToken(), id);
         return new RedirectView(ADMIN_NEWS_BASE);
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
     @PreAuthorize(HAS_ROLE_ROLE_NEWS)
     public RedirectView save(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
+            CognitoAuthentication cognitoAuthentication,
             News news,
             RedirectAttributes redirectAttributes)
             throws IOException {
         try {
-            newsService.saveNewsItem(authorizedClient.getAccessToken(), news);
+            newsService.saveNewsItem(cognitoAuthentication.getOAuth2AccessToken(), news);
             return new RedirectView(ADMIN_NEWS_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
@@ -144,12 +140,11 @@ public class NewsController extends SspController<News> {
             produces = APPLICATION_JSON_VALUE,
             path = ADMIN_NEWS_AJAX_ROUTE)
     public @ResponseBody SspResponse<SspResponseDataWrapper<News>> getData(
-            @RegisteredOAuth2AuthorizedClient("login") OAuth2AuthorizedClient authorizedClient,
-            @RequestBody SspRequest request) {
+            CognitoAuthentication cognitoAuthentication, @RequestBody SspRequest request) {
         try {
             var data =
                     newsService.getItems(
-                            authorizedClient.getAccessToken(),
+                            cognitoAuthentication.getOAuth2AccessToken(),
                             request.getStart(),
                             request.getLength(),
                             request.getSearch().getValue());

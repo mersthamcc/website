@@ -13,4 +13,16 @@ public class StringExtensions {
                                 .split(" "))
                 .replaceAll("-+", "-");
     }
+
+    public static boolean isNumeric(String in) {
+        if (in == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(in);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
 }

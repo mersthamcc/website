@@ -4,7 +4,7 @@
 <@layout.mainLayout formName="menu.register">
     <@components.panel>
         <form class="form-horizontal" method="post" name="action" action="/register">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <@components.section title="Members">
                 <table class="table table-hover">
                     <thead>

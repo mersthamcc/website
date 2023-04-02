@@ -387,7 +387,7 @@
 
                         <div class="card-footer border-0">
                             <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
-                                <input type="hidden" name="_csrf" value="${_csrf.token}" />
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <input type="hidden" name="category" value="${category.key}" />
                                 <input type="hidden" name="uuid" value="${subscriptionId}" />
                                 <button
@@ -754,5 +754,111 @@
         </tr>
         </tfoot>
     </table>
+    </#if>
+</#macro>
+
+<#macro otpScript fieldPrefix="code">
+    <script>
+        let input1 = document.getElementById('${fieldPrefix}1'),
+            inputs = document.querySelectorAll('input.form-control-otp'),
+            splitNumber = function(e) {
+                let data = e.data || e.target.value;
+                if(!data) return;
+                if(data.length === 1) return;
+                console.log(e);
+                populateNext($(e.target), data);
+            },
+            populateNext = function(el, data) {
+                let next = $(el).parents("div.otp-digit-container").next().find("input.form-control-otp");
+
+                el.val(data[0]);
+                data = data.substring(1);
+
+                if ( next && data.length ) {
+                    next.focus();
+                    populateNext(next, data);
+                }
+            };
+
+        inputs.forEach(function(input) {
+            input.addEventListener('keyup', function(e){
+                let previous = $(e.target).parents("div.otp-digit-container").prev().find("input.form-control-otp");
+                let next = $(e.target).parents("div.otp-digit-container").next().find("input.form-control-otp");
+                // Break if Shift, Tab, CMD, Option, Control.
+                if (e.keyCode === 16 || e.keyCode === 9 || e.keyCode === 224 || e.keyCode === 18 || e.keyCode === 17) {
+                    return;
+                }
+
+                // On Backspace or left arrow, go to the previous field.
+                if ((e.keyCode === 8 || e.keyCode === 37) && previous) {
+                    previous.select();
+                } else if (e.keyCode !== 8 && next) {
+                    next.select();
+                }
+            });
+
+            input.addEventListener('focus', function(e) {
+                if (this === input1) return;
+                let previous = $(e.target).parents("div.otp-digit-container").prev().find("input.form-control-otp");
+
+                if (input1.value === '') {
+                    input1.focus();
+                }
+
+                if (previous && previous.value === '') {
+                    previous.focus();
+                }
+            });
+        });
+
+        input1.addEventListener('input', splitNumber);
+        input1.focus();
+    </script>
+</#macro>
+
+<#macro otpCode fieldPrefix="code" noOfDigits=6>
+    <fieldset>
+        <div class="row mb-6">
+            <#list 1..noOfDigits as i>
+                <div class="col-2 otp-digit-container">
+                    <!-- Form Group -->
+                    <div class="form-group">
+                        <input
+                                type="number"
+                                class="form-control form-control-single-number form-control-otp"
+                                name="${fieldPrefix}${i}"
+                                id="${fieldPrefix}${i}"
+                                required="required"
+                                placeholder=""
+                                aria-label=""
+                                min="0"
+                                max="9"
+                                maxlength="1"
+                                pattern="[0-9]+"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                autocapitalize="off"
+                                spellcheck="false">
+                    </div>
+                    <!-- End Form Group -->
+                </div>
+            </#list>
+        </div>
+    </fieldset>
+</#macro>
+
+<#macro formErrors errors errorKey="An error occured">
+    <#if (errors?size > 0)>
+        <div class="alert alert-soft-danger" role="alert">
+            <h5 class="alert-heading">
+                <@spring.messageText code=errorKey text=errorKey />
+            </h5>
+
+            <#list errors as error>
+                <p class="text-inherit">
+                    <@spring.messageText code=error text=error />
+                </p>
+            </#list>
+        </div>
     </#if>
 </#macro>

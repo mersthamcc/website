@@ -1,13 +1,19 @@
 package cricket.merstham.website.frontend.configuration;
 
+import cricket.merstham.website.frontend.security.filters.CognitoAuthenticationFailureHandler;
+import cricket.merstham.website.frontend.security.filters.CognitoChallengeFilter;
+import cricket.merstham.website.frontend.security.filters.CognitoChallengeResponseFilter;
+import cricket.merstham.website.frontend.security.filters.CognitoExceptionTranslationFilter;
+import cricket.merstham.website.frontend.security.providers.CognitoRefreshTokenAuthenticationProvider;
+import cricket.merstham.website.frontend.security.providers.CognitoUsernamePasswordAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -17,12 +23,16 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,14 +40,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static cricket.merstham.website.frontend.controller.LoginController.LOGIN_PROCESSING_URL;
+import static cricket.merstham.website.frontend.controller.LoginController.LOGIN_URL;
 import static cricket.merstham.website.frontend.controller.administration.CkFinderController.CONNECTOR_PATH;
 import static java.util.Objects.nonNull;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter
-        implements WebSecurityConfigurer<WebSecurity> {
+public class SecurityConfiguration {
+
+    @Bean
+    public CognitoIdentityProviderClient cognitoIdentityProviderClient(
+            @Value("${spring.security.oauth2.client.registration.login.region:#{null}}")
+                    String region) {
+        return CognitoIdentityProviderClient.builder().region(Region.of(region)).build();
+    }
 
     @Bean
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
@@ -49,8 +67,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         return new HttpSessionOAuth2AuthorizedClientRepository();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public AuthenticationManager authManager(
+            CognitoUsernamePasswordAuthenticationProvider
+                    cognitoUsernamePasswordAuthenticationProvider,
+            CognitoRefreshTokenAuthenticationProvider cognitoRefreshTokenAuthenticationProvider) {
+        return new ProviderManager(
+                cognitoUsernamePasswordAuthenticationProvider,
+                cognitoRefreshTokenAuthenticationProvider);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            CognitoChallengeFilter cognitoChallengeFilter,
+            CognitoChallengeResponseFilter cognitoChallengeProcessingFilter,
+            CognitoAuthenticationFailureHandler failureHandler,
+            CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter)
+            throws Exception {
         http.csrf()
                 .requireCsrfProtectionMatcher(
                         new AndRequestMatcher(
@@ -62,6 +96,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .frameOptions()
                 .sameOrigin()
                 .and()
+                .exceptionHandling()
+                .accessDeniedPage("/login?error=access_denied")
+                .and()
                 .sessionManagement()
                 .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
                 .and()
@@ -69,10 +106,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .and()
-                .oauth2Login(oauth2 -> oauth2.loginPage("/oauth2/authorization/login"))
+                .formLogin()
+                .loginPage(LOGIN_URL)
+                .loginProcessingUrl(LOGIN_PROCESSING_URL)
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/")
+                .failureHandler(failureHandler)
+                .and()
+                .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
+                .addFilterBefore(
+                        cognitoExceptionTranslationFilter, CognitoChallengeResponseFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .permitAll();
+        return http.build();
     }
 
     @Bean

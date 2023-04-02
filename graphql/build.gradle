@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.7.0-SNAPSHOT"
+    id "org.springframework.boot" version "2.7.8"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "java"
     id "jacoco"
@@ -11,8 +11,6 @@ targetCompatibility = JavaVersion.VERSION_15
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
-    maven { url "https://repo.spring.io/snapshot" }
 }
 
 configurations {
@@ -23,35 +21,33 @@ configurations {
 
 dependencies {
     compileOnly "org.projectlombok:lombok:${dependencyVersions.lombok}"
-    developmentOnly "org.springframework.boot:spring-boot-devtools"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${dependencyVersions.spring_boot}"
     annotationProcessor "org.projectlombok:lombok:${dependencyVersions.lombok}"
 
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation 'org.postgresql:postgresql:42.5.0'
-    implementation "org.springframework.boot:spring-boot-starter-graphql"
-    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    implementation "org.springframework.boot:spring-boot-starter-cache"
-    implementation "org.springframework.boot:spring-boot-starter-jersey"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${dependencyVersions.spring_boot}"
+    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation "org.springframework.boot:spring-boot-starter-graphql:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-cache:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
     implementation "org.modelmapper:modelmapper:3.1.0"
     implementation "org.modelmapper.extensions:modelmapper-jackson:3.1.0"
     implementation "org.modelmapper.extensions:modelmapper-spring:3.1.0"
-    implementation "io.micrometer:micrometer-registry-prometheus:1.10.1"
     implementation "commons-codec:commons-codec:1.15"
     implementation 'com.graphql-java:graphql-java-extended-scalars:19.1'
     implementation project(":shared")
 
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     testImplementation 'com.thedeanda:lorem:2.1'
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework:spring-webflux"
-    testImplementation "org.springframework.graphql:spring-graphql-test"
-    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation 'org.assertj:assertj-core:3.23.1'
 }

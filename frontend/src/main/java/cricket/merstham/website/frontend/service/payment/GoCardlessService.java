@@ -5,12 +5,12 @@ import com.gocardless.resources.Mandate;
 import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -110,7 +110,7 @@ public class GoCardlessService implements PaymentService {
             HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-        var principal = (OidcUser) request.getUserPrincipal();
+        var principal = ((CognitoAuthentication) request.getUserPrincipal()).getOidcUser();
         var redirectFlow =
                 client.redirectFlows()
                         .create()
