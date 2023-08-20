@@ -1,23 +1,23 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.jpa.JpaEncryptedJsonbConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.Instant;
-
-import static cricket.merstham.graphql.configuration.HibernateConfiguration.ENCRYPTED_JSON_TYPE;
 
 @Entity
 @Table(
@@ -33,7 +33,7 @@ import static cricket.merstham.graphql.configuration.HibernateConfiguration.ENCR
 public class MemberAttributeEntity implements Serializable {
     private static final long serialVersionUID = 3171795625796914171L;
 
-    @EmbeddedId private MemberAttributeEntityId primaryKey = new MemberAttributeEntityId();
+    @EmbeddedId private MemberAttributeEntityId primaryKey;
 
     @Column(name = "created_date", nullable = false)
     private Instant createdDate;
@@ -42,7 +42,8 @@ public class MemberAttributeEntity implements Serializable {
     private Instant updatedDate;
 
     @Column(name = "value")
-    @Type(type = ENCRYPTED_JSON_TYPE)
+    @Convert(converter = JpaEncryptedJsonbConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode value;
 
     @Transient

@@ -7,6 +7,9 @@ import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.QrCodeService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import java.util.List;
 import java.util.Map;

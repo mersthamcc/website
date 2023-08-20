@@ -2,8 +2,7 @@ package cricket.merstham.website.frontend.configuration.ckfinder;
 
 import com.cksource.ckfinder.config.Config;
 import com.cksource.ckfinder.exception.InvalidRequestException;
-
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;

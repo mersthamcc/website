@@ -1,10 +1,9 @@
 package cricket.merstham.website.frontend.validators;
 
 import cricket.merstham.website.frontend.service.CognitoService;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class EmailNotInUseValidator implements ConstraintValidator<EmailNotInUse, String> {
 

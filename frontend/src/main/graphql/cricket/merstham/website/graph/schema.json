@@ -3398,7 +3398,18 @@
             {
               "name": "args",
               "description": null,
-              "args": [],
+              "args": [
+                {
+                  "name": "includeDeprecated",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                }
+              ],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -3418,42 +3429,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "onOperation",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `locations`."
-            },
-            {
-              "name": "onFragment",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `locations`."
-            },
-            {
-              "name": "onField",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `locations`."
             }
           ],
           "inputFields": null,
@@ -4164,7 +4139,7 @@
               "deprecationReason": null
             },
             {
-              "name": "specifiedByUrl",
+              "name": "specifiedByURL",
               "description": null,
               "args": [],
               "type": {
@@ -4174,6 +4149,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "specifiedByUrl",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": true,
+              "deprecationReason": "This legacy name has been replaced by `specifiedByURL`"
             }
           ],
           "inputFields": null,
@@ -4191,7 +4178,7 @@
           "enumValues": [
             {
               "name": "SCALAR",
-              "description": "Indicates this type is a scalar. 'specifiedByUrl' is a valid field",
+              "description": "Indicates this type is a scalar. 'specifiedByURL' is a valid field",
               "isDeprecated": false,
               "deprecationReason": null
             },
@@ -4269,7 +4256,7 @@
         },
         {
           "name": "skip",
-          "description": "Directs the executor to skip this field or fragment when the `if`'argument is true.",
+          "description": "Directs the executor to skip this field or fragment when the `if` argument is true.",
           "locations": [
             "FIELD",
             "FRAGMENT_SPREAD",

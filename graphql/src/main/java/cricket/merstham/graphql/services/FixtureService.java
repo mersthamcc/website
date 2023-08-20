@@ -16,6 +16,7 @@ import cricket.merstham.shared.dto.League;
 import cricket.merstham.shared.dto.Team;
 import cricket.merstham.shared.extensions.StringExtensions;
 import io.micrometer.core.annotation.Timed;
+import jakarta.ws.rs.NotFoundException;
 import lombok.experimental.ExtensionMethod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,8 +26,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import javax.ws.rs.NotFoundException;
 
 import java.time.Instant;
 import java.time.LocalDate;

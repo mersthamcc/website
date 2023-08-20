@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
@@ -85,42 +87,44 @@ public class SecurityConfiguration {
             CognitoAuthenticationFailureHandler failureHandler,
             CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter)
             throws Exception {
-        http.csrf()
-                .requireCsrfProtectionMatcher(
-                        new AndRequestMatcher(
-                                CsrfFilter.DEFAULT_CSRF_MATCHER,
-                                new NegatedRequestMatcher(
-                                        new AntPathRequestMatcher(CONNECTOR_PATH))))
-                .and()
-                .headers()
-                .frameOptions()
-                .sameOrigin()
-                .and()
-                .exceptionHandling()
-                .accessDeniedPage("/login?error=access_denied")
-                .and()
-                .sessionManagement()
-                .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .and()
-                .formLogin()
-                .loginPage(LOGIN_URL)
-                .loginProcessingUrl(LOGIN_PROCESSING_URL)
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .defaultSuccessUrl("/")
-                .failureHandler(failureHandler)
-                .and()
+        http.csrf(
+                        csrf ->
+                                csrf.requireCsrfProtectionMatcher(
+                                        new AndRequestMatcher(
+                                                CsrfFilter.DEFAULT_CSRF_MATCHER,
+                                                new NegatedRequestMatcher(
+                                                        new AntPathRequestMatcher(
+                                                                CONNECTOR_PATH)))))
+                .headers(
+                        headers ->
+                                headers.frameOptions(Customizer.withDefaults())
+                                        .crossOriginOpenerPolicy(
+                                                cors ->
+                                                        cors.policy(
+                                                                CrossOriginOpenerPolicyHeaderWriter
+                                                                        .CrossOriginOpenerPolicy
+                                                                        .SAME_ORIGIN)))
+                .exceptionHandling(
+                        exceptionHandling ->
+                                exceptionHandling.accessDeniedPage("/login?error=access_denied"))
+                .sessionManagement(
+                        session ->
+                                session.sessionAuthenticationStrategy(
+                                        sessionAuthenticationStrategy()))
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
+                .formLogin(
+                        form ->
+                                form.loginPage(LOGIN_URL)
+                                        .loginProcessingUrl(LOGIN_PROCESSING_URL)
+                                        .usernameParameter("email")
+                                        .passwordParameter("password")
+                                        .defaultSuccessUrl("/")
+                                        .failureHandler(failureHandler))
                 .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
                 .addFilterBefore(
                         cognitoExceptionTranslationFilter, CognitoChallengeResponseFilter.class)
-                .authorizeRequests()
-                .anyRequest()
-                .permitAll();
+                .authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll());
         return http.build();
     }
 
@@ -135,9 +139,6 @@ public class SecurityConfiguration {
                             OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
 
                             OidcIdToken idToken = oidcUserAuthority.getIdToken();
-                            //                    OidcUserInfo userInfo =
-                            // oidcUserAuthority.getUserInfo();
-
                             var groups = (List<String>) idToken.getClaims().get("cognito:groups");
                             if (nonNull(groups))
                                 groups.forEach(

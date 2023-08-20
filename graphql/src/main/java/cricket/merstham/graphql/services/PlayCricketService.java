@@ -6,15 +6,14 @@ import cricket.merstham.graphql.dto.PlayCricketMatch;
 import cricket.merstham.graphql.dto.PlayCricketMatchSummaryResponse;
 import cricket.merstham.graphql.dto.PlayCricketTeam;
 import cricket.merstham.graphql.dto.PlayCricketTeamResponse;
+import jakarta.inject.Named;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Named;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 
 import java.time.Instant;
 import java.time.LocalDate;

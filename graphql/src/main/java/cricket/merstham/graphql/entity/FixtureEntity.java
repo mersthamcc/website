@@ -1,6 +1,15 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.jpa.JpaJsonbConverter;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,20 +18,11 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import static cricket.merstham.graphql.configuration.HibernateConfiguration.JSON_TYPE;
 
 @Entity
 @Table(name = "fixture")
@@ -61,7 +61,8 @@ public class FixtureEntity {
     private LocalTime start;
 
     @Column(name = "detail", nullable = false)
-    @Type(type = JSON_TYPE)
+    @Convert(converter = JpaJsonbConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode detail;
 
     @Override

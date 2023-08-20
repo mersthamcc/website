@@ -2,23 +2,23 @@ package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.jpa.JpaEncryptedJsonbConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.beans.Transient;
 import java.io.Serial;
 import java.io.Serializable;
-
-import static cricket.merstham.graphql.configuration.HibernateConfiguration.ENCRYPTED_JSON_TYPE;
 
 @Entity
 @Table(name = "player")
@@ -35,7 +35,8 @@ public class PlayerEntity implements Serializable {
     private Integer id;
 
     @Column(name = "detail")
-    @Type(type = ENCRYPTED_JSON_TYPE)
+    @Convert(converter = JpaEncryptedJsonbConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode detail;
 
     @Transient

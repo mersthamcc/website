@@ -2,6 +2,8 @@ package cricket.merstham.website.frontend.configuration;
 
 import cricket.merstham.website.frontend.menu.MenuBuilder;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import no.api.freemarker.java8.Java8ObjectWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +23,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.security.Principal;
@@ -102,7 +101,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
         route.setMethod(method);
         try {
             route.setPathVariables(
-                    (LinkedHashMap<String, String>)
+                    (Map<String, String>)
                             request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
         } catch (Exception ex) {
             LOG.warn("No parameters to cast", ex);

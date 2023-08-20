@@ -14,13 +14,13 @@ group 'cricket.merstham'
 
 ext {
     dependencyVersions = [
-            spring_boot    : "2.7.8",
-            spring_sessions: "2.7.0",
-            apollo         : "2.5.13",
+            spring_boot    : "3.1.2",
+            spring_sessions: "3.1.1",
+            apollo         : "2.5.14",
             prometheus     : "1.10.4",
             lombok         : "1.18.24",
             testcontainers : "1.16.2",
-            jackson        : "2.13.2",
+            jackson        : "2.13.4.1",
     ]
 }
 
@@ -32,7 +32,6 @@ dockerCompose {
             'traefik',
             'postgres',
             'redis',
-            'keycloak',
             'graph',
             'smtp',
             'prometheus',

@@ -1,13 +1,12 @@
 package cricket.merstham.website.frontend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.view.RedirectView;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.LEGACY_RESOURCES;
 
