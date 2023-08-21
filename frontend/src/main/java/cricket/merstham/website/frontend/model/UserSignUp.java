@@ -3,16 +3,15 @@ package cricket.merstham.website.frontend.model;
 import cricket.merstham.website.frontend.validators.EmailNotInUse;
 import cricket.merstham.website.frontend.validators.Password;
 import cricket.merstham.website.frontend.validators.PasswordsMatch;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 
 import java.io.Serial;
 import java.io.Serializable;

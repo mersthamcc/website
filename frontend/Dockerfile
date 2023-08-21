@@ -1,4 +1,4 @@
-ARG JAVA_VERSION=11
+ARG JAVA_VERSION=17
 ARG GRADLE_VERSION=7
 FROM gradle:${GRADLE_VERSION}-jdk${JAVA_VERSION} AS frontend-builder
 RUN mkdir /app
@@ -8,7 +8,7 @@ COPY src /app/src
 WORKDIR /app
 RUN gradle build -x test
 
-ARG JAVA_VERSION=11
+ARG JAVA_VERSION=17
 FROM adoptopenjdk:${JAVA_VERSION}
 ARG JAR_FILE=build/libs/*.jar
 

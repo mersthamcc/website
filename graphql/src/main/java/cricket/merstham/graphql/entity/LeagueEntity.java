@@ -1,6 +1,12 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.jpa.JpaJsonbConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,16 +14,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
-
-import static cricket.merstham.graphql.configuration.HibernateConfiguration.JSON_TYPE;
 
 @Entity
 @Table(name = "league")
@@ -41,6 +41,7 @@ public class LeagueEntity {
     private Instant lastUpdate;
 
     @Column(name = "\"table\"", nullable = false)
-    @Type(type = JSON_TYPE)
+    @Convert(converter = JpaJsonbConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode table;
 }

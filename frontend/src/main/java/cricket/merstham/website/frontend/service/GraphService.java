@@ -12,6 +12,9 @@ import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
 import cricket.merstham.website.frontend.mappers.InstantCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.JsonNodeCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
+import jakarta.inject.Named;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
 import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Named;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-
 import java.io.IOException;
 import java.util.Map;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static jakarta.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 @Service
 public class GraphService {

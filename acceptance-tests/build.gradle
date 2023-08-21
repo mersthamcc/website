@@ -14,8 +14,8 @@ ext {
     cucumber_version = '6.10.4'
 }
 
-sourceCompatibility = 16
-targetCompatibility = 16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 dependencies {
     testImplementation "io.cucumber:cucumber-java:${cucumber_version}",

@@ -34,6 +34,7 @@ import cricket.merstham.website.frontend.model.ckfinder.RenameFileResponse;
 import cricket.merstham.website.frontend.model.ckfinder.ResourceType;
 import cricket.merstham.website.frontend.model.ckfinder.SaveImageResponse;
 import cricket.merstham.website.frontend.service.S3Service;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.ws.rs.core.UriBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;

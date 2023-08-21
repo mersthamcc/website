@@ -1,28 +1,28 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cricket.merstham.graphql.jpa.PostgresSqlEnumType;
+import cricket.merstham.graphql.jpa.JpaJsonbConverter;
 import cricket.merstham.shared.types.AttributeType;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
-
-import static cricket.merstham.graphql.configuration.HibernateConfiguration.JSON_TYPE;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
@@ -34,7 +34,6 @@ import static cricket.merstham.graphql.configuration.HibernateConfiguration.JSON
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@TypeDef(name = "attribute_type", typeClass = PostgresSqlEnumType.class)
 public class AttributeDefinitionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +45,12 @@ public class AttributeDefinitionEntity {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Type(type = "attribute_type")
+    @Type(PostgreSQLEnumType.class)
     private AttributeType type;
 
     @Column(name = "choices", columnDefinition = "jsonb")
-    @Type(type = JSON_TYPE)
+    @Convert(converter = JpaJsonbConverter.class)
     @Basic(fetch = FetchType.EAGER)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode choices;
 }

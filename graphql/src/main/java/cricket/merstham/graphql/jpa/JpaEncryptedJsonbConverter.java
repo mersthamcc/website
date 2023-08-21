@@ -1,10 +1,11 @@
 package cricket.merstham.graphql.jpa;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -20,66 +21,25 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Base64;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 
-public class JpaEncryptedJsonbType extends JpaJsonbType {
+public class JpaEncryptedJsonbConverter implements AttributeConverter<JsonNode, String> {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     private final SecureRandom random = new SecureRandom();
     private final SecretKey secretKey;
+    private final ObjectMapper mapper;
 
-    public JpaEncryptedJsonbType(String secret) {
+    public JpaEncryptedJsonbConverter(
+            ObjectMapper objectMapper, @Value("${configuration.database-secret}") String secret) {
+        this.mapper = objectMapper;
         try {
             this.secretKey = new SecretKeySpec(Hex.decodeHex(secret), "AES");
         } catch (DecoderException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Object nullSafeGet(
-            ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
-            throws HibernateException, SQLException {
-        final String data = rs.getString(names[0]);
-        if (isNull(data)) {
-            return null;
-        }
-        try {
-            EncryptionEnvelope envelope =
-                    mapper.readValue(data.getBytes(UTF_8), EncryptionEnvelope.class);
-            return decrypt(envelope);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to decrypt and parse JSON: " + ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    public void nullSafeSet(
-            PreparedStatement st, Object value, int index, SharedSessionContractImplementor session)
-            throws HibernateException, SQLException {
-        if (isNull(value)) {
-            st.setNull(index, Types.OTHER);
-            return;
-        }
-        try {
-            byte[] jsonEncoded = mapper.writeValueAsBytes(value);
-            EncryptionEnvelope envelope = encrypt(jsonEncoded, generateIv());
-
-            final StringWriter w = new StringWriter();
-            mapper.writeValue(w, envelope);
-            w.flush();
-            st.setObject(index, w.toString(), Types.OTHER);
-        } catch (Exception ex) {
-            throw new RuntimeException(
-                    "Failed to encrypt and convert to JSONB: " + ex.getMessage(), ex);
         }
     }
 
@@ -112,5 +72,37 @@ public class JpaEncryptedJsonbType extends JpaJsonbType {
                 .iv(Hex.encodeHexString(iv))
                 .encrypted(Base64.getEncoder().encodeToString(cipher.doFinal(data)))
                 .build();
+    }
+
+    @Override
+    public String convertToDatabaseColumn(JsonNode attribute) {
+        if (isNull(attribute)) {
+            return null;
+        }
+        try {
+            byte[] jsonEncoded = mapper.writeValueAsBytes(attribute);
+            EncryptionEnvelope envelope = encrypt(jsonEncoded, generateIv());
+
+            final StringWriter w = new StringWriter();
+            mapper.writeValue(w, envelope);
+            w.flush();
+            return w.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    "Failed to encrypt and convert to JSONB: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public JsonNode convertToEntityAttribute(String dbData) {
+        if (isNull(dbData)) {
+            return null;
+        }
+        try {
+            EncryptionEnvelope envelope = mapper.readValue(dbData, EncryptionEnvelope.class);
+            return decrypt(envelope);
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to decrypt and parse JSON: " + ex.getMessage(), ex);
+        }
     }
 }

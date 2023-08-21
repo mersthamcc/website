@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "jacoco"
+    id "io.freefair.lombok" version "8.2.2"
 }
 
 group "cricket.merstham"
@@ -10,14 +11,11 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor "org.projectlombok:lombok:${dependencyVersions.lombok}"
-
-    compileOnly "org.projectlombok:lombok:${dependencyVersions.lombok}"
     compileOnly "com.fasterxml.jackson.core:jackson-core:${dependencyVersions.jackson}"
     compileOnly "com.fasterxml.jackson.core:jackson-annotations:${dependencyVersions.jackson}"
     compileOnly "com.fasterxml.jackson.core:jackson-databind:${dependencyVersions.jackson}"
     compileOnly "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
-    implementation "org.jsoup:jsoup:1.14.3"
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
@@ -29,6 +27,6 @@ test {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }

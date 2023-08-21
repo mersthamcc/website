@@ -1,9 +1,8 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
+import jakarta.inject.Singleton;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Singleton;
 
 import java.net.URI;
 import java.util.Collections;
