@@ -29,7 +29,6 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
@@ -179,7 +178,7 @@ public class RegistrationController {
                                                                         a.getValue(),
                                                                         body.get(a.getKey())))
                                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                 .build();
     }
 

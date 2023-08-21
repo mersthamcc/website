@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FixtureService {
@@ -33,7 +32,7 @@ public class FixtureService {
 
         return result.getData().getActiveTeams().stream()
                 .map(t -> modelMapper.map(t, Team.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Team getFixtures(int season, int teamId) throws IOException {

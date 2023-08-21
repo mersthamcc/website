@@ -141,7 +141,7 @@ public class CkFinderController {
                                                         .url(urlFor(rt))
                                                         .acl(service.defaultRights())
                                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                 .enabled(true)
                 .uploadCheckImages(false)
                 .s(ln)
@@ -167,7 +167,7 @@ public class CkFinderController {
                 .thumbs(
                         config.getThumbnailsConfig().getSizes().stream()
                                 .map(t -> imageSize(t.getWidth(), t.getHeight()))
-                                .collect(Collectors.toList()))
+                                .toList())
                 .build();
     }
 
@@ -365,7 +365,7 @@ public class CkFinderController {
                                                                     n.get("folder").asText(),
                                                                     n.get("name").asText())
                                                             .toString())
-                                    .collect(Collectors.toList());
+                                    .toList();
 
                     return DeleteFilesResponse.builder()
                             .resourceType(resourceType.getName())

@@ -66,7 +66,7 @@ public class ModelMapperConfiguration {
                                                                 .key(a.getKey())
                                                                 .value(a.getValue())
                                                                 .build())
-                                        .collect(Collectors.toList());
+                                        .toList();
                             }
                             return List.of();
                         });

@@ -24,6 +24,6 @@ public class PaymentServiceManager {
     }
 
     public List<String> getAvailableServices() {
-        return paymentServiceMap.keySet().stream().sorted().collect(Collectors.toList());
+        return paymentServiceMap.keySet().stream().sorted().toList();
     }
 }

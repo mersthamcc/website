@@ -27,7 +27,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static graphql.language.ObjectField.newObjectField;
 
@@ -94,10 +93,7 @@ public class JsonCoercing implements Coercing<JsonNode, Object> {
             List<Value> values = ((ArrayValue) input).getValues();
             return jsonNodeFactory
                     .arrayNode()
-                    .addAll(
-                            values.stream()
-                                    .map(v -> parseLiteral(v, variables))
-                                    .collect(Collectors.toList()));
+                    .addAll(values.stream().map(v -> parseLiteral(v, variables)).toList());
         }
         if (input instanceof ObjectValue) {
             List<ObjectField> values = ((ObjectValue) input).getObjectFields();

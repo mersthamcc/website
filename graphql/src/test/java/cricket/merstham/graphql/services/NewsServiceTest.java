@@ -29,7 +29,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -86,7 +85,7 @@ class NewsServiceTest {
                                         .build();
                             })
                     .sorted(Comparator.comparing(NewsEntity::getCreatedDate))
-                    .collect(Collectors.toList());
+                    .toList();
     private NewsEntityRepository repository = mock(NewsEntityRepository.class);
 
     private NewsService service =
@@ -108,11 +107,7 @@ class NewsServiceTest {
             when(repository.findAll(
                             eq(PageRequest.of(i + 1, 10, Sort.by("publishDate").descending()))))
                     .thenReturn(
-                            new PageImpl<>(
-                                    NEWS_ENTITIES.stream()
-                                            .skip(i * 10)
-                                            .limit(10)
-                                            .collect(Collectors.toList())));
+                            new PageImpl<>(NEWS_ENTITIES.stream().skip(i * 10).limit(10).toList()));
         }
         when(repository.count()).thenReturn((long) NEWS_STORY_COUNT);
         when(repository.findById(anyInt()))

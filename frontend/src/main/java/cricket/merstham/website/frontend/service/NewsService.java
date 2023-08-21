@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.service;
 
+import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.KeyValuePair;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
@@ -74,7 +74,7 @@ public class NewsService {
                                                         .mapFunction(
                                                                 news -> Map.of("id", news.getId()))
                                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                 .recordsFiltered(data.getNewsTotals().getTotalMatching())
                 .recordsTotal(data.getNewsTotals().getTotalRecords())
                 .build();
@@ -87,17 +87,14 @@ public class NewsService {
                 .data(
                         result.getData().getFeed().stream()
                                 .map(n -> modelMapper.map(n, News.class))
-                                .collect(Collectors.toList()))
+                                .toList())
                 .recordsTotal(result.getData().getNewsTotals().getTotalRecords())
                 .build();
     }
 
     public News saveNewsItem(OAuth2AccessToken accessToken, News news) throws IOException {
         var validationErrors =
-                processors.stream()
-                        .map(p -> p.preSave(news))
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                processors.stream().map(p -> p.preSave(news)).flatMap(List::stream).toList();
         if (!validationErrors.isEmpty()) {
             throw new EntitySaveException("Error saving News item", validationErrors);
         }
@@ -123,9 +120,7 @@ public class NewsService {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
                     "Error saving News item",
-                    result.getErrors().stream()
-                            .map(e -> e.getMessage())
-                            .collect(Collectors.toList()));
+                    result.getErrors().stream().map(Error::getMessage).toList());
         }
         news.setId(result.getData().getSaveNews().getId());
         news.setAttributes(
@@ -136,7 +131,7 @@ public class NewsService {
                                                 .key(a.getKey())
                                                 .value(a.getValue())
                                                 .build())
-                        .collect(Collectors.toList()));
+                        .toList());
 
         processors.forEach(p -> p.postSave(news));
 
@@ -155,7 +150,7 @@ public class NewsService {
                                                                 .key(a.getKey())
                                                                 .value(a.getValue())
                                                                 .build())
-                                        .collect(Collectors.toList()))
+                                        .toList())
                         .build();
         Response<SaveNewsAttributesMutation.Data> attributeResult =
                 graphService.executeMutation(saveAttributesRequest, accessToken);
@@ -163,9 +158,7 @@ public class NewsService {
             attributeResult.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
                     "Error saving News item",
-                    attributeResult.getErrors().stream()
-                            .map(e -> e.getMessage())
-                            .collect(Collectors.toList()));
+                    attributeResult.getErrors().stream().map(Error::getMessage).toList());
         }
         return modelMapper.map(attributeResult.getData().getSaveNewsAttributes(), News.class);
     }

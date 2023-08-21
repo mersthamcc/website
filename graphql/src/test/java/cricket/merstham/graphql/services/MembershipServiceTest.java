@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -394,7 +393,7 @@ class MembershipServiceTest {
                                                                                 invocation
                                                                                         .getArgument(
                                                                                                 1))))
-                                        .collect(Collectors.toList()));
+                                        .toList());
         when(orderEntityRepository.findByOwnerUserIdAllIgnoreCaseOrderByCreateDateAsc(any()))
                 .then(
                         invocation ->
@@ -404,7 +403,7 @@ class MembershipServiceTest {
                                                         Objects.equals(
                                                                 o.getOwnerUserId(),
                                                                 invocation.getArgument(0)))
-                                        .collect(Collectors.toList()));
+                                        .toList());
         when(orderEntityRepository.findById(anyInt()))
                 .then(
                         invocation ->

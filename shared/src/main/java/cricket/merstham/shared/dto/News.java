@@ -91,13 +91,13 @@ public class News implements Serializable {
                 "",
                 Arrays.stream(author.split(" "))
                         .map(n -> n.toUpperCase(Locale.ROOT).substring(0, 1))
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 
     public List<Image> getImages() {
         return Jsoup.parse(body).select("img").stream()
                 .map(i -> Image.builder().path(i.attr("src")).caption(i.attr("alt")).build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean hasImages() {

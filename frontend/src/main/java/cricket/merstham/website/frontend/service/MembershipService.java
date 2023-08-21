@@ -74,7 +74,7 @@ public class MembershipService {
                                         "\n",
                                         orderResult.getErrors().stream()
                                                 .map(error -> error.getMessage())
-                                                .collect(Collectors.toList())));
+                                                .toList()));
             }
             order.setId(orderResult.getData().getCreateOrder().getId())
                     .setUuid(orderResult.getData().getCreateOrder().getUuid())
@@ -95,7 +95,7 @@ public class MembershipService {
                                                                     .key(a.getDefinition().getKey())
                                                                     .value(a.getValue())
                                                                     .build())
-                                            .collect(Collectors.toList()))
+                                            .toList())
                             .subscription(
                                     MemberSubscriptionInput.builder()
                                             .year(LocalDate.now().getYear())
@@ -172,9 +172,7 @@ public class MembershipService {
         try {
             Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
             var categories = result.getData().getMembershipCategories();
-            return categories.stream()
-                    .map(c -> modelMapper.map(c, MemberCategory.class))
-                    .collect(Collectors.toList());
+            return categories.stream().map(c -> modelMapper.map(c, MemberCategory.class)).toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -198,7 +196,7 @@ public class MembershipService {
             Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
             return result.getData().getMembers().stream()
                     .map(m -> modelMapper.map(m, Member.class))
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -232,7 +230,7 @@ public class MembershipService {
                                                         .map(s -> Integer.toString(s.getYear()))
                                                         .orElse("unknown"))
                                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Optional<Member> get(int id, OAuth2AccessToken accessToken) {
@@ -271,7 +269,7 @@ public class MembershipService {
                                                                         attributes.get(f.getKey()),
                                                                         f.getValue()))
                                                         .build())
-                                .collect(Collectors.toList()));
+                                .toList());
         try {
             Response<UpdateMemberMutation.Data> result =
                     graphService.executeMutation(request, accessToken);

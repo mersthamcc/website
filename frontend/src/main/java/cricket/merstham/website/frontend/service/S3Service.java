@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.cksource.ckfinder.acl.Permission.FILE_CREATE;
 import static com.cksource.ckfinder.acl.Permission.FILE_DELETE;
@@ -100,7 +99,7 @@ public class S3Service {
                                     .build();
                         })
                 .filter(folder -> !backend.getHideFolders().contains(folder.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<File> getFiles(String prefix, Config.Backend backend) {
@@ -128,7 +127,7 @@ public class S3Service {
                                         .size(o.size() / 1024)
                                         .build())
                 .filter(file -> !backend.getHideFiles().contains(file.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public File getFile(String folder, String fileName) {

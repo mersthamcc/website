@@ -60,9 +60,7 @@ public class PlayCricketService {
         var request = createGetRequest(TEAMS_ENDPOINT, Map.of(SITE_ID, Integer.toString(siteId)));
         var result = request.invoke(PlayCricketTeamResponse.class);
 
-        return result.getTeams().stream()
-                .filter(t -> t.getSiteId() == siteId)
-                .collect(Collectors.toList());
+        return result.getTeams().stream().filter(t -> t.getSiteId() == siteId).toList();
     }
 
     public List<PlayCricketMatch> getFixtures(Optional<Instant> lastUpdate, Instant now) {

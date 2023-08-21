@@ -155,7 +155,7 @@ class MembershipServiceTest {
                                                                                 a.getDefinition()
                                                                                         .getKey()),
                                                                         a.getValue()))
-                                                .collect(Collectors.toList()),
+                                                .toList(),
                                         member.getSubscription().stream()
                                                 .map(
                                                         s ->
@@ -169,7 +169,7 @@ class MembershipServiceTest {
                                                                                 s.getPriceListItem()
                                                                                         .getId()),
                                                                         s.getYear()))
-                                                .collect(Collectors.toList()))));
+                                                .toList())));
 
         var basket =
                 new RegistrationBasket()
@@ -679,7 +679,7 @@ class MembershipServiceTest {
                                                                                 "adult",
                                                                                 List.of())),
                                                                 2022))))
-                        .collect(Collectors.toList());
+                        .toList();
 
         mockQuery(
                 graphService,
@@ -813,7 +813,7 @@ class MembershipServiceTest {
                                                                                 .toString()
                                                                                 .toUpperCase()),
                                                                 a.getChoices()))
-                                        .collect(Collectors.toList())));
+                                        .toList()));
         mockMutation(
                 graphService,
                 mutationCaptor,
@@ -850,7 +850,7 @@ class MembershipServiceTest {
                                                                             a.getDefinition()
                                                                                     .getKey())
                                                                     : a.getValue()))
-                                    .collect(Collectors.toList());
+                                    .toList();
                     return new UpdateMemberMutation.Data(
                             new UpdateMemberMutation.UpdateMember(
                                     "Member",
@@ -916,7 +916,7 @@ class MembershipServiceTest {
                                                                                 .toString()
                                                                                 .toUpperCase()),
                                                                 a.getChoices()))
-                                        .collect(Collectors.toList())));
+                                        .toList()));
 
         var result = service.getAttributes();
 
@@ -1056,7 +1056,7 @@ class MembershipServiceTest {
                                                         new MembersQuery.PriceListItem(
                                                                 "Subscription", "Adult Membership"),
                                                         LocalDate.now().getYear()))))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private OAuth2AccessToken createAccessToken() {

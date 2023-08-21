@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -107,8 +106,7 @@ class PlayCricketServiceTest {
 
     @Test
     void shouldCorrectlyGetTeamsWithNoLastUpdate() {
-        var expectedTeams =
-                TEAMS.stream().filter(t -> t.getSiteId() == SITE_ID).collect(Collectors.toList());
+        var expectedTeams = TEAMS.stream().filter(t -> t.getSiteId() == SITE_ID).toList();
         var webTarget = spy(WebTarget.class);
         var builder = spy(Invocation.Builder.class);
         var request = spy(Invocation.class);
