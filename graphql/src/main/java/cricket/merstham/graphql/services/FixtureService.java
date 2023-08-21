@@ -32,7 +32,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_CACHE;
@@ -78,14 +77,14 @@ public class FixtureService {
         return teamRepository.findByStatusAllIgnoreCaseOrderBySortOrderAsc("active").stream()
                 .filter(t -> !t.isHidden())
                 .map(t -> modelMapper.map(t, Team.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll(Sort.by(Sort.Direction.ASC, "sortOrder")).stream()
                 .filter(t -> !t.isHidden())
                 .map(t -> modelMapper.map(t, Team.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Team getTeam(int id) {
@@ -99,7 +98,7 @@ public class FixtureService {
                 .findByDateIsBetweenOrderByDateAscStartAsc(firstDayOfYear, lastDayOfYear)
                 .stream()
                 .map(f -> modelMapper.map(f, Fixture.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Cacheable(value = TEAM_CACHE, key = "{#season, #teamId}")
@@ -112,15 +111,13 @@ public class FixtureService {
                         team, firstDayOfYear, lastDayOfYear)
                 .stream()
                 .map(f -> modelMapper.map(f, Fixture.class).setFocusTeam(teamId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Cacheable(value = FIXTURE_CACHE, key = "#season")
     public List<Fixture> refreshFixtures(int season) {
         var fixtures = playCricketService.getFixtures(season);
-        return saveFixtures(fixtures).stream()
-                .map(f -> modelMapper.map(f, Fixture.class))
-                .collect(Collectors.toList());
+        return saveFixtures(fixtures).stream().map(f -> modelMapper.map(f, Fixture.class)).toList();
     }
 
     public List<League> getLeaguesForTeam(int season, int teamId) {
@@ -135,11 +132,11 @@ public class FixtureService {
                         .map(f -> f.getDetail().at("/competition_id").asInt())
                         .distinct()
                         .filter(integer -> integer > 0)
-                        .collect(Collectors.toList());
+                        .toList();
 
         return leagueRepository.findAllById(leagues).stream()
                 .map(l -> modelMapper.map(l, League.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Timed(

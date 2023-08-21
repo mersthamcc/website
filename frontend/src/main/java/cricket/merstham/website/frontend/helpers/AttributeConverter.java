@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static org.apache.logging.log4j.util.Strings.isBlank;
@@ -31,7 +30,7 @@ public class AttributeConverter {
                                 value.stream()
                                         .filter(v -> !v.equals("nothing-checked"))
                                         .map(o -> JSON.textNode((String) o))
-                                        .collect(Collectors.toList()));
+                                        .toList());
             default:
                 return JSON.textNode((String) value.get(0));
         }

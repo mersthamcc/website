@@ -20,7 +20,6 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
@@ -57,8 +56,12 @@ public class CognitoAuthentication implements Authentication {
             if (nonNull(claimSet.getStringListClaim(GROUP_CLAIM))) {
                 this.authorities =
                         claimSet.getStringListClaim(GROUP_CLAIM).stream()
-                                .map(r -> new SimpleGrantedAuthority(format("ROLE_{0}", r)))
-                                .collect(Collectors.toList());
+                                .map(
+                                        r ->
+                                                (GrantedAuthority)
+                                                        new SimpleGrantedAuthority(
+                                                                format("ROLE_{0}", r)))
+                                .toList();
             } else {
                 this.authorities = List.of();
             }

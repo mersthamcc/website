@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,7 +55,7 @@ class NewsServiceTest {
                                                 LOREM.getHtmlParagraphs(2, 5),
                                                 LOREM.getWords(2, 8),
                                                 "/news/test"))
-                        .collect(Collectors.toList());
+                        .toList();
 
         var data = mock(AdminNewsQuery.Data.class);
         when(data.getNews()).thenReturn(news);
@@ -116,7 +115,7 @@ class NewsServiceTest {
                                                                 "Attribute",
                                                                 "ATTRIBUTE_TWO",
                                                                 LOREM.getWords(1)))))
-                        .collect(Collectors.toList());
+                        .toList();
 
         var data = mock(NewsFeedQuery.Data.class);
         when(data.getFeed()).thenReturn(news);
@@ -201,7 +200,7 @@ class NewsServiceTest {
                                                                 "Attribute",
                                                                 a.getKey(),
                                                                 a.getValue()))
-                                        .collect(Collectors.toList())));
+                                        .toList()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 
@@ -300,7 +299,7 @@ class NewsServiceTest {
                                                                 "Attribute",
                                                                 a.getKey(),
                                                                 a.getValue()))
-                                        .collect(Collectors.toList())));
+                                        .toList()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 

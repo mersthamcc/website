@@ -143,7 +143,7 @@ public class MembershipController extends SspController<Member> {
                                                                                         .format(
                                                                                                 s
                                                                                                         .getPrice()))))
-                                .collect(Collectors.toList()),
+                                .toList(),
                 "subscriptionHistoryColumns",
                         List.of(
                                 new DataTableColumn().setKey("membership.year"),
@@ -192,7 +192,7 @@ public class MembershipController extends SspController<Member> {
                                                                                         .format(
                                                                                                 p
                                                                                                         .getAmount()))))
-                                .collect(Collectors.toList()),
+                                .toList(),
                 "paymentsColumns",
                         List.of(
                                 new DataTableColumn().setKey("payments.date"),
@@ -239,7 +239,7 @@ public class MembershipController extends SspController<Member> {
                                                 || m.getCategory().toLowerCase().contains(search)
                                                 || m.getLastSubscription().contains(search))
                         .sorted(comparator)
-                        .collect(Collectors.toList());
+                        .toList();
         return SspResponse.<SspResponseDataWrapper<Member>>builder()
                 .draw(request.getDraw())
                 .data(
@@ -264,7 +264,7 @@ public class MembershipController extends SspController<Member> {
                                                                                 "id",
                                                                                 member.getId()))
                                                         .build())
-                                .collect(Collectors.toList()))
+                                .toList())
                 .recordsTotal(members.size())
                 .recordsFiltered(members.size())
                 .build();

@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class JsonNodeCustomTypeAdapter implements CustomTypeAdapter<JsonNode> {
     private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
@@ -23,8 +22,7 @@ public class JsonNodeCustomTypeAdapter implements CustomTypeAdapter<JsonNode> {
                 return JSON.textNode((String) customTypeValue.value);
             case "GraphQLJsonList":
                 List<String> values = (List) customTypeValue.value;
-                return JSON.arrayNode()
-                        .addAll(values.stream().map(JSON::textNode).collect(Collectors.toList()));
+                return JSON.arrayNode().addAll(values.stream().map(JSON::textNode).toList());
             case "GraphQLBoolean":
                 return JSON.booleanNode((Boolean) customTypeValue.value);
             case "GraphQLNumber":

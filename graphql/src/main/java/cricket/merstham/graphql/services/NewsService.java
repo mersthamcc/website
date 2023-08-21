@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITEM_BY_ID_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITEM_BY_PATH_CACHE;
@@ -42,7 +41,7 @@ public class NewsService {
                 .findAll(PageRequest.of(page, 10, Sort.by("publishDate").descending()))
                 .map(this::convertToDto)
                 .stream()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Cacheable(value = NEWS_SUMMARY_TOTAL_CACHE)
@@ -66,7 +65,7 @@ public class NewsService {
     public List<News> getAdminNewsList(int start, int length, String searchString) {
         return repository.adminSearch(start, length, searchString).stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")

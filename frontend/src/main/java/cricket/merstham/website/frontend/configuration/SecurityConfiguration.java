@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +23,6 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authorize
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -33,13 +32,13 @@ import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHe
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import static cricket.merstham.website.frontend.controller.LoginController.LOGIN_PROCESSING_URL;
@@ -49,14 +48,17 @@ import static java.util.Objects.nonNull;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     @Bean
     public CognitoIdentityProviderClient cognitoIdentityProviderClient(
             @Value("${spring.security.oauth2.client.registration.login.region:#{null}}")
                     String region) {
-        return CognitoIdentityProviderClient.builder().region(Region.of(region)).build();
+        return CognitoIdentityProviderClient.builder()
+                .region(Region.of(region))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
     }
 
     @Bean
@@ -124,7 +126,8 @@ public class SecurityConfiguration {
                 .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
                 .addFilterBefore(
                         cognitoExceptionTranslationFilter, CognitoChallengeResponseFilter.class)
-                .authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll());
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.anyRequest().permitAll());
         return http.build();
     }
 
@@ -135,9 +138,7 @@ public class SecurityConfiguration {
 
             authorities.forEach(
                     authority -> {
-                        if (OidcUserAuthority.class.isInstance(authority)) {
-                            OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
-
+                        if (authority instanceof OidcUserAuthority oidcUserAuthority) {
                             OidcIdToken idToken = oidcUserAuthority.getIdToken();
                             var groups = (List<String>) idToken.getClaims().get("cognito:groups");
                             if (nonNull(groups))
@@ -148,12 +149,6 @@ public class SecurityConfiguration {
                                                                 "ROLE_"
                                                                         + s.toUpperCase(
                                                                                 Locale.ROOT))));
-                        } else if (OAuth2UserAuthority.class.isInstance(authority)) {
-                            OAuth2UserAuthority oauth2UserAuthority =
-                                    (OAuth2UserAuthority) authority;
-
-                            Map<String, Object> userAttributes =
-                                    oauth2UserAuthority.getAttributes();
                         }
                     });
 

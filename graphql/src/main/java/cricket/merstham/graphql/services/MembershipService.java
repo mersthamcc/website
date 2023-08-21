@@ -32,7 +32,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static java.util.Objects.isNull;
@@ -70,15 +69,13 @@ public class MembershipService {
     public List<AttributeDefinition> getAttributes() {
         return attributeRepository.findAll().stream()
                 .map(a -> modelMapper.map(a, AttributeDefinition.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public List<Member> getMembers() {
         var members = memberRepository.findAll();
-        return members.stream()
-                .map(m -> modelMapper.map(m, Member.class))
-                .collect(Collectors.toList());
+        return members.stream().map(m -> modelMapper.map(m, Member.class)).toList();
     }
 
     public List<MemberCategory> getCategories(MemberCategoryWhereInput where) {
@@ -86,7 +83,7 @@ public class MembershipService {
         return categories.stream()
                 .filter(category -> isNull(where) || where.matches(category))
                 .map(c -> modelMapper.map(c, MemberCategory.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
@@ -101,7 +98,7 @@ public class MembershipService {
                 .findByCreateDateBetween(LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31))
                 .stream()
                 .map(o -> modelMapper.map(o, Order.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -110,7 +107,7 @@ public class MembershipService {
                 .findByOwnerUserIdAllIgnoreCaseOrderByCreateDateAsc(getSubject(principal))
                 .stream()
                 .map(o -> modelMapper.map(o, Order.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -147,7 +144,7 @@ public class MembershipService {
                                                 .updatedDate(now)
                                                 .value(a.getValue())
                                                 .build())
-                        .collect(Collectors.toList()));
+                        .toList());
 
         member.setSubscription(
                 List.of(

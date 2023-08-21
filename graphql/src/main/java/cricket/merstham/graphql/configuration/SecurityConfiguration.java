@@ -16,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -62,8 +61,12 @@ public class SecurityConfiguration {
 
             if (authorities == null) return List.of();
             return authorities.stream()
-                    .map(s -> new SimpleGrantedAuthority("ROLE_" + s.toUpperCase(Locale.ROOT)))
-                    .collect(Collectors.toList());
+                    .map(
+                            s ->
+                                    (GrantedAuthority)
+                                            new SimpleGrantedAuthority(
+                                                    "ROLE_" + s.toUpperCase(Locale.ROOT)))
+                    .toList();
         }
     }
 }

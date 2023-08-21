@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
 
@@ -89,9 +88,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     private UserView createUserView(Principal principal) {
         List<String> roles =
                 ((CognitoAuthentication) principal)
-                        .getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList());
+                        .getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return new UserView((OidcUser) ((CognitoAuthentication) principal).getPrincipal(), roles);
     }
 
@@ -113,7 +110,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
                         ", ",
                         route.getPathVariables().entrySet().stream()
                                 .map(e -> format("{0}={1}", e.getKey(), e.getValue()))
-                                .collect(Collectors.toList())));
+                                .toList()));
         return route;
     }
 
