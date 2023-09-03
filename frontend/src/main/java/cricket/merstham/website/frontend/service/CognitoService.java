@@ -28,6 +28,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AssociateSo
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CodeMismatchException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCodeException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
@@ -41,6 +42,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +127,8 @@ public class CognitoService {
         } catch (PasswordResetRequiredException ex) {
             LOG.warn("Password reset required for user {}, requesting code.", username);
             return resetPasswordRequest(username);
-        } catch (Exception ex) {
-            LOG.error("Error calling Cognito", ex);
+        } catch (CognitoIdentityProviderException ex) {
+            LOG.error("Cognito Error", ex);
         }
         throw new BadCredentialsException("Invalid Credentials");
     }
@@ -157,8 +159,10 @@ public class CognitoService {
                         result.authenticationResult().refreshToken(),
                         result.authenticationResult().idToken());
             }
-        } catch (Exception ex) {
-            LOG.error("Error calling Cognito", ex);
+        } catch (ParseException ex) {
+            LOG.error("Error parsing JWT", ex);
+        } catch (CognitoIdentityProviderException ex) {
+            LOG.error("Cognito Error", ex);
         }
         throw new BadCredentialsException("Invalid Credentials");
     }
@@ -281,23 +285,40 @@ public class CognitoService {
     public Authentication verifySoftwareMfa(
             CognitoChallengeAuthentication authentication, String code) {
         var userId = getUserId(authentication);
-        var result =
-                client.adminRespondToAuthChallenge(
-                        AdminRespondToAuthChallengeRequest.builder()
-                                .clientId(clientId)
-                                .challengeName(authentication.getChallengeName())
-                                .session(authentication.getSessionId())
-                                .userPoolId(userPoolId)
-                                .challengeResponses(
-                                        Map.of(
-                                                USERNAME, userId,
-                                                SOFTWARE_TOKEN_MFA_CODE, code,
-                                                SECRET_HASH,
-                                                        calculateSecretHash(
-                                                                clientId, clientSecret, userId)))
-                                .build());
 
-        return resultToAuthentication(authentication, result, userId);
+        try {
+            var result =
+                    client.adminRespondToAuthChallenge(
+                            AdminRespondToAuthChallengeRequest.builder()
+                                    .clientId(clientId)
+                                    .challengeName(authentication.getChallengeName())
+                                    .session(authentication.getSessionId())
+                                    .userPoolId(userPoolId)
+                                    .challengeResponses(
+                                            Map.of(
+                                                    USERNAME,
+                                                    userId,
+                                                    SOFTWARE_TOKEN_MFA_CODE,
+                                                    code,
+                                                    SECRET_HASH,
+                                                    calculateSecretHash(
+                                                            clientId, clientSecret, userId)))
+                                    .build());
+
+            return resultToAuthentication(authentication, result, userId);
+        } catch (CodeMismatchException ex) {
+            LOG.warn(ex.getMessage());
+            return errorAuthentication(
+                    CognitoChallengeAuthentication.Error.WRONG_CODE, authentication);
+        } catch (ExpiredCodeException ex) {
+            LOG.warn(ex.getMessage());
+            return errorAuthentication(
+                    CognitoChallengeAuthentication.Error.EXPIRED_CODE, authentication);
+        } catch (NotAuthorizedException ex) {
+            throw new CognitoSessionExpiredException(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            throw new CognitoCodeException(ex.getMessage(), ex);
+        }
     }
 
     public Authentication verifySmsMfa(CognitoChallengeAuthentication authentication, String code) {

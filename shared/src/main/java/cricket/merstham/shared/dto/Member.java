@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public class Member implements Serializable {
     @JsonProperty private String type;
     @JsonProperty private Instant registrationDate;
     @JsonProperty private String ownerUserId;
-    @JsonProperty private List<MemberAttribute> attributes;
-    @JsonProperty private List<MemberSubscription> subscription;
+    @JsonProperty private List<MemberAttribute> attributes = new ArrayList<>();
+    @JsonProperty private List<MemberSubscription> subscription = new ArrayList<>();
 
     public Map<String, JsonNode> getAttributeMap() {
         return isNull(attributes)
