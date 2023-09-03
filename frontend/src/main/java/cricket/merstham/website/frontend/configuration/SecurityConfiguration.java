@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.security.filters.CognitoAuthenticationF
 import cricket.merstham.website.frontend.security.filters.CognitoChallengeFilter;
 import cricket.merstham.website.frontend.security.filters.CognitoChallengeResponseFilter;
 import cricket.merstham.website.frontend.security.filters.CognitoExceptionTranslationFilter;
+import cricket.merstham.website.frontend.security.filters.CognitoRefreshFilter;
 import cricket.merstham.website.frontend.security.providers.CognitoRefreshTokenAuthenticationProvider;
 import cricket.merstham.website.frontend.security.providers.CognitoUsernamePasswordAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,7 +88,8 @@ public class SecurityConfiguration {
             CognitoChallengeFilter cognitoChallengeFilter,
             CognitoChallengeResponseFilter cognitoChallengeProcessingFilter,
             CognitoAuthenticationFailureHandler failureHandler,
-            CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter)
+            CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter,
+            CognitoRefreshFilter cognitoRefreshFilter)
             throws Exception {
         http.csrf(
                         csrf ->
@@ -106,6 +108,7 @@ public class SecurityConfiguration {
                                                                 CrossOriginOpenerPolicyHeaderWriter
                                                                         .CrossOriginOpenerPolicy
                                                                         .SAME_ORIGIN)))
+                .cors(Customizer.withDefaults())
                 .exceptionHandling(
                         exceptionHandling ->
                                 exceptionHandling.accessDeniedPage("/login?error=access_denied"))
@@ -113,6 +116,7 @@ public class SecurityConfiguration {
                         session ->
                                 session.sessionAuthenticationStrategy(
                                         sessionAuthenticationStrategy()))
+                .securityContext(context -> context.requireExplicitSave(false))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
                 .formLogin(
                         form ->
@@ -120,12 +124,12 @@ public class SecurityConfiguration {
                                         .loginProcessingUrl(LOGIN_PROCESSING_URL)
                                         .usernameParameter("email")
                                         .passwordParameter("password")
-                                        .defaultSuccessUrl("/")
+                                        .defaultSuccessUrl("/", false)
                                         .failureHandler(failureHandler))
                 .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)
-                .addFilterBefore(
-                        cognitoExceptionTranslationFilter, CognitoChallengeResponseFilter.class)
+                .addFilterBefore(cognitoRefreshFilter, CognitoChallengeResponseFilter.class)
+                .addFilterBefore(cognitoExceptionTranslationFilter, CognitoRefreshFilter.class)
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests.anyRequest().permitAll());
         return http.build();

@@ -29,7 +29,7 @@
                         <@spring.message code="login.challenge.setup_mfa.which_method" />
                     </label>
                     <div class="col-md-12">
-                        <#list authentication.allowedMfaTypes as mfaType>
+                        <#list mfaTypes as mfaType>
                             <div class="radio">
                                 <label>
                                     <input

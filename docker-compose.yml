@@ -16,7 +16,7 @@ services:
       - com_docker_swarm_service_name=loki
       - tls-cert-host-check=loki.${DEVDOMAIN}
     ports:
-      - 3100:3100
+      - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     restart: unless-stopped
     healthcheck:
@@ -79,9 +79,9 @@ services:
     environment:
       DO_AUTH_TOKEN: ${DO_AUTH_TOKEN}
     ports:
-      - 80:80
-      - 443:443
-      - 8082:8082
+      - "80:80"
+      - "443:443"
+      - "8082:8082"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/acme
@@ -101,14 +101,13 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   postgres:
-    image: postgres:12
+    image: postgres:15-alpine
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: ${DATABASE_ROOT_PASSWORD}
       POSTGRES_USER: ${DATABASE_ROOT_USER}
       POSTGRES_DB: ${DATABASE_NAME}
-      PGOPTIONS: "-c custom.primary_encryption_key=${DATABASE_SECRET}"
     volumes:
       - pg-data:/var/lib/postgresql/data
     labels:
@@ -133,7 +132,7 @@ services:
     labels:
       - com_docker_swarm_service_name=redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     volumes:
       - ./dev-config/redis.conf:/usr/local/etc/redis/redis.conf
       - redis-data:/data
@@ -167,7 +166,7 @@ services:
       - com_docker_swarm_service_name=prometheus
       - tls-cert-host-check=prometheus.${DEVDOMAIN}
     ports:
-      - 9090:9090
+      - "9090:9090"
     volumes:
       - ./dev-config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks:
@@ -347,7 +346,7 @@ services:
     depends_on:
       - loki
     ports:
-      - 3000:3000
+      - "3000:3000"
     logging:
       driver: loki
       options:
@@ -452,7 +451,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   vault:
-    image: vault:latest
+    image: vault:1.13.3
     labels:
       - traefik.enable=true
       - traefik.http.routers.vault.rule=Host(`vault.${DEVDOMAIN}`)
@@ -471,12 +470,12 @@ services:
     cap_add:
       - IPC_LOCK
     ports:
-    - 8200:8200
+    - "8200:8200"
     networks:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: wget http://localhost:8200/ui -S -O -
+      test: vault status -address http://127.0.0.1:8200
       interval: 5s
       retries: 30
     depends_on:

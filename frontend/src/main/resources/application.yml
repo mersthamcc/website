@@ -37,15 +37,18 @@ spring:
             client-name: website-client
         provider:
           login:
-            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
+            issuer-uri: ${COGNITO_ISSUER_URI:}
             user-name-attribute: email
           website:
-            issuer-uri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_fl4u3kveF
+            issuer-uri: ${COGNITO_ISSUER_URI:}
 
-debug: true
+debug: false
 server:
   port: 8080
   forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 24h
 
 management:
   server:

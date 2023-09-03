@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,5 +30,5 @@ public class PriceListItem implements Serializable {
     @JsonProperty private String description;
     @JsonProperty private Boolean includesMatchFees;
     @JsonProperty private BigDecimal currentPrice;
-    @JsonProperty private List<Price> price;
+    @JsonProperty private List<Price> price = new ArrayList<>();
 }

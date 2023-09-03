@@ -154,7 +154,7 @@ public class NewsService {
                         .build();
         Response<SaveNewsAttributesMutation.Data> attributeResult =
                 graphService.executeMutation(saveAttributesRequest, accessToken);
-        if (attributeResult.hasErrors()) {
+        if (attributeResult.hasErrors() || isNull(attributeResult.getData())) {
             attributeResult.getErrors().forEach(e -> LOG.error(e.getMessage()));
             throw new EntitySaveException(
                     "Error saving News item",
