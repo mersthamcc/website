@@ -11,9 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.safety.Safelist;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -75,15 +72,7 @@ public class News implements Serializable {
     }
 
     public String getAbstract() {
-        Document doc = Jsoup.parse(body);
-        Element readMoreAnchor = doc.selectFirst("a#readmore");
-
-        if (isNull(readMoreAnchor)) {
-            return Jsoup.clean(body, Safelist.basic());
-        }
-
-        return Jsoup.clean(
-                body.substring(0, body.indexOf(readMoreAnchor.outerHtml())), Safelist.basic());
+        return body.toAbstract();
     }
 
     public String getAuthorInitials() {

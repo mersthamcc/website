@@ -14,7 +14,7 @@ import static java.lang.String.format;
 @Named
 public class CkFinderRequestConfiguration {
 
-    private static final List<String> ALLOWED_SECTIONS = List.of("news");
+    private static final List<String> ALLOWED_SECTIONS = List.of("news", "events");
     public static final String DEFAULT_BACKEND = "default";
 
     public List<Config.ResourceType> resourcesForRequest(Map<String, String> request) {

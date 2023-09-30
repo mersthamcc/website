@@ -19,6 +19,10 @@ public class CacheConfiguration {
     public static final String NEWS_SUMMARY_TOTAL_CACHE = "news_feed_totals";
     public static final String NEWS_ITEM_BY_ID_CACHE = "news_item_by_id";
     public static final String NEWS_ITEM_BY_PATH_CACHE = "news_item_by_path";
+    public static final String EVENT_SUMMARY_CACHE = "event_feed";
+    public static final String EVENT_SUMMARY_TOTAL_CACHE = "event_feed_totals";
+    public static final String EVENT_ITEM_BY_ID_CACHE = "event_item_by_id";
+    public static final String EVENT_ITEM_BY_PATH_CACHE = "event_item_by_path";
     public static final String TEAM_CACHE = "team";
     public static final String ACTIVE_TEAM_CACHE = "active_team";
     public static final String FIXTURE_CACHE = "fixture";
@@ -33,6 +37,10 @@ public class CacheConfiguration {
                                         NEWS_SUMMARY_TOTAL_CACHE,
                                         NEWS_ITEM_BY_ID_CACHE,
                                         NEWS_ITEM_BY_PATH_CACHE,
+                                        EVENT_SUMMARY_CACHE,
+                                        EVENT_SUMMARY_TOTAL_CACHE,
+                                        EVENT_ITEM_BY_ID_CACHE,
+                                        EVENT_ITEM_BY_PATH_CACHE,
                                         TEAM_CACHE,
                                         ACTIVE_TEAM_CACHE,
                                         FIXTURE_CACHE))

@@ -1,0 +1,19 @@
+query adminEvents($start: Int!, $length: Int!, $search: String) {
+    events(start: $start, length: $length, searchString: $search) {
+        id
+        eventDate
+        title
+        body
+        path
+        uuid
+        location
+        attributes {
+            key
+            value
+        }
+    }
+    eventTotals (searchString: $search){
+        totalRecords
+        totalMatching
+    }
+}

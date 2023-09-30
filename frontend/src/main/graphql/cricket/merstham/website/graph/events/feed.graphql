@@ -1,0 +1,19 @@
+query feed($page: Int!) {
+    eventsFeed(page: $page) {
+        id
+        eventDate
+        title
+        path
+        uuid
+        location
+        body
+        attributes {
+            key
+            value
+        }
+    }
+
+    eventTotals {
+        totalRecords
+    }
+}

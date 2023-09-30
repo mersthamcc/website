@@ -58,3 +58,14 @@ resource "aws_cognito_user_in_group" "developer_in_news" {
   group_name   = aws_cognito_user_group.news.name
   username     = aws_cognito_user.developer.username
 }
+
+resource "aws_cognito_user_group" "events" {
+  name         = "EVENTS"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_events" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.events.name
+  username     = aws_cognito_user.developer.username
+}

@@ -7,6 +7,7 @@ import static java.util.Objects.isNull;
 public class RoleHelper {
     public static String ADMIN = "ROLE_ADMIN";
     public static String NEWS = "ROLE_NEWS";
+    public static String EVENTS = "ROLE_EVENTS";
     public static String MEMBERSHIP = "ROLE_MEMBERSHIP";
 
     public static boolean hasRole(Principal principal, final String role) {
