@@ -1,0 +1,15 @@
+mutation saveEvent ($event: EventInput!) {
+    saveEvent(event: $event) {
+        id
+        eventDate
+        title
+        body
+        path
+        uuid
+        location
+        attributes {
+            key
+            value
+        }
+    }
+}

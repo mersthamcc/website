@@ -1,0 +1,34 @@
+type Event {
+    id: Int!
+    title: String!
+    path: String
+    eventDate: DateTime!
+    body: String!
+    uuid: String!
+    location: String
+    attributes: [KeyValuePair]
+}
+
+input EventInput {
+    id: Int
+    title: String!
+    eventDate: DateTime!
+    body: String!
+    location: String
+    path: String!
+    uuid: String!
+    attributes: [KeyValuePairInput]
+}
+
+extend type Query {
+    eventsFeed(page: Int): [Event]
+    eventItemByPath(path: String!): Event
+    eventItem(id: Int!): Event
+    events(start: Int!, length: Int!, searchString: String): [Event]
+}
+
+extend type Mutation {
+    saveEvent(event: EventInput!): Event
+    deleteEvent(id: Int!): Event
+    saveEventAttributes(id: Int!, attributes: [KeyValuePairInput]!): Event
+}

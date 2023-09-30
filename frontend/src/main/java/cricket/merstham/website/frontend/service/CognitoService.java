@@ -49,6 +49,7 @@ import java.util.Map;
 
 import static cricket.merstham.website.frontend.security.CognitoChallengeAuthentication.Step.SETUP_SOFTWARE_MFA;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenResponseType.SUCCESS;
 
 @Service
@@ -134,35 +135,40 @@ public class CognitoService {
     }
 
     public CognitoAuthentication refresh(CognitoAuthentication authentication) {
-        try {
-            var username =
-                    authentication
-                            .getIdTokenJwt()
-                            .getJWTClaimsSet()
-                            .getStringClaim(COGNITO_USERNAME_CLAIM);
-            var authParams =
-                    Map.of(
-                            USERNAME, username,
-                            SECRET_HASH, calculateSecretHash(clientId, clientSecret, username),
-                            REFRESH_TOKEN, authentication.getRefreshToken());
-            var result =
-                    client.adminInitiateAuth(
-                            AdminInitiateAuthRequest.builder()
-                                    .userPoolId(userPoolId)
-                                    .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
-                                    .authParameters(authParams)
-                                    .clientId(clientId)
-                                    .build());
-            if (isNull(result.challengeName())) {
-                return new CognitoAuthentication(
-                        result.authenticationResult().accessToken(),
-                        result.authenticationResult().refreshToken(),
-                        result.authenticationResult().idToken());
+        if (nonNull(authentication.getRefreshToken())) {
+            try {
+                var username =
+                        authentication
+                                .getIdTokenJwt()
+                                .getJWTClaimsSet()
+                                .getStringClaim(COGNITO_USERNAME_CLAIM);
+                var authParams =
+                        Map.of(
+                                USERNAME, username,
+                                SECRET_HASH, calculateSecretHash(clientId, clientSecret, username),
+                                REFRESH_TOKEN, authentication.getRefreshToken());
+                var result =
+                        client.adminInitiateAuth(
+                                AdminInitiateAuthRequest.builder()
+                                        .userPoolId(userPoolId)
+                                        .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                                        .authParameters(authParams)
+                                        .clientId(clientId)
+                                        .build());
+                if (isNull(result.challengeName())) {
+                    LOG.info("Token refresh response: {}", result);
+                    return new CognitoAuthentication(
+                            result.authenticationResult().accessToken(),
+                            nonNull(result.authenticationResult().refreshToken())
+                                    ? result.authenticationResult().refreshToken()
+                                    : authentication.getRefreshToken(),
+                            result.authenticationResult().idToken());
+                }
+            } catch (ParseException ex) {
+                LOG.error("Error parsing JWT", ex);
+            } catch (CognitoIdentityProviderException ex) {
+                LOG.error("Cognito Error", ex);
             }
-        } catch (ParseException ex) {
-            LOG.error("Error parsing JWT", ex);
-        } catch (CognitoIdentityProviderException ex) {
-            LOG.error("Cognito Error", ex);
         }
         throw new BadCredentialsException("Invalid Credentials");
     }

@@ -1,0 +1,15 @@
+query getEventItem($id: Int!) {
+    eventItem(id: $id) {
+        id
+        eventDate
+        title
+        body
+        path
+        uuid
+        location
+        attributes {
+            key
+            value
+        }
+    }
+}

@@ -1,0 +1,15 @@
+query getEventItemByPath($path: String!) {
+    eventItemByPath(path: $path) {
+        id
+        eventDate
+        title
+        body
+        path
+        uuid
+        location
+        attributes {
+            key
+            value
+        }
+    }
+}

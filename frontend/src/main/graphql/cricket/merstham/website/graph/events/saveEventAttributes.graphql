@@ -1,0 +1,15 @@
+mutation saveEventAttributes ($id: Int!, $attributes: [KeyValuePairInput]!) {
+    saveEventAttributes(id: $id, attributes: $attributes) {
+        id
+        eventDate
+        title
+        body
+        path
+        uuid
+        location
+        attributes {
+            key
+            value
+        }
+    }
+}
