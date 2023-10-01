@@ -70,7 +70,9 @@ public class EventController extends SspController<Event> {
                                 new DataTableColumn()
                                         .setKey("event.eventDate")
                                         .setFieldName("formattedDate"),
-                                new DataTableColumn().setKey("event.title").setFieldName("title"))));
+                                new DataTableColumn()
+                                        .setKey("event.title")
+                                        .setFieldName("title"))));
     }
 
     @GetMapping(value = ADMIN_EVENT_NEW_ROUTE, name = "admin-event-new")

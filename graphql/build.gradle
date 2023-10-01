@@ -41,6 +41,7 @@ dependencies {
     implementation "commons-codec:commons-codec:1.15"
     implementation 'com.graphql-java:graphql-java-extended-scalars:19.1'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.0'
+    implementation 'com.amazonaws.serverless:aws-serverless-java-container-springboot3:2.0.0-M2'
     implementation project(":shared")
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
@@ -64,6 +65,16 @@ test {
 
 bootJar {
     archiveFileName = "graphql.jar"
+}
+
+tasks.register('buildZip', Zip) {
+    from compileJava
+    from processResources
+    into("lib") {
+        from(configurations.compileClasspath) {
+            exclude 'tomcat-embed-*'
+        }
+    }
 }
 
 jacocoTestReport {
