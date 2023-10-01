@@ -189,7 +189,8 @@ public class EventsService {
 
     public boolean delete(OAuth2AccessToken accessToken, int id) throws IOException {
         var query = new DeleteEventMutation(id);
-        Response<DeleteEventMutation.Data> result = graphService.executeMutation(query, accessToken);
+        Response<DeleteEventMutation.Data> result =
+                graphService.executeMutation(query, accessToken);
         if (result.hasErrors()) {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
         }

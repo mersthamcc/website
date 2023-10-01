@@ -4,7 +4,7 @@ CREATE
             id SERIAL NOT NULL,
             event_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
             title VARCHAR(255) NOT NULL,
-            path TEXT NOT NULL,
+            "path" TEXT NOT NULL,
             uuid TEXT NOT NULL,
             location VARCHAR(255),
             body TEXT NOT NULL,
