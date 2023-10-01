@@ -73,7 +73,10 @@ public class EventsService {
             evict = {
                 @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE),
                 @CacheEvict(value = EVENT_ITEM_BY_ID_CACHE, key = "#event.id"),
-                @CacheEvict(value = EVENT_ITEM_BY_PATH_CACHE, key = "#event.path", condition = "#event.path != null"),
+                @CacheEvict(
+                        value = EVENT_ITEM_BY_PATH_CACHE,
+                        key = "#event.path",
+                        condition = "#event.path != null"),
                 @CacheEvict(value = EVENT_SUMMARY_CACHE, allEntries = true)
             })
     public Event save(Event event) {
