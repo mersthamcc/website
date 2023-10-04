@@ -8,9 +8,6 @@ spring:
   freemarker:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
   servlet:
     multipart:
       enabled: true
@@ -41,6 +38,10 @@ spring:
             user-name-attribute: email
           website:
             issuer-uri: ${COGNITO_ISSUER_URI:}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 debug: false
 server:

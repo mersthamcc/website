@@ -17,7 +17,7 @@ spring:
     show-sql: false
 
   datasource:
-    url: "jdbc:postgresql://localhost:5432/${DATABASE_NAME:}"
+    url: "jdbc:postgresql://${DATABASE_HOST:localhost}:5432/${DATABASE_NAME:}"
     username: ${DATABASE_USER:}
     password: ${DATABASE_PASSWORD:}
   graphql:
@@ -26,9 +26,6 @@ spring:
     schema:
       printer:
         enabled: true
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
   cache:
     redis:
       time-to-live: 300s
@@ -40,6 +37,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${COGNITO_ISSUER_URI:}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
   server:
