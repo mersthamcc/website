@@ -1,6 +1,6 @@
 ALTER TABLE
-    news ADD COLUMN PATH TEXT;
+    news ADD COLUMN "path" TEXT;
 
 CREATE
     UNIQUE INDEX IDX_UNIQUE_NEWS_PATH ON
-    news(PATH);
+    news("path");
