@@ -522,11 +522,69 @@ services:
       options:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
+  dynamodb:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ."
+    image: "amazon/dynamodb-local:latest"
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    networks:
+      - backendnetwork
+    working_dir: /home/dynamodblocal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dynamodb.rule=Host(`dynamodb.${DEVDOMAIN}`)
+      - traefik.http.services.dynamodb.loadbalancer.server.port=8000
+      - traefik.http.routers.dynamodb.entrypoints=web
+      - traefik.http.routers.dynamodb.middlewares=forcehttps
+      - traefik.http.routers.dynamodb-tls.tls=true
+      - traefik.http.routers.dynamodb-tls.rule=Host(`dynamodb.${DEVDOMAIN}`)
+      - traefik.http.routers.dynamodb-tls.entrypoints=websecure
+      - traefik.http.routers.dynamodb-tls.tls.certresolver=le
+      - traefik.http.routers.dynamodb-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=dynamodb
+      - tls-cert-host-check=dynamodb.${DEVDOMAIN}
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  dynamodb_admin:
+    image: aaronshaf/dynamodb-admin
+    networks:
+      - backendnetwork
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dynamo-admin.rule=Host(`dynamo-admin.${DEVDOMAIN}`)
+      - traefik.http.services.dynamo-admin.loadbalancer.server.port=8001
+      - traefik.http.routers.dynamo-admin.entrypoints=web
+      - traefik.http.routers.dynamo-admin.middlewares=forcehttps
+      - traefik.http.routers.dynamo-admin-tls.tls=true
+      - traefik.http.routers.dynamo-admin-tls.rule=Host(`dynamo-admin.${DEVDOMAIN}`)
+      - traefik.http.routers.dynamo-admin-tls.entrypoints=websecure
+      - traefik.http.routers.dynamo-admin-tls.tls.certresolver=le
+      - traefik.http.routers.dynamo-admin-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=dynamo-admin
+      - tls-cert-host-check=dynamo-admin.${DEVDOMAIN}
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+    restart: unless-stopped
+
 volumes:
   pg-data:
   redis-config:
   redis-data:
   smtp-data:
+  dynamodb-data:
 
 networks:
   backendnetwork:

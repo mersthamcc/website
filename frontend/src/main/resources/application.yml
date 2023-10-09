@@ -1,5 +1,12 @@
 base-url: https://www.new.mersthamcc.co.uk
 spring:
+  session:
+    dynamodb:
+      table-name: ${DYNAMO_SESSION_TABLE:sessions}
+      max-inactive-interval-in-seconds: 3600
+      region: eu-west-2
+      endpoint: ${DYNAMO_ENDPOINT:}
+      create-table: ${DYNAMO_SESSION_CREATE_TABLE:true}
   devtools:
     livereload:
       enabled: false
