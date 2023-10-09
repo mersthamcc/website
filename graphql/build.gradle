@@ -35,9 +35,9 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-cache:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
-    implementation "org.modelmapper:modelmapper:3.1.0"
-    implementation "org.modelmapper.extensions:modelmapper-jackson:3.1.0"
-    implementation "org.modelmapper.extensions:modelmapper-spring:3.1.0"
+    implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
+    implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"
+    implementation "org.modelmapper.extensions:modelmapper-spring:${dependencyVersions.model_mapper}"
     implementation "commons-codec:commons-codec:1.15"
     implementation 'com.graphql-java:graphql-java-extended-scalars:19.1'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.0'

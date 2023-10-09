@@ -14,13 +14,15 @@ group 'cricket.merstham'
 
 ext {
     dependencyVersions = [
+            apollo         : "2.5.14",
+            aws            : "2.20.109",
+            jackson        : "2.13.4.1",
+            lombok         : "1.18.24",
+            model_mapper   : "3.1.1",
+            prometheus     : "1.10.4",
             spring_boot    : "3.1.2",
             spring_sessions: "3.1.1",
-            apollo         : "2.5.14",
-            prometheus     : "1.10.4",
-            lombok         : "1.18.24",
             testcontainers : "1.16.2",
-            jackson        : "2.13.4.1",
     ]
 }
 
