@@ -45,10 +45,6 @@ spring:
             user-name-attribute: email
           website:
             issuer-uri: ${COGNITO_ISSUER_URI:}
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
 
 debug: false
 server:
