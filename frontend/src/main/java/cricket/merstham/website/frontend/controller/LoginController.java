@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -81,7 +80,7 @@ public class LoginController {
 
     @GetMapping(value = LOGIN_URL, name = RouteNames.ROUTE_LOGIN)
     @PostMapping(value = LOGIN_PROCESSING_URL)
-    public ModelAndView login(@Param("error") String error) {
+    public ModelAndView login(@RequestParam(value = "error", required = false) String error) {
         var errors =
                 isNull(error) ? List.of() : List.of(LOGIN_ERRORS_MESSAGE_CATEGORY.concat(error));
         return new ModelAndView(
