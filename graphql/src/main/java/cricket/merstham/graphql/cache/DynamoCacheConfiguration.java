@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.URI;
+import java.time.Duration;
 
 @Data
 @Configuration
@@ -15,7 +16,7 @@ public class DynamoCacheConfiguration {
     private String keyAttributeName = "cacheKey";
     private String dataAttributeName = "data";
     private String timeToLiveAttributeName = "ttl";
-    private int timeToLive;
+    private Duration timeToLive;
     private String region;
     private boolean createTable = true;
     private URI endpoint = null;

@@ -1,6 +1,8 @@
 package cricket.merstham.graphql.cache;
 
 import cricket.merstham.shared.utils.ObjectSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.Cache;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -18,8 +20,11 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static java.text.MessageFormat.format;
+
 public class DynamoCache implements Cache {
 
+    private static final Logger LOG = LogManager.getLogger(DynamoCache.class);
     private final String name;
     private final DynamoDbClient client;
     private final DynamoCacheConfiguration configuration;
@@ -44,7 +49,11 @@ public class DynamoCache implements Cache {
     @Override
     public ValueWrapper get(Object key) {
         var item = getItem(key);
-        if (item.hasItem()) return () -> decodeItemData(item, Object.class);
+        if (item.hasItem()) {
+            LOG.info("Cache hit {} key {}", name, key);
+            return () -> decodeItemData(item, Object.class);
+        }
+        LOG.info("Cache miss {} key {}", name, key);
         return null;
     }
 
@@ -63,30 +72,15 @@ public class DynamoCache implements Cache {
         return result != null ? (T) result.get() : putCacheValue(key, valueLoader);
     }
 
-    private <T> T putCacheValue(Object key, Callable<T> valueLoader) {
-        try {
-            var value = valueLoader.call();
-
-            client.putItem(
-                    PutItemRequest.builder()
-                            .tableName(configuration.getTableName())
-                            .item(toItem(key, value))
-                            .build());
-
-            return value;
-
-        } catch (Exception e) {
-            throw new ValueRetrievalException(key, valueLoader, e);
-        }
-    }
-
     @Override
     public void put(Object key, Object value) {
+        LOG.info("Putting cache value into {} key {}", name, key);
         putCacheValue(key, () -> value);
     }
 
     @Override
     public void evict(Object key) {
+        LOG.info("Evicting cache value from {} key {}", name, key);
         client.deleteItem(
                 DeleteItemRequest.builder()
                         .tableName(configuration.getTableName())
@@ -96,6 +90,7 @@ public class DynamoCache implements Cache {
 
     @Override
     public void clear() {
+        LOG.info("Clearing cache {}", name);
         Map<String, AttributeValue> startKey = Map.of();
         QueryResponse result;
         do {
@@ -136,7 +131,8 @@ public class DynamoCache implements Cache {
                                     .asByteArray());
             try {
                 return type.cast(data);
-            } catch (ClassCastException ignored) {
+            } catch (ClassCastException e) {
+                LOG.error("Error decoding cache value", e);
             }
         }
         return null;
@@ -163,15 +159,33 @@ public class DynamoCache implements Cache {
     }
 
     private AttributeValue calculateTtl() {
-        var ttl = Instant.now().plusSeconds(configuration.getTimeToLive());
+        var ttl = Instant.now().plusSeconds(configuration.getTimeToLive().toSeconds());
         return AttributeValue.fromN(Long.toString(ttl.getEpochSecond()));
     }
 
     private GetItemResponse getItem(Object key) {
+        LOG.info("Getting cache value {} key {}", name, key);
         return client.getItem(
                 GetItemRequest.builder()
                         .tableName(configuration.getTableName())
                         .key(toKey(key))
                         .build());
+    }
+
+    private <T> T putCacheValue(Object key, Callable<T> valueLoader) {
+        try {
+            var value = valueLoader.call();
+
+            client.putItem(
+                    PutItemRequest.builder()
+                            .tableName(configuration.getTableName())
+                            .item(toItem(key, value))
+                            .build());
+
+            return value;
+        } catch (Exception e) {
+            LOG.error(format("Error putting cache value {0} key {1}", name, key), e);
+            throw new ValueRetrievalException(key, valueLoader, e);
+        }
     }
 }

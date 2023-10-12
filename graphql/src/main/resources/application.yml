@@ -29,7 +29,7 @@ spring:
   cache:
     dynamodb:
       table-name: GraphQLCache
-      time-to-live: 300
+      time-to-live: 300s
       region: eu-west-2
       endpoint: ${DYNAMO_ENDPOINT:}
       create-table: true
