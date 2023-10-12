@@ -32,7 +32,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
-    implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-cache:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
     implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
@@ -41,6 +40,10 @@ dependencies {
     implementation "commons-codec:commons-codec:1.15"
     implementation 'com.graphql-java:graphql-java-extended-scalars:19.1'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.0'
+    implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
+    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
+
     implementation project(":shared")
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"

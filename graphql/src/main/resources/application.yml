@@ -27,20 +27,17 @@ spring:
       printer:
         enabled: true
   cache:
-    redis:
+    dynamodb:
+      table-name: GraphQLCache
       time-to-live: 300s
-      key-prefix: "graph-cache:"
-      use-key-prefix: true
-      enable-statistics: false
+      region: eu-west-2
+      endpoint: ${DYNAMO_ENDPOINT:}
+      create-table: true
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${COGNITO_ISSUER_URI:}
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
 
 management:
   server:
