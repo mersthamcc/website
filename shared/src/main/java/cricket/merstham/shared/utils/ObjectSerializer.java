@@ -24,7 +24,7 @@ public class ObjectSerializer<T> {
             return byteArrayOutputStream.toByteArray();
         } catch (IOException ex) {
             LOG.error("Error serializing object", ex);
-            return null;
+            return new byte[0];
         }
     }
 
