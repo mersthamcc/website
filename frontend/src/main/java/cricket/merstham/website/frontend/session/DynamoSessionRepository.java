@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.session;
 
 import cricket.merstham.shared.utils.IdGenerator;
+import cricket.merstham.shared.utils.ObjectSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.session.SessionRepository;
@@ -11,11 +12,6 @@ import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +23,7 @@ public class DynamoSessionRepository implements SessionRepository<DynamoSession>
     private static final Logger LOG = LoggerFactory.getLogger(DynamoSessionRepository.class);
     private final DynamoDbClient client;
     private final DynamoSessionConfiguration configuration;
+    private final ObjectSerializer<DynamoSession> serializer = new ObjectSerializer<>();
 
     public DynamoSessionRepository(
             DynamoDbClient client, DynamoSessionConfiguration configuration) {
@@ -37,7 +34,7 @@ public class DynamoSessionRepository implements SessionRepository<DynamoSession>
     @Override
     public DynamoSession createSession() {
         return new DynamoSession(
-                IdGenerator.generate(), configuration.getMaxInactiveIntervalInSeconds());
+                IdGenerator.generate(), configuration.getMaxInactiveInterval().toSeconds());
     }
 
     @Override
@@ -94,36 +91,14 @@ public class DynamoSessionRepository implements SessionRepository<DynamoSession>
 
         map.put(
                 configuration.getSessionDataAttributeName(),
-                AttributeValue.fromB(sessionToBinary(session)));
+                AttributeValue.fromB(
+                        serializer.serializeAndWrap(session, SdkBytes::fromByteArray)));
         return map;
     }
 
-    private SdkBytes sessionToBinary(DynamoSession session) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStream =
-                        new ObjectOutputStream(byteArrayOutputStream)) {
-            objectOutputStream.writeObject(session);
-
-            objectOutputStream.flush();
-            return SdkBytes.fromByteArray(byteArrayOutputStream.toByteArray());
-        } catch (IOException ex) {
-            LOG.error("Error serializing session", ex);
-            return SdkBytes.fromByteArray(new byte[0]);
-        }
-    }
-
     private DynamoSession toSession(Map<String, AttributeValue> item) {
-        try (ByteArrayInputStream byteArrayInputStream =
-                        new ByteArrayInputStream(
-                                item.get(configuration.getSessionDataAttributeName())
-                                        .b()
-                                        .asByteArray());
-                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
-            return (DynamoSession) objectInputStream.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            LOG.error("Error deserialising session", ex);
-            return null;
-        }
+        return serializer.deserialize(
+                item.get(configuration.getSessionDataAttributeName()).b().asByteArray());
     }
 
     private long calculateTimeToLive(DynamoSession session) {

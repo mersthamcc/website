@@ -5,12 +5,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.URI;
+import java.time.Duration;
 
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "spring.session.dynamodb")
 public class DynamoSessionConfiguration {
-    private Integer maxInactiveIntervalInSeconds;
+    private Duration maxInactiveInterval;
     private String tableName;
     private String sessionIdAttributeName = "sessionId";
     private String ttlAttributeName = "ttl";
