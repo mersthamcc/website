@@ -1,0 +1,46 @@
+type Contact {
+    id: Int!
+    name: Json!
+    position: String
+    slug: String!
+    category: ContactCategory!
+    methods: [KeyValuePair]
+}
+
+type ContactCategory {
+    id: Int!
+    title: String!
+    slug: String!
+
+    contacts: [Contact]
+}
+
+input ContactInput {
+    id: Int
+    name: String!
+    position: String
+    slug: String!
+    category: ContactCategoryInput!
+    methods: [KeyValuePairInput]
+}
+
+input ContactCategoryInput {
+    id: Int
+    title: String!
+    slug: String
+
+    contacts: [ContactInput]
+}
+
+extend type Query {
+    contactFeed(page: Int): [Contact]
+    contactItemByPath(path: String!): Contact
+    contactItem(id: Int!): Contact
+    contacts(start: Int!, length: Int!, searchString: String): [Contact]
+}
+
+extend type Mutation {
+    saveContact(contact: ContactInput!): Contact
+    deleteContact(id: Int!): Contact
+    saveContactMethods(id: Int!, methods: [KeyValuePairInput]!): Contact
+}
