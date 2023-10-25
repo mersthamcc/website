@@ -69,3 +69,14 @@ resource "aws_cognito_user_in_group" "developer_in_events" {
   group_name   = aws_cognito_user_group.events.name
   username     = aws_cognito_user.developer.username
 }
+
+resource "aws_cognito_user_group" "contact" {
+  name         = "CONTACT"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_contact" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.contact.name
+  username     = aws_cognito_user.developer.username
+}
