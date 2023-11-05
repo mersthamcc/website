@@ -18,8 +18,8 @@ type ContactCategory {
 input ContactInput {
     id: Int
     name: String!
-    position: String
-    slug: String!
+    position: String!
+    slug: String
     category: ContactCategoryInput!
     methods: [KeyValuePairInput]
 }
@@ -34,13 +34,16 @@ input ContactCategoryInput {
 
 extend type Query {
     contactFeed(page: Int): [Contact]
+    contactCategoryFeed: [ContactCategory]
     contactItemByPath(path: String!): Contact
     contactItem(id: Int!): Contact
     contacts(start: Int!, length: Int!, searchString: String): [Contact]
+    contactCategories(start: Int!, length: Int!, searchString: String): [ContactCategory]
 }
 
 extend type Mutation {
     saveContact(contact: ContactInput!): Contact
     deleteContact(id: Int!): Contact
     saveContactMethods(id: Int!, methods: [KeyValuePairInput]!): Contact
+    saveContactCategory(category: ContactCategoryInput!): ContactCategory
 }

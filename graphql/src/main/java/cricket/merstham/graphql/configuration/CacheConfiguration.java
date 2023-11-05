@@ -35,6 +35,13 @@ public class CacheConfiguration {
     public static final String EVENT_SUMMARY_TOTAL_CACHE = "event_feed_totals";
     public static final String EVENT_ITEM_BY_ID_CACHE = "event_item_by_id";
     public static final String EVENT_ITEM_BY_PATH_CACHE = "event_item_by_path";
+    public static final String CONTACT_SUMMARY_CACHE = "contact_feed";
+    public static final String CONTACT_CATEGORY_SUMMARY_CACHE = "contact_category_feed";
+    public static final String CONTACT_SUMMARY_TOTAL_CACHE = "contact_feed_totals";
+    public static final String CONTACT_CATEGORY_SUMMARY_TOTAL_CACHE =
+            "contact_category_feed_totals";
+    public static final String CONTACT_ITEM_BY_ID_CACHE = "contact_item_by_id";
+    public static final String CONTACT_ITEM_BY_PATH_CACHE = "contact_item_by_path";
     public static final String TEAM_CACHE = "team";
     public static final String ACTIVE_TEAM_CACHE = "active_team";
     public static final String FIXTURE_CACHE = "fixture";
