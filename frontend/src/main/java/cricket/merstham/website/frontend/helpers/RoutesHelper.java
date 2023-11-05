@@ -25,6 +25,13 @@ public class RoutesHelper {
     public static final String ADMIN_EVENT_DELETE_ROUTE = ADMIN_EVENT_BASE + "/delete/{id}";
     public static final String ADMIN_EVENT_AJAX_ROUTE = ADMIN_EVENT_BASE + "/get-data";
 
+    public static final String ADMIN_CONTACT_BASE = "/administration/contacts";
+    public static final String ADMIN_CONTACT_SAVE_ROUTE = ADMIN_CONTACT_BASE + "/save";
+    public static final String ADMIN_CONTACT_NEW_ROUTE = ADMIN_CONTACT_BASE + "/new";
+    public static final String ADMIN_CONTACT_EDIT_ROUTE = ADMIN_CONTACT_BASE + "/edit/{id}";
+    public static final String ADMIN_CONTACT_DELETE_ROUTE = ADMIN_CONTACT_BASE + "/delete/{id}";
+    public static final String ADMIN_CONTACT_AJAX_ROUTE = ADMIN_CONTACT_BASE + "/get-data";
+
     public static final String NEWS_HOME_ROUTE = "/news";
     public static final String NEWS_ITEM_LEGACY_ROUTE = "/news/{id}";
     public static final String NEWS_ROUTE_TEMPLATE = "/{year}/{month}/{day}/{slug}";
