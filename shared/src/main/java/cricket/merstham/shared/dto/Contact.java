@@ -13,6 +13,10 @@ import lombok.experimental.ExtensionMethod;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Data
 @Builder
@@ -23,10 +27,20 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ExtensionMethod(StringExtensions.class)
 public class Contact implements Serializable {
-    @JsonProperty private Integer id;
+    @JsonProperty private int id;
     @JsonProperty private ContactCategory category;
     @JsonProperty private String position;
     @JsonProperty private String slug;
     @JsonProperty private String name;
     @JsonProperty private List<KeyValuePair> methods;
+
+    public Map<String, String> getAttributeMap() {
+        return isNull(methods)
+                ? Map.of()
+                : getMethods().stream()
+                .collect(
+                        Collectors.toMap(
+                                KeyValuePair::getKey,
+                                KeyValuePair::getValue));
+    }
 }

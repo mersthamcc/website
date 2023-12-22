@@ -1,0 +1,17 @@
+mutation saveContact ($contact: ContactInput!) {
+    saveContact(contact: $contact) {
+        id
+        name
+        position
+        slug
+        category {
+            id
+            title
+            slug
+        }
+        methods {
+            key
+            value
+        }
+    }
+}

@@ -1,0 +1,17 @@
+mutation deleteContact($id: Int!) {
+    deleteContact(id: $id) {
+        id
+        name
+        position
+        slug
+        category {
+            id
+            title
+            slug
+        }
+        methods {
+            key
+            value
+        }
+    }
+}

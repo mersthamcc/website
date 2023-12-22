@@ -118,9 +118,13 @@ public class ContactService {
             })
     public Contact save(Contact contact) {
         var entity =
-                isNull(contact.getId())
+                contact.getId() == 0
                         ? new ContactEntity()
                         : repository.findById(contact.getId()).orElseGet(ContactEntity::new);
+        if (isNull(entity.getCategory()) || !contact.getCategory().getId().equals(entity.getCategory().getId())) {
+            var category = categoryRepository.getReferenceById(contact.getCategory().getId());
+            entity.setCategory(category);
+        }
         mapper.map(contact, entity);
         if (isNull(entity.getCategory().getId())) {
             entity.setCategory(categoryRepository.save(entity.getCategory()));

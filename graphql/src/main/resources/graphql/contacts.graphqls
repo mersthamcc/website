@@ -1,6 +1,6 @@
 type Contact {
     id: Int!
-    name: Json!
+    name: String!
     position: String
     slug: String!
     category: ContactCategory!

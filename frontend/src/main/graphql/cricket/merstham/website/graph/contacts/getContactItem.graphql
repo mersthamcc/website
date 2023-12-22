@@ -1,0 +1,17 @@
+query getContactItem($id: Int!) {
+    contactItem(id: $id) {
+        id
+        name
+        position
+        slug
+        category {
+            id
+            title
+            slug
+        }
+        methods {
+            key
+            value
+        }
+    }
+}

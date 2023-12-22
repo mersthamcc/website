@@ -40,6 +40,12 @@ public class RoutesHelper {
     public static final String EVENTS_ITEM_LEGACY_ROUTE = "/events/{id}";
     public static final String EVENTS_ROUTE_TEMPLATE = "/{year}/{month}/{day}/{slug}";
     public static final String EVENTS_ITEM_ROUTE = EVENTS_HOME_ROUTE + EVENTS_ROUTE_TEMPLATE;
+    public static final String CONTACTS_HOME_ROUTE = "/contacts";
+    public static final String CONTACTS_CATEGORY_HOME_ROUTE = "/contacts/{category}";
+    public static final String CONTACTS_ITEM_LEGACY_ROUTE = CONTACTS_HOME_ROUTE + "/{id}";
+    public static final String CONTACTS_ROUTE_TEMPLATE = "/{category-slug}/{slug}";
+    public static final String CONTACTS_ITEM_ROUTE = CONTACTS_HOME_ROUTE + CONTACTS_ROUTE_TEMPLATE;
+
     public static final String LEGACY_RESOURCES = "/resources/**";
 
     public static URI buildRoute(String template, Map<String, Object> parameters) {
