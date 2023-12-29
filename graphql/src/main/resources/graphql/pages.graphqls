@@ -1,0 +1,24 @@
+type Page {
+    slug: String!
+    title: String!
+    content: String!
+    sortOrder: Int!
+}
+
+input PageInput {
+    slug: String!
+    title: String!
+    content: String!
+    sortOrder: Int!
+}
+
+extend type Query {
+    page(slug: String!): Page
+    pages(start: Int!, length: Int!, searchString: String): [Page]
+    pageTotals(searchString: String): Totals
+}
+
+extend type Mutation {
+    savePage(page: PageInput!): Page
+    deletePage(slug: String!): Page
+}
