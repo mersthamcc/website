@@ -6,4 +6,5 @@ type Totals {
 extend type Query {
     newsTotals(searchString: String): Totals!
     eventTotals(searchString: String): Totals!
+    contactTotals(searchString: String): Totals!
 }

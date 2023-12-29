@@ -44,7 +44,7 @@ public class NewsService {
                 .toList();
     }
 
-    @Cacheable(value = NEWS_SUMMARY_TOTAL_CACHE)
+    @Cacheable(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'")
     public Totals getNewsFeedTotals() {
         var recordCount = repository.count();
         return Totals.builder().totalRecords(recordCount).totalMatching(recordCount).build();
@@ -71,7 +71,7 @@ public class NewsService {
     @PreAuthorize("hasRole('ROLE_NEWS')")
     @Caching(
             evict = {
-                @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE),
+                @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#news.id"),
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)
@@ -94,7 +94,7 @@ public class NewsService {
     @PreAuthorize("hasRole('ROLE_NEWS')")
     @Caching(
             evict = {
-                @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE),
+                @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#news.id"),
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)

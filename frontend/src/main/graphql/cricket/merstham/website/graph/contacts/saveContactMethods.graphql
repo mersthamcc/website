@@ -1,0 +1,19 @@
+mutation saveContactMethods ($id: Int!, $methods: [KeyValuePairInput]!) {
+    saveContactMethods(id: $id, methods: $methods) {
+        id
+        name
+        position
+        slug
+        sortOrder
+        category {
+            id
+            title
+            slug
+            sortOrder
+        }
+        methods {
+            key
+            value
+        }
+    }
+}

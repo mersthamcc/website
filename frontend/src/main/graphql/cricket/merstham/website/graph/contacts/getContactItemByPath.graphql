@@ -1,0 +1,19 @@
+query getContactItemByPath($path: String!) {
+    contactItemByPath(path: $path) {
+        id
+        name
+        position
+        slug
+        sortOrder
+        category {
+            id
+            title
+            slug
+            sortOrder
+        }
+        methods {
+            key
+            value
+        }
+    }
+}

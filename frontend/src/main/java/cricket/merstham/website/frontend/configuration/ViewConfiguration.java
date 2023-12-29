@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.configuration;
 
 import cricket.merstham.website.frontend.menu.MenuBuilder;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import cricket.merstham.website.frontend.templates.PhoneNumberFormatter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import no.api.freemarker.java8.Java8ObjectWrapper;
@@ -80,6 +81,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             adminMenus.put("administration", menuBuilderProvider.getAdminAdministrationMenu());
             adminMenus.put("system", menuBuilderProvider.getAdminSystemMenu());
             model.put("adminMenus", adminMenus);
+            model.put("parsePhoneNumber", new PhoneNumberFormatter());
 
             modelAndView.addAllObjects(model);
         }

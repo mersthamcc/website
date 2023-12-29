@@ -44,7 +44,7 @@ public class EventsService {
                 .toList();
     }
 
-    @Cacheable(value = EVENT_SUMMARY_TOTAL_CACHE)
+    @Cacheable(value = EVENT_SUMMARY_TOTAL_CACHE, key = "'totals'")
     public Totals getEventFeedTotals() {
         var recordCount = repository.count();
         return Totals.builder().totalRecords(recordCount).totalMatching(recordCount).build();
@@ -71,7 +71,7 @@ public class EventsService {
     @PreAuthorize("hasRole('ROLE_EVENTS')")
     @Caching(
             evict = {
-                @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE),
+                @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = EVENT_ITEM_BY_ID_CACHE, key = "#event.id"),
                 @CacheEvict(
                         value = EVENT_ITEM_BY_PATH_CACHE,
@@ -97,7 +97,7 @@ public class EventsService {
     @PreAuthorize("hasRole('ROLE_EVENTS')")
     @Caching(
             evict = {
-                @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE),
+                @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = EVENT_ITEM_BY_ID_CACHE, key = "#news.id"),
                 @CacheEvict(value = EVENT_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = EVENT_SUMMARY_CACHE, allEntries = true)

@@ -61,7 +61,19 @@ public class MenuBuilder {
                                                             null,
                                                             List.of(),
                                                             null))))),
-                    new Menu("events", null, URI.create("/events"), List.of(), null));
+                    new Menu("events", null, URI.create("/events"), List.of(), null),
+                    new Menu(
+                            "about",
+                            null,
+                            URI.create("#"),
+                            List.of(),
+                            List.of(
+                                    new Menu(
+                                            "contacts",
+                                            null,
+                                            URI.create("/contacts"),
+                                            List.of(),
+                                            null))));
 
     private final List<Menu> dashboardMenu =
             List.of(
@@ -99,7 +111,16 @@ public class MenuBuilder {
                             List.of(
                                     new Menu("admin-event-list", null, null, List.of(), null),
                                     new Menu("admin-event-new", null, null, List.of(), null)),
-                            "tio-calendar"));
+                            "tio-calendar"),
+                    new Menu(
+                            "admin-contact-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu("admin-contact-list", null, null, List.of(), null),
+                                    new Menu("admin-contact-new", null, null, List.of(), null)),
+                            "tio-call"));
 
     private final List<Menu> adminAdministrationMenu =
             List.of(

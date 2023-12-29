@@ -519,6 +519,21 @@
 
             </script>
 
+            <script type="text/javascript">
+                function startMail(user,domain) {
+                    let locationstring = "mailto:" + user + "@" + domain;
+                    window.location = locationstring;
+                }
+
+                function startCall(country,code,local) {
+                    if ( code.substring(0,1) == "0"){
+                        code = code.substring(1);
+                    }
+                    let locationstring = "tel:" + country + code + local;
+                    window.location = locationstring;
+                }
+            </script>
+
             <#if script?is_directive><@script /><#else>${script}</#if>
         </body>
     </html>

@@ -172,6 +172,29 @@
     </div>
 </#macro>
 
+<#macro adminSelectField name localeCategory data options required=false additionalClasses="">
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right align-middle">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <select class="form-control c-square c-theme ${additionalClasses}"
+                   name="${name}"
+                   value="${data}"
+                    ${requiredAttribute}>
+                <#list options?keys as option>
+                    <option value="${option}" <#if option==data>selected="selected"</#if>>${options[option]}</option>
+                </#list>
+            </select>
+        </div>
+    </div>
+</#macro>
+
 <#macro adminDateField name localeCategory data>
     <div class="row form-group">
         <label for="${name}Label" class="col-md-2 control-label text-right align-middle">
@@ -705,7 +728,7 @@
             <h5 class="alert-heading"><@spring.messageText code=errorKey text="An error occured" /></h5>
             <hr />
             <#list errors as error>
-                <p class="text-inherit">${error}</p>
+                <p class="text-inherit"><@spring.messageText code=error text=error /></p>
             </#list>
         </div>
     </#if>

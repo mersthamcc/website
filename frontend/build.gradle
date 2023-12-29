@@ -49,6 +49,7 @@ dependencies {
     implementation 'org.passay:passay:1.6.2'
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.google.zxing:javase:3.5.1'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.12'
     implementation project(":shared")
 
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"

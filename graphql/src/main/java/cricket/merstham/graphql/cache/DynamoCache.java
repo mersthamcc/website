@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.ComparisonOperator;
 import software.amazon.awssdk.services.dynamodb.model.Condition;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -81,22 +82,28 @@ public class DynamoCache implements Cache {
     @Override
     public void evict(Object key) {
         LOG.info("Evicting cache value from {} key {}", name, key);
-        client.deleteItem(
-                DeleteItemRequest.builder()
-                        .tableName(configuration.getTableName())
-                        .key(toKey(key))
-                        .build());
+        var itemKey = toKey(key);
+        try {
+            client.deleteItem(
+                    DeleteItemRequest.builder()
+                            .tableName(configuration.getTableName())
+                            .key(toKey(itemKey))
+                            .build());
+        } catch (DynamoDbException ex) {
+            LOG.warn("Error evicting cache!", ex);
+        }
     }
 
     @Override
     public void clear() {
         LOG.info("Clearing cache {}", name);
-        Map<String, AttributeValue> startKey = Map.of();
+        Map<String, AttributeValue> startKey = null;
         QueryResponse result;
         do {
             result =
                     client.query(
                             QueryRequest.builder()
+                                    .tableName(configuration.getTableName())
                                     .keyConditions(
                                             Map.of(
                                                     configuration.getCacheNameAttributeName(),
@@ -114,7 +121,17 @@ public class DynamoCache implements Cache {
 
             if (result.hasItems()) {
                 for (Map<String, AttributeValue> item : result.items()) {
-                    evict(item.get(configuration.getKeyAttributeName()));
+                    var key =
+                            Map.of(
+                                    configuration.getCacheNameAttributeName(),
+                                            AttributeValue.fromS(name),
+                                    configuration.getKeyAttributeName(),
+                                            item.get(configuration.getKeyAttributeName()));
+                    client.deleteItem(
+                            DeleteItemRequest.builder()
+                                    .tableName(configuration.getTableName())
+                                    .key(key)
+                                    .build());
                 }
             }
             startKey = result.lastEvaluatedKey();

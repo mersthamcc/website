@@ -1,0 +1,20 @@
+query feed {
+    contactCategoryFeed {
+        id
+        title
+        slug
+        sortOrder
+
+        contacts {
+            id
+            name
+            position
+            slug
+            sortOrder
+            methods {
+                key
+                value
+            }
+        }
+    }
+}

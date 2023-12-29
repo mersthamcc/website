@@ -862,3 +862,63 @@
         </div>
     </#if>
 </#macro>
+
+<#macro contactCard contact additionalClasses="">
+    <div class="card card-bordered ${additionalClasses}">
+        <div class="card-header">
+            <!-- Avatar -->
+            <div class="avatar avatar-xl avatar-soft-dark avatar-circle avatar-border-lg avatar-centered mb-3">
+                <span class="avatar-initials"><#list contact.name?split(" ") as n>${n?cap_first[0]}</#list></span>
+                <span class="avatar-status avatar-sm-status"></span>
+            </div>
+            <!-- End Avatar -->
+        </div>
+        <div class="card-body">
+            <h3 class="align-content-center text-center">
+                ${contact.name}
+            </h3>
+            <h5 class="align-content-center text-center">
+                ${contact.position}
+            </h5>
+
+            <ul class="list-group list-group-flush">
+                <#list contact.methods as method>
+                    <#if method.value?has_content>
+                        <li class="list-group-item">
+                            <#switch method.key>
+                                <#case "WHATSAPP">
+                                    <i class="fa fa-whatsapp-square">&nbsp;</i>
+                                    <#break>
+                                <#case "EMAIL">
+                                    <i class="fa fa-envelope">&nbsp;</i>
+                                    <@obfuscatedEmailLink email=method.value />
+                                    <#break>
+                                <#case "PHONE">
+                                    <i class="fa fa-phone">&nbsp;</i>
+                                    <@obfuscatePhone phone=method.value />
+                                    <#break>
+                            </#switch>
+                        </li>
+                    </#if>
+                </#list>
+            </ul>
+        </div>
+    </div>
+</#macro>
+
+<#macro obfuscatedEmailLink email>
+    <#assign localPart = email?split("@")[0]>
+    <#assign domainPart = email?split("@")[1]>
+    <a href="javascript:startMail('${localPart}','${domainPart}');">
+        ${localPart?replace(".", "&#46;")}<!-- >@. -->@<!-- >@. -->${domainPart?replace(".", "&#46;")}
+    </a>
+</#macro>
+
+<#macro obfuscatePhone phone>
+    <#if phone?has_content>
+        <#assign number = parsePhoneNumber(phone)>
+        <a href="javascript:startCall('${number.countryCode}','${number.areaCode}','${number.localNumber}');">
+            <#list 0..<number.formatted?length as n>${number.formatted[n]}<span style="display: none;">${.now?long?c}</span></#list>
+        </a>
+    </#if>
+</#macro>

@@ -1,0 +1,8 @@
+query getContactCategories {
+    contactCategoryFeed {
+        id
+        title
+        slug
+        sortOrder
+    }
+}

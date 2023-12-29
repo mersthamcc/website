@@ -136,3 +136,10 @@ twitter:
   api-secret: ${TWITTER_API_SECRET}
   oauth-access-token: ${TWITTER_OAUTH_ACCESS_TOKEN}
   oauth-access-token-secret: ${TWITTER_OAUTH_ACCESS_TOKEN_SECRET}
+
+contact-methods:
+  email:
+    enabled: true
+  phone:
+    enabled: true
+    default-region: GB

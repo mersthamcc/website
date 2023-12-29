@@ -1,0 +1,24 @@
+query adminContacts($start: Int!, $length: Int!, $search: String) {
+    contacts(start: $start, length: $length, searchString: $search) {
+        id
+        name
+        position
+        slug
+        sortOrder
+        category {
+            id
+            title
+            slug
+            sortOrder
+        }
+        methods {
+            key
+            value
+        }
+    }
+
+    contactTotals (searchString: $search){
+        totalRecords
+        totalMatching
+    }
+}
