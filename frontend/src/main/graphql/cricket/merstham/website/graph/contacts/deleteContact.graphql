@@ -4,10 +4,12 @@ mutation deleteContact($id: Int!) {
         name
         position
         slug
+        sortOrder
         category {
             id
             title
             slug
+            sortOrder
         }
         methods {
             key

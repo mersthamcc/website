@@ -15,7 +15,7 @@ public interface ContactEntityRepository
             value =
                     "SELECT *  FROM contact "
                             + "WHERE \"position\" ILIKE '%' || :searchString  || '%' "
-                            + "ORDER BY \"position\" DESC "
+                            + "ORDER BY sort_order ASC, \"position\" ASC "
                             + "LIMIT :length OFFSET :start")
     List<ContactEntity> adminSearch(int start, int length, String searchString);
 }

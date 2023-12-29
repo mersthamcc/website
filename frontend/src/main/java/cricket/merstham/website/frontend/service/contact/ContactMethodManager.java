@@ -24,9 +24,7 @@ public class ContactMethodManager {
     }
 
     public List<String> getAvailableMethods() {
-        return contactMethodMap
-                .values()
-                .stream()
+        return contactMethodMap.values().stream()
                 .filter(ContactMethod::isEnabled)
                 .map(ContactMethod::getKey)
                 .toList();

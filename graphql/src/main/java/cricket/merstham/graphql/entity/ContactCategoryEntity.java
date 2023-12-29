@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import cricket.merstham.shared.extensions.StringExtensions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +56,11 @@ public class ContactCategoryEntity {
 
     @OneToMany(mappedBy = "category")
     private List<ContactEntity> contacts = new LinkedList<>();
+
+    @NotNull
+    @Column(name = "sort_order", nullable = false)
+    @JsonProperty
+    private int sortOrder;
 
     @PrePersist
     void preInsert() {

@@ -4,10 +4,12 @@ query getContactItemByPath($path: String!) {
         name
         position
         slug
+        sortOrder
         category {
             id
             title
             slug
+            sortOrder
         }
         methods {
             key

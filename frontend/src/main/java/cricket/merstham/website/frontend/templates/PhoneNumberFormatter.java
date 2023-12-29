@@ -23,29 +23,18 @@ public class PhoneNumberFormatter implements TemplateMethodModelEx {
             throw new TemplateModelException("Wrong arguments");
         }
         try {
-            var phoneNumber = phoneUtil.parse(((SimpleScalar) args.get(0)).getAsString(), DEFAULT_REGION);
+            var phoneNumber =
+                    phoneUtil.parse(((SimpleScalar) args.get(0)).getAsString(), DEFAULT_REGION);
             var areaCodeLength = phoneUtil.getLengthOfNationalDestinationCode(phoneNumber);
             var fullNumber = Long.toString(phoneNumber.getNationalNumber());
-            return PhoneNumberWrapper
-                    .builder()
+            return PhoneNumberWrapper.builder()
                     .countryCode(format("+{0}", phoneNumber.getCountryCode()))
                     .areaCode(fullNumber.substring(0, areaCodeLength))
                     .localNumber(fullNumber.substring(areaCodeLength))
-                    .formatted(phoneUtil.formatNumberForMobileDialing(
-                            phoneNumber,
-                            DEFAULT_REGION, true))
+                    .formatted(
+                            phoneUtil.formatNumberForMobileDialing(
+                                    phoneNumber, DEFAULT_REGION, true))
                     .build();
-//            return new SimpleHash(
-//                    Map.of(
-//                            "country_code",
-//                                    new SimpleScalar(format("+{0}", phoneNumber.getCountryCode())),
-//                            "area_code", new SimpleScalar(fullNumber.substring(0, areaCodeLength)),
-//                            "local_number", new SimpleScalar(fullNumber.substring(areaCodeLength)),
-//                            "formatted",
-//                                    new SimpleScalar(
-//                                            phoneUtil.formatNumberForMobileDialing(
-//                                                    phoneNumber,
-//                                                    DEFAULT_REGION, true))));
         } catch (NumberParseException e) {
             throw new TemplateModelException("Cannot parse phone number", e);
         }

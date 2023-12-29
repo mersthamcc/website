@@ -4,10 +4,12 @@ query adminContacts($start: Int!, $length: Int!, $search: String) {
         name
         position
         slug
+        sortOrder
         category {
             id
             title
             slug
+            sortOrder
         }
         methods {
             key

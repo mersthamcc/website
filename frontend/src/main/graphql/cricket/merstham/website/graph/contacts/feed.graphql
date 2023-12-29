@@ -3,12 +3,14 @@ query feed {
         id
         title
         slug
+        sortOrder
 
         contacts {
             id
             name
             position
             slug
+            sortOrder
             methods {
                 key
                 value

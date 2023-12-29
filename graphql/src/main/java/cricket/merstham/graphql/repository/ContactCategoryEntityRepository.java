@@ -15,7 +15,7 @@ public interface ContactCategoryEntityRepository
             value =
                     "SELECT *  FROM contact_category "
                             + "WHERE title ILIKE '%' || :searchString  || '%' "
-                            + "ORDER BY title DESC "
+                            + "ORDER BY sort_order ASC, title ASC "
                             + "LIMIT :length OFFSET :start")
     List<ContactCategoryEntity> adminSearch(int start, int length, String searchString);
 }

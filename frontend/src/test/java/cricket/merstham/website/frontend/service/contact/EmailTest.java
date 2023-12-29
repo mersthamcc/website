@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ class EmailTest {
 
     @ParameterizedTest
     @MethodSource("validateTests")
-    void shouldValidateCorrectly(String emailAddress, boolean expectResult) {
+    void shouldValidateCorrectly(String emailAddress, List<String> expectResult) {
         var email = new Email(true);
 
         assertThat(email.validate(emailAddress)).isEqualTo(expectResult);
@@ -34,14 +35,14 @@ class EmailTest {
 
     private static Stream<Arguments> validateTests() {
         return Stream.of(
-                Arguments.of("user@domain.com", true),
-                Arguments.of("user@domain.com.", false),
-                Arguments.of(".user@domain.com", false),
-                Arguments.of("firstname.surname@domain.co.uk", true),
-                Arguments.of("firstname.surname+unique@domain.co.uk", true),
-                Arguments.of("firstname.surname@domain.org", true),
-                Arguments.of("firstname.surname@gmail.com", true),
-                Arguments.of("firstname.surname@hotmail.com", true),
-                Arguments.of("firstname.surname@outlook.com", true));
+                Arguments.of("user@domain.com", List.of()),
+                Arguments.of("user@domain.com.", List.of("contact.EMAIL.invalid")),
+                Arguments.of(".user@domain.com", List.of("contact.EMAIL.invalid")),
+                Arguments.of("firstname.surname@domain.co.uk", List.of()),
+                Arguments.of("firstname.surname+unique@domain.co.uk", List.of()),
+                Arguments.of("firstname.surname@domain.org", List.of()),
+                Arguments.of("firstname.surname@gmail.com", List.of()),
+                Arguments.of("firstname.surname@hotmail.com", List.of()),
+                Arguments.of("firstname.surname@outlook.com", List.of()));
     }
 }

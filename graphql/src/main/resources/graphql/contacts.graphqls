@@ -4,6 +4,7 @@ type Contact {
     position: String
     slug: String!
     category: ContactCategory!
+    sortOrder: Int!
     methods: [KeyValuePair]
 }
 
@@ -11,6 +12,7 @@ type ContactCategory {
     id: Int!
     title: String!
     slug: String!
+    sortOrder: Int!
 
     contacts: [Contact]
 }
@@ -21,6 +23,7 @@ input ContactInput {
     position: String!
     slug: String
     category: ContactCategoryInput!
+    sortOrder: Int
     methods: [KeyValuePairInput]
 }
 
@@ -28,6 +31,7 @@ input ContactCategoryInput {
     id: Int
     title: String!
     slug: String
+    sortOrder: Int
 
     contacts: [ContactInput]
 }

@@ -30,7 +30,7 @@
 
     <div class="container space-1">
         <div class="row">
-            <#list current.contacts as c>
+            <#list current.sortedContacts as c>
                 <div class="col-sm-6 col-md-4 mb-5">
                     <@components.contactCard contact=c additionalClasses="h-100" />
                 </div>

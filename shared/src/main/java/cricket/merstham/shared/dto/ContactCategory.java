@@ -11,8 +11,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
 
+import java.beans.Transient;
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
+
+import static java.text.MessageFormat.format;
 
 @Data
 @Builder
@@ -26,5 +30,16 @@ public class ContactCategory implements Serializable {
     @JsonProperty private Integer id;
     @JsonProperty private String title;
     @JsonProperty private String slug;
+    @JsonProperty private int sortOrder;
     @JsonProperty private List<Contact> contacts;
+
+    @Transient
+    public String getSortKey() {
+        return format("{0,number,0000000}-{1}", sortOrder, title);
+    }
+
+    @Transient
+    public List<Contact> getSortedContacts() {
+        return contacts.stream().sorted(Comparator.comparing(Contact::getSortKey)).toList();
+    }
 }

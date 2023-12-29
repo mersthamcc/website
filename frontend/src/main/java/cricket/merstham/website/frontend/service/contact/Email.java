@@ -8,10 +8,12 @@ import java.util.regex.Pattern;
 
 @Service("email-contact-method")
 public class Email implements ContactMethod {
-    private static final  String KEY = "EMAIL";
+    private static final String KEY = "EMAIL";
     private boolean enabled;
-    private static final Pattern PATTERN = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9\\+_-]+(\\.[A-Za-z0-9\\+_-]+)*@"
-            + "[^-][A-Za-z0-9\\+-]+(\\.[A-Za-z0-9\\+-]+)*(\\.[A-Za-z]{2,})$");
+    private static final Pattern PATTERN =
+            Pattern.compile(
+                    "^(?=.{1,64}@)[A-Za-z0-9\\+_-]+(\\.[A-Za-z0-9\\+_-]+)*@"
+                            + "[^-][A-Za-z0-9\\+-]+(\\.[A-Za-z0-9\\+-]+)*(\\.[A-Za-z]{2,})$");
 
     public Email(@Value("${contact-methods.email.enabled}") boolean enabled) {
         this.enabled = enabled;

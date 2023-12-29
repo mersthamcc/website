@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder
@@ -33,14 +35,18 @@ public class Contact implements Serializable {
     @JsonProperty private String slug;
     @JsonProperty private String name;
     @JsonProperty private List<KeyValuePair> methods;
+    @JsonProperty private int sortOrder;
+
+    public String getSortKey() {
+        return format(
+                "{0}-{1,number,0000000}-{2}-{3}",
+                nonNull(category) ? category.getSortKey() : "", sortOrder, position, name);
+    }
 
     public Map<String, String> getAttributeMap() {
         return isNull(methods)
                 ? Map.of()
                 : getMethods().stream()
-                .collect(
-                        Collectors.toMap(
-                                KeyValuePair::getKey,
-                                KeyValuePair::getValue));
+                        .collect(Collectors.toMap(KeyValuePair::getKey, KeyValuePair::getValue));
     }
 }

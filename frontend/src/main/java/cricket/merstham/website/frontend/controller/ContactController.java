@@ -1,7 +1,6 @@
 package cricket.merstham.website.frontend.controller;
 
 import cricket.merstham.website.frontend.service.ContactService;
-import cricket.merstham.website.frontend.service.contact.ContactMethodManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

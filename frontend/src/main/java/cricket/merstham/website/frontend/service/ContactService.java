@@ -29,6 +29,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,7 +70,8 @@ public class ContactService {
                                                 SspResponseDataWrapper.<Contact>builder()
                                                         .data(modelMapper.map(n, Contact.class))
                                                         .editRouteTemplate(
-                                                                Optional.of(ADMIN_CONTACT_EDIT_ROUTE))
+                                                                Optional.of(
+                                                                        ADMIN_CONTACT_EDIT_ROUTE))
                                                         .deleteRouteTemplate(
                                                                 Optional.of(
                                                                         ADMIN_CONTACT_DELETE_ROUTE))
@@ -89,18 +91,17 @@ public class ContactService {
                 .data(
                         result.getData().getContactCategoryFeed().stream()
                                 .map(n -> modelMapper.map(n, ContactCategory.class))
+                                .sorted(Comparator.comparing(ContactCategory::getSortKey))
                                 .toList())
                 .build();
     }
 
     public List<ContactCategory> getCategories(OAuth2AccessToken accessToken) throws IOException {
         var query = new GetContactCategoriesQuery();
-        Response<GetContactCategoriesQuery.Data> result = graphService.executeQuery(query, accessToken);
+        Response<GetContactCategoriesQuery.Data> result =
+                graphService.executeQuery(query, accessToken);
 
-        return result
-                .getData()
-                .getContactCategoryFeed()
-                .stream()
+        return result.getData().getContactCategoryFeed().stream()
                 .map(c -> modelMapper.map(c, ContactCategory.class))
                 .toList();
     }
@@ -119,21 +120,22 @@ public class ContactService {
                         .name(contact.getName())
                         .position(contact.getPosition())
                         .slug(contact.getSlug())
-                        .category(ContactCategoryInput
-                                .builder()
-                                .id(contact.getCategory().getId())
-                                .slug(contact.getCategory().getSlug())
-                                .title(contact.getCategory().getTitle())
-                                .build())
-                        .methods(contact
-                                .getMethods()
-                                .stream()
-                                .map(m -> KeyValuePairInput
-                                        .builder()
-                                        .key(m.getKey())
-                                        .value(m.getValue())
+                        .sortOrder(contact.getSortOrder())
+                        .category(
+                                ContactCategoryInput.builder()
+                                        .id(contact.getCategory().getId())
+                                        .slug(contact.getCategory().getSlug())
+                                        .title(contact.getCategory().getTitle())
                                         .build())
-                                .toList())
+                        .methods(
+                                contact.getMethods().stream()
+                                        .map(
+                                                m ->
+                                                        KeyValuePairInput.builder()
+                                                                .key(m.getKey())
+                                                                .value(m.getValue())
+                                                                .build())
+                                        .toList())
                         .build();
         var saveRequest = SaveContactMutation.builder().contact(input).build();
         Response<SaveContactMutation.Data> result =

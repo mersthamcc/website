@@ -121,7 +121,8 @@ public class ContactService {
                 contact.getId() == 0
                         ? new ContactEntity()
                         : repository.findById(contact.getId()).orElseGet(ContactEntity::new);
-        if (isNull(entity.getCategory()) || !contact.getCategory().getId().equals(entity.getCategory().getId())) {
+        if (isNull(entity.getCategory())
+                || !contact.getCategory().getId().equals(entity.getCategory().getId())) {
             var category = categoryRepository.getReferenceById(contact.getCategory().getId());
             entity.setCategory(category);
         }

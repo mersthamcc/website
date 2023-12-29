@@ -84,6 +84,11 @@ public class ContactEntity {
     @JsonProperty
     private Map<String, String> methods = new HashMap<>();
 
+    @NotNull
+    @Column(name = "sort_order", nullable = false)
+    @JsonProperty
+    private int sortOrder;
+
     @PrePersist
     void preInsert() {
         if (isNull(slug) || slug.isBlank()) {

@@ -3,5 +3,6 @@ query getContactCategories {
         id
         title
         slug
+        sortOrder
     }
 }

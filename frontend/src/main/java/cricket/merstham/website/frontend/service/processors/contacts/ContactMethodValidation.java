@@ -32,10 +32,14 @@ public class ContactMethodValidation implements ItemProcessor<Contact> {
         LOG.info("Validating methods on contact '{}'", item.getPosition());
 
         if (isNull(item.getMethods())) return List.of();
-        return item.getMethods()
-                .stream()
+        return item.getMethods().stream()
                 .filter(m -> !Strings.isNullOrEmpty(m.getValue()))
-                .flatMap(m -> contactMethodManager.getMethodByKey(m.getKey()).validate(m.getValue()).stream())
+                .flatMap(
+                        m ->
+                                contactMethodManager
+                                        .getMethodByKey(m.getKey())
+                                        .validate(m.getValue())
+                                        .stream())
                 .toList();
     }
 }

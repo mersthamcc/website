@@ -62,7 +62,10 @@ public class ContactController extends SspController<Contact> {
     private final OAuth2AuthorizedClientService clientService;
 
     @Autowired
-    public ContactController(ContactService service, ContactMethodManager contactMethodManager, OAuth2AuthorizedClientService clientService) {
+    public ContactController(
+            ContactService service,
+            ContactMethodManager contactMethodManager,
+            OAuth2AuthorizedClientService clientService) {
         this.service = service;
         this.contactMethodManager = contactMethodManager;
         this.clientService = clientService;
@@ -76,9 +79,7 @@ public class ContactController extends SspController<Contact> {
                 Map.of(
                         "columns",
                         List.of(
-                                new DataTableColumn()
-                                        .setKey("contact.name")
-                                        .setFieldName("name"),
+                                new DataTableColumn().setKey("contact.name").setFieldName("name"),
                                 new DataTableColumn()
                                         .setKey("contact.position")
                                         .setFieldName("position"),
@@ -90,22 +91,27 @@ public class ContactController extends SspController<Contact> {
     @GetMapping(value = ADMIN_CONTACT_NEW_ROUTE, name = "admin-contact-new")
     @PreAuthorize(HAS_ROLE_ROLE_CONTACT)
     public ModelAndView newContact(
-            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) throws IOException {
+            HttpServletRequest request, CognitoAuthentication cognitoAuthentication)
+            throws IOException {
         var flash = RequestContextUtils.getInputFlashMap(request);
-        var categoryMap = service.getCategories(cognitoAuthentication.getOAuth2AccessToken())
-                .stream()
-                .collect(Collectors.toMap(
-                        c -> c.getId().toString(),
-                        ContactCategory::getTitle));
+        var categoryMap =
+                service.getCategories(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        c -> c.getId().toString(), ContactCategory::getTitle));
         if (isNull(flash) || flash.isEmpty()) {
             var contact = Contact.builder().build();
             return new ModelAndView(
                     ADMINISTRATION_CONTACT_EDIT,
                     Map.of(
-                            CONTACT, contact,
-                            METHODS, contactMethodManager.getAvailableMethods(),
-                            CONTACT_METHODS, contact.getAttributeMap(),
-                            CATEGORIES, categoryMap));
+                            CONTACT,
+                            contact,
+                            METHODS,
+                            contactMethodManager.getAvailableMethods(),
+                            CONTACT_METHODS,
+                            contact.getAttributeMap(),
+                            CATEGORIES,
+                            categoryMap));
         } else {
             Contact contact = (Contact) flash.get(CONTACT);
             return new ModelAndView(
@@ -125,18 +131,22 @@ public class ContactController extends SspController<Contact> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
         var contact = service.get(cognitoAuthentication.getOAuth2AccessToken(), id);
-        var categoryMap = service.getCategories(cognitoAuthentication.getOAuth2AccessToken())
-                .stream()
-                .collect(Collectors.toMap(
-                        c -> c.getId().toString(),
-                        ContactCategory::getTitle));
+        var categoryMap =
+                service.getCategories(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        c -> c.getId().toString(), ContactCategory::getTitle));
         return new ModelAndView(
                 ADMINISTRATION_CONTACT_EDIT,
                 Map.of(
-                        CONTACT, contact,
-                        METHODS, contactMethodManager.getAvailableMethods(),
-                        CONTACT_METHODS, contact.getAttributeMap(),
-                        CATEGORIES, categoryMap));
+                        CONTACT,
+                        contact,
+                        METHODS,
+                        contactMethodManager.getAvailableMethods(),
+                        CONTACT_METHODS,
+                        contact.getAttributeMap(),
+                        CATEGORIES,
+                        categoryMap));
     }
 
     @GetMapping(value = ADMIN_CONTACT_DELETE_ROUTE, name = "admin-contact-delete")
@@ -166,35 +176,41 @@ public class ContactController extends SspController<Contact> {
         }
     }
 
-    private Contact toContact(MultiValueMap<String, Object> data, CognitoAuthentication cognitoAuthentication) throws IOException {
-        var category = service.getCategories(cognitoAuthentication.getOAuth2AccessToken())
-                .stream()
-                .filter(contactCategory -> contactCategory
-                        .getId()
-                        .equals(Integer.parseInt((String) data.getFirst("category"))))
-                .findFirst();
+    private Contact toContact(
+            MultiValueMap<String, Object> data, CognitoAuthentication cognitoAuthentication)
+            throws IOException {
+        var category =
+                service.getCategories(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .filter(
+                                contactCategory ->
+                                        contactCategory
+                                                .getId()
+                                                .equals(
+                                                        Integer.parseInt(
+                                                                (String)
+                                                                        data.getFirst("category"))))
+                        .findFirst();
         var builder = Contact.builder();
-        builder
-                .id(Integer.parseInt((String) data.getFirst("id")))
-                .name((String)data.getFirst("name"))
-                .position((String)data.getFirst("position"))
+        builder.id(Integer.parseInt((String) data.getFirst("id")))
+                .name((String) data.getFirst("name"))
+                .position((String) data.getFirst("position"))
+                .sortOrder(Integer.parseInt((String) data.getFirst("sortOrder")))
                 .category(category.orElseThrow());
 
         List<KeyValuePair> methods = new LinkedList<>();
-        contactMethodManager.getAvailableMethods()
-                .forEach(method -> {
-                    if (data.containsKey(method)) {
-                        methods.add(
-                                KeyValuePair
-                                        .builder()
-                                        .key(method)
-                                        .value((String) data.getFirst(method))
-                                        .build());
-                    }
-                });
-        return builder
-                .methods(methods)
-                .build();
+        contactMethodManager
+                .getAvailableMethods()
+                .forEach(
+                        method -> {
+                            if (data.containsKey(method)) {
+                                methods.add(
+                                        KeyValuePair.builder()
+                                                .key(method)
+                                                .value((String) data.getFirst(method))
+                                                .build());
+                            }
+                        });
+        return builder.methods(methods).build();
     }
 
     @Override

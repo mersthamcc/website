@@ -4,10 +4,12 @@ mutation saveContactMethods ($id: Int!, $methods: [KeyValuePairInput]!) {
         name
         position
         slug
+        sortOrder
         category {
             id
             title
             slug
+            sortOrder
         }
         methods {
             key

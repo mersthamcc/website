@@ -16,6 +16,7 @@
                     <@admin.formErrors errors=errors![] errorKey="contact.errorSaving"/>
                     <@admin.adminFormField name="name" data=contact.name!"" required=true type="text" localeCategory="contact" />
                     <@admin.adminFormField name="position" data=contact.position!"" required=true type="text" localeCategory="contact" />
+                    <@admin.adminFormField name="sortOrder" data=contact.sortOrder?c!"" required=true type="number" localeCategory="contact" />
                     <@admin.adminSelectField name="category" data=(contact.category.id?c)!"" required=true localeCategory="contact" options=categories/>
                 </@admin.card>
 

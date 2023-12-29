@@ -1,21 +1,15 @@
 package cricket.merstham.website.frontend.templates;
 
-import freemarker.template.SimpleHash;
-import freemarker.template.TemplateModel;
+import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateModelException;
-import org.assertj.core.api.InstanceOfAssertFactory;
-import org.assertj.core.api.MapAssert;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.InstanceOfAssertFactories.map;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PhoneNumberFormatterTest {
 
@@ -39,34 +33,15 @@ class PhoneNumberFormatterTest {
     @ParameterizedTest
     @MethodSource("happyScenarios")
     void shouldReturnCorrectlyFormattedItemForUKLandlineNumber(
-            String input,
-            String countryCode,
-            String areaCode,
-            String localPart,
-            String formatted) throws TemplateModelException {
-        var result = formatter.exec(List.of(input));
+            String input, String countryCode, String areaCode, String localPart, String formatted)
+            throws TemplateModelException {
+        var result = formatter.exec(List.of(SimpleScalar.newInstanceOrNull(input)));
 
-//        assertThat(result)
-//                .isInstanceOf(SimpleHash.class)
-//                .extracting(PhoneNumberFormatterTest::extractMap, asStringMap())
-//                .containsExactlyInAnyOrderEntriesOf(
-//                        Map.of(
-//                                "country_code", countryCode,
-//                                "area_code", areaCode,
-//                                "local_number", localPart,
-//                                "formatted", formatted));
-    }
-
-    private static InstanceOfAssertFactory<Map, MapAssert<String, String>> asStringMap() {
-        return as(map(String.class, String.class));
-    }
-
-    @NotNull
-    private static Map extractMap(TemplateModel templateModel) {
-        try {
-            return ((SimpleHash) templateModel).toMap();
-        } catch (TemplateModelException e) {
-            throw new RuntimeException(e);
-        }
+        assertThat(result)
+                .isInstanceOf(PhoneNumberFormatter.PhoneNumberWrapper.class)
+                .hasFieldOrPropertyWithValue("countryCode", countryCode)
+                .hasFieldOrPropertyWithValue("areaCode", areaCode)
+                .hasFieldOrPropertyWithValue("localNumber", localPart)
+                .hasFieldOrPropertyWithValue("formatted", formatted);
     }
 }
