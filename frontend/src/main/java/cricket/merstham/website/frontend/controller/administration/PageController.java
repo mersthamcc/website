@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +38,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_
 import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller("AdminPageController")
+@Controller("adminPageController")
 public class PageController extends SspController<StaticPage> {
     private static final Logger LOG = LoggerFactory.getLogger(PageController.class);
     public static final String ADMINISTRATION_PAGE_EDIT = "administration/page/edit";
@@ -49,12 +48,10 @@ public class PageController extends SspController<StaticPage> {
     public static final String ERRORS = "errors";
 
     private final PageService service;
-    private final OAuth2AuthorizedClientService clientService;
 
     @Autowired
-    public PageController(PageService service, OAuth2AuthorizedClientService clientService) {
+    public PageController(PageService service) {
         this.service = service;
-        this.clientService = clientService;
     }
 
     @GetMapping(value = ADMIN_PAGE_BASE, name = "admin-page-list")
@@ -71,9 +68,7 @@ public class PageController extends SspController<StaticPage> {
 
     @GetMapping(value = ADMIN_PAGE_NEW_ROUTE, name = "admin-page-new")
     @PreAuthorize(HAS_ROLE_ROLE_PAGES)
-    public ModelAndView create(
-            HttpServletRequest request, CognitoAuthentication cognitoAuthentication)
-            throws IOException {
+    public ModelAndView create(HttpServletRequest request) {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
             var page = StaticPage.builder().build();
