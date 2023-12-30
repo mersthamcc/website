@@ -32,6 +32,13 @@ public class RoutesHelper {
     public static final String ADMIN_CONTACT_DELETE_ROUTE = ADMIN_CONTACT_BASE + "/delete/{id}";
     public static final String ADMIN_CONTACT_AJAX_ROUTE = ADMIN_CONTACT_BASE + "/get-data";
 
+    public static final String ADMIN_PAGE_BASE = "/administration/page";
+    public static final String ADMIN_PAGE_SAVE_ROUTE = ADMIN_PAGE_BASE + "/save";
+    public static final String ADMIN_PAGE_NEW_ROUTE = ADMIN_PAGE_BASE + "/new";
+    public static final String ADMIN_PAGE_EDIT_ROUTE = ADMIN_PAGE_BASE + "/edit/{slug}";
+    public static final String ADMIN_PAGE_DELETE_ROUTE = ADMIN_PAGE_BASE + "/delete/{slug}";
+    public static final String ADMIN_PAGE_AJAX_ROUTE = ADMIN_PAGE_BASE + "/get-data";
+
     public static final String NEWS_HOME_ROUTE = "/news";
     public static final String NEWS_ITEM_LEGACY_ROUTE = "/news/{id}";
     public static final String NEWS_ROUTE_TEMPLATE = "/{year}/{month}/{day}/{slug}";
@@ -45,6 +52,9 @@ public class RoutesHelper {
     public static final String CONTACTS_ITEM_LEGACY_ROUTE = CONTACTS_HOME_ROUTE + "/{id}";
     public static final String CONTACTS_ROUTE_TEMPLATE = "/{category-slug}/{slug}";
     public static final String CONTACTS_ITEM_ROUTE = CONTACTS_HOME_ROUTE + CONTACTS_ROUTE_TEMPLATE;
+
+    public static final String PAGES_HOME_ROUTE = "/pages";
+    public static final String PAGES_ITEM_ROUTE = PAGES_HOME_ROUTE + "/{slug}";
 
     public static final String LEGACY_RESOURCES = "/resources/**";
 

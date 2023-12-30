@@ -1,0 +1,8 @@
+mutation deletePage($slug: String!) {
+    deletePage(slug: $slug) {
+        slug
+        title
+        sortOrder
+        content
+    }
+}
