@@ -1,0 +1,14 @@
+query adminPages($start: Int!, $length: Int!, $search: String) {
+
+    pages(start: $start, length: $length, searchString: $search) {
+        slug
+        title
+        sortOrder
+        content
+    }
+
+    pageTotals (searchString: $search){
+        totalRecords
+        totalMatching
+    }
+}

@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Named
 public class CkFinderRequestConfiguration {
 
-    private static final List<String> ALLOWED_SECTIONS = List.of("news", "events");
+    private static final List<String> ALLOWED_SECTIONS = List.of("news", "events", "pages");
     public static final String DEFAULT_BACKEND = "default";
 
     public List<Config.ResourceType> resourcesForRequest(Map<String, String> request) {
@@ -27,28 +29,30 @@ public class CkFinderRequestConfiguration {
         } else {
             ArrayList<Config.ResourceType> resourceTypes = new ArrayList<>();
             int i = 0;
-            resourceTypes.add(
-                    resourceType(
-                            i,
-                            "Images",
-                            format("This %s item's images", section),
-                            DEFAULT_BACKEND,
-                            format("/%s/%s/images", section, uuid),
-                            "jpeg,jpg,png,gif,svg",
-                            null,
-                            0));
-            i = i + 1;
-            resourceTypes.add(
-                    resourceType(
-                            i,
-                            "Files",
-                            format("This %s item's attachments", section),
-                            DEFAULT_BACKEND,
-                            format("/%s/%s/files", section, uuid),
-                            "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
-                            null,
-                            0));
-            i = i + 1;
+            if (nonNull(uuid) && !uuid.isBlank()) {
+                resourceTypes.add(
+                        resourceType(
+                                i,
+                                "Images",
+                                format("This %s item's images", section),
+                                DEFAULT_BACKEND,
+                                format("/%s/%s/images", section, uuid),
+                                "jpeg,jpg,png,gif,svg",
+                                null,
+                                0));
+                i = i + 1;
+                resourceTypes.add(
+                        resourceType(
+                                i,
+                                "Files",
+                                format("This %s item's attachments", section),
+                                DEFAULT_BACKEND,
+                                format("/%s/%s/files", section, uuid),
+                                "csv,doc,docx,mov,mp3,mp4,ods,odt,pdf,ppt,pptx,swf,xls,xlsx",
+                                null,
+                                0));
+                i = i + 1;
+            }
             resourceTypes.add(
                     resourceType(
                             i,
@@ -76,6 +80,7 @@ public class CkFinderRequestConfiguration {
     }
 
     private boolean isValidUniqueId(String uuid) {
+        if (isNull(uuid) || uuid.isBlank()) return true;
         try {
             UUID.fromString(uuid);
             return true;

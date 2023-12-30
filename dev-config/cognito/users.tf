@@ -80,3 +80,14 @@ resource "aws_cognito_user_in_group" "developer_in_contact" {
   group_name   = aws_cognito_user_group.contact.name
   username     = aws_cognito_user.developer.username
 }
+
+resource "aws_cognito_user_group" "pages" {
+  name         = "PAGES"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_pages" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.pages.name
+  username     = aws_cognito_user.developer.username
+}

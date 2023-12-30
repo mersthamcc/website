@@ -120,7 +120,16 @@ public class MenuBuilder {
                             List.of(
                                     new Menu("admin-contact-list", null, null, List.of(), null),
                                     new Menu("admin-contact-new", null, null, List.of(), null)),
-                            "tio-call"));
+                            "tio-call"),
+                    new Menu(
+                            "admin-page-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            List.of(
+                                    new Menu("admin-page-list", null, null, List.of(), null),
+                                    new Menu("admin-page-new", null, null, List.of(), null)),
+                            "tio-pages-outlined"));
 
     private final List<Menu> adminAdministrationMenu =
             List.of(

@@ -1,0 +1,8 @@
+mutation savePage ($page: PageInput!) {
+    savePage(page: $page) {
+        slug
+        title
+        sortOrder
+        content
+    }
+}

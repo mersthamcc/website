@@ -1,0 +1,8 @@
+query getPage($slug: String!) {
+    page(slug: $slug) {
+        slug
+        title
+        sortOrder
+        content
+    }
+}

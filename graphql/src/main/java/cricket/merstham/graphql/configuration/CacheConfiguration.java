@@ -45,6 +45,8 @@ public class CacheConfiguration {
     public static final String TEAM_CACHE = "team";
     public static final String ACTIVE_TEAM_CACHE = "active_team";
     public static final String FIXTURE_CACHE = "fixture";
+    public static final String PAGE_SUMMARY_TOTAL_CACHE = "page_feed_totals";
+    public static final String PAGE_ITEM_BY_ID_CACHE = "page_item_by_id";
 
     @Bean
     public CacheManager cacheManager(
