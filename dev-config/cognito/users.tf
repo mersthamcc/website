@@ -91,3 +91,14 @@ resource "aws_cognito_user_in_group" "developer_in_pages" {
   group_name   = aws_cognito_user_group.pages.name
   username     = aws_cognito_user.developer.username
 }
+
+resource "aws_cognito_user_group" "venues" {
+  name         = "VENUES"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_venues" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.venues.name
+  username     = aws_cognito_user.developer.username
+}

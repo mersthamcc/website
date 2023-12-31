@@ -1,0 +1,43 @@
+type Venue {
+    slug: String!
+    name: String!
+    sortOrder: Int!
+    description: String!
+    directions: String!
+    latitude: Float
+    longitude: Float
+    address: String!
+    postCode: String!
+    marker: String
+    showOnMenu: Boolean!
+    aliasFor: String
+    playCricketId: Int
+}
+
+input VenueInput {
+    slug: String!
+    name: String!
+    sortOrder: Int!
+    description: String!
+    directions: String!
+    latitude: Float
+    longitude: Float
+    address: String
+    postCode: String
+    marker: String
+    showOnMenu: Boolean
+    aliasFor: String
+    playCricketId: Int
+}
+
+extend type Query {
+    venue(slug: String!): Venue
+    venues(start: Int!, length: Int!, searchString: String): [Venue]
+    venuesForMenu: [Venue]
+    venueTotals(searchString: String): Totals
+}
+
+extend type Mutation {
+    saveVenue(venue: VenueInput!): Venue
+    deleteVenue(slug: String!): Venue
+}
