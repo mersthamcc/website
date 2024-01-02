@@ -1,0 +1,22 @@
+query adminVenue ($start: Int!, $length: Int!, $search: String) {
+    venues(start: $start, length: $length, searchString: $search) {
+        slug
+        name
+        description
+        directions
+        longitude
+        latitude
+        sortOrder
+        address
+        postCode
+        marker
+        showOnMenu
+        aliasFor
+        playCricketId
+    }
+
+    venueTotals (searchString: $search){
+        totalRecords
+        totalMatching
+    }
+}

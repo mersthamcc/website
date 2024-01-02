@@ -14,6 +14,7 @@ public class ClubConfiguration {
     private SocialConfiguration social;
     private CookieConfiguration cookies;
     private String googleAnalyticsKey;
+    private String googleMapsApiKey;
 
     public String getClubName() {
         return clubName;
@@ -84,6 +85,15 @@ public class ClubConfiguration {
 
     public ClubConfiguration setGoogleAnalyticsKey(String googleAnalyticsKey) {
         this.googleAnalyticsKey = googleAnalyticsKey;
+        return this;
+    }
+
+    public String getGoogleMapsApiKey() {
+        return googleMapsApiKey;
+    }
+
+    public ClubConfiguration setGoogleMapsApiKey(String googleMapsApiKey) {
+        this.googleMapsApiKey = googleMapsApiKey;
         return this;
     }
 }

@@ -1,0 +1,17 @@
+query getVenue ($slug: String!) {
+    venue(slug: $slug) {
+        slug
+        name
+        description
+        directions
+        longitude
+        latitude
+        sortOrder
+        address
+        postCode
+        marker
+        showOnMenu
+        aliasFor
+        playCricketId
+    }
+}

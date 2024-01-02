@@ -1,7 +1,10 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
+import cricket.merstham.website.frontend.service.PageService;
+import cricket.merstham.website.frontend.service.VenueService;
 import jakarta.inject.Singleton;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -39,41 +42,48 @@ public class MenuBuilder {
                             null,
                             URI.create("#"),
                             List.of(),
-                            List.of(
-                                    new Menu("selection", null, null, List.of(), null),
-                                    new Menu("fixtures", null, null, List.of(), null),
-                                    new Menu("results", null, null, List.of(), null),
-                                    new Menu(
-                                            "result-archive",
-                                            null,
-                                            SCRIPT_LINK,
-                                            List.of(),
-                                            List.of(
-                                                    new Menu(
-                                                            "results-for-year",
-                                                            buildParams("year", "2020"),
-                                                            null,
-                                                            List.of(),
-                                                            null),
-                                                    new Menu(
-                                                            "results-for-year",
-                                                            buildParams("year", "2019"),
-                                                            null,
-                                                            List.of(),
-                                                            null))))),
+                            () ->
+                                    List.of(
+                                            new Menu("fixtures", null, null, List.of(), null),
+                                            new Menu("results", null, null, List.of(), null),
+                                            new Menu(
+                                                    "result-archive",
+                                                    null,
+                                                    SCRIPT_LINK,
+                                                    List.of(),
+                                                    null))),
+                    //                                            () -> List.of(
+                    //                                                    new Menu(
+                    //
+                    // "results-for-year",
+                    //
+                    // buildParams("year", "2020"),
+                    //                                                            null,
+                    //                                                            List.of(),
+                    //                                                            null),
+                    //                                                    new Menu(
+                    //
+                    // "results-for-year",
+                    //
+                    // buildParams("year", "2019"),
+                    //                                                            null,
+                    //                                                            List.of(),
+                    //                                                            null))))),
                     new Menu("events", null, URI.create("/events"), List.of(), null),
                     new Menu(
                             "about",
                             null,
                             URI.create("#"),
                             List.of(),
-                            List.of(
-                                    new Menu(
-                                            "contacts",
-                                            null,
-                                            URI.create("/contacts"),
-                                            List.of(),
-                                            null))));
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "contacts",
+                                                    null,
+                                                    URI.create("/contacts"),
+                                                    List.of(),
+                                                    null))),
+                    new Menu("venue", null, URI.create("#"), List.of(), this::getVenueList));
 
     private final List<Menu> dashboardMenu =
             List.of(
@@ -82,14 +92,20 @@ public class MenuBuilder {
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu("admin-home", null, SCRIPT_LINK, List.of(), null),
-                                    new Menu(
-                                            "admin-membership-dashboard",
-                                            null,
-                                            SCRIPT_LINK,
-                                            List.of(),
-                                            null)),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-home",
+                                                    null,
+                                                    SCRIPT_LINK,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-dashboard",
+                                                    null,
+                                                    SCRIPT_LINK,
+                                                    List.of(),
+                                                    null)),
                             "tio-dashboard-outlined"));
 
     private final List<Menu> adminContentMenu =
@@ -99,37 +115,85 @@ public class MenuBuilder {
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu("admin-news-list", null, null, List.of(), null),
-                                    new Menu("admin-news-new", null, null, List.of(), null)),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-news-list", null, null, List.of(), null),
+                                            new Menu(
+                                                    "admin-news-new", null, null, List.of(), null)),
                             "tio-feed-outlined"),
                     new Menu(
                             "admin-event-top",
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu("admin-event-list", null, null, List.of(), null),
-                                    new Menu("admin-event-new", null, null, List.of(), null)),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-event-list",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-event-new",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null)),
                             "tio-calendar"),
                     new Menu(
                             "admin-contact-top",
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu("admin-contact-list", null, null, List.of(), null),
-                                    new Menu("admin-contact-new", null, null, List.of(), null)),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-contact-list",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-contact-new",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null)),
                             "tio-call"),
                     new Menu(
                             "admin-page-top",
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu("admin-page-list", null, null, List.of(), null),
-                                    new Menu("admin-page-new", null, null, List.of(), null)),
-                            "tio-pages-outlined"));
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-page-list", null, null, List.of(), null),
+                                            new Menu(
+                                                    "admin-page-new", null, null, List.of(), null)),
+                            "tio-pages-outlined"),
+                    new Menu(
+                            "admin-venue-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-venue-list",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-venue-new",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null)),
+                            "tio-explore-outlined"));
 
     private final List<Menu> adminAdministrationMenu =
             List.of(
@@ -138,13 +202,14 @@ public class MenuBuilder {
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu(
-                                            "admin-membership-list",
-                                            null,
-                                            null,
-                                            List.of(),
-                                            List.of())),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-membership-list",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null)),
                             "tio-group-senior"));
 
     private final List<Menu> adminSystemMenu =
@@ -154,14 +219,40 @@ public class MenuBuilder {
                             null,
                             SCRIPT_LINK,
                             List.of(),
-                            List.of(
-                                    new Menu(
-                                            "admin-configuration-list",
-                                            null,
-                                            SCRIPT_LINK,
-                                            List.of(),
-                                            null)),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-configuration-list",
+                                                    null,
+                                                    SCRIPT_LINK,
+                                                    List.of(),
+                                                    null)),
                             "tio-tune"));
+
+    private final VenueService venueService;
+    private final PageService pageService;
+
+    @Autowired
+    public MenuBuilder(VenueService venueService, PageService pageService) {
+        this.venueService = venueService;
+        this.pageService = pageService;
+    }
+
+    private List<Menu> getVenueList() {
+        var venues = venueService.getVenuesForMenu();
+        return venues.stream()
+                .map(
+                        v ->
+                                new Menu(
+                                        "venue-item",
+                                        buildParams("slug", v.getSlug()),
+                                        null,
+                                        List.of(),
+                                        null,
+                                        null,
+                                        v.getName()))
+                .toList();
+    }
 
     public List<Menu> getTopMenu() {
         return topMenu;
