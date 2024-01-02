@@ -39,6 +39,13 @@ public class RoutesHelper {
     public static final String ADMIN_PAGE_DELETE_ROUTE = ADMIN_PAGE_BASE + "/delete/{slug}";
     public static final String ADMIN_PAGE_AJAX_ROUTE = ADMIN_PAGE_BASE + "/get-data";
 
+    public static final String ADMIN_VENUE_BASE = "/administration/venue";
+    public static final String ADMIN_VENUE_SAVE_ROUTE = ADMIN_VENUE_BASE + "/save";
+    public static final String ADMIN_VENUE_NEW_ROUTE = ADMIN_VENUE_BASE + "/new";
+    public static final String ADMIN_VENUE_EDIT_ROUTE = ADMIN_VENUE_BASE + "/edit/{slug}";
+    public static final String ADMIN_VENUE_DELETE_ROUTE = ADMIN_VENUE_BASE + "/delete/{slug}";
+    public static final String ADMIN_VENUE_AJAX_ROUTE = ADMIN_VENUE_BASE + "/get-data";
+
     public static final String NEWS_HOME_ROUTE = "/news";
     public static final String NEWS_ITEM_LEGACY_ROUTE = "/news/{id}";
     public static final String NEWS_ROUTE_TEMPLATE = "/{year}/{month}/{day}/{slug}";
@@ -55,6 +62,9 @@ public class RoutesHelper {
 
     public static final String PAGES_HOME_ROUTE = "/pages";
     public static final String PAGES_ITEM_ROUTE = PAGES_HOME_ROUTE + "/{slug}";
+
+    public static final String VENUE_HOME_ROUTE = "/findus";
+    public static final String VENUE_ITEM_ROUTE = VENUE_HOME_ROUTE + "/{slug}";
 
     public static final String LEGACY_RESOURCES = "/resources/**";
 

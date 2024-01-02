@@ -1,0 +1,17 @@
+mutation deleteVenue ($slug: String!) {
+    deleteVenue(slug: $slug) {
+        slug
+        name
+        description
+        directions
+        longitude
+        latitude
+        sortOrder
+        address
+        postCode
+        marker
+        showOnMenu
+        aliasFor
+        playCricketId
+    }
+}

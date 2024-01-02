@@ -68,6 +68,7 @@ club:
   favicon: "/mcc/img/logos/mcc-logo-favicon.svg"
   phone-number: "(01737) 645485"
   google-analytics-key: "UA-48714932-4"
+  google-maps-api-key: ${GOOGLE_MAPS_API_KEY:}
   play-cricket:
     enabled: true
     site: merstham

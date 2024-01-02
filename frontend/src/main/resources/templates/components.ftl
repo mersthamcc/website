@@ -231,7 +231,7 @@
                                aria-haspopup="true"
                                aria-expanded="false"
                                aria-labelledby="submenu-${item.name}">
-                                <@spring.messageArgs code="menu.${item.name}" args=item.argumentValues />
+                                <@spring.messageArgsText code="menu.${item.name}" args=item.argumentValues text=item.name />
                             </a>
 
                             <div id="submenu-${item.name}"
@@ -272,7 +272,7 @@
                                         </div>
                                     <#else>
                                         <a class="dropdown-item ${classes}" href="${subitem.destinationUrl}">
-                                            <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
+                                            <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.name />
                                         </a>
                                     </#if>
                                 </#list>

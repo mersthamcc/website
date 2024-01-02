@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @JsonSerialize
-public class Venue {
+public class Venue implements Serializable {
     @JsonProperty private String slug;
     @JsonProperty private String name;
     @JsonProperty private int sortOrder;

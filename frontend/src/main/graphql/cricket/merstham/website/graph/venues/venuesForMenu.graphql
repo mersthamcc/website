@@ -1,0 +1,17 @@
+query venuesForMenu {
+    venuesForMenu {
+        slug
+        name
+        description
+        directions
+        longitude
+        latitude
+        sortOrder
+        address
+        postCode
+        marker
+        showOnMenu
+        aliasFor
+        playCricketId
+    }
+}

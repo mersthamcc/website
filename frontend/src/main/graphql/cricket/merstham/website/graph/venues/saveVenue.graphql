@@ -1,0 +1,17 @@
+mutation saveVenue ($venue: VenueInput!) {
+    saveVenue(venue: $venue) {
+        slug
+        name
+        description
+        directions
+        longitude
+        latitude
+        sortOrder
+        address
+        postCode
+        marker
+        showOnMenu
+        aliasFor
+        playCricketId
+    }
+}

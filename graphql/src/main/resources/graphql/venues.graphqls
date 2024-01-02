@@ -2,12 +2,12 @@ type Venue {
     slug: String!
     name: String!
     sortOrder: Int!
-    description: String!
-    directions: String!
+    description: String
+    directions: String
     latitude: Float
     longitude: Float
-    address: String!
-    postCode: String!
+    address: String
+    postCode: String
     marker: String
     showOnMenu: Boolean!
     aliasFor: String
@@ -18,8 +18,8 @@ input VenueInput {
     slug: String!
     name: String!
     sortOrder: Int!
-    description: String!
-    directions: String!
+    description: String
+    directions: String
     latitude: Float
     longitude: Float
     address: String
