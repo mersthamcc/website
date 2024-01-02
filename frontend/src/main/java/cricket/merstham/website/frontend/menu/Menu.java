@@ -5,10 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import javax.inject.Provider;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public class Menu {
     private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
@@ -17,22 +22,25 @@ public class Menu {
     private final LinkedHashMap<String, String> arguments;
     private final URI destinationUrl;
     private final List<String> roles;
-    private final List<Menu> children;
+    private final Provider<List<Menu>> children;
     private final String icons;
+    private final String displayName;
 
     public Menu(
             String name,
             LinkedHashMap<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
-            List<Menu> children,
-            String icons) {
+            Provider<List<Menu>> children,
+            String icons,
+            String displayName) {
         this.name = name;
         this.arguments = arguments;
         this.destinationUrl = destinationUrl;
         this.roles = roles;
         this.children = children;
         this.icons = icons;
+        this.displayName = displayName;
     }
 
     public Menu(
@@ -40,7 +48,17 @@ public class Menu {
             LinkedHashMap<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
-            List<Menu> children) {
+            Provider<List<Menu>> children,
+            String icons) {
+        this(name, arguments, destinationUrl, roles, children, icons, null);
+    }
+
+    public Menu(
+            String name,
+            LinkedHashMap<String, String> arguments,
+            URI destinationUrl,
+            List<String> roles,
+            Provider<List<Menu>> children) {
         this(name, arguments, destinationUrl, roles, children, null);
     }
 
@@ -78,7 +96,8 @@ public class Menu {
     }
 
     public List<Menu> getChildren() {
-        return children;
+        if (isNull(children)) return null;
+        return children.get();
     }
 
     public boolean onActivePath(ViewConfiguration.CurrentRoute currentRoute) {
@@ -90,7 +109,7 @@ public class Menu {
                 this.getArguments());
         if (isActiveNode(currentRoute)) return true;
         if (children != null) {
-            for (var child : children) {
+            for (var child : getChildren()) {
                 if (child.onActivePath(currentRoute)) return true;
             }
         }
@@ -113,7 +132,7 @@ public class Menu {
     public List<Menu> getBreadcrumbs(ViewConfiguration.CurrentRoute currentRoute) {
         if (isActiveNode(currentRoute)) return new ArrayList<>(List.of(this));
         if (children != null) {
-            for (var child : children) {
+            for (var child : getChildren()) {
                 List<Menu> breadcrumbs = child.getBreadcrumbs(currentRoute);
                 if (!breadcrumbs.isEmpty()) {
                     breadcrumbs.add(this);
@@ -126,5 +145,10 @@ public class Menu {
 
     public String getIcons() {
         return icons;
+    }
+
+    public String getDisplayName() {
+        if (nonNull(displayName)) return displayName;
+        return name;
     }
 }

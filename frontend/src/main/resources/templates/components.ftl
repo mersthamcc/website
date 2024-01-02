@@ -24,17 +24,19 @@
             <#if breadcrumb?has_next>
                 <li class="breadcrumb-item">
                     <a href="${breadcrumb.destinationUrl}">
-                        <@spring.messageArgs
+                        <@spring.messageArgsText
                         code="menu.${breadcrumb.name}"
                         args=breadcrumb.argumentValues
+                        text=breadcrumb.displayName
                         />
                     </a>
                 </li>
             <#else>
                 <li class="breadcrumb-item active" aria-current="page">
-                    <@spring.messageArgs
+                    <@spring.messageArgsText
                     code="menu.${breadcrumb.name}"
                     args=breadcrumb.argumentValues
+                    text=breadcrumb.displayName
                     />
                 </li>
             </#if>
@@ -231,7 +233,7 @@
                                aria-haspopup="true"
                                aria-expanded="false"
                                aria-labelledby="submenu-${item.name}">
-                                <@spring.messageArgsText code="menu.${item.name}" args=item.argumentValues text=item.name />
+                                <@spring.messageArgsText code="menu.${item.name}" args=item.argumentValues text=item.displayName />
                             </a>
 
                             <div id="submenu-${item.name}"
@@ -265,14 +267,14 @@
                                                         <#assign classes></#assign>
                                                     </#if>
                                                     <a class="dropdown-item ${classes}" href="${leafItem.destinationUrl}">
-                                                        <@spring.messageArgs code="menu.${leafItem.name}" args=leafItem.argumentValues />
+                                                        <@spring.messageArgsText code="menu.${leafItem.name}" args=leafItem.argumentValues text=leafItem.displayName />
                                                     </a>
                                                 </#list>
                                             </div>
                                         </div>
                                     <#else>
                                         <a class="dropdown-item ${classes}" href="${subitem.destinationUrl}">
-                                            <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.name />
+                                            <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />
                                         </a>
                                     </#if>
                                 </#list>
@@ -286,7 +288,7 @@
                                aria-haspopup="true"
                                aria-expanded="false"
                                >
-                                <@spring.messageArgs code="menu.${item.name}" args=item.argumentValues />
+                                <@spring.messageArgsText code="menu.${item.name}" args=item.argumentValues text=item.displayName />
                             </a>
                         </li>
                     </#if>

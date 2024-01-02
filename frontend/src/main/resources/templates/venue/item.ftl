@@ -63,6 +63,7 @@
                 <h2>Our Address</h2>
                 <address class="markeraddress">
                     ${venue.address}
+                    <div class="bold">${venue.postCode}</div>
                 </address>
             </div>
         </div>

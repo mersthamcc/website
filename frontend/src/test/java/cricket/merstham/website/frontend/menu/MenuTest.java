@@ -23,9 +23,10 @@ class MenuTest {
                             new LinkedHashMap<>(),
                             null,
                             null,
-                            List.of(
-                                    new Menu("sub-item-1", null, null, null, null),
-                                    new Menu("sub-item-2", null, null, null, null))));
+                            () ->
+                                    List.of(
+                                            new Menu("sub-item-1", null, null, null, null),
+                                            new Menu("sub-item-2", null, null, null, null))));
 
     @Test
     void getArgumentValuesWhenNoPathVariables() {
@@ -91,8 +92,11 @@ class MenuTest {
         ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("sub-item-1");
 
         assertThat(menuTree.get(1).getBreadcrumbs(currentRoute).size()).isEqualTo(2);
-        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute))
-                .contains(menuTree.get(1).getChildren().get(0), menuTree.get(1));
+        assertThat(
+                        menuTree.get(1).getBreadcrumbs(currentRoute).stream()
+                                .map(b -> b.getName())
+                                .toList())
+                .containsExactlyInAnyOrder("test-item-2", "sub-item-1");
     }
 
     @Test
@@ -100,8 +104,11 @@ class MenuTest {
         ViewConfiguration.CurrentRoute currentRoute = createMockCurrentRoute("sub-item-2");
 
         assertThat(menuTree.get(1).getBreadcrumbs(currentRoute).size()).isEqualTo(2);
-        assertThat(menuTree.get(1).getBreadcrumbs(currentRoute))
-                .contains(menuTree.get(1).getChildren().get(1), menuTree.get(1));
+        assertThat(
+                        menuTree.get(1).getBreadcrumbs(currentRoute).stream()
+                                .map(b -> b.getName())
+                                .toList())
+                .containsExactlyInAnyOrder("test-item-2", "sub-item-2");
     }
 
     @Test

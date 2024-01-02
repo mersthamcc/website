@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.VENUE_ITEM_ROUTE;
@@ -23,7 +22,7 @@ public class VenueController {
     }
 
     @GetMapping(value = VENUE_ITEM_ROUTE, name = "venue-item")
-    public ModelAndView getItem(Principal principal, @PathVariable String slug) throws IOException {
+    public ModelAndView getItem(@PathVariable String slug) throws IOException {
         var venue = service.get(slug);
         return new ModelAndView("venue/item", Map.of("venue", venue));
     }
