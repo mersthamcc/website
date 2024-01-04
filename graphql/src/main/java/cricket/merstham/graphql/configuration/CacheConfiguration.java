@@ -3,7 +3,6 @@ package cricket.merstham.graphql.configuration;
 import cricket.merstham.graphql.cache.DynamoCacheConfiguration;
 import cricket.merstham.graphql.cache.DynamoCacheManager;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -23,7 +22,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateTimeToLiveRequest;
 import static java.util.Objects.nonNull;
 
 @Configuration
-@EnableCaching
+// @EnableCaching
 public class CacheConfiguration {
 
     public static final String MEMBER_SUMMARY_CACHE = "member_summary";

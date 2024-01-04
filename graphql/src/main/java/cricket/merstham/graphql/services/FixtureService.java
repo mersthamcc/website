@@ -144,28 +144,33 @@ public class FixtureService {
             description = "Time taken to process players from PlayCricket")
     public void refreshPlayers() {
         LOG.info("Starting PlayCricket player refresh...");
-        var players = playCricketService.getPlayers();
+        try {
+            var players = playCricketService.getPlayers();
 
-        var updates = new ArrayList<PlayerEntity>();
-        players.entrySet()
-                .forEach(
-                        p -> {
-                            var entity =
-                                    playerRepository
-                                            .findById(p.getKey())
-                                            .orElseGet(
-                                                    () ->
-                                                            PlayerEntity.builder()
-                                                                    .id(p.getKey())
-                                                                    .build())
-                                            .setDetail(p.getValue());
+            var updates = new ArrayList<PlayerEntity>();
+            players.entrySet()
+                    .forEach(
+                            p -> {
+                                var entity =
+                                        playerRepository
+                                                .findById(p.getKey())
+                                                .orElseGet(
+                                                        () ->
+                                                                PlayerEntity.builder()
+                                                                        .id(p.getKey())
+                                                                        .build())
+                                                .setDetail(p.getValue());
 
-                            updates.add(entity);
-                        });
+                                updates.add(entity);
+                            });
 
-        if (!updates.isEmpty()) {
-            LOG.info("Saving PlayCricket player data.");
-            playerRepository.saveAllAndFlush(updates);
+            if (!updates.isEmpty()) {
+                LOG.info("Saving PlayCricket player data.");
+                playerRepository.saveAllAndFlush(updates);
+            }
+
+        } catch (Exception ex) {
+            LOG.error("Error in PlayCricket player refresh", ex);
         }
         LOG.info("Finished PlayCricket player refresh!");
     }
@@ -177,32 +182,36 @@ public class FixtureService {
             value = "playcricket.teams.refresh",
             description = "Time taken to process teams from PlayCricket")
     public void refreshTeams() {
-        refreshPlayers();
         LOG.info("Starting PlayCricket team refresh...");
-        var teams = playCricketService.getTeams();
+        try {
+            refreshPlayers();
+            var teams = playCricketService.getTeams();
 
-        int order = 1;
-        for (var team : teams) {
-            LOG.info("Processing team {}", team);
-            var name =
-                    Objects.equals(team.getTeamName(), OTHER)
-                            ? team.getOtherTeamName()
-                            : team.getTeamName();
-            var entity =
-                    teamRepository
-                            .findById(team.getId())
-                            .orElseGet(() -> TeamEntity.builder().id(team.getId()).build())
-                            .setSortOrder(order)
-                            .setSlug(name.toSlug())
-                            .setName(name)
-                            .setStatus(team.getStatus())
-                            .setCaptain(getCaptain(team.getTeamCaptain()));
-            try {
-                teamRepository.saveAndFlush(entity);
-            } catch (Exception e) {
-                LOG.error(() -> format("Error saving team {0}", team.getId()), e);
+            int order = 1;
+            for (var team : teams) {
+                LOG.info("Processing team {}", team);
+                var name =
+                        Objects.equals(team.getTeamName(), OTHER)
+                                ? team.getOtherTeamName()
+                                : team.getTeamName();
+                var entity =
+                        teamRepository
+                                .findById(team.getId())
+                                .orElseGet(() -> TeamEntity.builder().id(team.getId()).build())
+                                .setSortOrder(order)
+                                .setSlug(name.toSlug())
+                                .setName(name)
+                                .setStatus(team.getStatus())
+                                .setCaptain(getCaptain(team.getTeamCaptain()));
+                try {
+                    teamRepository.saveAndFlush(entity);
+                } catch (Exception e) {
+                    LOG.error(() -> format("Error saving team {0}", team.getId()), e);
+                }
+                order++;
             }
-            order++;
+        } catch (Exception ex) {
+            LOG.error("Error in PlayCricket team refresh", ex);
         }
         LOG.info("Finished PlayCricket team refresh!");
     }
@@ -221,41 +230,45 @@ public class FixtureService {
             description = "Time taken to process fixtures from PlayCricket")
     public void refreshFixtures() {
         LOG.info("Starting PlayCricket fixture refresh... ");
-        var now = Instant.now();
-        var lastUpdateEntity = lastUpdateRepository.findById(FIXTURES);
-        var lastUpdate = lastUpdateEntity.map(LastUpdateEntity::getLastUpdate);
-        var fixtures = playCricketService.getFixtures(lastUpdate, now);
+        try {
+            var now = Instant.now();
+            var lastUpdateEntity = lastUpdateRepository.findById(FIXTURES);
+            var lastUpdate = lastUpdateEntity.map(LastUpdateEntity::getLastUpdate);
+            var fixtures = playCricketService.getFixtures(lastUpdate, now);
 
-        saveFixtures(fixtures);
-        lastUpdateRepository.saveAndFlush(
-                lastUpdateEntity
-                        .orElseGet(() -> LastUpdateEntity.builder().key(FIXTURES).build())
-                        .setLastUpdate(now));
+            saveFixtures(fixtures);
+            lastUpdateRepository.saveAndFlush(
+                    lastUpdateEntity
+                            .orElseGet(() -> LastUpdateEntity.builder().key(FIXTURES).build())
+                            .setLastUpdate(now));
 
-        LOG.info("Updating league info...");
-        var leagueIds =
-                fixtureRepository.findLeagueIdsForTeamsBetween(
-                        LocalDate.of(LocalDate.now().getYear(), 1, 1),
-                        LocalDate.of(LocalDate.now().getYear(), 12, 31));
+            LOG.info("Updating league info...");
+            var leagueIds =
+                    fixtureRepository.findLeagueIdsForTeamsBetween(
+                            LocalDate.of(LocalDate.now().getYear(), 1, 1),
+                            LocalDate.of(LocalDate.now().getYear(), 12, 31));
 
-        List<LeagueEntity> leagueUpdates = new ArrayList<>();
-        for (var leagueId : leagueIds) {
-            if (isNull(leagueId)) continue;
-            LOG.info("Getting league details for id {}", leagueId);
-            try {
-                var league = playCricketService.getLeague(leagueId);
-                leagueUpdates.add(
-                        leagueRepository
-                                .findById(leagueId)
-                                .orElseGet(() -> LeagueEntity.builder().id(leagueId).build())
-                                .setName(league.getName())
-                                .setLastUpdate(now)
-                                .setTable(league.getLeague().get(0)));
-            } catch (NotFoundException e) {
-                LOG.warn("League not found {}", leagueId);
+            List<LeagueEntity> leagueUpdates = new ArrayList<>();
+            for (var leagueId : leagueIds) {
+                if (isNull(leagueId)) continue;
+                LOG.info("Getting league details for id {}", leagueId);
+                try {
+                    var league = playCricketService.getLeague(leagueId);
+                    leagueUpdates.add(
+                            leagueRepository
+                                    .findById(leagueId)
+                                    .orElseGet(() -> LeagueEntity.builder().id(leagueId).build())
+                                    .setName(league.getName())
+                                    .setLastUpdate(now)
+                                    .setTable(league.getLeague().get(0)));
+                } catch (NotFoundException e) {
+                    LOG.warn("League not found {}", leagueId);
+                }
             }
+            leagueRepository.saveAllAndFlush(leagueUpdates);
+        } catch (Exception ex) {
+            LOG.error("Error in PlayCricket fixture refresh", ex);
         }
-        leagueRepository.saveAllAndFlush(leagueUpdates);
         LOG.info("Finished PlayCricket fixture refresh!");
     }
 

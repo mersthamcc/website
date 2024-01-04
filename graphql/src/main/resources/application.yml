@@ -7,9 +7,10 @@ spring:
 
   devtools:
     livereload:
-      enabled: false
+      enabled: ${DEVTOOLS_LIVE_RELOAD:false}
     restart:
-      enabled: false
+      enabled: ${DEVTOOLS_RESTART:false}
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,9 +18,10 @@ spring:
     show-sql: false
 
   datasource:
-    url: "jdbc:postgresql://${DATABASE_HOST:localhost}:5432/${DATABASE_NAME:}"
+    url: "jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:}"
     username: ${DATABASE_USER:}
     password: ${DATABASE_PASSWORD:}
+
   graphql:
     graphiql:
       enabled: true
@@ -32,7 +34,7 @@ spring:
       time-to-live: 300s
       region: eu-west-2
       endpoint: ${DYNAMO_ENDPOINT:}
-      create-table: true
+      create-table: ${DYNAMO_CREATE_TABLE:true}
   security:
     oauth2:
       resourceserver:

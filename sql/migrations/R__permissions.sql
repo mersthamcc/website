@@ -5,15 +5,15 @@ DO $$ BEGIN IF NOT EXISTS(
     WHERE
         rolname = '${content_user}'
 ) THEN CREATE
-    USER ${content_user} PASSWORD '${content_user_password}';
+    USER "${content_user}" PASSWORD '${content_user_password}';
 END IF;
 END $$;
 
 GRANT ALL ON
-DATABASE ${database_name} TO ${content_user};
+DATABASE "${database_name}" TO "${content_user}";
 
 GRANT USAGE ON
-SCHEMA public TO ${content_user};
+SCHEMA public TO "${content_user}";
 
 GRANT SELECT
     ,
@@ -23,14 +23,14 @@ GRANT SELECT
             ,
             DELETE
                 ON
-                ALL TABLES IN SCHEMA public TO ${content_user};
+                ALL TABLES IN SCHEMA public TO "${content_user}";
 
 GRANT USAGE,
 SELECT
     ,
     UPDATE
         ON
-        ALL SEQUENCES IN SCHEMA public TO ${content_user};
+        ALL SEQUENCES IN SCHEMA public TO "${content_user}";
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT
     ,
@@ -40,11 +40,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT
             ,
             DELETE
                 ON
-                TABLES TO ${content_user};
+                TABLES TO "${content_user}";
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE,
 SELECT
     ,
     UPDATE
         ON
-        SEQUENCES TO ${content_user};
+        SEQUENCES TO "${content_user}";

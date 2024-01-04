@@ -5,34 +5,99 @@ on:
       - main
 
 jobs:
-  analyse:
+#  analyse:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code
+#        uses: actions/checkout@v2
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'corretto'
+#          java-version-file: '.java-version'
+#
+#      - name: Cache SonarCloud packages
+#        uses: actions/cache@v1
+#        with:
+#          path: ~/.sonar/cache
+#          key: ${{ runner.os }}-sonar-on-merge
+#          restore-keys: ${{ runner.os }}-sonar-on-merge
+#
+#      - name: Prepare
+#        shell: bash
+#        run: |
+#          echo "Removing symbolic link to assets..."
+#          rm frontend/src/main/resources/static
+#
+#      - name: Build and analyze
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: |
+#          ./gradlew build sonarqube --info
+
+  publish:
     runs-on: ubuntu-latest
+#    needs:
+#      - analyse
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          distribution: 'corretto'
-          java-version-file: '.java-version'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+      - name: Build frontend image
+        id: build-frontend
+        uses: docker/build-push-action@v5
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar-on-merge
-          restore-keys: ${{ runner.os }}-sonar-on-merge
+          context: .
+          push: true
+          tags: mersthamcc/frontend:test
+          build-args: |
+            COMPONENT=frontend
 
-      - name: Prepare
-        shell: bash
-        run: |
-          echo "Removing symbolic link to assets..."
-          rm frontend/src/main/resources/static
+      - name: Build GraphQL image
+        id: build-graphql
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: mersthamcc/graphql:test
+          build-args: |
+            COMPONENT=graphql
 
-      - name: Build and analyze
+      - name: Dispatch deployment event
+        uses: actions/github-script@v7
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew build sonarqube --info
+          GRAPHQL_IMAGE: ${{ steps.build-graphql.outputs.digest }}
+          FRONTEND_IMAGE: ${{ steps.build-frontend.outputs.digest }}
+        with:
+          github-token: ${{ secrets.DEPLOYMENT_PAT }}
+          script: |
+            const { GRAPHQL_IMAGE, FRONTEND_IMAGE } = process.env
+
+            console.log(`Images: ${GRAPHQL_IMAGE} ${FRONTEND_IMAGE}`)
+            
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'mersthamcc',
+              repo: 'infrastructure',
+              event_type: 'app_release',
+              client_payload: {
+                "graphql_image": GRAPHQL_IMAGE,
+                "frontend_image": FRONTEND_IMAGE
+              }
+            });
