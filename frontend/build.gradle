@@ -29,6 +29,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
     implementation "org.springframework.session:spring-session-core:${dependencyVersions.spring_sessions}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.session:spring-session-data-redis:${dependencyVersions.spring_sessions}"
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
     implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
     implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
