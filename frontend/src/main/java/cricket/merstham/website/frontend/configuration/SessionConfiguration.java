@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.session.DynamoSessionConfiguration;
 import cricket.merstham.website.frontend.session.DynamoSessionRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.session.config.annotation.web.http.SpringHttpSessionConfiguration;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -22,6 +23,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateTimeToLiveRequest;
 import static java.util.Objects.nonNull;
 
 @Configuration
+@Profile("dynamo-sessions")
 public class SessionConfiguration extends SpringHttpSessionConfiguration {
     @Bean
     public DynamoSessionRepository sessionRepository(

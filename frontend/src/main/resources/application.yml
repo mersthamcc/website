@@ -1,5 +1,9 @@
 base-url: "${BASE_URL:https://www.new.mersthamcc.co.uk}"
 spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   session:
     dynamodb:
       table-name: ${DYNAMO_SESSION_TABLE:sessions}
