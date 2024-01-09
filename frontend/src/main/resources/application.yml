@@ -1,4 +1,4 @@
-base-url: "${BASE_URL:https://www.new.mersthamcc.co.uk}"
+base-url: "${BASE_URL:http://localhost:8080}"
 spring:
   data:
     redis:
@@ -67,20 +67,20 @@ management:
         include: health,info,prometheus
 
 club:
-  club-name: ${CLUBNAME:Merstham Cricket Club}
+  club-name: ${CLUBNAME:My Cricket Club}
   logo: "/mcc/img/logos/mcc-logo-header.svg"
   favicon: "/mcc/img/logos/mcc-logo-favicon.svg"
-  phone-number: "${CLUB_PHONE_NUMBER:(01737) 645485}"
-  google-analytics-key: "${GOOGLE_ANALYTICS_KEY:UA-48714932-4}"
+  phone-number: "${CLUB_PHONE_NUMBER:(01234) 567890}"
+  google-analytics-key: "${GOOGLE_ANALYTICS_KEY:}"
   google-maps-api-key: ${GOOGLE_MAPS_API_KEY:}
   play-cricket:
     enabled: true
     site: merstham
   social:
     twitter:
-      handle: ${TWITTER_HANDLE:mersthammagics}
+      handle: ${TWITTER_HANDLE:~}
     facebook:
-      handle: ${FACEBOOK_HANDLE:MersthamCC}
+      handle: ${FACEBOOK_HANDLE:~}
   cookies:
     api-key: ${COOKIE_CONTROL_KEY:}
     product-code: ${COOKIE_CONTROL_PRODUCT:PRO}

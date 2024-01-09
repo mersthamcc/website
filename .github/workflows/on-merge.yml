@@ -5,42 +5,42 @@ on:
       - main
 
 jobs:
-#  analyse:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Check out repository code
-#        uses: actions/checkout@v2
-#
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          distribution: 'corretto'
-#          java-version-file: '.java-version'
-#
-#      - name: Cache SonarCloud packages
-#        uses: actions/cache@v1
-#        with:
-#          path: ~/.sonar/cache
-#          key: ${{ runner.os }}-sonar-on-merge
-#          restore-keys: ${{ runner.os }}-sonar-on-merge
-#
-#      - name: Prepare
-#        shell: bash
-#        run: |
-#          echo "Removing symbolic link to assets..."
-#          rm frontend/src/main/resources/static
-#
-#      - name: Build and analyze
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: |
-#          ./gradlew build sonarqube --info
+  analyse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version-file: '.java-version'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-on-merge
+          restore-keys: ${{ runner.os }}-sonar-on-merge
+
+      - name: Prepare
+        shell: bash
+        run: |
+          echo "Removing symbolic link to assets..."
+          rm frontend/src/main/resources/static
+
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./gradlew build sonarqube --info
 
   publish:
     runs-on: ubuntu-latest
-#    needs:
-#      - analyse
+    needs:
+      - analyse
     permissions:
       id-token: write
       contents: write
@@ -66,7 +66,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: mersthamcc/frontend:test
+          tags: mersthamcc/frontend:${{ github.sha }}
           build-args: |
             COMPONENT=frontend
 
@@ -76,7 +76,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: mersthamcc/graphql:test
+          tags: mersthamcc/graphql:${{ github.sha }}
           build-args: |
             COMPONENT=graphql
 
@@ -85,10 +85,11 @@ jobs:
         env:
           GRAPHQL_IMAGE: ${{ steps.build-graphql.outputs.digest }}
           FRONTEND_IMAGE: ${{ steps.build-frontend.outputs.digest }}
+          IMAGE_TAG: ${{ github.sha }}
         with:
           github-token: ${{ secrets.DEPLOYMENT_PAT }}
           script: |
-            const { GRAPHQL_IMAGE, FRONTEND_IMAGE } = process.env
+            const { GRAPHQL_IMAGE, FRONTEND_IMAGE, IMAGE_TAG } = process.env
 
             console.log(`Images: ${GRAPHQL_IMAGE} ${FRONTEND_IMAGE}`)
             
@@ -98,6 +99,7 @@ jobs:
               event_type: 'app_release',
               client_payload: {
                 "graphql_image": GRAPHQL_IMAGE,
-                "frontend_image": FRONTEND_IMAGE
+                "frontend_image": FRONTEND_IMAGE,
+                "image_tag": IMAGE_TAG
               }
             });
