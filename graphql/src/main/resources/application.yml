@@ -29,6 +29,13 @@ spring:
       printer:
         enabled: true
   cache:
+    type: redis
+    redis:
+      time-to-live: 300s
+      key-prefix: "graph-cache:"
+      use-key-prefix: true
+      enable-statistics: true
+
     dynamodb:
       table-name: GraphQLCache
       time-to-live: 300s
@@ -40,6 +47,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${COGNITO_ISSUER_URI:}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
   server:

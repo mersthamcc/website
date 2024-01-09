@@ -26,6 +26,7 @@ dependencies {
 
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
     implementation 'org.postgresql:postgresql:42.5.1'
     implementation "org.springframework.boot:spring-boot-starter-graphql:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
