@@ -1,33 +1,12 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cricket.merstham.graphql.jpa.JpaEncryptedStringConverter;
 import cricket.merstham.shared.extensions.StringExtensions;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKeyColumn;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.ExtensionMethod;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,16 +49,12 @@ public class ContactEntity {
 
     @NotNull
     @Column(name = "name", nullable = false)
-    @Convert(converter = JpaEncryptedStringConverter.class)
-    @JdbcTypeCode(SqlTypes.JSON)
     @JsonProperty
     private String name;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "\"method\"")
     @Column(name = "value")
-    @Convert(attributeName = "value", converter = JpaEncryptedStringConverter.class)
-    @JdbcTypeCode(SqlTypes.JSON)
     @CollectionTable(name = "contact_method", joinColumns = @JoinColumn(name = "contact_id"))
     @JsonProperty
     private Map<String, String> methods = new HashMap<>();

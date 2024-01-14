@@ -2,9 +2,7 @@ package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import cricket.merstham.graphql.jpa.JpaEncryptedJsonbConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -35,7 +33,6 @@ public class PlayerEntity implements Serializable {
     private Integer id;
 
     @Column(name = "detail")
-    @Convert(converter = JpaEncryptedJsonbConverter.class)
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode detail;
 

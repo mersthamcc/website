@@ -1,14 +1,8 @@
 package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cricket.merstham.graphql.jpa.JpaEncryptedJsonbConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import cricket.merstham.graphql.jpa.JpaJsonbConverter;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +36,7 @@ public class MemberAttributeEntity implements Serializable {
     private Instant updatedDate;
 
     @Column(name = "value")
-    @Convert(converter = JpaEncryptedJsonbConverter.class)
+    @Convert(converter = JpaJsonbConverter.class)
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode value;
 
