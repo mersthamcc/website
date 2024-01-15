@@ -51,23 +51,6 @@ public class MenuBuilder {
                                                     SCRIPT_LINK,
                                                     List.of(),
                                                     this::getFixtureArchive))),
-                    //                                            () -> List.of(
-                    //                                                    new Menu(
-                    //
-                    // "results-for-year",
-                    //
-                    // buildParams("year", "2020"),
-                    //                                                            null,
-                    //                                                            List.of(),
-                    //                                                            null),
-                    //                                                    new Menu(
-                    //
-                    // "results-for-year",
-                    //
-                    // buildParams("year", "2019"),
-                    //                                                            null,
-                    //                                                            List.of(),
-                    //                                                            null))))),
                     new Menu("events", null, URI.create("/events"), List.of(), null),
                     new Menu(
                             "about",
@@ -253,17 +236,15 @@ public class MenuBuilder {
     }
 
     private List<Menu> getFixtureArchive() {
-        return menuService.getDynamicMenuItems().getVenues().stream()
+        return menuService.getDynamicMenuItems().getSeasons().stream()
                 .map(
-                        v ->
+                        s ->
                                 new Menu(
-                                        "archive-item",
-                                        buildParams("slug", v.getSlug()),
+                                        "results-for-year",
+                                        buildParams("year", s.toString()),
                                         null,
                                         List.of(),
-                                        null,
-                                        null,
-                                        v.getName()))
+                                        null))
                 .toList();
     }
 
