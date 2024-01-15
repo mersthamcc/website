@@ -120,14 +120,14 @@
 
                             <ul class="list-inline ml-2 mb-0">
                                 <!-- Search -->
-                                <li class="list-inline-item">
-                                    <div class="hs-unfold">
-                                        <a class="js-hs-unfold-invoker btn btn-xs btn-icon btn-ghost-secondary" href="javascript:;"
-                                           data-hs-unfold-options='{"target": "#searchPushTop", "type": "jquery-slide", "contentSelector": ".search-push-top"}'>
-                                            <i class="fas fa-search"></i>
-                                        </a>
-                                    </div>
-                                </li>
+<#--                                <li class="list-inline-item">-->
+<#--                                    <div class="hs-unfold">-->
+<#--                                        <a class="js-hs-unfold-invoker btn btn-xs btn-icon btn-ghost-secondary" href="javascript:;"-->
+<#--                                           data-hs-unfold-options='{"target": "#searchPushTop", "type": "jquery-slide", "contentSelector": ".search-push-top"}'>-->
+<#--                                            <i class="fas fa-search"></i>-->
+<#--                                        </a>-->
+<#--                                    </div>-->
+<#--                                </li>-->
                                 <!-- End Search -->
 
                                 <!-- Account Login -->

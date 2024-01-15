@@ -27,4 +27,12 @@ public interface FixtureRepository
             nativeQuery = true)
     List<Integer> findLeagueIdsForTeamsBetween(
             @Param("start") LocalDate start, @Param("end") LocalDate end);
+
+    @Query(
+            value =
+                    "SELECT DISTINCT DATE_PART('year', date) AS Year"
+                            + " FROM fixture"
+                            + " ORDER BY Year;",
+            nativeQuery = true)
+    List<Integer> findDistinctYears();
 }

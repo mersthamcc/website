@@ -1,8 +1,8 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
+import cricket.merstham.website.frontend.service.MenuService;
 import cricket.merstham.website.frontend.service.PageService;
-import cricket.merstham.website.frontend.service.VenueService;
 import jakarta.inject.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,8 @@ public class MenuBuilder {
                             null,
                             URI.create("/administration"),
                             List.of("ROLE_ADMIN"),
-                            null),
-                    new Menu("help", null, URI.create("/help"), List.of(), null));
+                            null));
+    //                    new Menu("help", null, URI.create("/help"), List.of(), null));
 
     private final List<Menu> userMenu = List.of(new Menu("logout", null, null, List.of(), null));
 
@@ -45,13 +45,12 @@ public class MenuBuilder {
                             () ->
                                     List.of(
                                             new Menu("fixtures", null, null, List.of(), null),
-                                            new Menu("results", null, null, List.of(), null),
                                             new Menu(
                                                     "result-archive",
                                                     null,
                                                     SCRIPT_LINK,
                                                     List.of(),
-                                                    null))),
+                                                    this::getFixtureArchive))),
                     //                                            () -> List.of(
                     //                                                    new Menu(
                     //
@@ -82,7 +81,7 @@ public class MenuBuilder {
                                                     null,
                                                     URI.create("/contacts"),
                                                     List.of(),
-                                                    null))),
+                                                    this::getContactCategories))),
                     new Menu("venue", null, URI.create("#"), List.of(), this::getVenueList));
 
     private final List<Menu> dashboardMenu =
@@ -229,18 +228,17 @@ public class MenuBuilder {
                                                     null)),
                             "tio-tune"));
 
-    private final VenueService venueService;
+    private final MenuService menuService;
     private final PageService pageService;
 
     @Autowired
-    public MenuBuilder(VenueService venueService, PageService pageService) {
-        this.venueService = venueService;
+    public MenuBuilder(MenuService menuService, PageService pageService) {
+        this.menuService = menuService;
         this.pageService = pageService;
     }
 
     private List<Menu> getVenueList() {
-        var venues = venueService.getVenuesForMenu();
-        return venues.stream()
+        return menuService.getDynamicMenuItems().getVenues().stream()
                 .map(
                         v ->
                                 new Menu(
@@ -252,6 +250,25 @@ public class MenuBuilder {
                                         null,
                                         v.getName()))
                 .toList();
+    }
+
+    private List<Menu> getFixtureArchive() {
+        return menuService.getDynamicMenuItems().getVenues().stream()
+                .map(
+                        v ->
+                                new Menu(
+                                        "archive-item",
+                                        buildParams("slug", v.getSlug()),
+                                        null,
+                                        List.of(),
+                                        null,
+                                        null,
+                                        v.getName()))
+                .toList();
+    }
+
+    private List<Menu> getContactCategories() {
+        return List.of();
     }
 
     public List<Menu> getTopMenu() {

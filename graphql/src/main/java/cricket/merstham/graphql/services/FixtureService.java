@@ -318,4 +318,8 @@ public class FixtureService {
             return fixtureRepository.saveAllAndFlush(updates);
         }
     }
+
+    public List<Integer> getAllFixtureSeasons() {
+        return fixtureRepository.findDistinctYears();
+    }
 }

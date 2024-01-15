@@ -1,4 +1,4 @@
-query venuesForMenu {
+query menus {
     venuesForMenu {
         slug
         name
@@ -14,4 +14,12 @@ query venuesForMenu {
         aliasFor
         playCricketId
     }
+
+    contactCategoryFeed {
+      title
+      slug
+      sortOrder
+    }
+
+    fixtureArchiveSeasons
 }
