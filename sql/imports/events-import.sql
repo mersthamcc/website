@@ -1,40 +1,27 @@
-\lo_import '../news-export.json';
-
 INSERT
     INTO
-        news(
+        event(
             id,
-            uuid,
+            event_date,
             title,
-            author,
-            created_date,
-            publish_date,
             PATH,
-            draft,
+            uuid,
+            location,
             body
         ) SELECT
             CAST(
                 value ->> 'id' AS INT
             ) AS id,
-            COALESCE(
-                value ->> 'unid',
-                gen_random_uuid()::TEXT
-            ) AS unid,
-            value ->> 'title' AS title,
-            value ->> 'author' AS author,
             to_timestamp(
-                value ->> 'createDate',
+                value ->> 'event_date',
                 'YYYY-MM-DD HH24:MI:SS.US'
-            ) AS createDate,
-            to_timestamp(
-                value ->> 'publishDate',
-                'YYYY-MM-DD HH24:MI:SS.US'
-            ) AS publishDate,
+            ) AS event_date,
+            value ->> 'name' AS title,
             CONCAT(
                 '/',
                 to_char(
                     to_timestamp(
-                        value ->> 'createDate',
+                        value ->> 'event_date',
                         'YYYY-MM-DD HH24:MI:SS.US'
                     ),
                     'YYYY'
@@ -42,7 +29,7 @@ INSERT
                 '/',
                 to_char(
                     to_timestamp(
-                        value ->> 'createDate',
+                        value ->> 'event_date',
                         'YYYY-MM-DD HH24:MI:SS.US'
                     ),
                     'MM'
@@ -50,26 +37,25 @@ INSERT
                 '/',
                 to_char(
                     to_timestamp(
-                        value ->> 'createDate',
+                        value ->> 'event_date',
                         'YYYY-MM-DD HH24:MI:SS.US'
                     ),
                     'DD'
                 ),
                 '/',
                 slugify(
-                    value ->> 'title'
+                    value ->> 'name'
                 )
             ) AS PATH,
-            FALSE AS draft,
-            value ->> 'body' AS body
+            gen_random_uuid()::TEXT AS unid,
+            value ->> 'location' AS location,
+            value ->> 'details' AS body
         FROM
             json_array_elements(
                 CAST(
                     convert_from(
-                        lo_get(24872),
+                        lo_get(25085),
                         'utf-8'
                     ) AS JSON
                 )
-            )
-        WHERE
-            value ->> 'createDate' IS NOT NULL;
+            );
