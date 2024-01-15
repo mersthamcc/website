@@ -4121,6 +4121,22 @@
               "deprecationReason": null
             },
             {
+              "name": "fixtureArchiveSeasons",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "attributes",
               "description": null,
               "args": [],

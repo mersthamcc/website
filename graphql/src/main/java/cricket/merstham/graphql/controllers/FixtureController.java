@@ -53,6 +53,11 @@ public class FixtureController {
         return fixtureService.getTeam(id);
     }
 
+    @QueryMapping
+    public List<Integer> fixtureArchiveSeasons() {
+        return fixtureService.getAllFixtureSeasons();
+    }
+
     @MutationMapping
     public List<Fixture> refreshFixtures(@Argument("season") int season) {
         return fixtureService.refreshFixtures(season);

@@ -14,7 +14,6 @@ import cricket.merstham.website.graph.venues.AdminVenueQuery;
 import cricket.merstham.website.graph.venues.DeleteVenueMutation;
 import cricket.merstham.website.graph.venues.GetVenueQuery;
 import cricket.merstham.website.graph.venues.SaveVenueMutation;
-import cricket.merstham.website.graph.venues.VenuesForMenuQuery;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,18 +76,6 @@ public class VenueService {
                 .recordsFiltered(data.getVenueTotals().getTotalMatching())
                 .recordsTotal(data.getVenueTotals().getTotalRecords())
                 .build();
-    }
-
-    public List<Venue> getVenuesForMenu() {
-        try {
-            Response<VenuesForMenuQuery.Data> result =
-                    graphService.executeQuery(new VenuesForMenuQuery());
-            return result.getData().getVenuesForMenu().stream()
-                    .map(m -> modelMapper.map(m, Venue.class))
-                    .toList();
-        } catch (IOException e) {
-            return List.of();
-        }
     }
 
     public Venue saveItem(OAuth2AccessToken accessToken, Venue venue) throws IOException {
