@@ -870,7 +870,7 @@
         <div class="card-header">
             <!-- Avatar -->
             <div class="avatar avatar-xl avatar-soft-dark avatar-circle avatar-border-lg avatar-centered mb-3">
-                <span class="avatar-initials"><#list contact.name?split(" ") as n>${n?cap_first[0]}</#list></span>
+                <span class="avatar-initials"><#list contact.name?split(" ")[0..1] as n>${n!" "?cap_first[0]}</#list></span>
                 <span class="avatar-status avatar-sm-status"></span>
             </div>
             <!-- End Avatar -->

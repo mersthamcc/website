@@ -96,11 +96,13 @@
                     <div class="container header-hide-content pt-2">
                         <div class="d-flex align-items-center">
                             <a href="//www.twitter.com/${config.social.twitter.handle}"
-                               class="nav-link font-size-1 py-2 pl-0">
+                               class="nav-link font-size-1 py-2 pl-0"
+                               target="_blank">
                                 <i class="fab fa-twitter"></i>
                             </a>
                             <a href="//www.facebook.com/${config.social.facebook.handle}"
-                               class="nav-link font-size-1 py-2 pl-0">
+                               class="nav-link font-size-1 py-2 pl-0"
+                               target="_blank">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                             <a href="tel:${config.phoneNumber}"
@@ -110,7 +112,8 @@
                             </a>
                             <#if config.playCricket.enabled>
                                 <a href="https://${config.playCricket.site}.play-cricket.com"
-                                   class="nav-link font-size-1 py-2 pl-0">
+                                   class="nav-link font-size-1 py-2 pl-0"
+                                   target="_blank">
                                     <i class="fas fa-globe"></i>
                                     Visit us on Play-Cricket
                                 </a>
