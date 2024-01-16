@@ -35,7 +35,7 @@ public class MenuService {
                     .venues(venues(result.getData()))
                     .seasons(
                             Lists.reverse(result.getData().getFixtureArchiveSeasons())
-                                    .subList(0, 20))
+                                    .subList(1, 20))
                     .contactCategories(categories(result.getData()))
                     .build();
         } catch (IOException e) {

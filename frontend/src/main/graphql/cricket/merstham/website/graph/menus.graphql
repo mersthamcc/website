@@ -2,23 +2,14 @@ query menus {
     venuesForMenu {
         slug
         name
-        description
-        directions
-        longitude
-        latitude
         sortOrder
-        address
-        postCode
-        marker
         showOnMenu
-        aliasFor
-        playCricketId
     }
 
     contactCategoryFeed {
-      title
-      slug
-      sortOrder
+        title
+        slug
+        sortOrder
     }
 
     fixtureArchiveSeasons

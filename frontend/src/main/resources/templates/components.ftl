@@ -254,7 +254,7 @@
                                                aria-haspopup="true"
                                                aria-expanded="false"
                                                aria-controls="submenu-${subitem.name}">
-                                                <@spring.messageArgs code="menu.${subitem.name}" args=subitem.argumentValues />
+                                                <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />
                                             </a>
                                             <div id="submenu-${subitem.name}"
                                                  class="hs-sub-menu dropdown-menu"
