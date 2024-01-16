@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.menu;
 
+import cricket.merstham.shared.dto.ContactCategory;
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import cricket.merstham.website.frontend.service.MenuService;
 import cricket.merstham.website.frontend.service.PageService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -62,7 +64,7 @@ public class MenuBuilder {
                                             new Menu(
                                                     "contacts",
                                                     null,
-                                                    URI.create("/contacts"),
+                                                    URI.create("#"),
                                                     List.of(),
                                                     this::getContactCategories))),
                     new Menu("venue", null, URI.create("#"), List.of(), this::getVenueList));
@@ -249,7 +251,19 @@ public class MenuBuilder {
     }
 
     private List<Menu> getContactCategories() {
-        return List.of();
+        return menuService.getDynamicMenuItems().getContactCategories().stream()
+                .sorted(Comparator.comparing(ContactCategory::getSortKey))
+                .map(
+                        s ->
+                                new Menu(
+                                        "contact-category",
+                                        buildParams("category", s.getSlug()),
+                                        null,
+                                        List.of(),
+                                        null,
+                                        null,
+                                        s.getTitle()))
+                .toList();
     }
 
     public List<Menu> getTopMenu() {
