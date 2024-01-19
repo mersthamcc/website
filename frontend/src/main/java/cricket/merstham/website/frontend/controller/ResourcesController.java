@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.LEGACY_RESOURCES;
 
 @Controller
@@ -24,6 +25,6 @@ public class ResourcesController {
     public RedirectView redirectToResourceServer(HttpServletRequest request) {
         String resource =
                 (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return new RedirectView(resourcePrefix + resource, false, false, false);
+        return redirectTo(resourcePrefix + resource);
     }
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_BASE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_DELETE_ROUTE;
@@ -95,7 +96,7 @@ public class PageController extends SspController<StaticPage> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("slug") String slug)
             throws IOException {
         service.delete(cognitoAuthentication.getOAuth2AccessToken(), slug);
-        return new RedirectView(ADMIN_PAGE_BASE);
+        return redirectTo(ADMIN_PAGE_BASE);
     }
 
     @PostMapping(value = ADMIN_PAGE_SAVE_ROUTE, name = "admin-page-save")
@@ -107,11 +108,11 @@ public class PageController extends SspController<StaticPage> {
             throws IOException {
         try {
             service.saveItem(cognitoAuthentication.getOAuth2AccessToken(), page);
-            return new RedirectView(ADMIN_PAGE_BASE);
+            return redirectTo(ADMIN_PAGE_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
             redirectAttributes.addFlashAttribute(PAGE, page);
-            return new RedirectView(ADMIN_PAGE_NEW_ROUTE);
+            return redirectTo(ADMIN_PAGE_NEW_ROUTE);
         }
     }
 

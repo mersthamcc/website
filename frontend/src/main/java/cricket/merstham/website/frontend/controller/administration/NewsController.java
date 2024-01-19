@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_BASE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
@@ -113,7 +114,7 @@ public class NewsController extends SspController<News> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
         newsService.delete(cognitoAuthentication.getOAuth2AccessToken(), id);
-        return new RedirectView(ADMIN_NEWS_BASE);
+        return redirectTo(ADMIN_NEWS_BASE);
     }
 
     @PostMapping(value = ADMIN_NEWS_SAVE_ROUTE, name = "admin-news-save")
@@ -125,11 +126,11 @@ public class NewsController extends SspController<News> {
             throws IOException {
         try {
             newsService.saveNewsItem(cognitoAuthentication.getOAuth2AccessToken(), news);
-            return new RedirectView(ADMIN_NEWS_BASE);
+            return redirectTo(ADMIN_NEWS_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
             redirectAttributes.addFlashAttribute(NEWS, news);
-            return new RedirectView(ADMIN_NEWS_NEW_ROUTE);
+            return redirectTo(ADMIN_NEWS_NEW_ROUTE);
         }
     }
 

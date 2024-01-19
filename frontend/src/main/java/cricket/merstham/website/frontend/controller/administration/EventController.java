@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_EVENT_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_EVENT_BASE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_EVENT_DELETE_ROUTE;
@@ -111,7 +112,7 @@ public class EventController extends SspController<Event> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
         service.delete(cognitoAuthentication.getOAuth2AccessToken(), id);
-        return new RedirectView(ADMIN_EVENT_BASE);
+        return redirectTo(ADMIN_EVENT_BASE);
     }
 
     @PostMapping(value = ADMIN_EVENT_SAVE_ROUTE, name = "admin-event-save")
@@ -123,11 +124,11 @@ public class EventController extends SspController<Event> {
             throws IOException {
         try {
             service.saveEventItem(cognitoAuthentication.getOAuth2AccessToken(), event);
-            return new RedirectView(ADMIN_EVENT_BASE);
+            return redirectTo(ADMIN_EVENT_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
             redirectAttributes.addFlashAttribute(EVENT, event);
-            return new RedirectView(ADMIN_EVENT_NEW_ROUTE);
+            return redirectTo(ADMIN_EVENT_NEW_ROUTE);
         }
     }
 

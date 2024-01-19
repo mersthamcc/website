@@ -33,6 +33,7 @@ import java.util.Map;
 import static cricket.merstham.website.frontend.controller.HomeController.ROOT_URL;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.OTP_CODE_FIELD_PREFIX;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.getCodeFromMap;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -181,12 +182,12 @@ public class LoginController {
             redirectAttributes.addFlashAttribute(ERRORS, errors.getAllErrors());
             redirectAttributes.addFlashAttribute(SIGN_UP, signUp);
 
-            return new RedirectView(SIGNUP_URL);
+            return redirectTo(SIGNUP_URL);
         }
         var pendingUser = cognitoService.register(signUp);
         redirectAttributes.addFlashAttribute(PENDING_USER, pendingUser);
 
-        return new RedirectView(VERIFICATION_URL);
+        return redirectTo(VERIFICATION_URL);
     }
 
     @GetMapping(value = VERIFICATION_URL, name = RouteNames.ROUTE_VERIFICATION)
@@ -201,16 +202,16 @@ public class LoginController {
         var userId = parameters.get(MODEL_USER_ID);
         var code = getCodeFromMap(parameters, OTP_CODE_FIELD_PREFIX);
         if (cognitoService.verify(userId, code)) {
-            return new RedirectView(ROOT_URL);
+            return redirectTo(ROOT_URL);
         }
-        return new RedirectView(SIGNUP_URL);
+        return redirectTo(SIGNUP_URL);
     }
 
     @GetMapping(value = LOGOUT_URL, name = RouteNames.ROUTE_LOGOUT)
     public RedirectView logout(HttpServletRequest request) throws ServletException {
         LOG.info("Logging out");
         request.logout();
-        return new RedirectView(ROOT_URL);
+        return redirectTo(ROOT_URL);
     }
 
     private List<String> getMfaTypes(CognitoChallengeAuthentication authentication) {
