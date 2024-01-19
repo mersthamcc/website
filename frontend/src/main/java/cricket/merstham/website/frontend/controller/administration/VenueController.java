@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_VENUE_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_VENUE_BASE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_VENUE_DELETE_ROUTE;
@@ -95,7 +96,7 @@ public class VenueController extends SspController<Venue> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("slug") String slug)
             throws IOException {
         service.delete(cognitoAuthentication.getOAuth2AccessToken(), slug);
-        return new RedirectView(ADMIN_VENUE_BASE);
+        return redirectTo(ADMIN_VENUE_BASE);
     }
 
     @PostMapping(value = ADMIN_VENUE_SAVE_ROUTE, name = "admin-venue-save")
@@ -107,11 +108,11 @@ public class VenueController extends SspController<Venue> {
             throws IOException {
         try {
             service.saveItem(cognitoAuthentication.getOAuth2AccessToken(), venue);
-            return new RedirectView(ADMIN_VENUE_BASE, false, false, false);
+            return redirectTo(ADMIN_VENUE_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
             redirectAttributes.addFlashAttribute(VENUE, venue);
-            return new RedirectView(ADMIN_VENUE_NEW_ROUTE);
+            return redirectTo(ADMIN_VENUE_NEW_ROUTE);
         }
     }
 

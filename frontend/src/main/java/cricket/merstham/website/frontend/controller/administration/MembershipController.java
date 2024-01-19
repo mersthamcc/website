@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_MEMBER_EDIT_ROUTE;
 import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
@@ -217,7 +218,7 @@ public class MembershipController extends SspController<Member> {
             LOG.error("Error performing update!", ex);
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
-        return new RedirectView(format("/administration/membership/edit/{0}", id));
+        return redirectTo(format("/administration/membership/edit/{0}", id));
     }
 
     @PostMapping(

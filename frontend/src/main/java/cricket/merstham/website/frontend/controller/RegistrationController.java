@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +31,7 @@ import java.util.UUID;
 
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 
 @Controller
 @SessionAttributes("basket")
@@ -99,10 +99,10 @@ public class RegistrationController {
                                     "subscriptionId",
                                     subscriptionId.toString()));
                 case "next":
-                    return new RedirectView("/register/confirmation");
+                    return redirectTo("/register/confirmation");
             }
         }
-        return new RedirectView("/register");
+        return redirectTo("/register");
     }
 
     private MultiValueMap<String, Object> memberToFormData(MemberSubscription subscription) {
@@ -160,7 +160,7 @@ public class RegistrationController {
         var uuid = UUID.fromString((String) body.getFirst("uuid"));
         var subscription = basket.getSubscription(uuid).setMember(memberFromPost(body));
         basket.putSubscription(uuid, subscription);
-        return new RedirectView("/register");
+        return redirectTo("/register");
     }
 
     private Member memberFromPost(MultiValueMap<String, Object> body) {

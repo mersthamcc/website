@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_CONTACT_AJAX_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_CONTACT_BASE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_CONTACT_DELETE_ROUTE;
@@ -155,7 +156,7 @@ public class ContactController extends SspController<Contact> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("id") int id)
             throws IOException {
         service.delete(cognitoAuthentication.getOAuth2AccessToken(), id);
-        return new RedirectView(ADMIN_CONTACT_BASE);
+        return redirectTo(ADMIN_CONTACT_BASE);
     }
 
     @PostMapping(value = ADMIN_CONTACT_SAVE_ROUTE, name = "admin-contact-save")
@@ -168,11 +169,11 @@ public class ContactController extends SspController<Contact> {
         Contact contact = toContact(data, cognitoAuthentication);
         try {
             service.saveContactItem(cognitoAuthentication.getOAuth2AccessToken(), contact);
-            return new RedirectView(ADMIN_CONTACT_BASE);
+            return redirectTo(ADMIN_CONTACT_BASE);
         } catch (EntitySaveException ex) {
             redirectAttributes.addFlashAttribute(ERRORS, ex.getErrors());
             redirectAttributes.addFlashAttribute(CONTACT, contact);
-            return new RedirectView(ADMIN_CONTACT_NEW_ROUTE);
+            return redirectTo(ADMIN_CONTACT_NEW_ROUTE);
         }
     }
 

@@ -46,7 +46,7 @@ public class ContactController {
 
     //    @GetMapping(value = CONTACTS_ITEM_LEGACY_ROUTE, name = "contacts-item-legacy")
     //    public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-    //        return new RedirectView(service.get(id).getSlug().toString());
+    //        return redirectTo(service.get(id).getSlug().toString());
     //    }
 
     @GetMapping(value = CONTACTS_ITEM_ROUTE, name = "contact-item")

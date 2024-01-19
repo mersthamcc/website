@@ -18,5 +18,5 @@ public class ClubConfiguration {
     private CookieConfiguration cookies;
     private String googleAnalyticsKey;
     private String googleMapsApiKey;
-    private Fundraising fundraising;
+    private FundraisingConfiguration fundraising;
 }
