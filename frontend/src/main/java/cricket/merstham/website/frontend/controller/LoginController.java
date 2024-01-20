@@ -6,16 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.RouteNames;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
+import cricket.merstham.website.frontend.security.SealedString;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.QrCodeService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +41,6 @@ import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectT
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
 
 @Controller
 public class LoginController {
@@ -67,16 +70,25 @@ public class LoginController {
     public static final String MODEL_ERRORS = "errors";
     public static final String MODEL_SIGN_UP = "signUp";
     public static final String ROUTE_SIGNUP = "signup";
+    public static final String PENDING_PASSWORD = "PENDING_PASSWORD"; // pragma: allowlist secret
+    public static final String EMAIL = "EMAIL";
     private final ObjectMapper objectMapper;
     private final CognitoService cognitoService;
     private final QrCodeService qrCodeService;
 
+    private final String salt;
+
     @Autowired
     public LoginController(
-            ObjectMapper objectMapper, CognitoService cognitoService, QrCodeService qrCodeService) {
+            ObjectMapper objectMapper,
+            CognitoService cognitoService,
+            QrCodeService qrCodeService,
+            @Value("${spring.security.oauth2.client.registration.login.session-salt:#{null}}")
+                    String salt) {
         this.objectMapper = objectMapper;
         this.cognitoService = cognitoService;
         this.qrCodeService = qrCodeService;
+        this.salt = salt;
     }
 
     @GetMapping(value = LOGIN_URL, name = RouteNames.ROUTE_LOGIN)
@@ -177,7 +189,10 @@ public class LoginController {
 
     @PostMapping(value = SIGNUP_URL, name = RouteNames.ROUTE_SIGNUP_PROCESS)
     public RedirectView signupProcess(
-            @Valid UserSignUp signUp, Errors errors, RedirectAttributes redirectAttributes) {
+            @Valid UserSignUp signUp,
+            Errors errors,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
         if (errors.hasErrors()) {
             redirectAttributes.addFlashAttribute(ERRORS, errors.getAllErrors());
             redirectAttributes.addFlashAttribute(SIGN_UP, signUp);
@@ -185,24 +200,37 @@ public class LoginController {
             return redirectTo(SIGNUP_URL);
         }
         var pendingUser = cognitoService.register(signUp);
-        redirectAttributes.addFlashAttribute(PENDING_USER, pendingUser);
-
+        session.setAttribute(PENDING_USER, pendingUser);
+        session.setAttribute(EMAIL, signUp.getEmail());
+        session.setAttribute(
+                PENDING_PASSWORD,
+                new SealedString(signUp.getPassword(), pendingUser.getUserId(), salt));
         return redirectTo(VERIFICATION_URL);
     }
 
     @GetMapping(value = VERIFICATION_URL, name = RouteNames.ROUTE_VERIFICATION)
-    public ModelAndView verification(HttpServletRequest request) {
-        var flash = requireNonNull(RequestContextUtils.getInputFlashMap(request));
-        var pendingUser = flash.get(PENDING_USER);
+    public ModelAndView verification(HttpServletRequest request, HttpSession session) {
+        var pendingUser = session.getAttribute(PENDING_USER);
         return new ModelAndView("login/verification", Map.of("pendingUser", pendingUser));
     }
 
     @PostMapping(value = VERIFICATION_URL, name = RouteNames.ROUTE_VERIFICATION_PROCESS)
-    public RedirectView verificationProcess(@RequestParam Map<String, String> parameters) {
+    public RedirectView verificationProcess(
+            @RequestParam Map<String, String> parameters, HttpSession session) {
         var userId = parameters.get(MODEL_USER_ID);
         var code = getCodeFromMap(parameters, OTP_CODE_FIELD_PREFIX);
         if (cognitoService.verify(userId, code)) {
-            return redirectTo(ROOT_URL);
+            var context = SecurityContextHolder.getContext();
+            var email = (String) session.getAttribute(EMAIL);
+            context.setAuthentication(
+                    cognitoService.login(
+                            email,
+                            ((SealedString) session.getAttribute(PENDING_PASSWORD))
+                                    .decrypt(userId, salt)));
+            SecurityContextHolder.setContext(context);
+            session.removeAttribute(EMAIL);
+            session.removeAttribute(PENDING_PASSWORD);
+            return redirectTo("/register");
         }
         return redirectTo(SIGNUP_URL);
     }
