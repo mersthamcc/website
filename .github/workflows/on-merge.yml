@@ -80,26 +80,34 @@ jobs:
           build-args: |
             COMPONENT=graphql
 
+      - name: Build Flyway image
+        id: build-flyway
+        uses: docker/build-push-action@v5
+        with:
+          context: sql/
+          push: true
+          tags: mersthamcc/flyway:${{ github.sha }}
+
       - name: Dispatch deployment event
         uses: actions/github-script@v7
         env:
-          GRAPHQL_IMAGE: ${{ steps.build-graphql.outputs.digest }}
-          FRONTEND_IMAGE: ${{ steps.build-frontend.outputs.digest }}
+          GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
+          FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
+          FLYWAY_DIGEST: ${{ steps.build-flyway.outputs.digest }}
           IMAGE_TAG: ${{ github.sha }}
         with:
           github-token: ${{ secrets.DEPLOYMENT_PAT }}
           script: |
-            const { GRAPHQL_IMAGE, FRONTEND_IMAGE, IMAGE_TAG } = process.env
+            const { GRAPHQL_DIGEST, FRONTEND_DIGEST, FLYWAY_DIGEST, IMAGE_TAG } = process.env
 
-            console.log(`Images: ${GRAPHQL_IMAGE} ${FRONTEND_IMAGE}`)
-            
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'mersthamcc',
               repo: 'infrastructure',
               event_type: 'app_release',
               client_payload: {
-                "graphql_image": GRAPHQL_IMAGE,
-                "frontend_image": FRONTEND_IMAGE,
+                "graphql_digest": GRAPHQL_DIGEST,
+                "frontend_digest": FRONTEND_DIGEST,
+                "flyway_digest": FLYWAY_DIGEST,
                 "image_tag": IMAGE_TAG
               }
             });
