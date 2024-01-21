@@ -16,6 +16,7 @@ import com.paypal.orders.OrdersGetRequest;
 import com.paypal.orders.PurchaseUnitRequest;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.configuration.ClubConfiguration;
+import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.service.MembershipService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -92,19 +93,20 @@ public class PaypalService implements PaymentService {
 
     @Override
     public ModelAndView checkout(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return new ModelAndView("payments/paypal/checkout");
     }
 
     @Override
     public ModelAndView authorise(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         var orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent(CAPTURE_INTENT);
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
         List<Item> items = new ArrayList<>();
-        order.getMemberSubscription()
+        basket.getSubscriptions()
+                .values()
                 .forEach(
                         subscription ->
                                 items.add(
@@ -134,7 +136,7 @@ public class PaypalService implements PaymentService {
                                                                                 .toPlainString()))));
         purchaseUnits.add(
                 new PurchaseUnitRequest()
-                        .description(order.getWebReference())
+                        .description(basket.getId())
                         .items(items)
                         .amountWithBreakdown(
                                 new AmountWithBreakdown()
@@ -145,9 +147,9 @@ public class PaypalService implements PaymentService {
                                                                 new Money()
                                                                         .currencyCode("GBP")
                                                                         .value(
-                                                                                order.getTotal()
+                                                                                basket.getBasketTotal()
                                                                                         .toPlainString())))
-                                        .value(order.getTotal().toPlainString())));
+                                        .value(basket.getBasketTotal().toPlainString())));
 
         orderRequest.purchaseUnits(purchaseUnits);
         var requestUri = URI.create(request.getRequestURL().toString());
@@ -179,7 +181,10 @@ public class PaypalService implements PaymentService {
 
     @Override
     public ModelAndView execute(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request,
+            RegistrationBasket basket,
+            Order order,
+            OAuth2AccessToken accessToken) {
         var captureRequest =
                 new OrdersCaptureRequest(
                         (String) request.getSession().getAttribute(PAYPAL_ORDER_SESSION_ATTRIBUTE));
@@ -235,7 +240,7 @@ public class PaypalService implements PaymentService {
 
     @Override
     public ModelAndView cancel(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 }

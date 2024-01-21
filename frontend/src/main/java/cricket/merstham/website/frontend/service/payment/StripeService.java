@@ -6,6 +6,7 @@ import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.service.MembershipService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -68,21 +69,22 @@ public class StripeService implements PaymentService {
 
     @Override
     public ModelAndView checkout(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
 
         SessionCreateParams.Builder params =
                 SessionCreateParams.builder()
                         .setCustomerEmail(request.getUserPrincipal().getName())
-                        .setClientReferenceId(order.getWebReference())
+                        .setClientReferenceId(basket.getId())
                         .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                         .setMode(SessionCreateParams.Mode.PAYMENT)
                         .setSuccessUrl(format("{0}/payments/{1}/execute", baseUri, SERVICE_NAME))
                         .setCancelUrl(format("{0}/payments/{1}/cancel", baseUri, SERVICE_NAME))
                         .setLocale(SessionCreateParams.Locale.EN_GB);
 
-        order.getMemberSubscription()
+        basket.getSubscriptions()
+                .values()
                 .forEach(
                         subscription ->
                                 params.addLineItem(
@@ -135,13 +137,16 @@ public class StripeService implements PaymentService {
 
     @Override
     public ModelAndView authorise(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
     public ModelAndView execute(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request,
+            RegistrationBasket basket,
+            Order order,
+            OAuth2AccessToken accessToken) {
         try {
             var session =
                     Session.retrieve(
@@ -180,7 +185,7 @@ public class StripeService implements PaymentService {
 
     @Override
     public ModelAndView cancel(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 

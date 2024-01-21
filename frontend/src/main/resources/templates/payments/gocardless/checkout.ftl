@@ -2,11 +2,11 @@
 <#import "../../base.ftl" as layout />
 <#import "../../components.ftl" as components />
 <#macro goCardlessHeader>
-    <script src="/assets/mcc/js/scripts/js-joda/js-joda.min.js"></script>
+    <script src="${resourcePrefix}/mcc/js/js-joda/js-joda.min.js"></script>
 </#macro>
 <#macro goCardlessScripts>
     <script>
-        const latestPaymentDate = JSJoda.LocalDate.parse("2021-11-30");
+        const latestPaymentDate = JSJoda.LocalDate.parse("2024-06-30");
         const LocalDate = JSJoda.LocalDate;
         const ChronoUnit = JSJoda.ChronoUnit;
         const DayOfWeek = JSJoda.DayOfWeek;
@@ -87,13 +87,6 @@
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            <input type="hidden" name="id" value="${order.id}" />
-            <input type="hidden" name="uuid" value="${order.uuid}" />
-
-            <@components.section title="Order Number">
-                Your order number is ${order.webReference}.
-            </@components.section>
-
             <@components.section title="Payment Schedule">
                 <div class="form-group">
                     <label class="col-md-3 control-label">Payment Day:</label>

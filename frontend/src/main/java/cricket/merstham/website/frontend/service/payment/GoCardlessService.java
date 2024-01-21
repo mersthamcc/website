@@ -4,6 +4,7 @@ import com.gocardless.GoCardlessClient;
 import com.gocardless.resources.Mandate;
 import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
@@ -85,16 +86,17 @@ public class GoCardlessService implements PaymentService {
 
     @Override
     public ModelAndView checkout(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         List<PaymentSchedule> schedules = new ArrayList<>();
         for (var i = 1; i <= 10; i++) {
-            BigDecimal monthly = order.getTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
+            BigDecimal monthly =
+                    basket.getBasketTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
             schedules.add(
                     new PaymentSchedule()
                             .setNumberOfPayments(i)
                             .setAmount(monthly)
                             .setFinalAmount(
-                                    order.getTotal()
+                                    basket.getBasketTotal()
                                             .subtract(
                                                     monthly.multiply(
                                                             BigDecimal.valueOf((long) i - 1)))));
@@ -106,7 +108,7 @@ public class GoCardlessService implements PaymentService {
 
     @Override
     public ModelAndView authorise(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         var requestUri = URI.create(request.getRequestURL().toString());
         String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
         var principal = ((CognitoAuthentication) request.getUserPrincipal()).getOidcUser();
@@ -139,7 +141,10 @@ public class GoCardlessService implements PaymentService {
 
     @Override
     public ModelAndView execute(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request,
+            RegistrationBasket basket,
+            Order order,
+            OAuth2AccessToken accessToken) {
         int dayOfMonth = (int) request.getSession().getAttribute(SESSION_DAY_OF_MONTH);
         int numberOfPayments = (int) request.getSession().getAttribute(SESSION_NUMBER_OF_PAYMENTS);
         String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
@@ -165,7 +170,7 @@ public class GoCardlessService implements PaymentService {
                 "Payment dates = {}",
                 chargeDates.stream().map(LocalDate::toString).collect(Collectors.joining(", ")));
 
-        BigDecimal remaining = order.getTotal();
+        BigDecimal remaining = basket.getBasketTotal();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
         for (LocalDate chargeDate : chargeDates) {
             BigDecimal chargeAmount = paymentSchedule.getAmount();
@@ -229,7 +234,7 @@ public class GoCardlessService implements PaymentService {
 
     @Override
     public ModelAndView cancel(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 }

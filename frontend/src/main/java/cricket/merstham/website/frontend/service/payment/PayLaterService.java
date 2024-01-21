@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.service.payment;
 
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.website.frontend.model.RegistrationBasket;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -42,19 +43,22 @@ public class PayLaterService implements PaymentService {
 
     @Override
     public ModelAndView checkout(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 
     @Override
     public ModelAndView authorise(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 
     @Override
     public ModelAndView execute(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request,
+            RegistrationBasket basket,
+            Order order,
+            OAuth2AccessToken accessToken) {
         return null;
     }
 
@@ -66,7 +70,7 @@ public class PayLaterService implements PaymentService {
 
     @Override
     public ModelAndView cancel(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
     }
 }

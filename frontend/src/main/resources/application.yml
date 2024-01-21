@@ -108,7 +108,7 @@ resources:
 
 payments:
   pay-later:
-    enabled: true
+    enabled: false
     disabled-reason: ~
   paypal:
     enabled: true

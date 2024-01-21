@@ -5,12 +5,6 @@
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            <input type="hidden" name="id" value="${order.id}" />
-            <input type="hidden" name="uuid" value="${order.uuid}" />
-
-            <@components.section title="Order Number">
-                Your order number is ${order.webReference}.
-            </@components.section>
 
             <@components.section title="Payment">
                 <div class="form-group">

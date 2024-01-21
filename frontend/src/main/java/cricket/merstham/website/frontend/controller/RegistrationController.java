@@ -7,6 +7,7 @@ import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +21,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -32,12 +39,15 @@ import java.util.UUID;
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static java.util.Objects.nonNull;
 
 @Controller
 @SessionAttributes("basket")
 @PreAuthorize("isAuthenticated()")
 public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
+    public static final String CURRENT_SUBSCRIPTION = "current-subscription";
+    public static final String ERRORS = "errors";
 
     private MembershipService membershipService;
     private PaymentServiceManager paymentServiceManager;
@@ -56,8 +66,16 @@ public class RegistrationController {
     }
 
     @GetMapping(value = "/register", name = "register")
-    public ModelAndView register(@ModelAttribute("basket") RegistrationBasket basket) {
-        return new ModelAndView("registration/register", Map.of("basket", basket));
+    public ModelAndView register(
+            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(ERRORS)) {
+            var errors = flash.get(ERRORS);
+            model.put(ERRORS, errors);
+        }
+        model.put("basket", basket);
+        return new ModelAndView("registration/register", model);
     }
 
     @PostMapping(value = "/register", name = "registration-actions")
@@ -65,11 +83,16 @@ public class RegistrationController {
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
-            @ModelAttribute("edit-member") String editMember) {
+            @ModelAttribute("edit-member") String editMember,
+            @RequestParam(value = "declarations", required = false, defaultValue = "")
+                    List<String> declarations,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         if (!deleteMember.isBlank()) {
             basket.removeSuscription(UUID.fromString(deleteMember));
         } else if (!editMember.isBlank()) {
             var subscription = basket.getSubscriptions().get(UUID.fromString(editMember));
+            setCurrentSubscription(session, subscription);
             return new ModelAndView(
                     "registration/select-membership",
                     Map.of(
@@ -88,7 +111,7 @@ public class RegistrationController {
                                     .action(NEW)
                                     .build();
                     UUID subscriptionId = UUID.randomUUID();
-                    basket.putSubscription(subscriptionId, subscription);
+                    setCurrentSubscription(session, subscription);
                     return new ModelAndView(
                             "registration/select-membership",
                             Map.of(
@@ -99,26 +122,15 @@ public class RegistrationController {
                                     "subscriptionId",
                                     subscriptionId.toString()));
                 case "next":
-                    return redirectTo("/register/confirmation");
+                    var errors = validateBasket(basket, declarations);
+                    if (errors.isEmpty()) {
+                        return redirectTo("/register/confirmation");
+                    }
+                    redirectAttributes.addFlashAttribute(ERRORS, errors);
+                    break;
             }
         }
         return redirectTo("/register");
-    }
-
-    private MultiValueMap<String, Object> memberToFormData(MemberSubscription subscription) {
-        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-        subscription.getMember().getAttributeMap().entrySet().stream()
-                .forEachOrdered(
-                        a -> {
-                            if (a.getValue().isArray()) {
-                                for (var node : a.getValue()) {
-                                    form.add(a.getKey(), node.asText());
-                                }
-                            } else {
-                                form.add(a.getKey(), a.getValue().asText());
-                            }
-                        });
-        return form;
     }
 
     @PostMapping(value = "/register/select-membership", name = "member-details")
@@ -126,7 +138,8 @@ public class RegistrationController {
             @ModelAttribute("basket") RegistrationBasket basket,
             @ModelAttribute("category") String category,
             @ModelAttribute("uuid") UUID uuid,
-            @ModelAttribute("priceListItemId") Integer priceListItemId) {
+            @ModelAttribute("priceListItemId") Integer priceListItemId,
+            HttpSession session) {
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =
                 membershipCategory.getPriceListItem().stream()
@@ -135,11 +148,11 @@ public class RegistrationController {
                         .orElseThrow();
 
         var subscription =
-                basket.getSubscription(uuid)
+                getCurrentSubscription(session)
                         .setPriceListItem(priceListItem)
                         .setPrice(priceListItem.getCurrentPrice())
                         .setCategory(membershipCategory.getKey());
-        basket.putSubscription(uuid, subscription);
+        setCurrentSubscription(session, subscription);
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
@@ -156,11 +169,29 @@ public class RegistrationController {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public View membershipFormProcess(
             @ModelAttribute("basket") RegistrationBasket basket,
-            @RequestBody MultiValueMap<String, Object> body) {
+            @RequestBody MultiValueMap<String, Object> body,
+            HttpSession session) {
         var uuid = UUID.fromString((String) body.getFirst("uuid"));
-        var subscription = basket.getSubscription(uuid).setMember(memberFromPost(body));
+        var subscription = getCurrentSubscription(session).setMember(memberFromPost(body));
+        session.removeAttribute(CURRENT_SUBSCRIPTION);
         basket.putSubscription(uuid, subscription);
         return redirectTo("/register");
+    }
+
+    @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
+    public ModelAndView confirmation(
+            @ModelAttribute("basket") RegistrationBasket basket,
+            CognitoAuthentication cognitoAuthentication,
+            Locale locale,
+            HttpSession session,
+            SessionStatus status) {
+        return new ModelAndView(
+                "registration/confirmation",
+                Map.of(
+                        "basket",
+                        basket,
+                        "paymentTypes",
+                        paymentServiceManager.getEnabledServices()));
     }
 
     private Member memberFromPost(MultiValueMap<String, Object> body) {
@@ -182,24 +213,41 @@ public class RegistrationController {
                 .build();
     }
 
-    @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
-    public ModelAndView confirmation(
-            @ModelAttribute("basket") RegistrationBasket basket,
-            CognitoAuthentication cognitoAuthentication,
-            Locale locale,
-            HttpSession session,
-            SessionStatus status) {
-        var order =
-                membershipService.registerMembersFromBasket(
-                        basket, cognitoAuthentication.getOAuth2AccessToken(), locale);
-        status.setComplete();
-        session.setAttribute("order", order);
-        return new ModelAndView(
-                "registration/confirmation",
-                Map.of(
-                        "order",
-                        order,
-                        "paymentTypes",
-                        paymentServiceManager.getAvailableServices()));
+    private MultiValueMap<String, Object> memberToFormData(MemberSubscription subscription) {
+        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+        subscription.getMember().getAttributeMap().entrySet().stream()
+                .forEachOrdered(
+                        a -> {
+                            if (a.getValue().isArray()) {
+                                for (var node : a.getValue()) {
+                                    form.add(a.getKey(), node.asText());
+                                }
+                            } else {
+                                form.add(a.getKey(), a.getValue().asText());
+                            }
+                        });
+        return form;
+    }
+
+    private MemberSubscription getCurrentSubscription(HttpSession session) {
+        return ((MemberSubscription) session.getAttribute(CURRENT_SUBSCRIPTION));
+    }
+
+    private void setCurrentSubscription(HttpSession session, MemberSubscription subscription) {
+        session.setAttribute(CURRENT_SUBSCRIPTION, subscription);
+    }
+
+    private List<String> validateBasket(RegistrationBasket basket, List<String> declarations) {
+        var errors = new ArrayList<String>();
+        if (basket.getBasketTotal().doubleValue() == 0.00) {
+            errors.add("membership.errors.no-members");
+        }
+        if (!declarations.contains("terms")) {
+            errors.add("membership.errors.accept-terms");
+        }
+        if (!declarations.contains("policies")) {
+            errors.add("membership.errors.accept-policies");
+        }
+        return errors;
     }
 }

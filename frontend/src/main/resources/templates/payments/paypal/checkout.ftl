@@ -5,15 +5,9 @@
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/paypal/authorise">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            <input type="hidden" name="id" value="${order.id}" />
-            <input type="hidden" name="uuid" value="${order.uuid}" />
-
-            <@components.section title="Order Number">
-                Your order number is ${order.webReference}.
-            </@components.section>
 
             <@components.section title="Payment">
-                You are about to redirected to PayPal to authorise a payment of ${order.total?string.currency}
+                You are about to redirected to PayPal to authorise a payment of ${basket.basketTotal?string.currency}
             </@components.section>
 
             <@components.buttonGroup>
