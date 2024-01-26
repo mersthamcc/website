@@ -172,7 +172,7 @@ class MembershipServiceTest {
                                                 .toList())));
 
         var basket =
-                new RegistrationBasket()
+                new RegistrationBasket(List.of())
                         .setId(subsId.toString())
                         .setSubscriptions(
                                 Map.of(

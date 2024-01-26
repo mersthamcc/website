@@ -4,6 +4,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
+import cricket.merstham.website.frontend.model.discounts.Discount;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
@@ -49,20 +50,24 @@ public class RegistrationController {
     public static final String CURRENT_SUBSCRIPTION = "current-subscription";
     public static final String ERRORS = "errors";
 
-    private MembershipService membershipService;
-    private PaymentServiceManager paymentServiceManager;
+    private final MembershipService membershipService;
+    private final PaymentServiceManager paymentServiceManager;
+    private final List<Discount> activeDiscounts;
 
     @Autowired
     public RegistrationController(
-            MembershipService membershipService, PaymentServiceManager paymentServiceManager) {
+            MembershipService membershipService,
+            PaymentServiceManager paymentServiceManager,
+            List<Discount> activeDiscounts) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
+        this.activeDiscounts = activeDiscounts;
     }
 
     @ModelAttribute("basket")
     public RegistrationBasket createRegistrationBasket() {
         LOG.info("Creating new registration basket");
-        return new RegistrationBasket();
+        return new RegistrationBasket(activeDiscounts);
     }
 
     @GetMapping(value = "/register", name = "register")
