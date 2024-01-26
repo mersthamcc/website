@@ -1,19 +1,22 @@
 <#import "/spring.ftl" as spring />
 <#import "../../base.ftl" as layout />
 <#import "../../components.ftl" as components />
-<@layout.mainLayout formName="membership.confirmation">
+<@layout.mainLayout formName="membership.checkout">
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments/paypal/authorise">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            <input type="hidden" name="id" value="${order.id}" />
-            <input type="hidden" name="uuid" value="${order.uuid}" />
 
-            <@components.section title="Order Number">
-                Your order number is ${order.webReference}.
-            </@components.section>
-
-            <@components.section title="Payment">
-                You are about to redirected to PayPal to authorise a payment of ${order.total?string.currency}
+            <@components.section title="payments.paypal-short">
+                <div class="row">
+                    <div class="col-md-9">
+                        <@spring.messageArgs
+                            code="payments.paypal-checkout"
+                            args=[basket.basketTotal?string.currency]/>
+                    </div>
+                    <div class="col-md-3 right-align">
+                        <img src="${resourcePrefix}/mcc/img/paypal-logo.png" alt="PayPal Logo" width="200px" />
+                    </div>
+                </div>
             </@components.section>
 
             <@components.buttonGroup>

@@ -2,11 +2,11 @@
 <#import "../../base.ftl" as layout />
 <#import "../../components.ftl" as components />
 <#macro goCardlessHeader>
-    <script src="/assets/mcc/js/scripts/js-joda/js-joda.min.js"></script>
+    <script src="${resourcePrefix}/mcc/js/js-joda/js-joda.min.js"></script>
 </#macro>
 <#macro goCardlessScripts>
     <script>
-        const latestPaymentDate = JSJoda.LocalDate.parse("2021-11-30");
+        const latestPaymentDate = JSJoda.LocalDate.parse($('#payment-schedule-form').data('end-date'));
         const LocalDate = JSJoda.LocalDate;
         const ChronoUnit = JSJoda.ChronoUnit;
         const DayOfWeek = JSJoda.DayOfWeek;
@@ -83,17 +83,24 @@
         });
     </script>
 </#macro>
-<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.confirmation">
+<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.checkout">
+
     <@components.panel>
-        <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise">
+        <@components.section title="payments.gocardless">
+            <div class="row">
+                <div class="col-md-9">
+                    <@spring.message code="payments.gocardless-checkout" />
+                </div>
+                <div class="col-md-3 right-align">
+                    <img src="${resourcePrefix}/mcc/img/gocardless-logo.png" alt="GoCardless Logo" width="200px" />
+                </div>
+            </div>
+        </@components.section>
+    </@components.panel>
+
+    <@components.panel>
+        <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise" id="payment-schedule-form" data-end-date="${endDate}">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            <input type="hidden" name="id" value="${order.id}" />
-            <input type="hidden" name="uuid" value="${order.uuid}" />
-
-            <@components.section title="Order Number">
-                Your order number is ${order.webReference}.
-            </@components.section>
-
             <@components.section title="Payment Schedule">
                 <div class="form-group">
                     <label class="col-md-3 control-label">Payment Day:</label>
@@ -115,7 +122,7 @@
                                 <option value="${schedule.numberOfPayments}">${schedule.numberOfPayments} Months - ${schedule.amount?string.currency} per month <#if schedule.amount != schedule.finalAmount>(final payment ${schedule.finalAmount?string.currency})</#if></option>
                             </#list>
                         </select>
-                        <span class="help-block">The latest your final payment can be is 30th November.</span>
+                        <span class="help-block">The latest your final payment can be is ${(endDate).format('EEEE dd MMMM yyyy')}.</span>
                     </div>
                 </div>
 

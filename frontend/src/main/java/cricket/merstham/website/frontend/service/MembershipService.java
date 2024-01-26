@@ -17,6 +17,7 @@ import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.MemberQuery;
 import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
+import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
@@ -308,6 +309,16 @@ public class MembershipService {
                                                             AttributeType.valueOf(
                                                                     a.getType().rawValue()))
                                                     .build()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Order getOrder(int id) {
+        try {
+            var query = new OrderQuery(id);
+            Response<OrderQuery.Data> result = graphService.executeQuery(query);
+            return modelMapper.map(result.getData().getOrder(), Order.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

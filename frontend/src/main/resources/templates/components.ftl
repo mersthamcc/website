@@ -512,7 +512,7 @@
                                         id="member-${attribute.definition.key}"
                                         value="${choice}"
                                         <#if data?keys?seq_contains(attribute.definition.key)
-                                            && data[attribute.definition.key]?seq_contains(choice)>
+                                        && data[attribute.definition.key]?seq_contains(choice)>
                                             checked="checked"
                                         </#if>
                                         ${required} />
@@ -849,9 +849,9 @@
     </fieldset>
 </#macro>
 
-<#macro formErrors errors errorKey="An error occured">
+<#macro formErrors errors errorKey="An error occured" class="alert-soft-danger">
     <#if (errors?size > 0)>
-        <div class="alert alert-soft-danger" role="alert">
+        <div class="alert ${class}" role="alert">
             <h5 class="alert-heading">
                 <@spring.messageText code=errorKey text=errorKey />
             </h5>

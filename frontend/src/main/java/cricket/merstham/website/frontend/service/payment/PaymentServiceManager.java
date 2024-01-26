@@ -26,4 +26,12 @@ public class PaymentServiceManager {
     public List<String> getAvailableServices() {
         return paymentServiceMap.keySet().stream().sorted().toList();
     }
+
+    public List<String> getEnabledServices() {
+        return paymentServiceMap.values().stream()
+                .filter(PaymentService::isEnabled)
+                .map(PaymentService::getName)
+                .sorted()
+                .toList();
+    }
 }

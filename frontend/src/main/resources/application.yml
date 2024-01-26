@@ -69,6 +69,7 @@ management:
 club:
   club-name: ${CLUBNAME:My Cricket Club}
   logo: "/mcc/img/logos/mcc-logo-header.svg"
+  mail-logo: "/mcc/img/logos/mcc-logo.svg"
   favicon: "/mcc/img/logos/mcc-logo-favicon.svg"
   club-address: ${CLUB_ADDRESS:}
   phone-number: "${CLUB_PHONE_NUMBER:(01234) 567890}"
@@ -108,7 +109,7 @@ resources:
 
 payments:
   pay-later:
-    enabled: true
+    enabled: false
     disabled-reason: ~
   paypal:
     enabled: true
@@ -127,6 +128,7 @@ payments:
     access-token: ${GOCARDLESS_ACCESS_TOKEN:}
     sandbox: true
     mandate-description: Membership and Match Fees
+    schedule-end-date: 2024-11-30
   bank:
     enabled: true
     disabled-reason: ~
@@ -152,3 +154,9 @@ contact-methods:
   phone:
     enabled: true
     default-region: GB
+
+mail:
+  region: eu-west-2
+  fromAddress: no-reply@mersthamcc.co.uk
+  confirmation-email-bcc:
+    - treasurer@mersthamcc.co.uk

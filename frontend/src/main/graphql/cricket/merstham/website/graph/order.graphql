@@ -1,0 +1,15 @@
+query order ($id: Int!){
+    order(id: $id) {
+        id
+        uuid
+        ownerUserId
+        createDate
+        payment {
+            id
+            date
+            type
+            reference
+            amount
+        }
+    }
+}
