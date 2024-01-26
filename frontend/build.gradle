@@ -48,6 +48,7 @@ dependencies {
     implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:sesv2:${dependencyVersions.aws}"
     implementation 'org.passay:passay:1.6.2'
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.google.zxing:javase:3.5.1'

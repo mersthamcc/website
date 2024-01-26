@@ -58,6 +58,11 @@ public class MembershipController {
         return membershipService.getMyOrders(principal);
     }
 
+    @QueryMapping
+    public Order order(@Argument int id) {
+        return membershipService.getOrder(id);
+    }
+
     @MutationMapping
     public Member createMember(@Argument MemberInput data, Principal principal) {
         return membershipService.createMember(data, principal);

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClubConfiguration {
     private String clubName;
     private String logo;
+    private String mailLogo;
     private String favicon;
     private String phoneNumber;
     private String clubAddress;

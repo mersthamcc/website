@@ -111,6 +111,11 @@ public class MembershipService {
     }
 
     @PreAuthorize("isAuthenticated()")
+    public Order getOrder(int id) {
+        return modelMapper.map(orderEntityRepository.findById(id), Order.class);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     public Member createMember(MemberInput data, Principal principal) {
         var now = Instant.now();
         var currentDate = LocalDate.ofInstant(now, ZoneId.systemDefault());

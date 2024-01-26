@@ -6,7 +6,7 @@
 </#macro>
 <#macro goCardlessScripts>
     <script>
-        const latestPaymentDate = JSJoda.LocalDate.parse("2024-06-30");
+        const latestPaymentDate = JSJoda.LocalDate.parse($('#payment-schedule-form').data('end-date'));
         const LocalDate = JSJoda.LocalDate;
         const ChronoUnit = JSJoda.ChronoUnit;
         const DayOfWeek = JSJoda.DayOfWeek;
@@ -83,9 +83,23 @@
         });
     </script>
 </#macro>
-<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.confirmation">
+<@layout.mainLayout headers=goCardlessHeader script=goCardlessScripts formName="membership.checkout">
+
     <@components.panel>
-        <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise">
+        <@components.section title="payments.gocardless">
+            <div class="row">
+                <div class="col-md-9">
+                    <@spring.message code="payments.gocardless-checkout" />
+                </div>
+                <div class="col-md-3 right-align">
+                    <img src="${resourcePrefix}/mcc/img/gocardless-logo.png" alt="GoCardless Logo" width="200px" />
+                </div>
+            </div>
+        </@components.section>
+    </@components.panel>
+
+    <@components.panel>
+        <form class="form-horizontal" method="post" name="payment" action="/payments/gocardless/authorise" id="payment-schedule-form" data-end-date="${endDate}">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <@components.section title="Payment Schedule">
                 <div class="form-group">
@@ -108,7 +122,7 @@
                                 <option value="${schedule.numberOfPayments}">${schedule.numberOfPayments} Months - ${schedule.amount?string.currency} per month <#if schedule.amount != schedule.finalAmount>(final payment ${schedule.finalAmount?string.currency})</#if></option>
                             </#list>
                         </select>
-                        <span class="help-block">The latest your final payment can be is 30th November.</span>
+                        <span class="help-block">The latest your final payment can be is ${(endDate).format('EEEE dd MMMM yyyy')}.</span>
                     </div>
                 </div>
 

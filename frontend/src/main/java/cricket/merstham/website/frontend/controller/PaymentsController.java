@@ -1,8 +1,9 @@
 package cricket.merstham.website.frontend.controller;
 
-import cricket.merstham.shared.dto.Order;
+import cricket.merstham.website.frontend.configuration.MailConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import cricket.merstham.website.frontend.service.EmailService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 @Controller
 @SessionAttributes("basket")
 public class PaymentsController {
@@ -23,12 +28,19 @@ public class PaymentsController {
     public static final String ORDER = "current-order";
     private final PaymentServiceManager paymentServiceManager;
     private final MembershipService membershipService;
+    private final EmailService emailService;
+    private final MailConfiguration mailConfiguration;
 
     @Autowired
     public PaymentsController(
-            PaymentServiceManager paymentServiceManager, MembershipService membershipService) {
+            PaymentServiceManager paymentServiceManager,
+            MembershipService membershipService,
+            EmailService emailService,
+            MailConfiguration mailConfiguration) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
+        this.emailService = emailService;
+        this.mailConfiguration = mailConfiguration;
     }
 
     @PostMapping(value = "/payments", name = "payment-start")
@@ -66,7 +78,7 @@ public class PaymentsController {
         var order =
                 membershipService.registerMembersFromBasket(
                         basket, cognitoAuthentication.getOAuth2AccessToken(), request.getLocale());
-        session.setAttribute(ORDER, order);
+        session.setAttribute(ORDER, order.getId());
         return paymentService.execute(
                 request, basket, order, cognitoAuthentication.getOAuth2AccessToken());
     }
@@ -79,7 +91,20 @@ public class PaymentsController {
             HttpServletRequest request,
             HttpSession session) {
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
-        var order = (Order) session.getAttribute(ORDER);
+        var orderId = (int) session.getAttribute(ORDER);
+        var order = membershipService.getOrder(orderId);
+        emailService.sendEmail(
+                cognitoAuthentication.getOidcUser().getEmail(),
+                List.of(),
+                mailConfiguration.getConfirmationEmailBcc(),
+                "Registration Confirmation",
+                paymentService.getConfirmationEmail(),
+                paymentService.getEmailModel(
+                        Map.of(
+                                "basket", basket,
+                                "order", order,
+                                "paymentType", paymentType,
+                                "season", Integer.toString(LocalDate.now().getYear()))));
         session.removeAttribute(ORDER);
         basket.reset();
         return paymentService.confirm(request, order, cognitoAuthentication.getOAuth2AccessToken());

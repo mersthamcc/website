@@ -158,6 +158,7 @@ extend type Query {
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myOrders: [Order]
     orders(year: Int!): [Order]
+    order(id: Int!): Order
 }
 
 extend type Mutation {

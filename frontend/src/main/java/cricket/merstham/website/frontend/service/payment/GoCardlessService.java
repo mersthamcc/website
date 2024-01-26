@@ -49,6 +49,7 @@ public class GoCardlessService implements PaymentService {
     private final String disabledReason;
     private final MembershipService membershipService;
     private final String mandateDescription;
+    private final LocalDate endDate;
 
     private final GoCardlessClient client;
 
@@ -58,11 +59,13 @@ public class GoCardlessService implements PaymentService {
             @Value("${payments.gocardless.access-token}") String accessToken,
             @Value("${payments.gocardless.sandbox}") boolean sandbox,
             @Value("${payments.gocardless.mandate-description}") String mandateDescription,
+            @Value("${payments.gocardless.schedule-end-date}") LocalDate endDate,
             MembershipService membershipService) {
         this.enabled = enabled;
         this.disabledReason = disabledReason;
         this.membershipService = membershipService;
         this.mandateDescription = mandateDescription;
+        this.endDate = endDate;
         this.client =
                 GoCardlessClient.newBuilder(accessToken)
                         .withEnvironment(sandbox ? SANDBOX : LIVE)
@@ -103,7 +106,11 @@ public class GoCardlessService implements PaymentService {
         }
 
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);
-        return new ModelAndView("payments/gocardless/checkout", Map.of("schedules", schedules));
+        return new ModelAndView(
+                "payments/gocardless/checkout",
+                Map.of(
+                        "schedules", schedules,
+                        "endDate", endDate));
     }
 
     @Override
@@ -204,7 +211,19 @@ public class GoCardlessService implements PaymentService {
         return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 
-    public List<LocalDate> calculateDates(Mandate mandate, int dayOfMonth, int numberOfPayments) {
+    @Override
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+        return new ModelAndView("payments/gocardless/confirmation", Map.of("order", order));
+    }
+
+    @Override
+    public ModelAndView cancel(
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
+        return null;
+    }
+
+    private List<LocalDate> calculateDates(Mandate mandate, int dayOfMonth, int numberOfPayments) {
         List<LocalDate> chargeDates = new ArrayList<>();
         var earliestDate = LocalDate.parse(mandate.getNextPossibleChargeDate());
         var startDate = earliestDate;
@@ -224,17 +243,5 @@ public class GoCardlessService implements PaymentService {
             startDate = startDate.plusMonths(1);
         }
         return chargeDates;
-    }
-
-    @Override
-    public ModelAndView confirm(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
-        return new ModelAndView("payments/gocardless/confirmation");
-    }
-
-    @Override
-    public ModelAndView cancel(
-            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
-        return null;
     }
 }

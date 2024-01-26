@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,7 +55,7 @@ public class BankTransferService implements PaymentService {
     @Override
     public ModelAndView checkout(
             HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
-        return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
+        return new ModelAndView(format("redirect:/payments/{0}/execute", SERVICE_NAME));
     }
 
     @Override
@@ -69,7 +70,7 @@ public class BankTransferService implements PaymentService {
             RegistrationBasket basket,
             Order order,
             OAuth2AccessToken accessToken) {
-        return null;
+        return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 
     @Override
@@ -87,5 +88,16 @@ public class BankTransferService implements PaymentService {
     public ModelAndView cancel(
             HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getEmailModel(Map<String, Object> baseModel) {
+        var model = new HashMap<>(baseModel);
+        model.putAll(
+                Map.of(
+                        "bankAccountName", bankAccountName,
+                        "bankAccountNumber", bankAccountNumber,
+                        "bankAccountSortCode", bankAccountSortCode));
+        return model;
     }
 }

@@ -180,7 +180,7 @@ public class StripeService implements PaymentService {
     @Override
     public ModelAndView confirm(
             HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
-        return new ModelAndView("payments/stripe/confirmation");
+        return new ModelAndView("payments/stripe/confirmation", Map.of("order", order));
     }
 
     @Override

@@ -1,7 +1,7 @@
 <#import "/spring.ftl" as spring />
 <#import "../base.ftl" as layout />
 <#import "../components.ftl" as components />
-<@layout.mainLayout formName="membership.confirmation">
+<@layout.mainLayout formName="membership.checkout">
     <@components.panel>
         <form class="form-horizontal" method="post" name="payment" action="/payments">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
