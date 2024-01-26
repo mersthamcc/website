@@ -117,11 +117,13 @@ public class PaypalService implements PaymentService {
                                                                 subscription
                                                                         .getMember()
                                                                         .getAttributeMap()
-                                                                        .get("given-name"),
+                                                                        .get("given-name")
+                                                                        .asText(),
                                                                 subscription
                                                                         .getMember()
                                                                         .getAttributeMap()
-                                                                        .get("family-name")))
+                                                                        .get("family-name")
+                                                                        .asText()))
                                                 .quantity("1")
                                                 .sku(
                                                         subscription
@@ -134,6 +136,13 @@ public class PaypalService implements PaymentService {
                                                                         subscription
                                                                                 .getPrice()
                                                                                 .toPlainString()))));
+        var discount =
+                new Money()
+                        .currencyCode("GBP")
+                        .value(
+                                basket.getDiscounts().values().stream()
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                        .toPlainString());
         purchaseUnits.add(
                 new PurchaseUnitRequest()
                         .description(basket.getId())
@@ -143,11 +152,12 @@ public class PaypalService implements PaymentService {
                                         .currencyCode("GBP")
                                         .amountBreakdown(
                                                 new AmountBreakdown()
+                                                        .discount(discount)
                                                         .itemTotal(
                                                                 new Money()
                                                                         .currencyCode("GBP")
                                                                         .value(
-                                                                                basket.getBasketTotal()
+                                                                                basket.getItemTotal()
                                                                                         .toPlainString())))
                                         .value(basket.getBasketTotal().toPlainString())));
 

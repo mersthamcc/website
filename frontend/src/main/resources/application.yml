@@ -57,6 +57,8 @@ server:
   servlet:
     session:
       timeout: 24h
+      cookie:
+        max-age: 24h
 
 management:
   server:

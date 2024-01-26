@@ -55,6 +55,12 @@ public class RegistrationBasket implements Serializable {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    public BigDecimal getItemTotal() {
+        return subscriptions.values().stream()
+                .map(MemberSubscription::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     public BigDecimal getBasketTotal() {
         return subscriptions.values().stream()
                 .map(MemberSubscription::getPrice)

@@ -19,14 +19,14 @@
                 <thead class="thead-light">
                 <tr>
                     <th><@spring.message code="payments.stripe-reference" /></th>
-                    <th style="text-align: right;"><@spring.message code="payments.stripe-amount" /></th>
+                    <th class="align-right"><@spring.message code="payments.stripe-amount" /></th>
                 </tr>
                 </thead>
                 <tbody>
                 <#assign payment=order.payment[0] />
                 <tr scope="row">
                     <td>${payment.reference}</td>
-                    <td style="text-align: right;">${payment.amount?string.currency}</td>
+                    <td class="align-right">${payment.amount?string.currency}</td>
                 </tr>
                 </tbody>
             </table>

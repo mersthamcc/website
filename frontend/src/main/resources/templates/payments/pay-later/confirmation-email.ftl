@@ -3,6 +3,6 @@
 
 <@email.template header="Thank you">
 
-    <@email.baseMembershipConfirmation season=season basket=basket order=order />
+    <@email.baseMembershipConfirmation season=season basket=basket order=order translations=discountTranslations/>
 
 </@email.template>
