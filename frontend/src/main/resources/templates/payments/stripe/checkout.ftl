@@ -34,6 +34,9 @@
             </@components.section>
 
             <@components.buttonGroup>
+                <a href="/register" class="btn btn-danger transition-3d-hover">
+                    <@spring.message code="membership.cancel" />
+                </a>&nbsp;
                 <button type="button" class="btn btn-primary btn-xlg transition-3d-hover" name="action" id="checkout-button">
                     <@spring.message code="membership.next" />
                     <i class="fa fa-arrow-circle-o-right"></i>

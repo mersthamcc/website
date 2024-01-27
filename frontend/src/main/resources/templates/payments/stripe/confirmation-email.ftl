@@ -3,7 +3,7 @@
 
 <@email.template header="Thank you">
 
-    <@email.baseMembershipConfirmation season=season basket=basket order=order />
+    <@email.baseMembershipConfirmation season=season basket=basket order=order translations=discountTranslations />
 
     <@email.paragraph>
         You have paid, in full, using credit/debit card.

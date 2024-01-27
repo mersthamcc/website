@@ -2,13 +2,17 @@ package cricket.merstham.website.frontend.controller;
 
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
+import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSubscription;
+import cricket.merstham.website.frontend.configuration.RegistrationConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
+import cricket.merstham.website.frontend.model.discounts.Discount;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +34,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
 
 @Controller
@@ -49,20 +56,27 @@ public class RegistrationController {
     public static final String CURRENT_SUBSCRIPTION = "current-subscription";
     public static final String ERRORS = "errors";
 
-    private MembershipService membershipService;
-    private PaymentServiceManager paymentServiceManager;
+    private final MembershipService membershipService;
+    private final PaymentServiceManager paymentServiceManager;
+    private final List<Discount> activeDiscounts;
+    private final RegistrationConfiguration registrationConfiguration;
 
     @Autowired
     public RegistrationController(
-            MembershipService membershipService, PaymentServiceManager paymentServiceManager) {
+            MembershipService membershipService,
+            PaymentServiceManager paymentServiceManager,
+            List<Discount> activeDiscounts,
+            RegistrationConfiguration registrationConfiguration) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
+        this.activeDiscounts = activeDiscounts;
+        this.registrationConfiguration = registrationConfiguration;
     }
 
     @ModelAttribute("basket")
     public RegistrationBasket createRegistrationBasket() {
         LOG.info("Creating new registration basket");
-        return new RegistrationBasket();
+        return new RegistrationBasket(activeDiscounts);
     }
 
     @GetMapping(value = "/register", name = "register")
@@ -116,7 +130,9 @@ public class RegistrationController {
                             "registration/select-membership",
                             Map.of(
                                     "categories",
-                                    membershipService.getMembershipCategories(),
+                                    membershipService.getMembershipCategories().stream()
+                                            .sorted(Comparator.comparing(MemberCategory::getId))
+                                            .toList(),
                                     "subscription",
                                     subscription,
                                     "subscriptionId",
@@ -139,7 +155,9 @@ public class RegistrationController {
             @ModelAttribute("category") String category,
             @ModelAttribute("uuid") UUID uuid,
             @ModelAttribute("priceListItemId") Integer priceListItemId,
-            HttpSession session) {
+            @ModelAttribute("code") String code,
+            HttpSession session,
+            CognitoAuthentication authentication) {
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =
                 membershipCategory.getPriceListItem().stream()
@@ -152,7 +170,30 @@ public class RegistrationController {
                         .setPriceListItem(priceListItem)
                         .setPrice(priceListItem.getCurrentPrice())
                         .setCategory(membershipCategory.getKey());
+
+        var sessionDefaults = getSessionDefaults(session);
+
         setCurrentSubscription(session, subscription);
+
+        if (!(Strings.isBlank(membershipCategory.getRegistrationCode()))) {
+            if (!(membershipCategory.getRegistrationCode().equals(code)
+                    || codePreviouslyEntered(
+                            session, category, membershipCategory.getRegistrationCode()))) {
+                List<String> errors = List.of();
+                if (!Strings.isBlank(code)) {
+                    errors = List.of("membership.registration-code-invalid");
+                }
+                return new ModelAndView(
+                        "registration/enter-code",
+                        Map.of(
+                                "errors", errors,
+                                "category", category,
+                                "uuid", uuid.toString(),
+                                "priceListItemId", priceListItemId));
+            }
+            storeCode(session, category, code);
+        }
+
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
@@ -160,7 +201,12 @@ public class RegistrationController {
                         "subscription", subscription,
                         "category", membershipCategory,
                         "subscriptionId", uuid.toString(),
-                        "data", memberToFormData(subscription)));
+                        "data",
+                                addDefaults(
+                                        memberToFormData(subscription),
+                                        authentication,
+                                        category,
+                                        sessionDefaults)));
     }
 
     @PostMapping(
@@ -175,6 +221,7 @@ public class RegistrationController {
         var subscription = getCurrentSubscription(session).setMember(memberFromPost(body));
         session.removeAttribute(CURRENT_SUBSCRIPTION);
         basket.putSubscription(uuid, subscription);
+        saveDefaults(body, subscription, session);
         return redirectTo("/register");
     }
 
@@ -249,5 +296,93 @@ public class RegistrationController {
             errors.add("membership.errors.accept-policies");
         }
         return errors;
+    }
+
+    private MultiValueMap<String, Object> addDefaults(
+            MultiValueMap<String, Object> attributes,
+            CognitoAuthentication authentication,
+            String category,
+            Map<String, String> sessionDefaults) {
+        var defaults =
+                registrationConfiguration.getDefaults().stream()
+                        .filter(d -> d.getCategory().equals(category))
+                        .findFirst();
+        if (defaults.isPresent()) {
+            if (nonNull(sessionDefaults)) {
+                defaults.get()
+                        .getPersistFields()
+                        .forEach(
+                                d -> {
+                                    if ((!attributes.containsKey(d))
+                                            || Strings.isBlank((String) attributes.getFirst(d))) {
+                                        if (sessionDefaults.containsKey(d))
+                                            attributes.put(d, List.of(sessionDefaults.get(d)));
+                                    }
+                                });
+            }
+            if (!attributes.containsKey(defaults.get().getEmailField())
+                    || Strings.isBlank(
+                            (String) attributes.getFirst(defaults.get().getEmailField()))) {
+                attributes.put(
+                        defaults.get().getEmailField(),
+                        List.of(authentication.getOidcUser().getEmail()));
+            }
+            if (!attributes.containsKey(defaults.get().getNameField())
+                    || Strings.isBlank(
+                            (String) attributes.getFirst(defaults.get().getNameField()))) {
+                var name =
+                        format(
+                                "{0} {1}",
+                                authentication
+                                        .getOidcUser()
+                                        .getClaims()
+                                        .getOrDefault("given_name", ""),
+                                authentication
+                                        .getOidcUser()
+                                        .getClaims()
+                                        .getOrDefault("family_name", ""));
+                attributes.put(defaults.get().getNameField(), List.of(name));
+            }
+        }
+        return attributes;
+    }
+
+    private Map<String, String> getSessionDefaults(HttpSession session) {
+        var defaults = session.getAttribute("defaults");
+        if (nonNull(defaults) && defaults instanceof Map<?, ?>)
+            return (Map<String, String>) defaults;
+        return Map.of();
+    }
+
+    private void saveDefaults(
+            MultiValueMap<String, Object> body,
+            MemberSubscription subscription,
+            HttpSession session) {
+        Map<String, String> sessionDefaults = new HashMap<>();
+        var defaults =
+                registrationConfiguration.getDefaults().stream()
+                        .filter(d -> d.getCategory().equals(subscription.getCategory()))
+                        .findFirst();
+        if (defaults.isPresent()) {
+            defaults.get()
+                    .getPersistFields()
+                    .forEach(
+                            d -> {
+                                if (body.containsKey(d)
+                                        && !Strings.isBlank((String) body.getFirst(d))) {
+                                    sessionDefaults.put(d, (String) body.getFirst(d));
+                                }
+                            });
+            session.setAttribute("defaults", sessionDefaults);
+        }
+    }
+
+    private boolean codePreviouslyEntered(
+            HttpSession session, String category, String registrationCode) {
+        return Objects.equals(session.getAttribute(format("{0}-code", category)), registrationCode);
+    }
+
+    private void storeCode(HttpSession session, String category, String registrationCode) {
+        session.setAttribute(format("{0}-code", category), registrationCode);
     }
 }

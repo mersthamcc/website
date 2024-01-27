@@ -1,9 +1,11 @@
 package cricket.merstham.website.frontend.service.payment;
 
 import com.stripe.exception.StripeException;
+import com.stripe.model.Coupon;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
+import com.stripe.param.CouponCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
@@ -12,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -38,18 +41,21 @@ public class StripeService implements PaymentService {
     private final MembershipService membershipService;
     private final String apiKey;
     private final String publishableKey;
+    private final MessageSource messageSource;
 
     public StripeService(
             @Value("${payments.stripe.enabled}") boolean enabled,
             @Value("${payments.stripe.disabled-reason}") String disabledReason,
             @Value("${payments.stripe.api-key}") String apiKey,
             @Value("${payments.stripe.publishable-key}") String publishableKey,
-            MembershipService membershipService) {
+            MembershipService membershipService,
+            MessageSource messageSource) {
         this.enabled = enabled;
         this.disabledReason = disabledReason;
         this.membershipService = membershipService;
         this.apiKey = apiKey;
         this.publishableKey = publishableKey;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -110,17 +116,48 @@ public class StripeService implements PaymentService {
                                                                                                         .getMember()
                                                                                                         .getAttributeMap()
                                                                                                         .get(
-                                                                                                                "given-name"),
+                                                                                                                "given-name")
+                                                                                                        .asText(),
                                                                                                 subscription
                                                                                                         .getMember()
                                                                                                         .getAttributeMap()
                                                                                                         .get(
-                                                                                                                "family-name")))
+                                                                                                                "family-name")
+                                                                                                        .asText()))
                                                                                 .build())
                                                                 .build())
                                                 .build()));
 
         try {
+            basket.getDiscounts()
+                    .forEach(
+                            (name, amount) -> {
+                                try {
+                                    var coupon =
+                                            Coupon.create(
+                                                    CouponCreateParams.builder()
+                                                            .setCurrency("gbp")
+                                                            .setName(
+                                                                    messageSource.getMessage(
+                                                                            name,
+                                                                            null,
+                                                                            name,
+                                                                            request.getLocale()))
+                                                            .setAmountOff(toStripeLongValue(amount))
+                                                            .putMetadata("basket", basket.getId())
+                                                            .build(),
+                                                    RequestOptions.builder()
+                                                            .setApiKey(apiKey)
+                                                            .build());
+                                    params.addDiscount(
+                                            SessionCreateParams.Discount.builder()
+                                                    .setCoupon(coupon.getId())
+                                                    .build());
+                                } catch (StripeException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+            params.putMetadata("basket", basket.getId());
             var session =
                     Session.create(
                             params.build(), RequestOptions.builder().setApiKey(apiKey).build());

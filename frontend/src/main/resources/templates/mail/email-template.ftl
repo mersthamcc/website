@@ -224,7 +224,7 @@
     </tr>
 </#macro>
 
-<#macro baseMembershipConfirmation season basket order>
+<#macro baseMembershipConfirmation season basket order translations>
     <@paragraph>
         Thank you registering for ${season}.
     </@paragraph>
@@ -241,6 +241,14 @@
             <@row
                 left=name
                 right=subscription.price?string.currency />
+        </#list>
+        <#list basket.discounts as discountName, discount>
+            <tr>
+                <td class="fw-700 border-top" style="line-height: 24px; font-size: 16px; border-top-width: 1px !important; border-top-color: #e2e8f0 !important; border-top-style: solid !important; width: 100%; font-style: italic; margin: 0; padding: 8px;" align="left" width="100%">
+                    ${translations[discountName]}
+                </td>
+                <td class="fw-700 text-right border-top" style="line-height: 24px; font-size: 16px; border-top-width: 1px !important; border-top-color: #e2e8f0 !important; border-top-style: solid !important; width: 100%; margin: 0; padding: 8px;" align="right" width="100%">-${discount?string.currency}</td>
+            </tr>
         </#list>
         <@totals left="Total" right=basket.basketTotal?string.currency />
     </@table>

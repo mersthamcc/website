@@ -17,9 +17,9 @@
             </#list>
 
             <@components.buttonGroup>
-                <button type="submit" class="btn btn-danger transition-3d-hover" name="action" value="cancel" formnovalidate>
+                <a href="/register" class="btn btn-danger transition-3d-hover">
                     <@spring.message code="membership.cancel" />
-                </button>&nbsp;
+                </a>&nbsp;
                 <button type="reset" class="btn btn-light transition-3d-hover" name="action">
                     <@spring.messageText code="membership.reset" text="Clear Form" />
                 </button>&nbsp;

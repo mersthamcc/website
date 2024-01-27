@@ -172,7 +172,7 @@ class MembershipServiceTest {
                                                 .toList())));
 
         var basket =
-                new RegistrationBasket()
+                new RegistrationBasket(List.of())
                         .setId(subsId.toString())
                         .setSubscriptions(
                                 Map.of(
@@ -315,6 +315,7 @@ class MembershipServiceTest {
                                 List.of(
                                         new MembershipCategoriesQuery.MembershipCategory(
                                                 "MemberCategory",
+                                                1,
                                                 "adult",
                                                 null,
                                                 List.of(
@@ -416,6 +417,7 @@ class MembershipServiceTest {
                                 List.of(
                                         new MembershipCategoriesQuery.MembershipCategory(
                                                 "MemberCategory",
+                                                1,
                                                 "adult",
                                                 null,
                                                 List.of(

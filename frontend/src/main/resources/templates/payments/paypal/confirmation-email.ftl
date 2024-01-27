@@ -3,7 +3,7 @@
 
 <@email.template header="Thank you">
 
-    <@email.baseMembershipConfirmation season=season basket=basket order=order />
+    <@email.baseMembershipConfirmation season=season basket=basket order=order translations=discountTranslations />
 
     <#assign payment=order.payment[0] />
     <@email.paragraph>

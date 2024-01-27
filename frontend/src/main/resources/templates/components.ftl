@@ -321,6 +321,9 @@
             <div class="w-lg-80 mx-lg-auto position-relative">
                 <@categoryPricelist category=category _csrf=_csrf subscriptionId=subscriptionId />
             </div>
+            <p>
+                <sup>*&nbsp;</sup>&nbsp;<@spring.message code="membership.age-footnote" />
+            </p>
         </@section>
     </#list>
 </#macro>
@@ -328,7 +331,7 @@
 <#macro categoryPricelist category _csrf subscriptionId>
     <div class="row position-relative z-index-2 mx-n2 mb-5">
         <#list category.priceListItem as item>
-            <div class="col-md-4 col-sm-3">
+            <div class="col-md-5 col-sm-4">
                 <div class="px-2 mb-3">
                     <div class="card h-100">
                         <div class="card-header text-center">
@@ -354,36 +357,21 @@
                                 <div class="media-body">
                                     Ages ${item.minAge}
                                     <#if item.maxAge??>
-                                        ${item.maxAge}
+                                        to ${item.maxAge}
                                     <#else>
                                         and up
                                     </#if>
+                                    <sup>*</sup>
                                 </div>
                             </div>
+                            <#if (item.includesMatchFees)?? && item.includesMatchFees>
                             <div class="media font-size-1 text-body mb-3">
                                 <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
                                 <div class="media-body">
-                                    <#if (item.includesMatchFees)?? && item.includesMatchFees>
-                                        <i class="fa fa-check c-font-20"></i>
-                                    <#elseif (item.includesMatchFees)??>
-                                        <i class="fa fa-times c-font-20"></i>
-                                    <#else>
-                                        N/A
-                                    </#if>
+                                    Includes Match Fees
                                 </div>
                             </div>
-                            <div class="media font-size-1 text-body mb-3">
-                                <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
-                                <div class="media-body">
-
-                                </div>
-                            </div>
-                            <div class="media font-size-1 text-body">
-                                <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
-                                <div class="media-body">
-
-                                </div>
-                            </div>
+                            </#if>
                         </div>
                         <!-- End Body -->
 
@@ -401,7 +389,6 @@
                                     <@spring.message code="membership.select" />
                                 </button>
                             </form>
-
                         </div>
                     </div>
                 </div>

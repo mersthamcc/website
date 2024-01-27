@@ -3,7 +3,7 @@
 
 <@email.template header="Thank you">
 
-    <@email.baseMembershipConfirmation season=season basket=basket order=order />
+    <@email.baseMembershipConfirmation season=season basket=basket order=order translations=discountTranslations/>
 
     <@email.paragraph>
         You have opted to pay by bank transfer. Please arrange a transfer to the following details at quoting reference ${order.webReference}.

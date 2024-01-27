@@ -57,6 +57,8 @@ server:
   servlet:
     session:
       timeout: 24h
+      cookie:
+        max-age: 24h
 
 management:
   server:
@@ -160,3 +162,17 @@ mail:
   fromAddress: no-reply@mersthamcc.co.uk
   confirmation-email-bcc:
     - treasurer@mersthamcc.co.uk
+
+registration:
+  defaults:
+    - category: junior
+      name-field: parent-name-1
+      email-field: parent-email-1
+      persist-fields:
+        - parent-name-1
+        - parent-name-2
+        - parent-number-1
+        - parent-number-2
+        - parent-email-1
+        - parent-email-2
+        - family-name

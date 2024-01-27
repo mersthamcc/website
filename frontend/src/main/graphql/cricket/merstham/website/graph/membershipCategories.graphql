@@ -2,6 +2,7 @@ query membershipCategories($key: StringFilter!) {
   membershipCategories(where: {
     key: $key
   }) {
+    id
     key
     registrationCode
     priceListItem {

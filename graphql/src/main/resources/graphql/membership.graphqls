@@ -38,6 +38,7 @@ input AttributeInput {
 }
 
 type MemberCategory {
+    id: Int
     key: String!
     registrationCode: String
     form: [MemberCategoryFormSection!]!

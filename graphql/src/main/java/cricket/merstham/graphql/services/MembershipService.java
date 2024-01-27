@@ -2,6 +2,7 @@ package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
+import cricket.merstham.graphql.entity.MemberCategoryEntity;
 import cricket.merstham.graphql.entity.MemberEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
@@ -31,6 +32,7 @@ import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
@@ -82,6 +84,7 @@ public class MembershipService {
         var categories = memberCategoryEntityRepository.findAll();
         return categories.stream()
                 .filter(category -> isNull(where) || where.matches(category))
+                .sorted(Comparator.comparing(MemberCategoryEntity::getId))
                 .map(c -> modelMapper.map(c, MemberCategory.class))
                 .toList();
     }

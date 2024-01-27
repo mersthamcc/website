@@ -254,11 +254,13 @@ class MembershipServiceTest {
     private static final List<MemberCategoryEntity> MEMBER_CATEGORIES =
             List.of(
                     MemberCategoryEntity.builder()
+                            .id(1)
                             .key("adult")
                             .pricelistItem(List.of(PRICELIST_ITEM_ENTITIES.get(0)))
                             .form(List.of())
                             .build(),
                     MemberCategoryEntity.builder()
+                            .id(2)
                             .key("junior")
                             .pricelistItem(List.of(PRICELIST_ITEM_ENTITIES.get(1)))
                             .form(List.of())
