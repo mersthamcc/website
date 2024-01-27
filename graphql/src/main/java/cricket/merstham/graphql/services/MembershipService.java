@@ -31,6 +31,7 @@ import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
@@ -83,6 +84,7 @@ public class MembershipService {
         return categories.stream()
                 .filter(category -> isNull(where) || where.matches(category))
                 .map(c -> modelMapper.map(c, MemberCategory.class))
+                .sorted(Comparator.comparing(MemberCategory::getId))
                 .toList();
     }
 

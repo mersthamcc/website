@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.controller;
 
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
+import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.website.frontend.configuration.RegistrationConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
@@ -33,10 +34,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
@@ -127,7 +130,9 @@ public class RegistrationController {
                             "registration/select-membership",
                             Map.of(
                                     "categories",
-                                    membershipService.getMembershipCategories(),
+                                    membershipService.getMembershipCategories().stream()
+                                            .sorted(Comparator.comparing(MemberCategory::getId))
+                                            .toList(),
                                     "subscription",
                                     subscription,
                                     "subscriptionId",
@@ -150,6 +155,7 @@ public class RegistrationController {
             @ModelAttribute("category") String category,
             @ModelAttribute("uuid") UUID uuid,
             @ModelAttribute("priceListItemId") Integer priceListItemId,
+            @ModelAttribute("code") String code,
             HttpSession session,
             CognitoAuthentication authentication) {
         var membershipCategory = membershipService.getMembershipCategory(category);
@@ -168,6 +174,26 @@ public class RegistrationController {
         var sessionDefaults = getSessionDefaults(session);
 
         setCurrentSubscription(session, subscription);
+
+        if (!(Strings.isBlank(membershipCategory.getRegistrationCode()))) {
+            if (!(membershipCategory.getRegistrationCode().equals(code)
+                    || codePreviouslyEntered(
+                            session, category, membershipCategory.getRegistrationCode()))) {
+                List<String> errors = List.of();
+                if (!Strings.isBlank(code)) {
+                    errors = List.of("membership.registration-code-invalid");
+                }
+                return new ModelAndView(
+                        "registration/enter-code",
+                        Map.of(
+                                "errors", errors,
+                                "category", category,
+                                "uuid", uuid.toString(),
+                                "priceListItemId", priceListItemId));
+            }
+            storeCode(session, category, code);
+        }
+
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
@@ -349,5 +375,14 @@ public class RegistrationController {
                             });
             session.setAttribute("defaults", sessionDefaults);
         }
+    }
+
+    private boolean codePreviouslyEntered(
+            HttpSession session, String category, String registrationCode) {
+        return Objects.equals(session.getAttribute(format("{0}-code", category)), registrationCode);
+    }
+
+    private void storeCode(HttpSession session, String category, String registrationCode) {
+        session.setAttribute(format("{0}-code", category), registrationCode);
     }
 }
