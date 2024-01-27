@@ -8,6 +8,9 @@
         </@components.section>
 
         <@components.buttonGroup>
+            <a href="/register" class="btn btn-danger transition-3d-hover">
+                <@spring.message code="membership.cancel" />
+            </a>&nbsp;
             <a class="btn btn-success btn-xlg transition-3d-hover" href="/">
                 <@spring.message code="membership.complete" />
                 <i class="fa fa-icon-home"></i>
