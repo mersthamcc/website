@@ -35,7 +35,9 @@ public class SecurityConfiguration {
                                                         grantedAuthoritiesExtractor())))
                 .authorizeHttpRequests(
                         requests ->
-                                requests.requestMatchers("/graphql")
+                                requests.requestMatchers("/webhooks/**")
+                                        .permitAll()
+                                        .requestMatchers("/graphql")
                                         .permitAll()
                                         .requestMatchers("/graphiql**")
                                         .anonymous());
