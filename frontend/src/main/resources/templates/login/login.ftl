@@ -18,6 +18,11 @@
                 <#if errors??>
                     <@components.formErrors errors=errors errorKey="login.errors.title" />
                 </#if>
+                <div class="alert alert-soft-primary" role="alert">
+                    <p>We are using a new service for managing username and passwords.</p>
+
+                    <p>All existing accounts have been removed, you will need to sign up for a new  account <a class="link-underline" href="/sign-up">here</a>, this only takes a minute.</p>
+                </div>
                 <!-- Form Group -->
                 <div class="js-form-message form-group">
                     <label class="input-label" for="email">

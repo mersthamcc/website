@@ -91,6 +91,13 @@
                 </div>
                 <!-- End Search -->
 
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>New website</strong> Not all features are available yet, full service will be available soon. Membership registration is available now.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
                 <div class="header-section">
                     <!-- Topbar -->
                     <div class="container header-hide-content pt-2">
@@ -376,6 +383,8 @@
             <script src="${resourcePrefix}/front/assets/vendor/dzsparallaxer/dzsparallaxer.js"></script>
             <script src="${resourcePrefix}/front/assets/vendor/typed.js/lib/typed.min.js"></script>
             <script src="${resourcePrefix}/front/assets/vendor/aos/dist/aos.js"></script>
+            <script src="${resourcePrefix}/front/assets/vendor/slick-carousel/slick/slick.js"></script>
+
 
             <!-- JS Front -->
             <script src="${resourcePrefix}/front/assets/js/theme.min.js"></script>
