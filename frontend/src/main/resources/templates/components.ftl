@@ -435,7 +435,7 @@
         <#assign required></#assign>
     </#if>
     <div class="row form-group">
-        <label class="col-md-4 control-label"><@spring.message code="${localeCategory}.${attribute.definition.key}" /></label>
+        <label class="col-md-4 control-label"><@spring.messageText code="${localeCategory}.${attribute.definition.key}" text="${localeCategory}.${attribute.definition.key}" /></label>
         <div class="col-md-6">
             <#switch attribute.definition.type.toString()>
                 <#case "String">
@@ -465,6 +465,13 @@
                 <#case "Date">
                     <@memberInputField type="date"
                         required=required
+                        subscription=subscription
+                        key=attribute.definition.key
+                        localeCategory=localeCategory
+                        data=data />
+                    <#break>
+                <#case "Boolean">
+                    <@memberSwitchField
                         subscription=subscription
                         key=attribute.definition.key
                         localeCategory=localeCategory
@@ -502,7 +509,10 @@
                                         && data[attribute.definition.key]?seq_contains(choice)>
                                             checked="checked"
                                         </#if>
-                                        ${required} />
+                                        <#if (required?has_content || (choice)?starts_with("ACCEPT-"))>
+                                            required="required"
+                                        </#if>
+                                />
                                 &nbsp;&nbsp;<@spring.messageText code="${localeCategory}.${choice}" text="${choice}"/>
                             </label>
                         </div>
@@ -512,6 +522,28 @@
             <span class="help-block"><@spring.messageText code="${localeCategory}.${attribute.definition.key}-help" text="" /></span>
         </div>
     </div>
+</#macro>
+
+<#macro memberSwitchField subscription key localeCategory data>
+    <label class="toggle-switch d-flex align-items-center mb-3" for="${key}">
+        <input
+                type="checkbox"
+                class="toggle-switch-input"
+                id="${key}"
+                <#if (data[key]?first)!false>
+                    checked="checked"
+                </#if> />
+        <span class="toggle-switch-label">
+            <span class="toggle-switch-indicator"></span>
+        </span>
+        <span class="toggle-switch-content">
+            <span class="d-block">
+            &nbsp;&nbsp;<@spring.messageText
+                code="${localeCategory}.${key}-switch"
+                text="${localeCategory}.${key}-switch" />
+            </span>
+        </span>
+    </label>
 </#macro>
 
 <#macro memberInputField type required subscription key localeCategory data>

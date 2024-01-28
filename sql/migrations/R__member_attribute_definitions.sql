@@ -1,11 +1,28 @@
 INSERT
     INTO
-        member_category(KEY)
-    VALUES('adult'),
-    ('junior'),
-    ('disability'),
-    ('social') ON
-    CONFLICT DO NOTHING;
+        member_category(
+            "key",
+            registration_code
+        )
+    VALUES(
+        'adult',
+        NULL
+    ),
+    (
+        'junior',
+        '${junior_code}'
+    ),
+    (
+        'disability',
+        NULL
+    ),
+    (
+        'social',
+        NULL
+    ) ON
+    CONFLICT("key") DO UPDATE
+    SET
+        registration_code = EXCLUDED.registration_code;
 
 INSERT
     INTO
@@ -103,34 +120,75 @@ INSERT
         'gender',
         'Option',
         '[
-         "MALE",
-         "FEMALE",
-         "NON-BINARY",
-         "NOT-SPECIFIED"
-       ]'::JSONB
+          "MALE",
+          "FEMALE"
+        ]'::JSONB
     ),
     (
         'skills',
         'List',
         '[
-         "BOWL",
-         "BAT",
-         "KEEPER"
-       ]'::JSONB
+          "BOWL",
+          "BAT",
+          "KEEPER"
+        ]'::JSONB
     ),
     (
         'preferred-days',
         'List',
         '[
-         "SATURDAY",
-         "SUNDAY"
-       ]'::JSONB
+          "SATURDAY",
+          "SUNDAY"
+        ]'::JSONB
     ),
     (
         'open-age-allowed',
         'Boolean',
         NULL
+    ),
+    (
+        'medical-conditions',
+        'String',
+        NULL
+    ),
+    (
+        'emergency-contact-name',
+        'String',
+        NULL
+    ),
+    (
+        'emergency-contact-relationship',
+        'String',
+        NULL
+    ),
+    (
+        'emergency-contact-phone',
+        'String',
+        NULL
+    ),
+    (
+        'junior-declarations',
+        'List',
+        '[
+          "ACCEPT-DECLARATION",
+          "ACCEPT-UNACCOMPANIED",
+          "OPENAGE",
+          "PHOTOS-COACHING",
+          "PHOTOS-MARKETING"
+        ]'::JSONB
     ) ON
+    CONFLICT(KEY) DO UPDATE
+    SET
+        TYPE = EXCLUDED.type,
+        choices = EXCLUDED.choices;
+
+INSERT
+    INTO
+        member_category(KEY)
+    VALUES('adult'),
+    ('junior'),
+    ('disability'),
+    ('social') ON
     CONFLICT DO NOTHING;
 
 INSERT
@@ -142,7 +200,10 @@ INSERT
     ('adult-cricket'),
     ('junior-cricket'),
     ('adult-basics'),
-    ('junior-basics') ON
+    ('junior-basics'),
+    ('emergency-contact'),
+    ('medical-conditions'),
+    ('junior-policy') ON
     CONFLICT DO NOTHING;
 
 INSERT
@@ -660,7 +721,7 @@ INSERT
             FROM
                 member_form_section
             WHERE
-                KEY = 'junior-cricket'
+                KEY = 'emergency-contact'
         ),
         (
             SELECT
@@ -668,9 +729,89 @@ INSERT
             FROM
                 attribute_definition
             WHERE
-                KEY = 'open-age-allowed'
+                KEY = 'emergency-contact-name'
+        ),
+        10,
+        TRUE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'emergency-contact'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                attribute_definition
+            WHERE
+                KEY = 'emergency-contact-phone'
+        ),
+        20,
+        TRUE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'emergency-contact'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                attribute_definition
+            WHERE
+                KEY = 'emergency-contact-relationship'
         ),
         30,
+        FALSE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'medical-conditions'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                attribute_definition
+            WHERE
+                KEY = 'medical-conditions'
+        ),
+        10,
+        FALSE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'junior-policy'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                attribute_definition
+            WHERE
+                KEY = 'junior-declarations'
+        ),
+        10,
         FALSE
     ) ON
     CONFLICT(
@@ -744,9 +885,29 @@ INSERT
             FROM
                 member_form_section
             WHERE
-                KEY = 'junior-cricket'
+                KEY = 'medical-conditions'
         ),
         30,
+        TRUE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_category
+            WHERE
+                KEY = 'junior'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'junior-policy'
+        ),
+        40,
         TRUE
     ),
     (
@@ -784,9 +945,29 @@ INSERT
             FROM
                 member_form_section
             WHERE
-                KEY = 'adult-cricket'
+                KEY = 'contact'
         ),
         20,
+        TRUE
+    ),
+    (
+        (
+            SELECT
+                id
+            FROM
+                member_category
+            WHERE
+                KEY = 'adult'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                member_form_section
+            WHERE
+                KEY = 'emergency-contact'
+        ),
+        30,
         TRUE
     ),
     (
@@ -856,26 +1037,6 @@ INSERT
             FROM
                 member_category
             WHERE
-                KEY = 'disability'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-cricket'
-        ),
-        40,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
                 KEY = 'social'
         ),
         (
@@ -909,7 +1070,76 @@ INSERT
         20,
         TRUE
     ) ON
-    CONFLICT DO NOTHING;
+    CONFLICT(
+        member_category_id,
+        member_form_section_id
+    ) DO UPDATE
+    SET
+        sort_order = EXCLUDED.sort_order,
+        show_on_registration = EXCLUDED.show_on_registration;
+
+DELETE
+FROM
+    member_category_form_section
+WHERE
+    member_category_id =(
+        SELECT
+            id
+        FROM
+            member_category
+        WHERE
+            KEY = 'junior'
+    )
+    AND member_form_section_id =(
+        SELECT
+            id
+        FROM
+            member_form_section
+        WHERE
+            KEY = 'junior-cricket'
+    );
+
+DELETE
+FROM
+    member_category_form_section
+WHERE
+    member_category_id =(
+        SELECT
+            id
+        FROM
+            member_category
+        WHERE
+            KEY = 'adult'
+    )
+    AND member_form_section_id =(
+        SELECT
+            id
+        FROM
+            member_form_section
+        WHERE
+            KEY = 'adult-cricket'
+    );
+
+DELETE
+FROM
+    member_category_form_section
+WHERE
+    member_category_id =(
+        SELECT
+            id
+        FROM
+            member_category
+        WHERE
+            KEY = 'disability'
+    )
+    AND member_form_section_id =(
+        SELECT
+            id
+        FROM
+            member_form_section
+        WHERE
+            KEY = 'junior-cricket'
+    );
 
 INSERT
     INTO
@@ -978,7 +1208,7 @@ INSERT
         ),
         16,
         NULL,
-        'Students (inclusive of match fees)',
+        'Students (all inclusive)',
         FALSE
     ),
     (
@@ -1008,7 +1238,7 @@ INSERT
         ),
         16,
         NULL,
-        'Adults (inclusive of match fees)',
+        'Adults (all inclusive)',
         TRUE
     ),
     (
@@ -1055,8 +1285,29 @@ INSERT
         NULL,
         'Social',
         NULL
+    ),
+    (
+        10,
+        (
+            SELECT
+                id
+            FROM
+                member_category
+            WHERE
+                KEY = 'adult'
+        ),
+        18,
+        NULL,
+        'Walking Cricket',
+        NULL
     ) ON
-    CONFLICT DO NOTHING;
+    CONFLICT(id) DO UPDATE
+    SET
+        category_id = EXCLUDED.category_id,
+        min_age = EXCLUDED.min_age,
+        max_age = EXCLUDED.max_age,
+        description = EXCLUDED.description,
+        includes_match_fees = EXCLUDED.includes_match_fees;
 
 INSERT
     INTO
@@ -1197,5 +1448,17 @@ INSERT
         '2024-01-01',
         '2024-12-31',
         40.00
+    ),
+    (
+        10,
+        '2024-01-01',
+        '2024-12-31',
+        50.00
     ) ON
-    CONFLICT DO NOTHING;
+    CONFLICT(
+        pricelist_item_id,
+        date_from,
+        date_to
+    ) DO UPDATE
+    SET
+        price = EXCLUDED.price;
