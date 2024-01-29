@@ -403,6 +403,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
       - ./dev-config/pgadmin4/servers.json:/pgadmin4/servers.json:ro
+      - ~/.ssh:/pgadmin4/ssh:ro
     networks:
       - backendnetwork
     restart: unless-stopped
