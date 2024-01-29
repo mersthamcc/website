@@ -462,11 +462,11 @@
 
             <!-- Global site tag (gtag.js) - Google Analytics -->
             <#if config.googleAnalyticsKey?? && config.googleAnalyticsKey != "">
-              <script async src="https://www.googletagmanager.com/gtag/js?id=${config.googleAnalyticsKey}"></script>
+<#--              <script async src="https://www.googletagmanager.com/gtag/js?id=${config.googleAnalyticsKey}"></script>-->
             </#if>
 
             <!--  GOOGLE reCAPTCHA -->
-            <script src='//www.google.com/recaptcha/api.js'></script>
+<#--            <script src='//www.google.com/recaptcha/api.js'></script>-->
             <!--  GOOGLE reCAPTCHA -->
 
             <#if config.cookies.apiKey?? && config.cookies.apiKey != "">
