@@ -385,7 +385,6 @@
             <script src="${resourcePrefix}/front/assets/vendor/aos/dist/aos.js"></script>
             <script src="${resourcePrefix}/front/assets/vendor/slick-carousel/slick/slick.js"></script>
 
-
             <!-- JS Front -->
             <script src="${resourcePrefix}/front/assets/js/theme.min.js"></script>
 
