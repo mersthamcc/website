@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import cricket.merstham.shared.dto.AttributeDefinition;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -40,13 +41,13 @@ public class AttributeConverter {
         var valueAsString = value.asText();
         switch (attribute.getType()) {
             case Date:
-                var formatter = new SimpleDateFormat("yyyy-MM-dd", locale);
+                var formatter = DateTimeFormatter.ISO_DATE;
                 try {
                     if (isBlank(valueAsString)) {
                         return "";
                     }
-                    return formatter.parse(valueAsString);
-                } catch (ParseException e) {
+                    return LocalDate.from(formatter.parse(valueAsString));
+                } catch (DateTimeParseException e) {
                     throw new RuntimeException("Error parsing date string", e);
                 }
             case Boolean:

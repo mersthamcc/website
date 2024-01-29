@@ -242,7 +242,7 @@ public class MenuBuilder {
                 .map(
                         s ->
                                 new Menu(
-                                        "results-for-year",
+                                        "fixtures-for-season",
                                         buildParams("year", s.toString()),
                                         null,
                                         List.of(),

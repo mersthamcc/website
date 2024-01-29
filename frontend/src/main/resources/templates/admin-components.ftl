@@ -87,7 +87,7 @@
                     localeCategory=localeCategory />
                     <#break>
                 <#case "Date">
-                    <@memberAdminInputField type="date"
+                    <@memberAdminDateField
                     required=required
                     data=data
                     key=attribute.definition.key
@@ -147,6 +147,16 @@
            type="${type}"
            placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
            value="${data[key]!""}"
+            ${required}
+    />
+</#macro>
+
+<#macro memberAdminDateField required data key localeCategory>
+    <input class="form-control c-square c-theme"
+           name="${key}"
+           type="date"
+           placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
+           value="${(data[key]).format('yyyy-MM-dd')!""}"
             ${required}
     />
 </#macro>

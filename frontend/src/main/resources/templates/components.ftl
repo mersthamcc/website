@@ -93,7 +93,7 @@
                 </#list>
             </div>
         <#else>
-            <a class="js-hs-unfold-invoker btn btn-icon btn-xs btn-ghost-secondary" href="/login">
+            <a class="js-hs-unfold-invoker btn btn-icon btn-xs btn-ghost-secondary" href="/account">
                 <i class="fas fa-user-circle"></i>
             </a>
         </#if>

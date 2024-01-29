@@ -32,12 +32,21 @@ public class CricketController {
         return getFixtures(LocalDate.now().getYear(), null);
     }
 
-    @GetMapping(path = "/fixtures/{season:[\\d]{4}}/{teamId:[\\d]*}")
+    @GetMapping(path = "/fixtures/{season:[\\d]{4}}", name = "fixtures-for-season")
+    public ModelAndView fixtures(@PathVariable int season) {
+        return getFixtures(season, null);
+    }
+
+    @GetMapping(
+            path = "/fixtures/{season:[\\d]{4}}/{teamId:[\\d]*}",
+            name = "fixtures-for-season-team")
     public ModelAndView fixtures(@PathVariable int season, @PathVariable int teamId) {
         return getFixtures(season, teamId);
     }
 
-    @GetMapping(path = "/fixtures/{season:[\\d]{4}}/{teamId:[\\d]*}/{fixtureId:[\\d]*}")
+    @GetMapping(
+            path = "/fixtures/{season:[\\d]{4}}/{teamId:[\\d]*}/{fixtureId:[\\d]*}",
+            name = "fixtures-details")
     public ModelAndView fixtureDetails(
             @PathVariable int season, @PathVariable int teamId, @PathVariable int fixtureId) {
         try {
@@ -59,16 +68,6 @@ public class CricketController {
         } catch (IOException e) {
             throw new RuntimeException("Error getting fixture data", e);
         }
-    }
-
-    @GetMapping(path = "/results", name = "results")
-    public String results() {
-        return "home/home";
-    }
-
-    @GetMapping(path = "/results/{year:[\\d]{4}}", name = "results-for-year")
-    public String resultsForYear(@PathVariable int year) {
-        return "home/home";
     }
 
     private ModelAndView getFixtures(int season, Integer teamId) {
