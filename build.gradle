@@ -18,7 +18,7 @@ ext {
             aws            : "2.20.109",
             jackson        : "2.13.4.1",
             lombok         : "1.18.24",
-            model_mapper   : "3.1.1",
+            model_mapper   : "3.2.0",
             prometheus     : "1.10.4",
             spring_boot    : "3.1.2",
             spring_sessions: "3.1.1",
