@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class Member implements Serializable {
     @JsonProperty private List<MemberAttribute> attributes = new ArrayList<>();
     @JsonProperty private List<MemberSubscription> subscription = new ArrayList<>();
 
+    @Transient
     public Map<String, JsonNode> getAttributeMap() {
         return isNull(attributes)
                 ? Map.of()
