@@ -39,6 +39,8 @@ public class SecurityConfiguration {
                                         .permitAll()
                                         .requestMatchers("/graphql")
                                         .permitAll()
+                                        .requestMatchers("/actuator/**")
+                                        .permitAll()
                                         .requestMatchers("/graphiql**")
                                         .anonymous());
         return http.build();
