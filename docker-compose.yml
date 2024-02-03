@@ -509,7 +509,7 @@ services:
       MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
       MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
     volumes:
-      - ./infrastructure/spaces-data:/data
+      - ./infrastructure/assets:/data
     networks:
       - backendnetwork
     restart: unless-stopped
