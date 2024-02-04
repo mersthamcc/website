@@ -10,7 +10,6 @@
                 toolbar: [
                     'heading', '|',
                     'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
-                    'readMore', '|',
                     'undo', 'redo', '|',
                     'ckfinder', 'mediaEmbed', '|',
                     'sourceEditing'],

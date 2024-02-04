@@ -83,7 +83,10 @@ public class NewsController extends SspController<News> {
             var now = Instant.now();
             var news =
                     News.builder()
-                            .author(cognitoAuthentication.getOidcUser().getName())
+                            .author(
+                                    cognitoAuthentication.getOidcUser().getGivenName()
+                                            + " "
+                                            + cognitoAuthentication.getOidcUser().getFamilyName())
                             .createdDate(now)
                             .publishDate(now)
                             .draft(false)
