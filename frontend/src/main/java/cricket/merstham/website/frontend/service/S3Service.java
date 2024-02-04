@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -54,9 +55,12 @@ public class S3Service {
             @Value("${resources.bucket}") String bucketName,
             @Value("${resources.region}") String region,
             @Value("${resources.api-endpoint:#{null}}") Optional<URI> endpoint) {
-        this.bucketName = bucketName;
+        this.bucketName = "website-resources-20240114154447044000000001";
         this.region = region;
-        var builder = S3Client.builder().region(Region.of(region));
+        var builder =
+                S3Client.builder()
+                        .credentialsProvider(DefaultCredentialsProvider.builder().build())
+                        .region(Region.of(region));
         endpoint.ifPresent(
                 e ->
                         builder.endpointOverride(e)
