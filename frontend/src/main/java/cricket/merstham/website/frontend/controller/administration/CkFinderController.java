@@ -640,12 +640,23 @@ public class CkFinderController {
         try {
             var resourceType = getResourceType(params);
             var currentFolder = params.get("currentFolder");
-            var folder = resourceType.getDirectory() + currentFolder;
+            var folder = getFolder(resourceType.getDirectory(), currentFolder);
 
             return callable.getResult(resourceType, currentFolder, folder);
         } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
             throw new RuntimeException("Error running CKFinder command", ex);
         }
+    }
+
+    private String getFolder(String base, String currentFolder) {
+        var root = config.getBackendConfig("default").getRoot();
+        var folder = new StringBuilder(root);
+        if (!(root.endsWith("/") || base.startsWith("/"))) folder.append("/");
+        folder.append(base);
+        if (!(base.endsWith("/") || currentFolder.startsWith("/"))) folder.append("/");
+        folder.append(currentFolder);
+        return folder.toString();
     }
 
     private Config.ResourceType getResourceType(Map<String, String> params) {
