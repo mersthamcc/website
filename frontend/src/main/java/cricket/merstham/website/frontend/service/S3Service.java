@@ -62,12 +62,14 @@ public class S3Service {
                         .credentialsProvider(DefaultCredentialsProvider.builder().build())
                         .region(Region.of(region));
         endpoint.ifPresent(
-                e ->
+                e -> {
+                    if (!e.toString().isBlank())
                         builder.endpointOverride(e)
                                 .serviceConfiguration(
                                         S3Configuration.builder()
                                                 .pathStyleAccessEnabled(true)
-                                                .build()));
+                                                .build());
+                });
         this.client = builder.build();
     }
 

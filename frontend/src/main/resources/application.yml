@@ -107,7 +107,7 @@ resources:
   base-directory: "${RESOURCES_BASE_DIRECTORY:../infrastructure/spaces-data}"
   bucket: "${RESOURCES_BUCKET_NAME:resources}"
   region: "${RESOURCES_BUCKET_REGION:eu-west-2}"
-  api-endpoint: ${RESOURCES_API_ENDPOINT:~}
+  api-endpoint: ${RESOURCES_API_ENDPOINT:}
 
 payments:
   pay-later:
