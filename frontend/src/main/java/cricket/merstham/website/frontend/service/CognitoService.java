@@ -34,6 +34,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCode
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.PasswordResetRequiredException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ResendConfirmationCodeRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenRequest;
@@ -210,6 +211,26 @@ public class CognitoService {
 
         return CognitoPendingUser.builder()
                 .userId(result.userSub())
+                .attributeName(result.codeDeliveryDetails().attributeName())
+                .destination(result.codeDeliveryDetails().destination())
+                .confirmationMedium(result.codeDeliveryDetails().deliveryMediumAsString())
+                .build();
+    }
+
+    public CognitoPendingUser resendVerificationCode(CognitoPendingUser pendingUser) {
+        var request =
+                ResendConfirmationCodeRequest.builder()
+                        .clientId(clientId)
+                        .username(pendingUser.getUserId())
+                        .secretHash(
+                                calculateSecretHash(
+                                        clientId, clientSecret, pendingUser.getUserId()))
+                        .build();
+
+        var result = client.resendConfirmationCode(request);
+
+        return CognitoPendingUser.builder()
+                .userId(pendingUser.getUserId())
                 .attributeName(result.codeDeliveryDetails().attributeName())
                 .destination(result.codeDeliveryDetails().destination())
                 .confirmationMedium(result.codeDeliveryDetails().deliveryMediumAsString())

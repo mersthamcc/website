@@ -841,7 +841,7 @@
     <fieldset>
         <div class="row mb-6">
             <#list 1..noOfDigits as i>
-                <div class="col-2 otp-digit-container">
+                <div class="col-md-2 col-4 otp-digit-container">
                     <!-- Form Group -->
                     <div class="form-group">
                         <input
