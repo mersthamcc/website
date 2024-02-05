@@ -261,7 +261,7 @@ public class LoginController {
             redirectAttributes.addFlashAttribute(ERRORS, List.of("signup.errors.signup_failed"));
             return redirectTo(LOGIN_URL);
         }
-        cognitoService.resendVerificationCode(pendingUser);
+        cognitoService.resendVerificationCode(pendingUser.getUserId());
         redirectAttributes.addFlashAttribute(INFO, List.of("verification.resent"));
         return redirectTo(VERIFICATION_URL);
     }

@@ -7,6 +7,7 @@ import cricket.merstham.website.frontend.security.filters.CognitoExceptionTransl
 import cricket.merstham.website.frontend.security.filters.CognitoRefreshFilter;
 import cricket.merstham.website.frontend.security.providers.CognitoRefreshTokenAuthenticationProvider;
 import cricket.merstham.website.frontend.security.providers.CognitoUsernamePasswordAuthenticationProvider;
+import cricket.merstham.website.frontend.service.CognitoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,6 +81,14 @@ public class SecurityConfiguration {
         return new ProviderManager(
                 cognitoUsernamePasswordAuthenticationProvider,
                 cognitoRefreshTokenAuthenticationProvider);
+    }
+
+    @Bean
+    public CognitoAuthenticationFailureHandler failureHandler(
+            @Value("${spring.security.oauth2.client.registration.login.session-salt:#{null}}")
+                    String salt,
+            CognitoService cognitoService) {
+        return new CognitoAuthenticationFailureHandler(salt, cognitoService);
     }
 
     @Bean
