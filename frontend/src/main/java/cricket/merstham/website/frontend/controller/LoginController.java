@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.RouteNames;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
+import cricket.merstham.website.frontend.security.CognitoPendingUser;
 import cricket.merstham.website.frontend.security.SealedString;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.QrCodeService;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,7 @@ public class LoginController {
     public static final String LOGOUT_URL = "/logout";
     public static final String SIGNUP_URL = "/sign-up";
     public static final String VERIFICATION_URL = "/sign-up/verification";
+    public static final String RESEND_VERIFICATION_URL = "/sign-up/verification/resend";
     public static final String PENDING_USER = "pending_user";
     public static final String ERROR_FLASH = "ERROR";
     public static final String ERRORS = "ERRORS";
@@ -68,10 +71,12 @@ public class LoginController {
     public static final String MODEL_CHALLENGE_NAME = "challengeName";
     public static final String MODEL_MFA_TYPES = "mfaTypes";
     public static final String MODEL_ERRORS = "errors";
+    public static final String MODEL_INFO = "info";
     public static final String MODEL_SIGN_UP = "signUp";
     public static final String ROUTE_SIGNUP = "signup";
     public static final String PENDING_PASSWORD = "PENDING_PASSWORD"; // pragma: allowlist secret
     public static final String EMAIL = "EMAIL";
+    public static final String INFO = "INFO";
     private final ObjectMapper objectMapper;
     private final CognitoService cognitoService;
     private final QrCodeService qrCodeService;
@@ -211,12 +216,23 @@ public class LoginController {
     @GetMapping(value = VERIFICATION_URL, name = RouteNames.ROUTE_VERIFICATION)
     public ModelAndView verification(HttpServletRequest request, HttpSession session) {
         var pendingUser = session.getAttribute(PENDING_USER);
-        return new ModelAndView("login/verification", Map.of("pendingUser", pendingUser));
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        Map<String, Object> model = new HashMap<>();
+        if (nonNull(flash)) {
+            var errors = flash.get(ERRORS);
+            model.put(MODEL_ERRORS, errors);
+            var info = flash.get(INFO);
+            model.put(MODEL_INFO, info);
+        }
+        model.put("pendingUser", pendingUser);
+        return new ModelAndView("login/verification", model);
     }
 
     @PostMapping(value = VERIFICATION_URL, name = RouteNames.ROUTE_VERIFICATION_PROCESS)
     public RedirectView verificationProcess(
-            @RequestParam Map<String, String> parameters, HttpSession session) {
+            @RequestParam Map<String, String> parameters,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         var userId = parameters.get(MODEL_USER_ID);
         var code = getCodeFromMap(parameters, OTP_CODE_FIELD_PREFIX);
         if (cognitoService.verify(userId, code)) {
@@ -232,7 +248,22 @@ public class LoginController {
             session.removeAttribute(PENDING_PASSWORD);
             return redirectTo("/register");
         }
-        return redirectTo(SIGNUP_URL);
+        redirectAttributes.addFlashAttribute(
+                ERRORS, List.of("signup.errors.invalid_verification_code"));
+        return redirectTo(VERIFICATION_URL);
+    }
+
+    @GetMapping(value = RESEND_VERIFICATION_URL)
+    public RedirectView resendVerification(
+            HttpSession session, RedirectAttributes redirectAttributes) {
+        var pendingUser = (CognitoPendingUser) session.getAttribute(PENDING_USER);
+        if (isNull(pendingUser)) {
+            redirectAttributes.addFlashAttribute(ERRORS, List.of("signup.errors.signup_failed"));
+            return redirectTo(LOGIN_URL);
+        }
+        cognitoService.resendVerificationCode(pendingUser.getUserId());
+        redirectAttributes.addFlashAttribute(INFO, List.of("verification.resent"));
+        return redirectTo(VERIFICATION_URL);
     }
 
     @GetMapping(value = LOGOUT_URL, name = RouteNames.ROUTE_LOGOUT)

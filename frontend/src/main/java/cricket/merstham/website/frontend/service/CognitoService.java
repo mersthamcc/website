@@ -9,6 +9,7 @@ import cricket.merstham.website.frontend.security.CognitoPendingUser;
 import cricket.merstham.website.frontend.security.SealedString;
 import cricket.merstham.website.frontend.security.exceptions.CognitoCodeException;
 import cricket.merstham.website.frontend.security.exceptions.CognitoSessionExpiredException;
+import cricket.merstham.website.frontend.security.exceptions.CognitoUserNotVerifiedException;
 import lombok.experimental.ExtensionMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,9 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCode
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.PasswordResetRequiredException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ResendConfirmationCodeRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotConfirmedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenRequest;
 
@@ -128,6 +131,8 @@ public class CognitoService {
         } catch (PasswordResetRequiredException ex) {
             LOG.warn("Password reset required for user {}, requesting code.", username);
             return resetPasswordRequest(username);
+        } catch (UserNotConfirmedException ex) {
+            throw new CognitoUserNotVerifiedException("User not confirmed", ex);
         } catch (CognitoIdentityProviderException ex) {
             LOG.error("Cognito Error", ex);
         }
@@ -210,6 +215,24 @@ public class CognitoService {
 
         return CognitoPendingUser.builder()
                 .userId(result.userSub())
+                .attributeName(result.codeDeliveryDetails().attributeName())
+                .destination(result.codeDeliveryDetails().destination())
+                .confirmationMedium(result.codeDeliveryDetails().deliveryMediumAsString())
+                .build();
+    }
+
+    public CognitoPendingUser resendVerificationCode(String username) {
+        var request =
+                ResendConfirmationCodeRequest.builder()
+                        .clientId(clientId)
+                        .username(username)
+                        .secretHash(calculateSecretHash(clientId, clientSecret, username))
+                        .build();
+
+        var result = client.resendConfirmationCode(request);
+
+        return CognitoPendingUser.builder()
+                .userId(username)
                 .attributeName(result.codeDeliveryDetails().attributeName())
                 .destination(result.codeDeliveryDetails().destination())
                 .confirmationMedium(result.codeDeliveryDetails().deliveryMediumAsString())

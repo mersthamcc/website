@@ -19,6 +19,14 @@
                     <img class="avatar avatar-xxl avatar-4by3" src="${resourcePrefix}/front/assets/svg/illustrations/account-creation.svg" alt="Verification">
                 </div>
 
+                <#if info??>
+                    <@components.formErrors errors=info errorKey="verification.resent.title" class="alert-soft-info"/>
+                </#if>
+
+                <#if errors??>
+                    <@components.formErrors errors=errors errorKey="signup.errors.title" />
+                </#if>
+
                 <div class="mb-5">
                     <p>
                         <@spring.messageArgs code="verification.subtitle" args=[pendingUser.destination] />
@@ -40,7 +48,7 @@
                     <div class="col-sm-6 text-sm-right">
                         <p>
                             <@spring.message code="login.sms_code_not_received" />
-                            <a href="#">
+                            <a href="/sign-up/verification/resend">
                                 <@spring.message code="login.sms_code_resend" />
                             </a>
                         </p>
