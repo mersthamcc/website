@@ -11,60 +11,62 @@
             </#if>
 
             <@components.section title="Members">
-                <table class="table table-borderless table-thead-bordered table-nowrap table-align-middle">
-                    <thead class="thead-light">
-                        <tr>
-                            <th><@spring.message code="membership.given-name" /></th>
-                            <th><@spring.message code="membership.family-name" /></th>
-                            <th><@spring.message code="membership.action" /></th>
-                            <th><@spring.message code="membership.category" /></th>
-                            <th><@spring.message code="membership.price" /></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <#list basket.subscriptions as id, subscription>
-                            <tr scope="row">
-                                <td>${subscription.member.attributeMap["given-name"].asText()!""}</td>
-                                <td>${subscription.member.attributeMap["family-name"].asText()!""}</td>
-                                <td><@spring.message code="membership.${subscription.action}" /></td>
-                                <td><@spring.message code="membership.${subscription.category!'unknown'}" /></td>
-                                <td class="align-right">${subscription.price?string.currency}</td>
-                                <td>
-                                    <button type="submit" class="btn btn-info btn-xs" name="edit-member" value="${id}">
-                                        <i class="fa fa-edit"></i>
-                                        <@spring.message code="membership.review" />
-                                    </button>&nbsp;
-
-                                    <button type="submit" class="btn c-btn-red btn-xs" name="delete-member" value="${id}">
-                                        <i class="fa fa-minus"></i>
-                                        <@spring.message code="membership.delete-member" />
-                                    </button>&nbsp;
-                                </td>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-thead-bordered table-align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th><@spring.message code="membership.given-name" /></th>
+                                <th><@spring.message code="membership.family-name" /></th>
+                                <th><@spring.message code="membership.action" /></th>
+                                <th><@spring.message code="membership.category" /></th>
+                                <th><@spring.message code="membership.price" /></th>
+                                <th></th>
                             </tr>
-                        </#list>
-                    </tbody>
-                    <tfoot>
-                        <#list basket.discounts as name, discount>
+                        </thead>
+                        <tbody>
+                            <#list basket.subscriptions as id, subscription>
+                                <tr scope="row">
+                                    <td>${subscription.member.attributeMap["given-name"].asText()!""}</td>
+                                    <td>${subscription.member.attributeMap["family-name"].asText()!""}</td>
+                                    <td><@spring.message code="membership.${subscription.action}" /></td>
+                                    <td><@spring.message code="membership.${subscription.category!'unknown'}" /></td>
+                                    <td class="align-right">${subscription.price?string.currency}</td>
+                                    <td>
+                                        <button type="submit" class="btn btn-info btn-xs" name="edit-member" value="${id}">
+                                            <i class="fa fa-edit"></i>
+                                            <@spring.message code="membership.review" />
+                                        </button>&nbsp;
+
+                                        <button type="submit" class="btn c-btn-red btn-xs" name="delete-member" value="${id}">
+                                            <i class="fa fa-minus"></i>
+                                            <@spring.message code="membership.delete-member" />
+                                        </button>&nbsp;
+                                    </td>
+                                </tr>
+                            </#list>
+                        </tbody>
+                        <tfoot>
+                            <#list basket.discounts as name, discount>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><i><@spring.messageText code=name text=name /></i></td>
+                                    <td class="align-right">-${discount?string.currency}</td>
+                                    <td></td>
+                                </tr>
+                            </#list>
                             <tr>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td><i><@spring.messageText code=name text=name /></i></td>
-                                <td class="align-right">-${discount?string.currency}</td>
+                                <th>Total:</th>
+                                <td class="align-right"><b>${basket.basketTotal?string.currency}</b></td>
                                 <td></td>
                             </tr>
-                        </#list>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <th>Total:</th>
-                            <td class="align-right"><b>${basket.basketTotal?string.currency}</b></td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
                 <button type="submit"
                         class="btn btn-soft-primary transition-3d-hover"
                         name="action"
