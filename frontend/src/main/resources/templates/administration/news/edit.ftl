@@ -50,7 +50,7 @@
                 <@admin.card title="menu.admin-news-new">
                     <input type="hidden" name="id" value="${news.id?long?c}" />
                     <input type="hidden" name="uuid" value="${news.uuid}" />
-                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZ")}" />
+                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSX")}" />
                     <@admin.formErrors errors=errors![] errorKey="news.errorSaving"/>
                     <@admin.adminFormDisplayField name="createdDate" data=news.createdDate.format()?datetime.iso?string["dd/MM/yyyy HH:mm"] localeCategory="news" />
                     <@admin.adminFormField name="title" data=news.title!"" required=true type="text" localeCategory="news" />
