@@ -1268,7 +1268,7 @@ INSERT
         ),
         5,
         NULL,
-        'Disability (All Ages)',
+        'Magics Memberships',
         NULL
     ),
     (
