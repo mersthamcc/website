@@ -177,7 +177,7 @@ public class FixtureService {
 
     @Scheduled(
             cron = "${configuration.play-cricket.team-refresh-cron}",
-            zone = "${configuration.play-cricket.scheduler-zone}")
+            zone = "${configuration.scheduler-zone}")
     @Timed(
             value = "playcricket.teams.refresh",
             description = "Time taken to process teams from PlayCricket")
@@ -224,7 +224,7 @@ public class FixtureService {
 
     @Scheduled(
             cron = "${configuration.play-cricket.fixture-refresh-cron}",
-            zone = "${configuration.play-cricket.scheduler-zone}")
+            zone = "${configuration.scheduler-zone}")
     @Timed(
             value = "playcricket.fixtures.refresh",
             description = "Time taken to process fixtures from PlayCricket")
