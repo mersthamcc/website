@@ -44,6 +44,7 @@ dependencies {
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
     implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:lambda:${dependencyVersions.aws}"
 
     implementation project(":shared")
 

@@ -4,7 +4,6 @@ server:
 spring:
 #  mvc:
 #    log-request-details: true
-
   devtools:
     livereload:
       enabled: ${DEVTOOLS_LIVE_RELOAD:false}
@@ -39,7 +38,6 @@ spring:
     dynamodb:
       table-name: GraphQLCache
       time-to-live: 300s
-      region: eu-west-2
       endpoint: ${DYNAMO_ENDPOINT:}
       create-table: ${DYNAMO_CREATE_TABLE:true}
   security:
@@ -64,9 +62,14 @@ debug: false
 
 configuration:
   database-secret: ${DATABASE_SECRET:}
+  scheduler-zone: "Europe/London"
+  region: eu-west-2
+  epos-now:
+    customer-refresh-cron: "0 */10 * * * ?"
+    create-function-arn: "${EPOS_CREATE_CUSTOMER_FUNCTION_ARN:}"
+    dry-run: true
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
     team-refresh-cron: "0 0 */2 * * ?"
     fixture-refresh-cron: "0 */10 * * * ?"
-    scheduler-zone: "Europe/London"
