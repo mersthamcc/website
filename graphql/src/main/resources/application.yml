@@ -68,6 +68,10 @@ configuration:
     customer-refresh-cron: "0 */10 * * * ?"
     create-function-arn: "${EPOS_CREATE_CUSTOMER_FUNCTION_ARN:}"
     dry-run: true
+  accounting:
+    sync-cron: "0 */5 * * * ?"
+    create-sales-order-arn: "${CREATE_SALES_ORDER_ARN:}"
+    create-payment-arn: "${CREATE_PAYMENT_ARN:}"
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
