@@ -2,6 +2,7 @@ package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cricket.merstham.graphql.entity.PaymentEntity;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.shared.dto.Order;
@@ -22,6 +23,7 @@ import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.isNull;
@@ -49,6 +51,7 @@ public class AccountingService {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final String createSalesOrderArn;
+    private final String createPaymentArn;
     private final LambdaClient client;
 
     @Autowired
@@ -58,12 +61,14 @@ public class AccountingService {
             ModelMapper modelMapper,
             ObjectMapper objectMapper,
             @Value("${configuration.accounting.create-sales-order-arn}") String createSalesOrderArn,
+            @Value("${configuration.accounting.create-payment-arn}") String createPaymentArn,
             LambdaClient client) {
         this.repository = repository;
         this.paymentRepository = paymentRepository;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
         this.createSalesOrderArn = createSalesOrderArn;
+        this.createPaymentArn = createPaymentArn;
         this.client = client;
     }
 
@@ -76,19 +81,75 @@ public class AccountingService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void accountingSalesOrderSync() {
         LOG.info("Starting accounting sync...");
+        LOG.info("Send new orders...");
         var orders = repository.findOrderEntitiesByAccountingIdIsNull();
         orders.forEach(
                 order -> {
                     if (!order.getMemberSubscription().isEmpty()) {
                         order.setAccountingId(
-                                sendToAccounting(orderJson(modelMapper.map(order, Order.class))));
+                                sendOrderToAccounting(
+                                        orderJson(modelMapper.map(order, Order.class))));
                     }
                 });
         repository.saveAllAndFlush(orders);
+        LOG.info("Order sync complete!");
+
+        LOG.info("Send payments...");
+        var payments = paymentRepository.findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrue();
+        payments.forEach(
+                payment -> {
+                    var result = sendPaymentToAccounting(payment);
+                    payment.setAccountingId(result.get("payment_id").asText());
+                    payment.setFeesAccountingId(result.get("fee_id").asText());
+                    payment.setReconciled(true);
+                });
+        paymentRepository.saveAllAndFlush(payments);
+        LOG.info("Payment sync complete!");
         LOG.info("Finished accounting sync!");
     }
 
-    private String sendToAccounting(JsonNode order) {
+    private JsonNode sendPaymentToAccounting(PaymentEntity payment) {
+        Map<String, Object> request =
+                Map.of(
+                        "id", payment.getId(),
+                        "type", payment.getType(),
+                        "reference", payment.getReference(),
+                        "date", payment.getDate().format(DateTimeFormatter.ISO_DATE),
+                        "amount", payment.getAmount(),
+                        "fees", payment.getProcessingFees(),
+                        "order_id", payment.getOrder().getAccountingId());
+        try {
+            if (!(isNull(createPaymentArn) || createPaymentArn.isBlank())) {
+                var response =
+                        client.invoke(
+                                InvokeRequest.builder()
+                                        .functionName(createPaymentArn)
+                                        .payload(
+                                                SdkBytes.fromByteArray(
+                                                        objectMapper.writeValueAsBytes(request)))
+                                        .invocationType(InvocationType.REQUEST_RESPONSE)
+                                        .build());
+                var result = objectMapper.readTree(response.payload().asByteArray());
+                LOG.info("Lambda response: {}", result);
+                if (nonNull(response.functionError()) && !response.functionError().isBlank()) {
+                    LOG.error("Function error: {}", response.functionError());
+                    var error = result.get("errorMessage");
+                    throw new RuntimeException(
+                            isNull(error)
+                                    ? "Unknown error from accounting service"
+                                    : error.asText());
+                }
+                return result;
+            } else {
+                LOG.info("Request JSON: {}", request);
+                return null;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Error processing order", ex);
+        }
+    }
+
+    private String sendOrderToAccounting(JsonNode order) {
         try {
             if (!(isNull(createSalesOrderArn) || createSalesOrderArn.isBlank())) {
                 var response =
