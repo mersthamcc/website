@@ -45,6 +45,9 @@ dependencies {
     implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:lambda:${dependencyVersions.aws}"
+    implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
+    implementation 'com.stripe:stripe-java:21.14.0'
+    implementation 'com.gocardless:gocardless-pro:5.8.0'
 
     implementation project(":shared")
 
