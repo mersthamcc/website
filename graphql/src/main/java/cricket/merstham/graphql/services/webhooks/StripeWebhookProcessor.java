@@ -83,7 +83,7 @@ public class StripeWebhookProcessor implements WebhookProcessor {
                         BalanceTransaction.retrieve(
                                 transactionId, RequestOptions.builder().setApiKey(apiKey).build());
 
-                payment.setReconciled(true);
+                payment.setCollected(true);
                 payment.setProcessingFees(
                         BigDecimal.valueOf(transaction.getFee())
                                 .divide(ONE_HUNDRED, SCALE, RoundingMode.HALF_UP));
