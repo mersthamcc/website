@@ -77,3 +77,9 @@ configuration:
     site-id: ${PLAY_CRICKET_SITE_ID:}
     team-refresh-cron: "0 0 */2 * * ?"
     fixture-refresh-cron: "0 */10 * * * ?"
+  webhooks:
+    stripe:
+      secret: ${STRIPE_WEBHOOK_SECRET:}
+      api-key: ${STRIPE_API_KEY:}
+      publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+
