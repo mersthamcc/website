@@ -39,6 +39,7 @@ import java.util.Map;
 import static cricket.merstham.website.frontend.controller.HomeController.ROOT_URL;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.OTP_CODE_FIELD_PREFIX;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.getCodeFromMap;
+import static cricket.merstham.website.frontend.helpers.OtpHelper.getCodeFromRequestParameters;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -52,6 +53,8 @@ public class LoginController {
     public static final String CHALLENGE_PROCESSING_URL = "/login/challenge";
     public static final String LOGIN_URL = "/login";
     public static final String LOGOUT_URL = "/logout";
+    public static final String FORGOT_PASSWORD_URL = "/forgot-password";
+    private static final String FORGOT_PASSWORD_CODE_URL = "/forgot-password/code";
     public static final String SIGNUP_URL = "/sign-up";
     public static final String VERIFICATION_URL = "/sign-up/verification";
     public static final String RESEND_VERIFICATION_URL = "/sign-up/verification/resend";
@@ -72,11 +75,14 @@ public class LoginController {
     public static final String MODEL_MFA_TYPES = "mfaTypes";
     public static final String MODEL_ERRORS = "errors";
     public static final String MODEL_INFO = "info";
+    public static final String MODEL_EMAIL = "email";
     public static final String MODEL_SIGN_UP = "signUp";
     public static final String ROUTE_SIGNUP = "signup";
     public static final String PENDING_PASSWORD = "PENDING_PASSWORD"; // pragma: allowlist secret
     public static final String EMAIL = "EMAIL";
     public static final String INFO = "INFO";
+    public static final String FORGOT_PASSWORD_CODE_DELIVERY_DETAILS =
+            "forgot-password-code-delivery-details";
     private final ObjectMapper objectMapper;
     private final CognitoService cognitoService;
     private final QrCodeService qrCodeService;
@@ -98,15 +104,22 @@ public class LoginController {
 
     @GetMapping(value = LOGIN_URL, name = RouteNames.ROUTE_LOGIN)
     @PostMapping(value = LOGIN_PROCESSING_URL)
-    public ModelAndView login(@RequestParam(value = "error", required = false) String error) {
+    public ModelAndView login(
+            @RequestParam(value = "error", required = false) String error,
+            HttpServletRequest request) {
         var errors =
                 isNull(error) ? List.of() : List.of(LOGIN_ERRORS_MESSAGE_CATEGORY.concat(error));
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash)) {
+            if (flash.containsKey(INFO)) {
+                model.put(MODEL_INFO, flash.get(INFO));
+            }
+        }
+        model.put(MODEL_PROCESSING_URL, LOGIN_PROCESSING_URL);
+        model.put(MODEL_ERRORS, errors);
         return new ModelAndView(
-                "login/login",
-                Map.of(
-                        MODEL_PROCESSING_URL, LOGIN_PROCESSING_URL,
-                        MODEL_ERRORS, errors),
-                isNull(error) ? HttpStatus.OK : HttpStatus.FORBIDDEN);
+                "login/login", model, isNull(error) ? HttpStatus.OK : HttpStatus.FORBIDDEN);
     }
 
     @GetMapping(value = "/auth/challenge/{type}", name = RouteNames.ROUTE_CHALLENGE)
@@ -271,6 +284,61 @@ public class LoginController {
         LOG.info("Logging out");
         request.logout();
         return redirectTo(ROOT_URL);
+    }
+
+    @GetMapping(value = FORGOT_PASSWORD_URL, name = RouteNames.ROUTE_FORGOT_PASSWORD)
+    public ModelAndView forgotPassword() {
+        return new ModelAndView(
+                "login/forgot-password", Map.of(MODEL_PROCESSING_URL, FORGOT_PASSWORD_URL));
+    }
+
+    @GetMapping(value = FORGOT_PASSWORD_CODE_URL, name = RouteNames.ROUTE_FORGOT_PASSWORD)
+    public ModelAndView forgotPasswordCode(HttpServletRequest request) {
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash)) {
+            if (flash.containsKey(ERROR_FLASH)) {
+                model.put(MODEL_ERRORS, flash.get(ERROR_FLASH));
+            }
+            model.put(MODEL_EMAIL, flash.get(EMAIL));
+        }
+        model.put(MODEL_PROCESSING_URL, FORGOT_PASSWORD_CODE_URL);
+        return new ModelAndView(
+                "login/forgot-password-code",
+                model,
+                model.containsKey(MODEL_ERRORS) ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+    }
+
+    @PostMapping(value = FORGOT_PASSWORD_URL, name = RouteNames.ROUTE_FORGOT_PASSWORD)
+    public RedirectView forgotPasswordRequest(
+            @RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        cognitoService.forgotPassword(email);
+        redirectAttributes.addFlashAttribute(EMAIL, email);
+        return redirectTo(FORGOT_PASSWORD_CODE_URL);
+    }
+
+    @PostMapping(value = FORGOT_PASSWORD_CODE_URL, name = RouteNames.ROUTE_FORGOT_PASSWORD)
+    public RedirectView forgotPasswordCodeRequest(
+            HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        var params = request.getParameterMap();
+        var code = getCodeFromRequestParameters(params);
+        var email = params.get("email")[0];
+        var password = params.get("password")[0];
+        var confirmPassword = params.get("confirmPassword")[0];
+
+        if (password.equals(confirmPassword)) {
+            var result = cognitoService.completeForgotPassword(email, code, password);
+            if (result.isEmpty()) {
+                redirectAttributes.addFlashAttribute(INFO, List.of("forgot-password.info.success"));
+                return redirectTo(LOGIN_URL);
+            }
+            redirectAttributes.addFlashAttribute(ERROR_FLASH, List.of(result.get()));
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_FLASH, List.of("forgot-password.errors.password-do-not-match"));
+        }
+        redirectAttributes.addFlashAttribute(EMAIL, email);
+        return redirectTo(FORGOT_PASSWORD_CODE_URL);
     }
 
     private List<String> getMfaTypes(CognitoChallengeAuthentication authentication) {

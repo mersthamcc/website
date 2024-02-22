@@ -9,4 +9,6 @@ public class RouteNames {
     public static final String ROUTE_VERIFICATION = "verification";
     public static final String ROUTE_VERIFICATION_PROCESS = "verification_process";
     public static final String ROUTE_LOGOUT = "logout";
+    public static final String ROUTE_FORGOT_PASSWORD =
+            "forgot-password"; // pragma: allowlist secret
 }

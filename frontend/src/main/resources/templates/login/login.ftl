@@ -6,8 +6,18 @@
 </#macro>
 <#macro imageScripts>
     <script>
-        $('#loginWarning')
-            .modal();
+        $(document).ready(function () {
+            let key = "loginMessageAcknowledged";
+            let acknowledged = localStorage.getItem(key);
+
+            if (!acknowledged) {
+                $('#loginWarning')
+                    .modal();
+            }
+            $('#loginWarning').on('shown.bs.modal', function () {
+                localStorage.setItem(key, "1");
+            })
+        });
     </script>
 </#macro>
 
@@ -17,7 +27,11 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <@components.section title="login.subtitle">
                 <#if errors??>
-                    <@components.formErrors errors=errors errorKey="login.errors.title" />
+                    <@components.formMessages errors=errors errorKey="login.errors.title" />
+                </#if>
+
+                <#if info??>
+                    <@components.formMessages errors=info errorKey="forgot-passwords.info.title" class="alert-soft-info"/>
                 </#if>
                 <!-- Form Group -->
                 <div class="js-form-message form-group">
@@ -41,9 +55,9 @@
                     <label class="input-label" for="password">
                         <span class="d-flex justify-content-between align-items-center">
                             <@spring.message code="login.password" />
-<#--                            <a class="link-underline text-capitalize font-weight-normal" href="/forgot-password">-->
-<#--                                <@spring.message code="login.forgot_password" />-->
-<#--                            </a>-->
+                            <a class="link-underline text-capitalize font-weight-normal" href="/forgot-password">
+                                <@spring.message code="login.forgot_password" />
+                            </a>
                         </span>
                     </label>
                     <input

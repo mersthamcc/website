@@ -18,7 +18,7 @@
                 </div>
 
                 <#if errors??>
-                    <@components.formErrors errors=errors errorKey="login.errors.title" />
+                    <@components.formMessages errors=errors errorKey="login.errors.title" />
                 </#if>
                 <div class="mb-5">
                     <p>

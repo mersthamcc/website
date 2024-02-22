@@ -30,13 +30,18 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeTy
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CodeMismatchException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmForgotPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCodeException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPasswordException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.LimitExceededException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.PasswordResetRequiredException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ResendConfirmationCodeRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.TooManyRequestsException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotConfirmedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenRequest;
@@ -49,6 +54,7 @@ import java.text.ParseException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cricket.merstham.website.frontend.security.CognitoChallengeAuthentication.Step.SETUP_SOFTWARE_MFA;
 import static java.util.Objects.isNull;
@@ -513,5 +519,44 @@ public class CognitoService {
             CognitoChallengeAuthentication.Error error,
             CognitoChallengeAuthentication authentication) {
         return authentication.toBuilder().error(error).build();
+    }
+
+    public ForgotPasswordResponse forgotPassword(String email) {
+        try {
+            return client.forgotPassword(
+                    ForgotPasswordRequest.builder()
+                            .username(email)
+                            .clientId(clientId)
+                            .secretHash(calculateSecretHash(clientId, clientSecret, email))
+                            .build());
+        } catch (UserNotFoundException ex) {
+            LOG.warn("Forgot Password - Username not found: {}", email);
+            return null;
+        }
+    }
+
+    public Optional<String> completeForgotPassword(String email, String code, String password) {
+        try {
+            client.confirmForgotPassword(
+                    ConfirmForgotPasswordRequest.builder()
+                            .clientId(clientId)
+                            .username(email)
+                            .confirmationCode(code)
+                            .password(password)
+                            .secretHash(calculateSecretHash(clientId, clientSecret, email))
+                            .build());
+            return Optional.empty();
+        } catch (CodeMismatchException | UserNotFoundException ex) {
+            return Optional.of("forgot-password.errors.incorrect-code");
+        } catch (ExpiredCodeException ex) {
+            return Optional.of("forgot-password.errors.code-expired");
+        } catch (InvalidPasswordException ex) {
+            return Optional.of("forgot-password.errors.password-not-valid");
+        } catch (TooManyRequestsException | LimitExceededException ex) {
+            return Optional.of("forgot-password.errors.too-many-attempts");
+        } catch (Exception ex) {
+            LOG.error("Unexpected error resetting password", ex);
+            return Optional.of("forgot-password.errors.unknown");
+        }
     }
 }
