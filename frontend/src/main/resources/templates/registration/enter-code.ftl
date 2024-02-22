@@ -12,7 +12,7 @@
 
             <@components.section title="membership.enter-code">
                 <#if (errors?size > 0)>
-                    <@components.formErrors errors=errors errorKey="membership.registration-code-errors" />
+                    <@components.formMessages errors=errors errorKey="membership.registration-code-errors" />
                 </#if>
 
                 <@spring.message code="membership.enter-code-text" />

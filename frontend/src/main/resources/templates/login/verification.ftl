@@ -20,11 +20,11 @@
                 </div>
 
                 <#if info??>
-                    <@components.formErrors errors=info errorKey="verification.resent.title" class="alert-soft-info"/>
+                    <@components.formMessages errors=info errorKey="verification.resent.title" class="alert-soft-info"/>
                 </#if>
 
                 <#if errors??>
-                    <@components.formErrors errors=errors errorKey="signup.errors.title" />
+                    <@components.formMessages errors=errors errorKey="signup.errors.title" />
                 </#if>
 
                 <div class="mb-5">

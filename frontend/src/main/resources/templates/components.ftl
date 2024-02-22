@@ -868,7 +868,7 @@
     </fieldset>
 </#macro>
 
-<#macro formErrors errors errorKey="An error occured" class="alert-soft-danger">
+<#macro formMessages errors errorKey="An error occured" class="alert-soft-danger">
     <#if (errors?size > 0)>
         <div class="alert ${class}" role="alert">
             <h5 class="alert-heading">

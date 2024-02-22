@@ -7,7 +7,7 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
             <#if errors??>
-                <@components.formErrors errors=errors errorKey="membership.errors" class="alert-danger"/>
+                <@components.formMessages errors=errors errorKey="membership.errors" class="alert-danger"/>
             </#if>
 
             <@components.section title="Members">
