@@ -82,4 +82,7 @@ configuration:
       secret: ${STRIPE_WEBHOOK_SECRET:}
       api-key: ${STRIPE_API_KEY:}
       publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
-
+    gocardless:
+      secret: ${GOCARDLESS_WEBHOOK_SECRET:}
+      access-token: ${GOCARDLESS_ACCESS_TOKEN:}
+      sandbox: true

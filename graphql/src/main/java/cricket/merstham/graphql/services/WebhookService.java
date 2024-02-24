@@ -89,31 +89,20 @@ public class WebhookService {
         webhooks.forEach(
                 webhook -> {
                     var processor = getProcessor(webhook.getType());
-                    var reference = processor.getPaymentReference(webhook.getBody());
-                    var payment =
-                            paymentRepository.findByTypeAndReference(webhook.getType(), reference);
-
-                    if (payment.isPresent()) {
-                        if (processor.processWebhook(webhook.getBody(), payment.get())) {
-                            paymentRepository.saveAndFlush(payment.get());
-                            LOG.info(
-                                    "Payment updated - Type: {}, Reference: {}",
-                                    webhook.getType(),
-                                    reference);
-                        } else {
-                            LOG.warn(
-                                    "Failed to process webhook - Type: {}, Reference: {}",
-                                    webhook.getType(),
-                                    reference);
-                        }
+                    if (processor.processWebhook(webhook.getBody())) {
+                        LOG.info(
+                                "Webhook successfully process - Type: {}, Reference: {}",
+                                webhook.getType(),
+                                webhook.getId());
                     } else {
                         LOG.warn(
-                                "Payment not found - Type: {}, Reference: {}",
+                                "Failed to process webhook - Type: {}, Reference: {}",
                                 webhook.getType(),
-                                reference);
+                                webhook.getId());
                     }
                     webhook.setProcessed(true);
                 });
+        repository.saveAllAndFlush(webhooks);
         LOG.info("Finished processing received webhooks!");
     }
 
