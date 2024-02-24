@@ -10,7 +10,5 @@ public interface PaymentEntityRepository extends JpaRepository<PaymentEntity, In
 
     List<PaymentEntity> findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrue();
 
-    PaymentEntity findPaymentEntityByTypeEqualsAndReferenceEquals(String type, String reference);
-
     Optional<PaymentEntity> findByTypeAndReference(String type, String reference);
 }

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class StripeWebhookProcessorTest {
 
@@ -145,7 +147,8 @@ class StripeWebhookProcessorTest {
                     + "}";
     // endregion
 
-    private final StripeWebhookProcessor processor = new StripeWebhookProcessor("", "");
+    private final PaymentEntityRepository repository = mock(PaymentEntityRepository.class);
+    private final StripeWebhookProcessor processor = new StripeWebhookProcessor("", "", repository);
     private final ObjectMapper objectMapper = new JsonMapper();
 
     @Test

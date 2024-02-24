@@ -7,7 +7,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.BalanceTransaction;
 import com.stripe.net.RequestOptions;
 import com.stripe.net.Webhook;
-import cricket.merstham.graphql.entity.PaymentEntity;
+import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.isNull;
 
@@ -25,7 +26,7 @@ public class StripeWebhookProcessor implements WebhookProcessor {
 
     private static final Logger LOG = LogManager.getLogger(StripeWebhookProcessor.class);
     private static final String NAME = "stripe";
-    public static final String STRIPE_SIGNATURE_HEADER = "Stripe-Signature";
+    public static final String STRIPE_SIGNATURE_HEADER = "stripe-signature";
     public static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     public static final int SCALE = 2;
     public static final String CHARGE_SUCCEEDED = "charge.succeeded";
@@ -33,13 +34,16 @@ public class StripeWebhookProcessor implements WebhookProcessor {
 
     private final String secret;
     private final String apiKey;
+    private final PaymentEntityRepository paymentRepository;
 
     @Autowired
     public StripeWebhookProcessor(
             @Value("${configuration.webhooks.stripe.secret}") String secret,
-            @Value("${configuration.webhooks.stripe.api-key}") String apiKey) {
+            @Value("${configuration.webhooks.stripe.api-key}") String apiKey,
+            PaymentEntityRepository paymentRepository) {
         this.secret = secret;
         this.apiKey = apiKey;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -66,32 +70,44 @@ public class StripeWebhookProcessor implements WebhookProcessor {
         }
     }
 
-    @Override
     public String getPaymentReference(JsonNode webhook) {
         return webhook.get("data").get("object").get("payment_intent").asText();
     }
 
     @Override
-    public boolean processWebhook(JsonNode webhook, PaymentEntity payment) {
-        var id = webhook.get("id").asText();
-        var type = webhook.get("type").asText();
-        var transactionId = webhook.get("data").get("object").get("balance_transaction").asText();
-        LOG.info("Processing Stripe event ID {}", id);
-        if (type.equals(CHARGE_SUCCEEDED)) {
-            try {
-                var transaction =
-                        BalanceTransaction.retrieve(
-                                transactionId, RequestOptions.builder().setApiKey(apiKey).build());
+    public boolean processWebhook(JsonNode webhook) {
+        var reference = getPaymentReference(webhook);
+        var payment = paymentRepository.findByTypeAndReference(NAME, reference);
+        AtomicBoolean success = new AtomicBoolean(false);
 
-                payment.setCollected(true);
-                payment.setProcessingFees(
-                        BigDecimal.valueOf(transaction.getFee())
-                                .divide(ONE_HUNDRED, SCALE, RoundingMode.HALF_UP));
-                return true;
-            } catch (StripeException ex) {
-                LOG.error("Error retrieving Stripe transaction details.", ex);
-            }
-        }
-        return false;
+        payment.ifPresentOrElse(
+                p -> {
+                    var id = webhook.get("id").asText();
+                    var type = webhook.get("type").asText();
+                    var transactionId =
+                            webhook.get("data").get("object").get("balance_transaction").asText();
+                    LOG.info("Processing Stripe event ID {}", id);
+                    if (type.equals(CHARGE_SUCCEEDED)) {
+                        try {
+                            var transaction =
+                                    BalanceTransaction.retrieve(
+                                            transactionId,
+                                            RequestOptions.builder().setApiKey(apiKey).build());
+
+                            p.setCollected(true);
+                            p.setProcessingFees(
+                                    BigDecimal.valueOf(transaction.getFee())
+                                            .divide(ONE_HUNDRED, SCALE, RoundingMode.HALF_UP));
+                            paymentRepository.saveAndFlush(payment.get());
+                            success.set(true);
+                        } catch (StripeException ex) {
+                            LOG.error("Error retrieving Stripe transaction details.", ex);
+                        }
+                    }
+                },
+                () -> {
+                    LOG.warn("Payment not found - Type: {}, Reference: {}", NAME, reference);
+                });
+        return success.get();
     }
 }
