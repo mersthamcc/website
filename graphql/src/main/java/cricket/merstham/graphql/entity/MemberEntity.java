@@ -49,6 +49,12 @@ public class MemberEntity {
     @Column(name = "owner_user_id", nullable = false, length = 64)
     private String ownerUserId;
 
+    @Column(name = "cancelled")
+    private Instant cancelled;
+
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
     @OneToMany(
             fetch = FetchType.LAZY,
             mappedBy = "primaryKey.member",

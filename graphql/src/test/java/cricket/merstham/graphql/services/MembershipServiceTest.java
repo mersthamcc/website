@@ -364,7 +364,7 @@ class MembershipServiceTest {
     @BeforeEach
     void setup() {
         when(attributeRepository.findAll()).thenReturn(ATTRIBUTES);
-        when(memberRepository.findAll()).thenReturn(MEMBERS);
+        when(memberRepository.findAllByCancelledIsNull()).thenReturn(MEMBERS);
         when(priceListItemEntityRepository.findAll()).thenReturn(PRICELIST_ITEM_ENTITIES);
         when(memberCategoryEntityRepository.findAll()).thenReturn(MEMBER_CATEGORIES);
         when(memberRepository.findById(anyInt()))
