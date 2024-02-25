@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class GoCardlessWebhookProcessorTest {
@@ -25,6 +24,10 @@ class GoCardlessWebhookProcessorTest {
         assertThat(processor.convertAmount("200")).isEqualTo(BigDecimal.valueOf(2.00).setScale(2));
         assertThat(processor.convertAmount("112")).isEqualTo(BigDecimal.valueOf(1.12).setScale(2));
         assertThat(processor.convertAmount("2349"))
+                .isEqualTo(BigDecimal.valueOf(23.49).setScale(2));
+        assertThat(processor.convertAmount("-200")).isEqualTo(BigDecimal.valueOf(2.00).setScale(2));
+        assertThat(processor.convertAmount("-112")).isEqualTo(BigDecimal.valueOf(1.12).setScale(2));
+        assertThat(processor.convertAmount("-2349"))
                 .isEqualTo(BigDecimal.valueOf(23.49).setScale(2));
     }
 }

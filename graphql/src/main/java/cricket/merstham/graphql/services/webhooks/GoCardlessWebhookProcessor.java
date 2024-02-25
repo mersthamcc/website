@@ -115,7 +115,8 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     public BigDecimal convertAmount(String amount) {
         return BigDecimal.valueOf(Double.parseDouble(amount))
                 .setScale(2, RoundingMode.UNNECESSARY)
-                .divide(BigDecimal.valueOf(100), RoundingMode.UNNECESSARY);
+                .divide(BigDecimal.valueOf(100), RoundingMode.UNNECESSARY)
+                .abs();
     }
 
     private boolean isPayoutEvent(Event event) {
