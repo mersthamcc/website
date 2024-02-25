@@ -20,4 +20,6 @@ public interface MemberEntityRepository
                             + "   AND cancelled IS NULL",
             nativeQuery = true)
     List<MemberEntity> findAllWhereIdentifiersDoesNotContainKey(@Param("key") String key);
+
+    List<MemberEntity> findAllByCancelledIsNull();
 }

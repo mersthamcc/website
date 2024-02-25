@@ -76,7 +76,7 @@ public class MembershipService {
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public List<Member> getMembers() {
-        var members = memberRepository.findAll();
+        var members = memberRepository.findAllByCancelledIsNull();
         return members.stream().map(m -> modelMapper.map(m, Member.class)).toList();
     }
 
