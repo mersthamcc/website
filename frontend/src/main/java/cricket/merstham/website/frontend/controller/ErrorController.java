@@ -20,6 +20,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Controller
@@ -37,7 +38,9 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         }
 
         var exception = RequestContextUtils.getInputFlashMap(request);
-        return new ModelAndView("error/500", Map.of(EXCEPTION_FLASH, exception));
+        Map<String, Object> model =
+                isNull(exception) ? Map.of() : Map.of(EXCEPTION_FLASH, exception);
+        return new ModelAndView("error/500", model);
     }
 
     @GetMapping(value = "/throw-error", name = "throw-error")

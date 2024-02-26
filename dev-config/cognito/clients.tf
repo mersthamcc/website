@@ -16,10 +16,11 @@ resource "aws_cognito_user_pool_client" "website" {
 
   supported_identity_providers = [
     "COGNITO",
+    aws_cognito_identity_provider.saml_provider.provider_name
   ]
 
   callback_urls = [
-    "http://localhost:8080/login/oauth2/code/login",
+    "http://localhost:8080/login/code",
   ]
 
   generate_secret = true

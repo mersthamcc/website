@@ -35,6 +35,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import static cricket.merstham.website.frontend.controller.HomeController.ROOT_URL;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.OTP_CODE_FIELD_PREFIX;
@@ -52,6 +54,8 @@ public class LoginController {
     public static final String LOGIN_PROCESSING_URL = "/login";
     public static final String CHALLENGE_PROCESSING_URL = "/login/challenge";
     public static final String LOGIN_URL = "/login";
+    public static final String PROVIDER_LOGIN_URL = "/login/{provider}";
+    public static final String PROVIDER_LOGIN_CODE_URL = "/login/code";
     public static final String LOGOUT_URL = "/logout";
     public static final String FORGOT_PASSWORD_URL = "/forgot-password";
     private static final String FORGOT_PASSWORD_CODE_URL = "/forgot-password/code";
@@ -83,6 +87,11 @@ public class LoginController {
     public static final String INFO = "INFO";
     public static final String FORGOT_PASSWORD_CODE_DELIVERY_DETAILS =
             "forgot-password-code-delivery-details";
+    public static final String STATE = "state";
+    public static final String CODE = "code";
+    public static final String ERROR_PARAMETER = "error";
+    public static final String ERROR_DESCRIPTION = "error_description";
+    private static final String MODEL_PROVIDERS = "providers";
     private final ObjectMapper objectMapper;
     private final CognitoService cognitoService;
     private final QrCodeService qrCodeService;
@@ -105,7 +114,7 @@ public class LoginController {
     @GetMapping(value = LOGIN_URL, name = RouteNames.ROUTE_LOGIN)
     @PostMapping(value = LOGIN_PROCESSING_URL)
     public ModelAndView login(
-            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = ERROR_PARAMETER, required = false) String error,
             HttpServletRequest request) {
         var errors =
                 isNull(error) ? List.of() : List.of(LOGIN_ERRORS_MESSAGE_CATEGORY.concat(error));
@@ -116,10 +125,50 @@ public class LoginController {
                 model.put(MODEL_INFO, flash.get(INFO));
             }
         }
+        var providers = cognitoService.getProviders();
         model.put(MODEL_PROCESSING_URL, LOGIN_PROCESSING_URL);
         model.put(MODEL_ERRORS, errors);
+        model.put(MODEL_PROVIDERS, providers);
         return new ModelAndView(
                 "login/login", model, isNull(error) ? HttpStatus.OK : HttpStatus.FORBIDDEN);
+    }
+
+    @PostMapping(value = PROVIDER_LOGIN_URL)
+    public RedirectView providerLogin(
+            @PathVariable("provider") String provider, HttpSession session) {
+        var state = UUID.randomUUID().toString();
+        var redirectUrl = cognitoService.getProviderLoginUrl(provider, state);
+        session.setAttribute("PROVIDER_LOGIN_STATE", state);
+        return redirectTo(redirectUrl);
+    }
+
+    @GetMapping(value = PROVIDER_LOGIN_CODE_URL)
+    public RedirectView providerLoginWithCode(
+            @RequestParam Map<String, String> params,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        if (params.containsKey(ERROR_PARAMETER)) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_FLASH,
+                    List.of(
+                            params.containsKey(ERROR_DESCRIPTION)
+                                    ? params.get(ERROR_DESCRIPTION)
+                                    : params.get(ERROR_PARAMETER)));
+        } else {
+            var state = params.get(STATE);
+            var code = params.get(CODE);
+            var storedState = (String) session.getAttribute("PROVIDER_LOGIN_STATE");
+            if (Objects.equals(state, storedState)) {
+                var authentication = cognitoService.authenticateWithCode(code);
+                var context = SecurityContextHolder.getContext();
+                context.setAuthentication(authentication);
+
+                return redirectTo("/administration");
+            }
+            redirectAttributes.addFlashAttribute(ERROR_FLASH, List.of("Invalid request state"));
+        }
+        return redirectTo(LOGIN_URL);
     }
 
     @GetMapping(value = "/auth/challenge/{type}", name = RouteNames.ROUTE_CHALLENGE)

@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import cricket.merstham.shared.extensions.StringExtensions;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
@@ -10,6 +11,12 @@ import cricket.merstham.website.frontend.security.SealedString;
 import cricket.merstham.website.frontend.security.exceptions.CognitoCodeException;
 import cricket.merstham.website.frontend.security.exceptions.CognitoSessionExpiredException;
 import cricket.merstham.website.frontend.security.exceptions.CognitoUserNotVerifiedException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 import lombok.experimental.ExtensionMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +44,10 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPassw
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPasswordException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.LimitExceededException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListIdentityProvidersRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.PasswordResetRequiredException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ProviderDescription;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ResendConfirmationCodeRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.TooManyRequestsException;
@@ -55,8 +64,11 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static cricket.merstham.website.frontend.security.CognitoChallengeAuthentication.Step.SETUP_SOFTWARE_MFA;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static software.amazon.awssdk.services.cognitoidentityprovider.model.VerifySoftwareTokenResponseType.SUCCESS;
@@ -82,6 +94,8 @@ public class CognitoService {
     private final String userPoolId;
     private final String clientId;
     private final String clientSecret;
+    private final String baseUri;
+    private final String hostedUiUri;
 
     @Autowired
     public CognitoService(
@@ -93,12 +107,17 @@ public class CognitoService {
             @Value("${spring.security.oauth2.client.registration.login.client-secret:#{null}}")
                     String clientSecret,
             @Value("${spring.security.oauth2.client.registration.login.session-salt:#{null}}")
-                    String salt) {
+                    String salt,
+            @Value("${base-url:#{null}}") String baseUri,
+            @Value("${spring.security.oauth2.client.registration.login.hosted-ui-uri:#{null}}")
+                    String hostedUiUri) {
         this.client = client;
         this.userPoolId = userPoolId;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.salt = salt;
+        this.baseUri = baseUri;
+        this.hostedUiUri = hostedUiUri;
     }
 
     public Authentication login(String username, String password) {
@@ -558,5 +577,73 @@ public class CognitoService {
             LOG.error("Unexpected error resetting password", ex);
             return Optional.of("forgot-password.errors.unknown");
         }
+    }
+
+    public List<String> getProviders() {
+        return client
+                .listIdentityProviders(
+                        ListIdentityProvidersRequest.builder()
+                                .maxResults(10)
+                                .userPoolId(userPoolId)
+                                .build())
+                .providers()
+                .stream()
+                .map(ProviderDescription::providerName)
+                .toList();
+    }
+
+    public String getProviderLoginUrl(String provider, String state) {
+        var uri =
+                UriBuilder.fromUri(hostedUiUri)
+                        .path("/oauth2/authorize")
+                        .queryParam("client_id", clientId)
+                        .queryParam("response_type", "code")
+                        .queryParam("redirect_uri", constructRedirectUrl())
+                        .queryParam("identity_provider", provider)
+                        .queryParam("scope", "email openid phone profile")
+                        .queryParam("nonce", UUID.randomUUID())
+                        .queryParam("state", state)
+                        .build();
+
+        return uri.toString();
+    }
+
+    public CognitoAuthentication authenticateWithCode(String code) {
+        try {
+            Client httpClient = ClientBuilder.newBuilder().build();
+            var uri = UriBuilder.fromUri(hostedUiUri).path("/oauth2/token").build();
+            var webTarget = httpClient.target(uri);
+            var authHeader =
+                    "Basic "
+                            + Base64.getEncoder()
+                                    .encodeToString(
+                                            format("{0}:{1}", clientId, clientSecret)
+                                                    .getBytes(StandardCharsets.UTF_8));
+            var invocation =
+                    webTarget
+                            .request()
+                            .accept(MediaType.WILDCARD_TYPE)
+                            .header(AUTHORIZATION, authHeader)
+                            .buildPost(
+                                    Entity.form(
+                                            new Form()
+                                                    .param("grant_type", "authorization_code")
+                                                    .param("client_id", "id")
+                                                    .param("redirect_uri", constructRedirectUrl())
+                                                    .param("code", code)));
+            var response = invocation.invoke(JsonNode.class);
+
+            return new CognitoAuthentication(
+                    response.get("access_token").asText(),
+                    response.get("refresh_token").asText(),
+                    response.get("id_token").asText());
+        } catch (Exception ex) {
+            LOG.error("Error getting tokens", ex);
+            return null;
+        }
+    }
+
+    private String constructRedirectUrl() {
+        return UriBuilder.fromUri(baseUri).path("/login/code").build().toString();
     }
 }
