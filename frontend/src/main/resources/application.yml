@@ -37,6 +37,7 @@ spring:
             region: ${AWS_REGION:eu-west-2}
             user-pool-id: ${COGNITO_USER_POOL_ID:eu-west-2_fl4u3kveF}
             session-salt: "${COGNITO_SESSION_SALT:}"
+            hosted-ui-uri: "${COGNITO_UI_URI:}"
           website:
             client-id: "${WEBSITE_CLIENT_CREDENTIALS_ID:dummy}"
             client-secret: "${WEBSITE_CLIENT_CREDENTIALS_SECRET:}"

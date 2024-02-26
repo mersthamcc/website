@@ -6,7 +6,7 @@ resource "aws_cognito_user_pool" "dev_pool" {
   }
 
   password_policy {
-    minimum_length = 8
+    minimum_length    = 8
     require_lowercase = true
     require_uppercase = true
     require_numbers   = true
@@ -19,9 +19,9 @@ resource "aws_cognito_user_pool" "dev_pool" {
     enabled = true
   }
 
-  username_attributes = ["email"]
+  username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
-  mfa_configuration   = "OPTIONAL"
+  mfa_configuration        = "OPTIONAL"
 }
 
 resource "aws_cognito_user_pool_domain" "dev_pool_domain" {
@@ -31,8 +31,8 @@ resource "aws_cognito_user_pool_domain" "dev_pool_domain" {
 
 resource "aws_cognito_user_pool_ui_customization" "dev_pool_ui" {
   user_pool_id = aws_cognito_user_pool.dev_pool.id
-  image_file = filebase64("data/header-logo.png")
-  css        = file("data/cognito-login.css")
+  image_file   = filebase64("data/header-logo.png")
+  css          = file("data/cognito-login.css")
 }
 
 resource "aws_cognito_resource_server" "graphql" {
@@ -44,5 +44,21 @@ resource "aws_cognito_resource_server" "graphql" {
   scope {
     scope_description = "GraphQL Trusted Client (website only)"
     scope_name        = "trusted-client"
+  }
+}
+
+resource "aws_cognito_identity_provider" "saml_provider" {
+  user_pool_id  = aws_cognito_user_pool.dev_pool.id
+  provider_name = "mersthamcc.co.uk"
+  provider_type = "SAML"
+
+  provider_details = {
+    MetadataFile = file("data/google-idp-metadata.xml")
+  }
+
+  attribute_mapping = {
+    email       = "email"
+    family_name = "last_name"
+    given_name  = "first_name"
   }
 }
