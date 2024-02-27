@@ -279,16 +279,16 @@ public class MembershipController extends SspController<Member> {
                             String column = request.getColumns().get(c.getColumn()).getData();
                             Comparator<Member> comparator = null;
                             switch (column) {
-                                case "givenName":
+                                case "data.givenName":
                                     comparator = Comparator.comparing(Member::getGivenName);
                                     break;
-                                case "familyName":
+                                case "data.familyName":
                                     comparator = Comparator.comparing(Member::getFamilyName);
                                     break;
-                                case "category":
+                                case "data.category":
                                     comparator = Comparator.comparing(Member::getCategory);
                                     break;
-                                case "lastSubscription":
+                                case "data.lastSubscription":
                                     comparator = Comparator.comparing(Member::getLastSubscription);
                                     break;
                             }
