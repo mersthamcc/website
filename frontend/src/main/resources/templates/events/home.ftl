@@ -55,7 +55,8 @@
         </div>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation">
+        <#if (totalPages > 1) >
+            <nav aria-label="Page navigation">
             <ul class="pagination mb-0">
                 <#if (page > 1)>
                     <li class="page-item">
@@ -94,6 +95,7 @@
                 </#if>
             </ul>
         </nav>
+        </#if>
         <!-- End Pagination -->
     </div>
 </@layout.mainLayout>

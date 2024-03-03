@@ -1,11 +1,13 @@
 <#import "../base.ftl" as layout>
 <@layout.mainLayout>
     <div class="container space-1">
-        <div class="profile-cover">
-            <div class="profile-cover-img-wrapper">
-                <img class="profile-cover-img" src="${event.banner}" alt="Banner Image">
+        <#if event.banner??>
+            <div class="profile-cover">
+                <div class="profile-cover-img-wrapper">
+                    <img class="profile-cover-img" src="${event.banner}" alt="Banner Image">
+                </div>
             </div>
-        </div>
+        </#if>
 
         <div class="row justify-content-lg-between">
             <div class="w-lg-60 mx-lg-auto">
