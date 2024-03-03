@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,15 @@ public class EventEntity {
 
     @Column(name = "body", nullable = false, length = Integer.MAX_VALUE)
     private String body;
+
+    @Column(name = "cta_link", length = Integer.MAX_VALUE)
+    private URI callToActionLink;
+
+    @Column(name = "cta_description", length = Integer.MAX_VALUE)
+    private URI callToActionDescription;
+
+    @Column(name = "banner", length = Integer.MAX_VALUE)
+    private String banner;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "name")

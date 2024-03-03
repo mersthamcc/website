@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -45,11 +46,20 @@ public class Event implements Serializable {
     @JsonProperty("uuid")
     private String uuid;
 
-    @JsonProperty("locaton")
+    @JsonProperty("location")
     private String location;
 
     @JsonProperty("body")
     private String body;
+
+    @JsonProperty("callToActionLink")
+    private URI callToActionLink;
+
+    @JsonProperty("callToActionDescription")
+    private URI callToActionDescription;
+
+    @JsonProperty("banner")
+    private String banner;
 
     @JsonProperty("attributes")
     private List<KeyValuePair> attributes;
