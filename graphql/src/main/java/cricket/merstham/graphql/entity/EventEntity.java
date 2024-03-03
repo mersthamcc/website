@@ -52,6 +52,15 @@ public class EventEntity {
     @Column(name = "body", nullable = false, length = Integer.MAX_VALUE)
     private String body;
 
+    @Column(name = "cta_link", length = Integer.MAX_VALUE)
+    private String callToActionLink;
+
+    @Column(name = "cta_description", length = Integer.MAX_VALUE)
+    private String callToActionDescription;
+
+    @Column(name = "banner", length = Integer.MAX_VALUE)
+    private String banner;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "name")
     @Column(name = "value")

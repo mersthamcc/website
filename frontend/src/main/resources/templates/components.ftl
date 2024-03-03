@@ -146,72 +146,74 @@
     </a>
 </#macro>
 
-<#macro adminMenuItems items=[]>
+<#macro adminMenuItems items=[] user={}>
     <#list items as item>
-        <#if item.isActiveNode(currentRoute)>
-            <#assign classes>active</#assign>
-            <#assign style></#assign>
-        <#elseif item.onActivePath(currentRoute)>
-            <#assign classes>show</#assign>
-            <#assign style>display: block;</#assign>
-        <#else>
-            <#assign classes></#assign>
-            <#assign style></#assign>
-        </#if>
-        <#assign itemTitle>
-            <@spring.messageArgsText
-                code="menu.${item.name}"
-                args=item.argumentValues
-                text="${item.name}"
-            />
-        </#assign>
-        <li class="navbar-vertical-aside-has-menu ${classes}">
-            <#if item.children??>
-                <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle ${classes}"
-                   href="${item.destinationUrl}"
-                   title="${itemTitle}">
-                    <i class="${item.icons!""} nav-icon"></i>
-                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                        ${itemTitle}
-                    </span>
-                </a>
-
-                <ul class="js-navbar-vertical-aside-submenu nav nav-sub "
-                    style="${style}">
-                    <#list item.children as subItem>
-                        <#if subItem.isActiveNode(currentRoute)>
-                            <#assign classes>active</#assign>
-                        <#elseif subItem.onActivePath(currentRoute)>
-                            <#assign classes>show</#assign>
-                        <#else>
-                            <#assign classes></#assign>
-                        </#if>
-                        <#assign subTitle>
-                            <@spring.messageArgsText
-                                code="menu.${subItem.name}"
-                                args=subItem.argumentValues
-                                text=subItem.name
-                            />
-                        </#assign>
-                        <li class="nav-item">
-                            <a class="nav-link ${classes}" href="${subItem.destinationUrl}" title="${subTitle}">
-                                <span class="tio-circle nav-indicator-icon"></span>
-                                <span class="text-truncate">${subTitle}</span>
-                            </a>
-                        </li>
-                    </#list>
-                </ul>
+        <#if user.id?? && user.hasOneOfRoles(item.roles)>
+            <#if item.isActiveNode(currentRoute)>
+                <#assign classes>active</#assign>
+                <#assign style></#assign>
+            <#elseif item.onActivePath(currentRoute)>
+                <#assign classes>show</#assign>
+                <#assign style>display: block;</#assign>
             <#else>
-                <a class="js-navbar-vertical-aside-menu-link nav-link ${classes}"
-                   href="${item.destinationUrl}"
-                   title="${itemTitle}">
-                    <i class="tio-home-vs-1-outlined nav-icon"></i>
-                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                        ${itemTitle}
-                    </span>
-                </a>
+                <#assign classes></#assign>
+                <#assign style></#assign>
             </#if>
-        </li>
+            <#assign itemTitle>
+                <@spring.messageArgsText
+                    code="menu.${item.name}"
+                    args=item.argumentValues
+                    text="${item.name}"
+                />
+            </#assign>
+            <li class="navbar-vertical-aside-has-menu ${classes}">
+                <#if item.children??>
+                    <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle ${classes}"
+                       href="${item.destinationUrl}"
+                       title="${itemTitle}">
+                        <i class="${item.icons!""} nav-icon"></i>
+                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                            ${itemTitle}
+                        </span>
+                    </a>
+
+                    <ul class="js-navbar-vertical-aside-submenu nav nav-sub "
+                        style="${style}">
+                        <#list item.children as subItem>
+                            <#if subItem.isActiveNode(currentRoute)>
+                                <#assign classes>active</#assign>
+                            <#elseif subItem.onActivePath(currentRoute)>
+                                <#assign classes>show</#assign>
+                            <#else>
+                                <#assign classes></#assign>
+                            </#if>
+                            <#assign subTitle>
+                                <@spring.messageArgsText
+                                    code="menu.${subItem.name}"
+                                    args=subItem.argumentValues
+                                    text=subItem.name
+                                />
+                            </#assign>
+                            <li class="nav-item">
+                                <a class="nav-link ${classes}" href="${subItem.destinationUrl}" title="${subTitle}">
+                                    <span class="tio-circle nav-indicator-icon"></span>
+                                    <span class="text-truncate">${subTitle}</span>
+                                </a>
+                            </li>
+                        </#list>
+                    </ul>
+                <#else>
+                    <a class="js-navbar-vertical-aside-menu-link nav-link ${classes}"
+                       href="${item.destinationUrl}"
+                       title="${itemTitle}">
+                        <i class="tio-home-vs-1-outlined nav-icon"></i>
+                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                            ${itemTitle}
+                        </span>
+                    </a>
+                </#if>
+            </li>
+        </#if>
     </#list>
 </#macro>
 

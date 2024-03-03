@@ -7,6 +7,9 @@ mutation saveEventAttributes ($id: Int!, $attributes: [KeyValuePairInput]!) {
         path
         uuid
         location
+        callToActionLink
+        callToActionDescription
+        banner
         attributes {
             key
             value

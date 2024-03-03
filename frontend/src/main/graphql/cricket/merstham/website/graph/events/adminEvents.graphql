@@ -7,6 +7,9 @@ query adminEvents($start: Int!, $length: Int!, $search: String) {
         path
         uuid
         location
+        callToActionLink
+        callToActionDescription
+        banner
         attributes {
             key
             value

@@ -7,6 +7,9 @@ query feed($page: Int!) {
         uuid
         location
         body
+        callToActionLink
+        callToActionDescription
+        banner
         attributes {
             key
             value

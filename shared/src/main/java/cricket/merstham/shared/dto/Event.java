@@ -45,11 +45,20 @@ public class Event implements Serializable {
     @JsonProperty("uuid")
     private String uuid;
 
-    @JsonProperty("locaton")
+    @JsonProperty("location")
     private String location;
 
     @JsonProperty("body")
     private String body;
+
+    @JsonProperty("callToActionLink")
+    private String callToActionLink;
+
+    @JsonProperty("callToActionDescription")
+    private String callToActionDescription;
+
+    @JsonProperty("banner")
+    private String banner;
 
     @JsonProperty("attributes")
     private List<KeyValuePair> attributes;

@@ -174,10 +174,13 @@
         <div class="col-md-10">
             <input class="form-control c-square c-theme ${additionalClasses}"
                    name="${name}"
+                   id="item-${name}"
                    type="${type}"
                    placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
                    value="${data}"
                    ${requiredAttribute} />
+            <#nested />
+            <span class="help-block"><@spring.messageText code="${localeCategory}.${name}-help" text="" /></span>
         </div>
     </div>
 </#macro>

@@ -6,6 +6,9 @@ type Event {
     body: String!
     uuid: String!
     location: String
+    callToActionLink: String
+    callToActionDescription: String
+    banner: String
     attributes: [KeyValuePair]
 }
 
@@ -17,6 +20,9 @@ input EventInput {
     location: String
     path: String!
     uuid: String!
+    callToActionLink: String
+    callToActionDescription: String
+    banner: String
     attributes: [KeyValuePairInput]
 }
 
