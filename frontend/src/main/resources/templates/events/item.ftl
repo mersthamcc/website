@@ -20,8 +20,8 @@
 
 
             <div class="col-lg-3">
-                <#if n.callToActionLink??>
-                    <a class="btn btn-primary" href="${n.callToActionLink}">${n.callToActionDescription}</a>
+                <#if event.callToActionLink??>
+                    <a class="btn btn-primary" href="${event.callToActionLink}">${event.callToActionDescription}</a>
                 </#if>
             </div>
         </div>
