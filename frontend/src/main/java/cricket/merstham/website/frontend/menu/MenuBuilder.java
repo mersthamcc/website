@@ -98,7 +98,7 @@ public class MenuBuilder {
                             "admin-news-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_NEWS"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -110,7 +110,7 @@ public class MenuBuilder {
                             "admin-event-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_EVENTS"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -130,7 +130,7 @@ public class MenuBuilder {
                             "admin-contact-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_CONTACT"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -150,7 +150,7 @@ public class MenuBuilder {
                             "admin-page-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_PAGES"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -162,7 +162,7 @@ public class MenuBuilder {
                             "admin-venue-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_VENUES"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -185,7 +185,7 @@ public class MenuBuilder {
                             "admin-membership-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_MEMBERSHIP"),
                             () ->
                                     List.of(
                                             new Menu(
@@ -202,7 +202,7 @@ public class MenuBuilder {
                             "admin-configuration-top",
                             null,
                             SCRIPT_LINK,
-                            List.of(),
+                            List.of("ROLE_SYSTEM"),
                             () ->
                                     List.of(
                                             new Menu(

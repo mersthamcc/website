@@ -1,5 +1,7 @@
 package cricket.merstham.website.frontend.helpers;
 
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
+
 import java.security.Principal;
 
 import static java.util.Objects.isNull;
@@ -13,7 +15,7 @@ public class RoleHelper {
 
     public static boolean hasRole(Principal principal, final String role) {
         if (isNull(principal)) return false;
-        return true; // ((KeycloakAuthenticationToken) principal)
-        //                .getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(role));
+        return ((CognitoAuthentication) principal)
+                .getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(role));
     }
 }
