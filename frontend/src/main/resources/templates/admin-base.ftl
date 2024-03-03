@@ -354,7 +354,7 @@
 									<div class="navbar-vertical-content">
 										<!-- Navbar Nav -->
 										<ul class="navbar-nav navbar-nav-lg card-navbar-nav">
-											<@components.adminMenuItems items=dashboardMenu/>
+											<@components.adminMenuItems items=dashboardMenu  user=user />
 
 											<#list adminMenus as title, items>
 												<li class="nav-item">
@@ -368,7 +368,7 @@
 													</small>
 													<small class="tio-more-horizontal nav-subtitle-replacer"></small>
 												</li>
-												<@components.adminMenuItems items=items/>
+												<@components.adminMenuItems items=items user=user/>
 											</#list>
 										</ul>
 										<!-- End Navbar Nav -->

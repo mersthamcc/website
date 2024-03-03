@@ -40,6 +40,28 @@
             .catch( error => {
                 console.error(error);
             });
+        $(document).ready(function (){
+            $("#banner-browse").click(function () {
+                CKFinder.modal({
+                    chooseFiles: true,
+                    connectorPath: '/administration/components/ckfinder/connector',
+                    section: 'events',
+                    startupPath: '0-Images:/',
+                    rememberLastFolder: false,
+                    uuid: '${event.uuid}',
+                    pass: 'section,uuid',
+                    onInit: function(finder) {
+                        finder.on('files:choose', function(event) {
+                            let file = event.data.files.first();
+                            $("#item-banner").val(file.getUrl());
+                        });
+                        finder.on('file:choose:resizedImage', function(event) {
+                            $("#item-banner").val(event.data.resizedUrl)
+                        });
+                    }
+                });
+            });
+        });
     </script>
 </#macro>
 
@@ -54,7 +76,17 @@
                     <@admin.adminDateTimeField name="eventDate" data=event.eventDate localeCategory="event" />
                     <@admin.adminFormField name="title" data=event.title!"" required=true type="text" localeCategory="event" />
                     <@admin.adminFormField name="location" data=event.location!"" required=true type="text" localeCategory="event" />
+                    <@admin.adminFormField name="banner" data=event.banner!"" required=false type="text" localeCategory="event">
+                        <button type="button" class="btn btn-light transition-3d-hover" name="banner-browse" id="banner-browse">
+                            <@spring.messageText code="event.browse" text="Browse" />
+                        </button>
+                    </@admin.adminFormField>
                     <@admin.adminCkEditorField name="body" data=event.body!"" required=true type="text" localeCategory="event" rows=40 />
+                </@admin.card>
+
+                <@admin.card title="event.callToAction">
+                    <@admin.adminFormField name="callToActionLink" data=event.callToActionLink!"" required=false type="text" localeCategory="event" />
+                    <@admin.adminFormField name="callToActionDescription" data=event.callToActionDescription!"" required=false type="text" localeCategory="event" />
                 </@admin.card>
 
                 <@components.buttonGroup>

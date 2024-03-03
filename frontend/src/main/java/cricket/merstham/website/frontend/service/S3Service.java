@@ -55,7 +55,7 @@ public class S3Service {
             @Value("${resources.bucket}") String bucketName,
             @Value("${resources.region}") String region,
             @Value("${resources.api-endpoint:#{null}}") Optional<URI> endpoint) {
-        this.bucketName = "website-resources-20240114154447044000000001";
+        this.bucketName = bucketName;
         this.region = region;
         var builder =
                 S3Client.builder()

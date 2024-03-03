@@ -108,6 +108,9 @@ public class EventsService {
                         .path(event.getPath())
                         .uuid(event.getUuid())
                         .location(event.getLocation())
+                        .callToActionDescription(event.getCallToActionDescription())
+                        .callToActionLink(event.getCallToActionLink().toString())
+                        .banner(event.getBanner())
                         .attributes(List.of())
                         .build();
         var saveRequest = SaveEventMutation.builder().event(input).build();
