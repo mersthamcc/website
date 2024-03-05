@@ -86,3 +86,8 @@ configuration:
       secret: ${GOCARDLESS_WEBHOOK_SECRET:}
       access-token: ${GOCARDLESS_ACCESS_TOKEN:}
       sandbox: true
+    paypal:
+      client-id: ${PAYPAL_CLIENT_ID:}
+      client-secret: ${PAYPAL_CLIENT_SECRET:}
+      sandbox: true
+      webhook-id: ${PAYPAL_WEBHOOK_ID:}

@@ -84,7 +84,9 @@ public class WebhookService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void processWebhooks() {
         LOG.info("Processing received webhooks...");
-        var webhooks = repository.findAllByProcessedFalseAndTypeIn(List.of("stripe", "gocardless"));
+        var webhooks =
+                repository.findAllByProcessedFalseAndTypeIn(
+                        List.of("stripe", "gocardless", "paypal"));
 
         webhooks.forEach(
                 webhook -> {
