@@ -72,6 +72,7 @@ configuration:
     sync-cron: "0 */5 * * * ?"
     create-sales-order-arn: "${CREATE_SALES_ORDER_ARN:}"
     create-payment-arn: "${CREATE_PAYMENT_ARN:}"
+    get-payments-arn: "${GET_PAYMENTS_ARN:}"
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
