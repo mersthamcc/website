@@ -92,8 +92,10 @@ public class PaypalWebhookProcessor implements WebhookProcessor {
                                             VerificationResponse.class)
                                     .requestBody(createVerificationRequest(httpHeaders, body))
                                     .header(CONTENT_TYPE, APPLICATION_JSON));
-            return result.statusCode() == 200
-                    && result.result().getVerificationStatus().equals(VerificationResponse.SUCCESS);
+            LOG.info(
+                    "PayPal verification result status code {}, result = {}",
+                    result.statusCode(),
+                    result.result().getVerificationStatus());
         } catch (Exception ex) {
             LOG.error("Error calling PayPal verification", ex);
         }

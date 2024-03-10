@@ -22,7 +22,10 @@ import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -48,27 +51,33 @@ public class AccountingService {
 
     private final OrderEntityRepository repository;
     private final PaymentEntityRepository paymentRepository;
+    private final OrderEntityRepository orderRepository;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final String createSalesOrderArn;
     private final String createPaymentArn;
+    private final String getPaymentsArn;
     private final LambdaClient client;
 
     @Autowired
     public AccountingService(
             OrderEntityRepository repository,
             PaymentEntityRepository paymentRepository,
+            OrderEntityRepository orderRepository,
             ModelMapper modelMapper,
             ObjectMapper objectMapper,
             @Value("${configuration.accounting.create-sales-order-arn}") String createSalesOrderArn,
             @Value("${configuration.accounting.create-payment-arn}") String createPaymentArn,
+            @Value("${configuration.accounting.get-payments-arn}") String getPaymentsArn,
             LambdaClient client) {
         this.repository = repository;
         this.paymentRepository = paymentRepository;
+        this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
         this.createSalesOrderArn = createSalesOrderArn;
         this.createPaymentArn = createPaymentArn;
+        this.getPaymentsArn = getPaymentsArn;
         this.client = client;
     }
 
@@ -104,8 +113,80 @@ public class AccountingService {
                     payment.setReconciled(true);
                 });
         paymentRepository.saveAllAndFlush(payments);
+
+        LOG.info("Receiving offline payments...");
+        payments = syncOfflinePayments();
+        paymentRepository.saveAllAndFlush(payments);
+
         LOG.info("Payment sync complete!");
         LOG.info("Finished accounting sync!");
+    }
+
+    private List<PaymentEntity> syncOfflinePayments() {
+        Map<String, Object> request = Map.of("since", "2024-01-01T00:00:00.000Z");
+        List<PaymentEntity> result = new ArrayList<>();
+        try {
+            var response =
+                    client.invoke(
+                            InvokeRequest.builder()
+                                    .functionName(getPaymentsArn)
+                                    .payload(
+                                            SdkBytes.fromByteArray(
+                                                    objectMapper.writeValueAsBytes(request)))
+                                    .invocationType(InvocationType.REQUEST_RESPONSE)
+                                    .build());
+            var payments = objectMapper.readTree(response.payload().asByteArray());
+            LOG.info("Found {} offline payments to process!", payments.size());
+            payments.forEach(
+                    p -> {
+                        var id = p.get("id").asText();
+                        LOG.info("Processing accounting payment id {}", id);
+                        var entities = paymentRepository.findByAccountingId(id);
+                        if (entities.isEmpty()) {
+                            p.get("artefact")
+                                    .forEach(
+                                            a -> {
+                                                var order =
+                                                        orderRepository
+                                                                .findOrderEntityByAccountingId(
+                                                                        a.get("id").asText());
+
+                                                order.ifPresentOrElse(
+                                                        o ->
+                                                                result.add(
+                                                                        PaymentEntity.builder()
+                                                                                .accountingId(id)
+                                                                                .date(
+                                                                                        LocalDate
+                                                                                                .parse(
+                                                                                                        p.get(
+                                                                                                                        "date")
+                                                                                                                .asText()))
+                                                                                .reference(
+                                                                                        p.get(
+                                                                                                        "reference")
+                                                                                                .asText())
+                                                                                .type("bank")
+                                                                                .order(o)
+                                                                                .amount(
+                                                                                        BigDecimal
+                                                                                                .valueOf(
+                                                                                                        a.get(
+                                                                                                                        "amount")
+                                                                                                                .asDouble()))
+                                                                                .build()),
+                                                        () ->
+                                                                LOG.warn(
+                                                                        "Error could not be found during sync {}",
+                                                                        a.get("displayedAs")
+                                                                                .asText()));
+                                            });
+                        }
+                    });
+            return result;
+        } catch (Exception ex) {
+            throw new RuntimeException("Error getting offline payments", ex);
+        }
     }
 
     private JsonNode sendPaymentToAccounting(PaymentEntity payment) {
