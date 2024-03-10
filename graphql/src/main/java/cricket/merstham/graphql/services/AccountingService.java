@@ -174,6 +174,13 @@ public class AccountingService {
                                                                                                         a.get(
                                                                                                                         "amount")
                                                                                                                 .asDouble()))
+                                                                                .feesAccountingId(
+                                                                                        null)
+                                                                                .processingFees(
+                                                                                        BigDecimal
+                                                                                                .ZERO)
+                                                                                .reconciled(true)
+                                                                                .collected(true)
                                                                                 .build()),
                                                         () ->
                                                                 LOG.warn(
