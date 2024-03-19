@@ -13,6 +13,10 @@ query member($id: Int!) {
             }
             value
         }
+        identifiers {
+            key
+            value
+        }
         subscription {
             addedDate
             price

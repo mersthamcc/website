@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
 import cricket.merstham.graphql.entity.MemberCategoryEntity;
@@ -15,12 +16,16 @@ import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
+import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
+import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.MemberFilter;
+import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
 import org.modelmapper.ModelMapper;
@@ -34,8 +39,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static java.util.Objects.isNull;
 
 @Component
@@ -43,29 +51,37 @@ public class MembershipService {
 
     private final AttributeDefinitionEntityRepository attributeRepository;
     private final MemberEntityRepository memberRepository;
+    private final MemberSummaryRepository summaryRepository;
     private final MemberCategoryEntityRepository memberCategoryEntityRepository;
     private final OrderEntityRepository orderEntityRepository;
     private final PaymentEntityRepository paymentEntityRepository;
-
+    private final MemberFilterEntityRepository filterEntityRepository;
     private final PriceListItemEntityRepository priceListItemEntityRepository;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public MembershipService(
             AttributeDefinitionEntityRepository attributeRepository,
             MemberEntityRepository memberRepository,
+            MemberSummaryRepository summaryRepository,
             MemberCategoryEntityRepository memberCategoryEntityRepository,
             OrderEntityRepository orderEntityRepository,
             PaymentEntityRepository paymentEntityRepository,
+            MemberFilterEntityRepository filterEntityRepository,
             PriceListItemEntityRepository priceListItemEntityRepository,
-            ModelMapper modelMapper) {
+            ModelMapper modelMapper,
+            ObjectMapper objectMapper) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
+        this.summaryRepository = summaryRepository;
         this.memberCategoryEntityRepository = memberCategoryEntityRepository;
         this.orderEntityRepository = orderEntityRepository;
         this.paymentEntityRepository = paymentEntityRepository;
+        this.filterEntityRepository = filterEntityRepository;
         this.priceListItemEntityRepository = priceListItemEntityRepository;
         this.modelMapper = modelMapper;
+        this.objectMapper = objectMapper;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -75,9 +91,16 @@ public class MembershipService {
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public List<Member> getMembers() {
-        var members = memberRepository.findAllByCancelledIsNull();
-        return members.stream().map(m -> modelMapper.map(m, Member.class)).toList();
+    public List<MemberSummary> getMembers(Principal principal) {
+        var filter = getUserFilter(principal);
+
+        var members =
+                filter.map(
+                                f ->
+                                        summaryRepository.findAll(
+                                                summaryRepository.getMemberSpecification(f)))
+                        .orElse(summaryRepository.findAll());
+        return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
     }
 
     public List<MemberCategory> getCategories(MemberCategoryWhereInput where) {
@@ -90,9 +113,21 @@ public class MembershipService {
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public Member getMember(int id) {
-        var member = memberRepository.findById(id);
-        return member.map(m -> modelMapper.map(m, Member.class)).orElseThrow();
+    public Member getMember(int id, Principal principal) {
+        var filter = getUserFilter(principal);
+
+        AtomicReference<Optional<MemberEntity>> member = new AtomicReference<>(Optional.empty());
+        filter.ifPresentOrElse(
+                f -> {
+                    var results =
+                            summaryRepository.findAll(
+                                    summaryRepository.getMemberSpecificationWithId(f, id));
+                    if (results.size() == 1) {
+                        member.set(memberRepository.findById(id));
+                    }
+                },
+                () -> member.set(memberRepository.findById(id)));
+        return member.get().map(m -> modelMapper.map(m, Member.class)).orElseThrow();
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")

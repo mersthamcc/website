@@ -1,9 +1,9 @@
 package cricket.merstham.website.frontend.controller.administration;
 
+import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.DataTableValue;
-import cricket.merstham.website.frontend.model.admintables.Member;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
@@ -42,9 +42,10 @@ import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectT
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_MEMBER_EDIT_ROUTE;
 import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.nonNull;
 
 @Controller("AdminMembershipController")
-public class MembershipController extends SspController<Member> {
+public class MembershipController extends SspController<MemberSummary> {
 
     private static final Logger LOG = LogManager.getLogger(MembershipController.class);
     private final MessageSource messageSource;
@@ -76,10 +77,16 @@ public class MembershipController extends SspController<Member> {
                                         .setFieldName("givenName"),
                                 new DataTableColumn()
                                         .setKey("membership.category")
-                                        .setFieldName("category"),
+                                        .setFieldName("lastSubsCategory"),
+                                new DataTableColumn()
+                                        .setKey("membership.age-group")
+                                        .setFieldName("ageGroup"),
+                                new DataTableColumn()
+                                        .setKey("membership.gender")
+                                        .setFieldName("gender"),
                                 new DataTableColumn()
                                         .setKey("membership.last-subscription")
-                                        .setFieldName("lastSubscription"))));
+                                        .setFieldName("mostRecentSubscription"))));
     }
 
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
@@ -222,14 +229,34 @@ public class MembershipController extends SspController<Member> {
     }
 
     @PostMapping(
+            value = "/administration/membership/edit/{id}/play-cricket-link",
+            name = "admin-membership-play-cricket-link")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public RedirectView playCricketLink(
+            CognitoAuthentication cognitoAuthentication,
+            RedirectAttributes redirectAttributes,
+            @PathVariable int id,
+            @RequestBody MultiValueMap<String, Object> data) {
+        try {
+            var playCricketId = Integer.parseInt((String) data.getFirst("play-cricket-id"));
+            membershipService.linkToPlayCricketPlayer(
+                    id, cognitoAuthentication.getOAuth2AccessToken(), playCricketId);
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
+    @PostMapping(
             consumes = "application/json",
             produces = "application/json",
             path = "/administration/membership/get-data")
-    public @ResponseBody SspResponse<SspResponseDataWrapper<Member>> getData(
+    public @ResponseBody SspResponse<SspResponseDataWrapper<MemberSummary>> getData(
             CognitoAuthentication cognitoAuthentication, @RequestBody SspRequest request) {
-        Comparator<Member> comparator = createComparator(request);
+        Comparator<MemberSummary> comparator = createComparator(request);
         String search = request.getSearch().getValue().toLowerCase();
-        List<Member> members =
+        List<MemberSummary> members =
                 membershipService
                         .getMemberSummary(cognitoAuthentication.getOAuth2AccessToken())
                         .stream()
@@ -237,11 +264,17 @@ public class MembershipController extends SspController<Member> {
                                 m ->
                                         m.getFamilyName().toLowerCase().contains(search)
                                                 || m.getGivenName().toLowerCase().contains(search)
-                                                || m.getCategory().toLowerCase().contains(search)
-                                                || m.getLastSubscription().contains(search))
+                                                || m.getLastSubsCategory()
+                                                        .toLowerCase()
+                                                        .contains(search)
+                                                || m.getLastSubsYear().contains(search)
+                                                || (nonNull(m.getAgeGroup())
+                                                        && m.getAgeGroup().equalsIgnoreCase(search))
+                                                || (nonNull(m.getGender())
+                                                        && m.getGender().equalsIgnoreCase(search)))
                         .sorted(comparator)
                         .toList();
-        return SspResponse.<SspResponseDataWrapper<Member>>builder()
+        return SspResponse.<SspResponseDataWrapper<MemberSummary>>builder()
                 .draw(request.getDraw())
                 .data(
                         members
@@ -253,7 +286,7 @@ public class MembershipController extends SspController<Member> {
                                 .stream()
                                 .map(
                                         m ->
-                                                SspResponseDataWrapper.<Member>builder()
+                                                SspResponseDataWrapper.<MemberSummary>builder()
                                                         .data(m)
                                                         .editRouteTemplate(
                                                                 Optional.of(
@@ -271,25 +304,55 @@ public class MembershipController extends SspController<Member> {
                 .build();
     }
 
-    private Comparator<Member> createComparator(SspRequest request) {
+    private Comparator<MemberSummary> createComparator(SspRequest request) {
         return request.getOrder().stream()
                 .findFirst()
                 .map(
                         c -> {
                             String column = request.getColumns().get(c.getColumn()).getData();
-                            Comparator<Member> comparator = null;
+                            Comparator<MemberSummary> comparator = null;
                             switch (column) {
                                 case "data.givenName":
-                                    comparator = Comparator.comparing(Member::getGivenName);
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getGivenName,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
                                     break;
                                 case "data.familyName":
-                                    comparator = Comparator.comparing(Member::getFamilyName);
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getFamilyName,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
                                     break;
-                                case "data.category":
-                                    comparator = Comparator.comparing(Member::getCategory);
+                                case "data.lastSubsCategory":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getLastSubsCategory,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
                                     break;
-                                case "data.lastSubscription":
-                                    comparator = Comparator.comparing(Member::getLastSubscription);
+                                case "data.ageGroup":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getAgeGroup,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
+                                    break;
+                                case "data.gender":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getGender,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
+                                    break;
+                                case "data.mostRecentSubscription":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberSummary::getLastSubsDate,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
                                     break;
                             }
                             if ("desc".equals(c.getDir())) {
@@ -297,6 +360,6 @@ public class MembershipController extends SspController<Member> {
                             }
                             return comparator;
                         })
-                .orElse(Comparator.comparing(Member::getFamilyName));
+                .orElse(Comparator.comparing(MemberSummary::getFamilyName));
     }
 }

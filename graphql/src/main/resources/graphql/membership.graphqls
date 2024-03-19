@@ -152,10 +152,28 @@ type PriceListItem {
     currentPrice: Float
 }
 
+type MemberSummary {
+    id: Int!
+    familyName: String!
+    givenName: String!
+    firstRegistrationDate: DateTime
+    dob: Date
+    ageGroup: String
+    gender: String
+    mostRecentSubscription: Int!
+    lastSubsDate: Date
+    lastSubsPrice: Float
+    lastSubsCategory: String
+    received: Float
+    paymentTypes: String
+    description: String
+    declarations: [String]
+}
+
 extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
-    members: [Member]
+    members: [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myOrders: [Order]
     orders(year: Int!): [Order]
