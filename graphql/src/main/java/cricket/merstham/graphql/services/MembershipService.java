@@ -269,4 +269,17 @@ public class MembershipService {
 
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public Member associateMemberToPlayer(int id, int playerId) {
+        var member = memberRepository.findById(id).orElseThrow();
+        member.getIdentifiers().put(PLAYER_ID, Long.toString(playerId));
+        return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
+    }
+
+    private Optional<MemberFilter> getUserFilter(Principal principal) {
+        return filterEntityRepository
+                .findById(principal.getName())
+                .map(f -> modelMapper.map(f, MemberFilter.class));
+    }
 }

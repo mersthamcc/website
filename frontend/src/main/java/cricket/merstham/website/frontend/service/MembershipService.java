@@ -19,6 +19,7 @@ import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -298,12 +299,27 @@ public class MembershipService {
         }
     }
 
-    private String getMemberAttributeString(
-            List<MemberAttribute> attributeList, String field, String defaultValue) {
-        return attributeList.stream()
-                .filter(a -> a.getDefinition().getKey().equals(field))
-                .findFirst()
-                .map(f -> f.getValue().asText())
-                .orElse(defaultValue);
+    public Member linkToPlayCricketPlayer(
+            int id, OAuth2AccessToken accessToken, int playCricketId) {
+        var request = new PlayCricketLinkMutation(id, playCricketId);
+        try {
+            Response<PlayCricketLinkMutation.Data> result =
+                    graphService.executeMutation(request, accessToken);
+
+            if (result.hasErrors()) {
+                throw new GraphException(
+                        result.getErrors().stream()
+                                .map(Error::getMessage)
+                                .reduce((error, error2) -> error.concat("\n").concat(error2))
+                                .orElse("Unknown GraphQL Error"),
+                        result.getErrors());
+            }
+
+            return modelMapper.map(
+                    requireNonNull(result.getData()).getAssociateMemberToPlayer(),
+                    cricket.merstham.shared.dto.Member.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

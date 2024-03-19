@@ -22,6 +22,7 @@ type Member {
     ownerUserId: String!
     registrationDate: DateTime!
     subscription: [MemberSubscription!]!
+    identifiers: [KeyValuePair]
 }
 
 type MemberAttribute {
@@ -185,4 +186,5 @@ extend type Mutation {
     updateMember(id: Int!, data: [AttributeInput]!): Member
     createOrder(uuid: String!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
+    associateMemberToPlayer(id: Int!, playerId: Int!): Member
 }

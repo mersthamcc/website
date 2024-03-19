@@ -27,4 +27,9 @@ public class Player implements Serializable {
 
     @JsonProperty("name")
     private String name;
+
+    @JsonProperty("text")
+    public String getText() {
+        return name;
+    }
 }

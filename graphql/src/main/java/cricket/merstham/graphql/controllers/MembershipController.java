@@ -85,4 +85,9 @@ public class MembershipController {
             @Argument int id, @Argument List<AttributeInput> data, Principal principal) {
         return membershipService.updateMember(id, data);
     }
+
+    @MutationMapping
+    public Member associateMemberToPlayer(@Argument int id, @Argument int playerId) {
+        return membershipService.associateMemberToPlayer(id, playerId);
+    }
 }
