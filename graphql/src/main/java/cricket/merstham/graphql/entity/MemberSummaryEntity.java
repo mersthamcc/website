@@ -8,7 +8,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -24,6 +27,9 @@ import java.time.LocalDate;
 @Entity
 @Immutable
 @Table(name = "member_summary")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberSummaryEntity {
     @Id
     @Column(name = "id")
