@@ -114,7 +114,7 @@
 
                     <!-- Badges -->
                     <ul class="list-inline list-inline-m-1 mb-0">
-                        <li class="list-inline-item"><a class="badge badge-soft-secondary p-2" href="#">1st XI</a></li>
+<#--                        <li class="list-inline-item"><a class="badge badge-soft-secondary p-2" href="#">1st XI</a></li>-->
                     </ul>
                     <!-- End Badges -->
                 </div>
