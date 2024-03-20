@@ -108,7 +108,10 @@ public class AccountingService {
                                         "Error processing order {}: ",
                                         order.getId(),
                                         ex.getMessage());
-                                order.setAccountingError(ex.getMessage());
+                                order.setAccountingError(
+                                        isNull(ex.getCause())
+                                                ? ex.getMessage()
+                                                : ex.getCause().getMessage());
                             }
                         }
                     });
@@ -135,7 +138,10 @@ public class AccountingService {
                                     "Error processing payment {}: ",
                                     payment.getId(),
                                     ex.getMessage());
-                            payment.setAccountingError(ex.getMessage());
+                            payment.setAccountingError(
+                                    isNull(ex.getCause())
+                                            ? ex.getMessage()
+                                            : ex.getCause().getMessage());
                         }
                     });
             paymentRepository.saveAllAndFlush(payments);
