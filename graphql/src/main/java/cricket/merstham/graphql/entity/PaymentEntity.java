@@ -59,4 +59,7 @@ public class PaymentEntity {
 
     @Column(name = "reconciled")
     private Boolean reconciled;
+
+    @Column(name = "accounting_error")
+    private String accountingError;
 }

@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public interface PaymentEntityRepository extends JpaRepository<PaymentEntity, Integer> {
 
-    List<PaymentEntity> findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrue();
+    List<PaymentEntity>
+            findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrueAndAccountingErrorIsNull();
 
     Optional<PaymentEntity> findByTypeAndReference(String type, String reference);
 
