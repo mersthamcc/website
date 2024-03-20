@@ -8,6 +8,7 @@ import cricket.merstham.graphql.services.MembershipService;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -33,13 +34,13 @@ public class MembershipController {
     }
 
     @QueryMapping
-    public List<Member> members() {
-        return membershipService.getMembers();
+    public List<MemberSummary> members(Principal principal) {
+        return membershipService.getMembers(principal);
     }
 
     @QueryMapping
-    public Member member(@Argument int id) {
-        return membershipService.getMember(id);
+    public Member member(@Argument int id, Principal principal) {
+        return membershipService.getMember(id, principal);
     }
 
     @QueryMapping
@@ -83,5 +84,10 @@ public class MembershipController {
     public Member updateMember(
             @Argument int id, @Argument List<AttributeInput> data, Principal principal) {
         return membershipService.updateMember(id, data);
+    }
+
+    @MutationMapping
+    public Member associateMemberToPlayer(@Argument int id, @Argument int playerId) {
+        return membershipService.associateMemberToPlayer(id, playerId);
     }
 }

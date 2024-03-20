@@ -22,6 +22,7 @@ type Member {
     ownerUserId: String!
     registrationDate: DateTime!
     subscription: [MemberSubscription!]!
+    identifiers: [KeyValuePair]
 }
 
 type MemberAttribute {
@@ -152,10 +153,28 @@ type PriceListItem {
     currentPrice: Float
 }
 
+type MemberSummary {
+    id: Int!
+    familyName: String!
+    givenName: String!
+    firstRegistrationDate: DateTime
+    dob: Date
+    ageGroup: String
+    gender: String
+    mostRecentSubscription: Int!
+    lastSubsDate: Date
+    lastSubsPrice: Float
+    lastSubsCategory: String
+    received: Float
+    paymentTypes: String
+    description: String
+    declarations: [String]
+}
+
 extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
-    members: [Member]
+    members: [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myOrders: [Order]
     orders(year: Int!): [Order]
@@ -167,4 +186,5 @@ extend type Mutation {
     updateMember(id: Int!, data: [AttributeInput]!): Member
     createOrder(uuid: String!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
+    associateMemberToPlayer(id: Int!, playerId: Int!): Member
 }

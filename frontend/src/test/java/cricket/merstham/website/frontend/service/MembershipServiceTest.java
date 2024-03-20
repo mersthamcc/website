@@ -44,6 +44,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -516,31 +518,6 @@ class MembershipServiceTest {
         var result = service.getAllMembers(accessToken);
 
         assertThat(result.size(), equalTo(NUMBER_OF_MEMBERS));
-
-        for (int i = 0; i < result.size(); i++) {
-            var member = result.get(i);
-
-            assertThat(
-                    member.getAttributes().size(), equalTo(members.get(i).getAttributes().size()));
-
-            for (int j = 0; j < member.getAttributes().size(); j++) {
-                assertThat(
-                        member.getAttributes().get(j).getDefinition().getKey(),
-                        equalTo(members.get(i).getAttributes().get(j).getDefinition().getKey()));
-                assertThat(
-                        member.getAttributes().get(j).getDefinition().getType().toString(),
-                        equalTo(
-                                members.get(i)
-                                        .getAttributes()
-                                        .get(j)
-                                        .getDefinition()
-                                        .getType()
-                                        .rawValue()));
-                assertThat(
-                        member.getAttributes().get(j).getValue(),
-                        equalTo(members.get(i).getAttributes().get(j).getValue()));
-            }
-        }
     }
 
     @Test
@@ -555,29 +532,6 @@ class MembershipServiceTest {
         var result = service.getMemberSummary(accessToken);
 
         assertThat(result.size(), equalTo(NUMBER_OF_MEMBERS));
-
-        for (int i = 0; i < result.size(); i++) {
-            var member = result.get(i);
-
-            assertThat(member.getId(), equalTo(Integer.toString(members.get(i).getId())));
-            assertThat(
-                    member.getGivenName(),
-                    equalTo(members.get(i).getAttributes().get(0).getValue().asText()));
-            assertThat(
-                    member.getFamilyName(),
-                    equalTo(members.get(i).getAttributes().get(1).getValue().asText()));
-            assertThat(
-                    member.getLastSubscription(),
-                    equalTo(Integer.toString(members.get(i).getSubscription().get(0).getYear())));
-            assertThat(
-                    member.getCategory(),
-                    equalTo(
-                            members.get(i)
-                                    .getSubscription()
-                                    .get(0)
-                                    .getPriceListItem()
-                                    .getDescription()));
-        }
     }
 
     @ParameterizedTest
@@ -636,6 +590,7 @@ class MembershipServiceTest {
                                                                                 .EMAIL,
                                                                         null),
                                                                 JSON.textNode(LOREM.getEmail()))),
+                                                List.of(),
                                                 List.of(
                                                         new MemberQuery.Subscription(
                                                                 "Subscription",
@@ -1012,52 +967,23 @@ class MembershipServiceTest {
                 .mapToObj(
                         i ->
                                 new MembersQuery.Member(
-                                        "Member",
+                                        "MemberSummary",
                                         i,
-                                        UUID.randomUUID().toString(),
-                                        Instant.now(),
-                                        List.of(
-                                                new MembersQuery.Attribute(
-                                                        "Attribute",
-                                                        Instant.now(),
-                                                        Instant.now(),
-                                                        new MembersQuery.Definition(
-                                                                "AttributeDefinition",
-                                                                "given-name",
-                                                                cricket.merstham.website.graph.type
-                                                                        .AttributeType.STRING,
-                                                                null),
-                                                        JSON.textNode(LOREM.getFirstName())),
-                                                new MembersQuery.Attribute(
-                                                        "Attribute",
-                                                        Instant.now(),
-                                                        Instant.now(),
-                                                        new MembersQuery.Definition(
-                                                                "AttributeDefinition",
-                                                                "family-name",
-                                                                cricket.merstham.website.graph.type
-                                                                        .AttributeType.STRING,
-                                                                null),
-                                                        JSON.textNode(LOREM.getLastName())),
-                                                new MembersQuery.Attribute(
-                                                        "Attribute",
-                                                        Instant.now(),
-                                                        Instant.now(),
-                                                        new MembersQuery.Definition(
-                                                                "AttributeDefinition",
-                                                                "email",
-                                                                cricket.merstham.website.graph.type
-                                                                        .AttributeType.EMAIL,
-                                                                null),
-                                                        JSON.textNode(LOREM.getEmail()))),
-                                        List.of(
-                                                new MembersQuery.Subscription(
-                                                        "Subscription",
-                                                        LocalDate.now(),
-                                                        120.0,
-                                                        new MembersQuery.PriceListItem(
-                                                                "Subscription", "Adult Membership"),
-                                                        LocalDate.now().getYear()))))
+                                        LOREM.getLastName(),
+                                        LOREM.getFirstName(),
+                                        Instant.now().minus(30, ChronoUnit.DAYS),
+                                        LocalDate.now().minus(20, ChronoUnit.YEARS),
+                                        "Adult",
+                                        "MALE",
+                                        LocalDate.now().getYear(),
+                                        LocalDate.now().minus(3, ChronoUnit.MONTHS),
+                                        120.0,
+                                        "Subscription",
+                                        120.0,
+                                        "cash",
+                                        "Adult Membership",
+                                        List.of()))
+                .sorted(Comparator.comparing(MembersQuery.Member::getId))
                 .toList();
     }
 

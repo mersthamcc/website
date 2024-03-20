@@ -1,25 +1,19 @@
 query members {
     members {
         id
-        ownerUserId
-        registrationDate
-        attributes {
-            createdDate
-            updatedDate
-            definition {
-                key
-                type
-                choices
-            }
-            value
-        }
-        subscription {
-            addedDate
-            price
-            priceListItem {
-                description
-            }
-            year
-        }
+        familyName
+        givenName
+        firstRegistrationDate
+        dob
+        ageGroup
+        gender
+        mostRecentSubscription
+        lastSubsDate
+        lastSubsPrice
+        lastSubsCategory
+        received
+        paymentTypes
+        description
+        declarations
     }
 }

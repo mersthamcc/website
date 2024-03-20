@@ -4,8 +4,8 @@ import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Member;
-import cricket.merstham.shared.dto.MemberAttribute;
 import cricket.merstham.shared.dto.MemberCategory;
+import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.website.frontend.exception.GraphException;
@@ -19,6 +19,7 @@ import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -191,12 +192,12 @@ public class MembershipService {
         }
     }
 
-    public List<Member> getAllMembers(OAuth2AccessToken accessToken) {
+    public List<MemberSummary> getAllMembers(OAuth2AccessToken accessToken) {
         var query = new MembersQuery();
         try {
             Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
             return result.getData().getMembers().stream()
-                    .map(m -> modelMapper.map(m, Member.class))
+                    .map(m -> modelMapper.map(m, MemberSummary.class))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -204,34 +205,8 @@ public class MembershipService {
     }
 
     @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
-    public List<cricket.merstham.website.frontend.model.admintables.Member> getMemberSummary(
-            OAuth2AccessToken accessToken) {
-        return getAllMembers(accessToken).stream()
-                .map(
-                        m ->
-                                cricket.merstham.website.frontend.model.admintables.Member.builder()
-                                        .id(Integer.toString(m.getId()))
-                                        .familyName(
-                                                getMemberAttributeString(
-                                                        m.getAttributes(), "family-name", ""))
-                                        .givenName(
-                                                getMemberAttributeString(
-                                                        m.getAttributes(), "given-name", ""))
-                                        .category(
-                                                m.getSubscription().stream()
-                                                        .findFirst()
-                                                        .map(
-                                                                s ->
-                                                                        s.getPriceListItem()
-                                                                                .getDescription())
-                                                        .orElse("unknown"))
-                                        .lastSubscription(
-                                                m.getSubscription().stream()
-                                                        .findFirst()
-                                                        .map(s -> Integer.toString(s.getYear()))
-                                                        .orElse("unknown"))
-                                        .build())
-                .toList();
+    public List<MemberSummary> getMemberSummary(OAuth2AccessToken accessToken) {
+        return getAllMembers(accessToken);
     }
 
     public Optional<Member> get(int id, OAuth2AccessToken accessToken) {
@@ -324,12 +299,27 @@ public class MembershipService {
         }
     }
 
-    private String getMemberAttributeString(
-            List<MemberAttribute> attributeList, String field, String defaultValue) {
-        return attributeList.stream()
-                .filter(a -> a.getDefinition().getKey().equals(field))
-                .findFirst()
-                .map(f -> f.getValue().asText())
-                .orElse(defaultValue);
+    public Member linkToPlayCricketPlayer(
+            int id, OAuth2AccessToken accessToken, int playCricketId) {
+        var request = new PlayCricketLinkMutation(id, playCricketId);
+        try {
+            Response<PlayCricketLinkMutation.Data> result =
+                    graphService.executeMutation(request, accessToken);
+
+            if (result.hasErrors()) {
+                throw new GraphException(
+                        result.getErrors().stream()
+                                .map(Error::getMessage)
+                                .reduce((error, error2) -> error.concat("\n").concat(error2))
+                                .orElse("Unknown GraphQL Error"),
+                        result.getErrors());
+            }
+
+            return modelMapper.map(
+                    requireNonNull(result.getData()).getAssociateMemberToPlayer(),
+                    cricket.merstham.shared.dto.Member.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

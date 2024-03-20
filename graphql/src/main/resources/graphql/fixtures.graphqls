@@ -36,6 +36,7 @@ extend type Query {
     activeTeams: [Team]
     fixtures(season: Int!): [Fixture]
     fixtureArchiveSeasons: [Int]
+    players: [Player]
 #    fixturesByTeam(season: Int!, team: Int!): [Fixture]
 #    leaguesForTeam(season: Int!, team: Int!): [League]
 }

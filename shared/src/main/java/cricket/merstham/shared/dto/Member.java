@@ -13,12 +13,17 @@ import lombok.experimental.Accessors;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static cricket.merstham.shared.IdentifierConstants.EPOS_CUSTOMER_ID;
+import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder
@@ -36,6 +41,7 @@ public class Member implements Serializable {
     @JsonProperty private String ownerUserId;
     @JsonProperty private List<MemberAttribute> attributes = new ArrayList<>();
     @JsonProperty private List<MemberSubscription> subscription = new ArrayList<>();
+    @JsonProperty private List<KeyValuePair> identifiers = new ArrayList<>();
 
     @Transient
     public Map<String, JsonNode> getAttributeMap() {
@@ -46,5 +52,48 @@ public class Member implements Serializable {
                                 Collectors.toMap(
                                         a -> a.getDefinition().getKey(),
                                         MemberAttribute::getValue));
+    }
+
+    @Transient
+    public String getPlayerId() {
+        return identifiers.stream()
+                .filter(i -> i.getKey().equals(PLAYER_ID))
+                .findFirst()
+                .map(p -> p.getValue())
+                .orElse(null);
+    }
+
+    @Transient
+    public String getEposId() {
+        return identifiers.stream()
+                .filter(i -> i.getKey().equals(EPOS_CUSTOMER_ID))
+                .findFirst()
+                .map(p -> p.getValue())
+                .orElse(null);
+    }
+
+    @Transient
+    public boolean isSubscribedThisYear() {
+        try {
+            return nonNull(thisYearsSubscription());
+        } catch (NoSuchElementException ignored) {
+            return false;
+        }
+    }
+
+    @Transient
+    public boolean isPaidThisYear() {
+        try {
+            var subscription = thisYearsSubscription();
+            var payments = subscription.getOrder().getPayment();
+            return (!payments.isEmpty()) && payments.stream().allMatch(Payment::getCollected);
+        } catch (NoSuchElementException ignored) {
+            return false;
+        }
+    }
+
+    private MemberSubscription thisYearsSubscription() {
+        var now = LocalDate.now().getYear();
+        return subscription.stream().filter(s -> s.getYear() == now).findFirst().orElseThrow();
     }
 }

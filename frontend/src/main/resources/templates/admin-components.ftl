@@ -8,9 +8,11 @@
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <!-- Card -->
         <div class="card mb-3 mb-lg-5">
-            <div class="card-header">
-                <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
-            </div>
+            <#if title!="">
+                <div class="card-header">
+                    <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
+                </div>
+            </#if>
 
             <!-- Body -->
             <div class="card-body">
@@ -277,12 +279,12 @@
     </div>
 </#macro>
 
-<#macro adminFormDisplayField name localeCategory data>
+<#macro adminFormDisplayField name localeCategory data labelWidth=2>
     <div class="row form-group">
-        <label class="col-md-2 control-label text-right align-middle">
+        <label class="col-md-${labelWidth} control-label text-right align-middle">
             <@spring.message code="${localeCategory}.${name}" />
         </label>
-        <label class="col-md-10 control-label align-middle">
+        <label class="col-md-${12 - labelWidth} control-label align-middle">
             ${data}
         </label>
     </div>

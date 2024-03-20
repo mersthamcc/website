@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static cricket.merstham.shared.IdentifierConstants.EPOS_CUSTOMER_ID;
 import static java.util.Objects.nonNull;
 
 @Service
 public class EposNowService {
     private static final Logger LOG = LogManager.getLogger(EposNowService.class);
-    public static final String EPOS_CUSTOMER_ID = "EPOS_CUSTOMER_ID";
 
     private final MemberEntityRepository repository;
     private final String createFunctionArn;

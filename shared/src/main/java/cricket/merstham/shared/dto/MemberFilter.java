@@ -6,30 +6,24 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Player implements Serializable {
-    @Serial private static final long serialVersionUID = 5497279570370861431L;
+@EqualsAndHashCode(callSuper = false)
+public class MemberFilter implements Serializable {
+    @Serial private static final long serialVersionUID = 6319082946677831619L;
 
-    @JsonProperty("id")
-    private int id;
-
-    @JsonProperty("name")
-    private String name;
-
-    @JsonProperty("text")
-    public String getText() {
-        return name;
-    }
+    @JsonProperty private List<String> categories = List.of();
+    @JsonProperty private List<Integer> yearsOfBirth = List.of();
+    @JsonProperty private List<String> genders = List.of();
 }

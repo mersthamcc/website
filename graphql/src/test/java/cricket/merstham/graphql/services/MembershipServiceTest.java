@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
@@ -12,6 +13,7 @@ import cricket.merstham.graphql.entity.MemberCategoryEntity;
 import cricket.merstham.graphql.entity.MemberEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
+import cricket.merstham.graphql.entity.MemberSummaryEntity;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
 import cricket.merstham.graphql.entity.PricelistEntity;
@@ -25,6 +27,8 @@ import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
+import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
+import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
@@ -36,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -350,16 +355,23 @@ class MembershipServiceTest {
             mock(PaymentEntityRepository.class);
     private final PriceListItemEntityRepository priceListItemEntityRepository =
             mock(PriceListItemEntityRepository.class);
+    private final MemberSummaryRepository memberSummaryRepository =
+            mock(MemberSummaryRepository.class);
+    private final MemberFilterEntityRepository memberFilterEntityRepository =
+            mock(MemberFilterEntityRepository.class);
 
     private final MembershipService service =
             new MembershipService(
                     attributeRepository,
                     memberRepository,
+                    memberSummaryRepository,
                     memberCategoryEntityRepository,
                     orderEntityRepository,
                     paymentEntityRepository,
+                    memberFilterEntityRepository,
                     priceListItemEntityRepository,
-                    new ModelMapperConfiguration().modelMapper());
+                    new ModelMapperConfiguration().modelMapper(),
+                    mock(ObjectMapper.class));
 
     @BeforeEach
     void setup() {
@@ -377,6 +389,21 @@ class MembershipServiceTest {
                                                                 m.getId(),
                                                                 invocation.getArgument(0)))
                                         .findFirst());
+        when(memberSummaryRepository.findAll())
+                .thenReturn(
+                        MEMBERS.stream()
+                                .map(
+                                        member ->
+                                                MemberSummaryEntity.builder()
+                                                        .id(member.getId())
+                                                        .familyName(
+                                                                member.getStringAttribute(
+                                                                        "lastname"))
+                                                        .givenName(
+                                                                member.getStringAttribute(
+                                                                        "firstname"))
+                                                        .build())
+                                .toList());
         var year = LocalDate.now().getYear();
         when(orderEntityRepository.findByCreateDateBetween(
                         any(LocalDate.class), any(LocalDate.class)))
@@ -440,12 +467,21 @@ class MembershipServiceTest {
 
     @Test
     void shouldReturnAllMembersWhenGetMembersCalled() {
-        var result = service.getMembers();
+        var principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test-user");
+        when(memberFilterEntityRepository.findById(any())).thenReturn(Optional.empty());
+        var result = service.getMembers(principal);
 
         assertThat(result.size(), equalTo(MEMBERS.size()));
 
         for (int i = 0; i < MEMBERS.size(); i++) {
-            assertMemberMatchesEntity(result.get(i), MEMBERS.get(i));
+            assertThat(result.get(i).getId(), equalTo(MEMBERS.get(i).getId()));
+            assertThat(
+                    result.get(i).getFamilyName(),
+                    equalTo(MEMBERS.get(i).getStringAttribute("lastname")));
+            assertThat(
+                    result.get(i).getGivenName(),
+                    equalTo(MEMBERS.get(i).getStringAttribute("firstname")));
         }
     }
 
@@ -486,7 +522,7 @@ class MembershipServiceTest {
     @Test
     void shouldReturnCorrectMemberAndAllMappedAttribute() {
         final int ID = 1;
-        var result = service.getMember(ID);
+        var result = service.getMember(ID, mock(Principal.class));
 
         assertMemberMatchesEntity(result, MEMBERS.get(ID));
     }

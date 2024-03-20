@@ -43,7 +43,7 @@ services:
       "--certificatesResolvers.le.acme.httpChallenge=false",
       "--certificatesResolvers.le.acme.tlsChallenge=false",
       "--certificatesResolvers.le.acme.dnsChallenge=true",
-      "--certificatesResolvers.le.acme.dnsChallenge.provider=digitalocean",
+      "--certificatesResolvers.le.acme.dnsChallenge.provider=route53",
       "--certificatesResolvers.le.acme.dnsChallenge.delayBeforeCheck=1",
       "--certificatesResolvers.le.acme.dnsChallenge.resolvers=8.8.8.8:53, 8.8.4.4:53",
       "--metrics.prometheus=true",
@@ -77,7 +77,10 @@ services:
       - com_docker_swarm_service_name=traefik
       - tls-cert-host-check=traefik.${DEVDOMAIN}
     environment:
-      DO_AUTH_TOKEN: ${DO_AUTH_TOKEN}
+      AWS_ACCESS_KEY_ID: ${DNS_AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${DNS_AWS_SECRET_ACCESS_KEY}
+      AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID}
+      AWS_REGION: ${AWS_REGION}
     ports:
       - "80:80"
       - "443:443"
@@ -335,7 +338,7 @@ services:
       MCC_CONTENT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
       MCC_CONTENT_DATABASE: ${DATABASE_NAME}
     volumes:
-      - ${MCC_INFRASTRUCTURE_REPO}/terraform/data/grafana-provisioning/dashboards:/provision/dashboards:ro
+      - ./dev-config/grafana/dashboards:/provision/dashboards:ro
       - ./dev-config/grafana/datasources.yaml:/provision/datasources/datasources.yaml:ro
     networks:
       - backendnetwork
@@ -581,6 +584,24 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
     restart: unless-stopped
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      NGROK_HOST: ${NGROK_HOST}
+    command:
+      - "http"
+      - "--domain=${NGROK_HOST}"
+      - "host.docker.internal:8090"
+    ports:
+      - 4040:4040
+#    depends_on:
+#      - loki
+#    logging:
+#      driver: loki
+#      options:
+#        loki-url: "http://localhost:3100/loki/api/v1/push"
 volumes:
   pg-data:
   redis-config:

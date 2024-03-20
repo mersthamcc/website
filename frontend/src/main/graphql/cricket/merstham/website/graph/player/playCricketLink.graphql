@@ -1,5 +1,5 @@
-query member($id: Int!) {
-    member(id: $id) {
+mutation playCricketLink ($id: Int!, $playCricketId: Int!) {
+    associateMemberToPlayer(id: $id, playerId: $playCricketId) {
         id
         ownerUserId
         registrationDate
@@ -11,10 +11,6 @@ query member($id: Int!) {
                 type
                 choices
             }
-            value
-        }
-        identifiers {
-            key
             value
         }
         subscription {
