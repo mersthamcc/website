@@ -15,7 +15,7 @@ public interface OrderEntityRepository extends JpaRepository<OrderEntity, Intege
     List<OrderEntity> findByCreateDateBetween(
             @NonNull LocalDate createDateStart, @NonNull LocalDate createDateEnd);
 
-    List<OrderEntity> findOrderEntitiesByAccountingIdIsNull();
+    List<OrderEntity> findOrderEntitiesByAccountingIdIsNullAndAccountingErrorIsNull();
 
     Optional<OrderEntity> findOrderEntityByAccountingId(String accountingId);
 }

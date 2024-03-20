@@ -40,6 +40,9 @@ public class OrderEntity {
     @Column(name = "owner_user_id", nullable = false, length = 64)
     private String ownerUserId;
 
+    @Column(name = "accounting_error")
+    private String accountingError;
+
     @OneToMany(mappedBy = "order")
     @OrderBy("date")
     private List<PaymentEntity> payment;

@@ -22,13 +22,16 @@ import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -90,40 +93,70 @@ public class AccountingService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void accountingSalesOrderSync() {
         LOG.info("Starting accounting sync...");
-        LOG.info("Send new orders...");
-        var orders = repository.findOrderEntitiesByAccountingIdIsNull();
-        orders.forEach(
-                order -> {
-                    if (!order.getMemberSubscription().isEmpty()) {
-                        order.setAccountingId(
-                                sendOrderToAccounting(
-                                        orderJson(modelMapper.map(order, Order.class))));
-                    }
-                });
-        repository.saveAllAndFlush(orders);
-        LOG.info("Order sync complete!");
+        try {
+            LOG.info("Send new orders...");
+            var orders = repository.findOrderEntitiesByAccountingIdIsNullAndAccountingErrorIsNull();
+            orders.forEach(
+                    order -> {
+                        if (!order.getMemberSubscription().isEmpty()) {
+                            try {
+                                order.setAccountingId(
+                                        sendOrderToAccounting(
+                                                orderJson(modelMapper.map(order, Order.class))));
+                            } catch (Exception ex) {
+                                LOG.error(
+                                        "Error processing order {}: ",
+                                        order.getId(),
+                                        ex.getMessage());
+                                order.setAccountingError(ex.getMessage());
+                            }
+                        }
+                    });
+            repository.saveAllAndFlush(orders);
+            LOG.info("Order sync complete!");
+        } catch (Exception ex) {
+            LOG.error("Error sending orders to accounting", ex);
+        }
 
-        LOG.info("Send payments...");
-        var payments = paymentRepository.findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrue();
-        payments.forEach(
-                payment -> {
-                    var result = sendPaymentToAccounting(payment);
-                    payment.setAccountingId(result.get("payment_id").asText());
-                    payment.setFeesAccountingId(result.get("fee_id").asText());
-                    payment.setReconciled(true);
-                });
-        paymentRepository.saveAllAndFlush(payments);
+        try {
+            LOG.info("Send payments...");
+            var payments =
+                    paymentRepository
+                            .findPaymentEntitiesByReconciledIsFalseAndCollectedIsTrueAndAccountingErrorIsNull();
+            payments.forEach(
+                    payment -> {
+                        try {
+                            var result = sendPaymentToAccounting(payment);
+                            payment.setAccountingId(result.get("payment_id").asText());
+                            payment.setFeesAccountingId(result.get("fee_id").asText());
+                            payment.setReconciled(true);
+                        } catch (Exception ex) {
+                            LOG.error(
+                                    "Error processing payment {}: ",
+                                    payment.getId(),
+                                    ex.getMessage());
+                            payment.setAccountingError(ex.getMessage());
+                        }
+                    });
+            paymentRepository.saveAllAndFlush(payments);
+        } catch (Exception ex) {
+            LOG.error("Error sending payments to accounting", ex);
+        }
 
-        LOG.info("Receiving offline payments...");
-        payments = syncOfflinePayments();
-        paymentRepository.saveAllAndFlush(payments);
-
-        LOG.info("Payment sync complete!");
+        try {
+            LOG.info("Receiving offline payments...");
+            var payments = syncOfflinePayments();
+            paymentRepository.saveAllAndFlush(payments);
+            LOG.info("Payment sync complete!");
+        } catch (Exception ex) {
+            LOG.error("Error receiving payments to accounting", ex);
+        }
         LOG.info("Finished accounting sync!");
     }
 
     private List<PaymentEntity> syncOfflinePayments() {
-        Map<String, Object> request = Map.of("since", "2024-01-01T00:00:00.000Z");
+        var since = Instant.now().minus(24, ChronoUnit.HOURS);
+        Map<String, Object> request = Map.of("since", since);
         List<PaymentEntity> result = new ArrayList<>();
         try {
             var response =
@@ -233,7 +266,8 @@ public class AccountingService {
                 return null;
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Error processing order", ex);
+            throw new RuntimeException(
+                    format("Error processing payment: {0}", payment.getId()), ex);
         }
     }
 
