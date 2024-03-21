@@ -1,5 +1,5 @@
 DROP
-    VIEW member_summary;
+    VIEW IF EXISTS member_summary;
 
 CREATE
     VIEW member_summary AS SELECT
@@ -40,7 +40,8 @@ CREATE
         payments.received AS received,
         payments.types AS payment_types,
         pl.description,
-        declarations.value::JSONB AS declarations
+        declarations.value::JSONB AS declarations,
+        identifiers.list AS identifiers
     FROM
         MEMBER m
     INNER JOIN(
@@ -124,6 +125,18 @@ CREATE
             WHERE
                 KEY = 'junior-declarations' LIMIT 1
         )
+    LEFT OUTER JOIN(
+            SELECT
+                member_id,
+                JSONB_AGG(
+                    DISTINCT name
+                ) AS list
+            FROM
+                member_identifier
+            GROUP BY
+                member_id
+        ) identifiers ON
+        m.id = identifiers.member_id
     WHERE
         m.cancelled IS NULL
     ORDER BY
