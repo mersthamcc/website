@@ -66,6 +66,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static cricket.merstham.website.frontend.security.CognitoChallengeAuthentication.Step.SETUP_SOFTWARE_MFA;
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static java.text.MessageFormat.format;
@@ -122,6 +123,8 @@ public class CognitoService {
 
     public Authentication login(String username, String password) {
         try {
+            if (isNullOrEmpty(username) || isNullOrEmpty(password))
+                throw new BadCredentialsException("Invalid Credentials");
             var authParams =
                     Map.of(
                             USERNAME, username,
