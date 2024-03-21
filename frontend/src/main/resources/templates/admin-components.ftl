@@ -551,7 +551,7 @@
             <#if searchable>
                 <div class="row justify-content-between align-items-center flex-grow-1">
                     <div class="col-10 col-md">
-                        <form>
+                        <form onsubmit="return false;">
                             <!-- Search -->
                             <div class="input-group input-group-merge input-group-flush">
                                 <div class="input-group-prepend">
@@ -559,7 +559,12 @@
                                         <i class="tio-search"></i>
                                     </div>
                                 </div>
-                                <input id="${id}Search" type="search" class="form-control" placeholder="<@spring.messageText code=searchPrompt text=searchPrompt />..." aria-label="<@spring.messageText code=searchPrompt text=searchPrompt />">
+                                <input
+                                        id="${id}Search"
+                                        type="search"
+                                        class="form-control"
+                                        placeholder="<@spring.messageText code=searchPrompt text=searchPrompt />..."
+                                        aria-label="<@spring.messageText code=searchPrompt text=searchPrompt />">
                             </div>
                             <!-- End Search -->
                         </form>
@@ -595,6 +600,7 @@
                             "pageLength": ${defaultPageLength},
                             "isResponsive": true,
                             "isShowPaging": false,
+                            "stateSave": true,
                             "pagination": "${id}EntriesPagination"
                             }' role="grid" aria-describedby="${id}_info">
                     <thead class="thead-light">
@@ -681,6 +687,19 @@
             beforeSend: function (request) {
                 request.setRequestHeader(header, token);
             }
+        },
+        stateSaveCallback: function (settings, data) {
+            localStorage.setItem(
+                'DataTables_' + settings.sInstance,
+                JSON.stringify(data)
+            );
+        },
+        stateLoadCallback: function (settings) {
+            let state = JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
+            if (state && state.search) {
+                $("#${id}Search").val(state.search.search);
+            }
+            return state;
         },
         language: {
             processing: "<div class='loading'><p><i class='fa fa-spinner fa-2x fa-spin'></i></p><p><@spring.message code="fetching" /></p></div>"
