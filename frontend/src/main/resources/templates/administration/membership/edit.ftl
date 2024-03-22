@@ -157,6 +157,48 @@
                     </select>
                 </@admin.section>
             </#if>
+
+            <@admin.section title="membership.sync-status.title" action="">
+                <div class="list-group list-group-lg list-group-flush list-group-no-gutters">
+                    <!-- List Item -->
+                    <div class="list-group-item">
+                        <div class="media">
+                            <div class="avatar mr-3">
+                                <img class="avatar-img" src="${resourcePrefix}/mcc/img/epos-now.png" alt="EposNow">
+                            </div>
+                            <div class="media-body">
+                                <div class="row align-items-center">
+                                    <div class="col-sm mb-1 mb-sm-0">
+                                        <h6 class="mb-0">
+                                            <@spring.message code="membership.sync-status.epos" />
+                                        </h6>
+                                        <#if member.eposId??>
+                                            <span class="small">ID: ${member.eposId}</span>
+                                        <#else>
+                                            <span class="small">
+                                                <@spring.message code="membership.sync-status.not-synced" />
+                                            </span>
+                                        </#if>
+                                    </div>
+
+                                    <div class="col-sm-auto">
+                                        <#if member.eposId??>
+                                            <span class="badge badge-soft-success ml-2">
+                                                <@spring.message code="membership.sync-status.active"/>
+                                            </span>
+                                        <#else>
+                                            <span class="badge badge-soft-danger ml-2">
+                                                <@spring.message code="membership.sync-status.inactive"/>
+                                            </span>
+                                        </#if>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End List Item -->
+                </div>
+            </@admin.section>
         </div>
     </div>
 </@layout.mainLayout>
