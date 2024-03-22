@@ -169,6 +169,7 @@ type MemberSummary {
     paymentTypes: String
     description: String
     declarations: [String]
+    identifiers: [String]
 }
 
 extend type Query {

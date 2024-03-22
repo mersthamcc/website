@@ -3,6 +3,15 @@
 <#import "../../admin-components.ftl" as admin>
 <#macro dataScript>
     <script>
+        function playCricketLink(row, type, set, meta) {
+            if (row.data.identifiers.includes("PLAYER_ID")) {
+                return `<div class="avatar mr-3">
+                            <img class="avatar-img" src="${resourcePrefix}/mcc/img/play-cricket-small.png" alt="Linked to PlayCricket">
+                        </div>`;
+            }
+            return "";
+        }
+
         function onPageLoad() {
             <@admin.adminSspTableScript
                 id="memberTable"

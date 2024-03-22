@@ -79,4 +79,9 @@ public class MemberSummaryEntity {
     @Convert(converter = JpaJsonbConverter.class)
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode declarations;
+
+    @Column(name = "identifiers")
+    @Convert(converter = JpaJsonbConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private JsonNode identifiers;
 }

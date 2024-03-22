@@ -70,6 +70,10 @@ public class MembershipController extends SspController<MemberSummary> {
                         "memberColumns",
                         List.of(
                                 new DataTableColumn()
+                                        .setKey("membership.play-cricket.table-icon")
+                                        .setFunction(true)
+                                        .setFunctionName("playCricketLink"),
+                                new DataTableColumn()
                                         .setKey("membership.family-name")
                                         .setFieldName("familyName"),
                                 new DataTableColumn()

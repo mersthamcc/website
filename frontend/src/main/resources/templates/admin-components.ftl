@@ -720,7 +720,14 @@
                 } },
             </#if>
             <#list columns as column>
-                { "data": "data.${column.fieldName}" },
+                <#if column.function>
+                    { "data": function(row, type, set, meta) {
+                        let content = ${column.functionName}(row, type, set, meta);
+                        return `<td>${'$'}{content}</td>`;
+                    }},
+                <#else>
+                    { "data": "data.${column.fieldName}" },
+                </#if>
             </#list>
             { "data": function(row, type, set, meta) {
                 let actions = "";
