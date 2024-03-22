@@ -188,4 +188,5 @@ extend type Mutation {
     createOrder(uuid: String!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
+    deleteMemberToPlayerLink(id: Int!): Member
 }

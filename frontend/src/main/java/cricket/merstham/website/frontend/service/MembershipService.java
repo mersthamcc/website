@@ -19,6 +19,7 @@ import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
@@ -317,6 +318,29 @@ public class MembershipService {
 
             return modelMapper.map(
                     requireNonNull(result.getData()).getAssociateMemberToPlayer(),
+                    cricket.merstham.shared.dto.Member.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Member deletePlayCricketLink(int id, OAuth2AccessToken accessToken) {
+        var request = new DeletePlayCricketLinkMutation(id);
+        try {
+            Response<DeletePlayCricketLinkMutation.Data> result =
+                    graphService.executeMutation(request, accessToken);
+
+            if (result.hasErrors()) {
+                throw new GraphException(
+                        result.getErrors().stream()
+                                .map(Error::getMessage)
+                                .reduce((error, error2) -> error.concat("\n").concat(error2))
+                                .orElse("Unknown GraphQL Error"),
+                        result.getErrors());
+            }
+
+            return modelMapper.map(
+                    requireNonNull(result.getData()).getDeleteMemberToPlayerLink(),
                     cricket.merstham.shared.dto.Member.class);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -90,4 +90,9 @@ public class MembershipController {
     public Member associateMemberToPlayer(@Argument int id, @Argument int playerId) {
         return membershipService.associateMemberToPlayer(id, playerId);
     }
+
+    @MutationMapping
+    public Member deleteMemberToPlayerLink(@Argument int id) {
+        return membershipService.deleteMemberToPlayerLink(id);
+    }
 }

@@ -982,6 +982,7 @@ class MembershipServiceTest {
                                         120.0,
                                         "cash",
                                         "Adult Membership",
+                                        List.of(),
                                         List.of()))
                 .sorted(Comparator.comparing(MembersQuery.Member::getId))
                 .toList();

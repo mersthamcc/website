@@ -277,6 +277,13 @@ public class MembershipService {
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public Member deleteMemberToPlayerLink(int id) {
+        var member = memberRepository.findById(id).orElseThrow();
+        member.getIdentifiers().remove(PLAYER_ID);
+        return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
+    }
+
     private Optional<MemberFilter> getUserFilter(Principal principal) {
         return filterEntityRepository
                 .findById(principal.getName())

@@ -252,6 +252,24 @@ public class MembershipController extends SspController<MemberSummary> {
         return redirectTo(format("/administration/membership/edit/{0}", id));
     }
 
+    @GetMapping(
+            value = "/administration/membership/edit/{id}/delete-play-cricket-link",
+            name = "admin-membership-delete-play-cricket-link")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public RedirectView deletePlayCricketLink(
+            CognitoAuthentication cognitoAuthentication,
+            RedirectAttributes redirectAttributes,
+            @PathVariable int id) {
+        try {
+            membershipService.deletePlayCricketLink(
+                    id, cognitoAuthentication.getOAuth2AccessToken());
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
     @PostMapping(
             consumes = "application/json",
             produces = "application/json",
