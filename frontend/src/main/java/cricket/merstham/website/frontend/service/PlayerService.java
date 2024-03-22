@@ -2,6 +2,8 @@ package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.Player;
+import cricket.merstham.shared.dto.PlayerSummary;
+import cricket.merstham.website.graph.player.PlayerSummaryQuery;
 import cricket.merstham.website.graph.player.PlayersQuery;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -36,6 +38,18 @@ public class PlayerService {
                     .filter(player -> isNull(term) || player.getName().toLowerCase().contains(term))
                     .map(player -> modelMapper.map(player, Player.class))
                     .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public PlayerSummary getPlayer(int id, OAuth2AccessToken accessToken) {
+        var query = new PlayerSummaryQuery(id);
+        try {
+            Response<PlayerSummaryQuery.Data> result =
+                    graphService.executeQuery(query, accessToken);
+            if (isNull(result.getData().getPlayerSummary())) return null;
+            return modelMapper.map(result.getData().getPlayerSummary(), PlayerSummary.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,0 +1,9 @@
+query playerSummary($id: Int!) {
+    playerSummary(id: $id) {
+        id
+        name
+        fixturesLastYear
+        fixturesThisYear
+        earliestDate
+    }
+}

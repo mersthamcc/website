@@ -3,7 +3,7 @@
 <#macro noButtons>
 </#macro>
 
-<#macro section title action buttons="">
+<#macro section title action footer="" headerRight="" footerClasses="d-flex justify-content-end">
     <form class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <!-- Card -->
@@ -11,6 +11,11 @@
             <#if title!="">
                 <div class="card-header">
                     <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
+                    <#if headerRight?is_directive>
+                        <@headerRight />
+                    <#else>
+                        ${headerRight}
+                    </#if>
                 </div>
             </#if>
 
@@ -19,9 +24,9 @@
                 <#nested />
             </div>
             <!-- End Body -->
-            <#if buttons?is_directive>
-                <div class="card-footer d-flex justify-content-end">
-                    <@buttons />
+            <#if footer?is_directive>
+                <div class="card-footer ${footerClasses}">
+                    <@footer />
                 </div>
             </#if>
         </div>
