@@ -1,0 +1,11 @@
+type PlayerSummary {
+    id: Int!
+    name: String!
+    fixturesLastYear: Int
+    fixturesThisYear: Int
+    earliestDate: Date
+}
+
+extend type Query {
+    playerSummary(id: Int!): PlayerSummary
+}

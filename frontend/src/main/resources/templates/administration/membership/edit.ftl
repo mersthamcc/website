@@ -23,7 +23,7 @@
     <div class="row">
         <div class="col-lg-8">
             <#list subscription.priceListItem.memberCategory.form as section>
-                <@admin.section title="membership.${section.section.key}" action="" buttons=detailsFormButtons>
+                <@admin.section title="membership.${section.section.key}" action="" footer=detailsFormButtons>
                     <#list section.section.attribute as attribute>
                         <@admin.memberAdminField attribute=attribute data=data />
                     </#list>
@@ -121,29 +121,29 @@
                 <!-- End Body -->
 
             </div>
-            <#if member.playerId??>
-                <@admin.section title="membership.play-cricket.linked" action="" buttons="">
-                    <@admin.adminFormDisplayField
-                        name="id"
-                        localeCategory="membership.play-cricket"
-                        data=member.playerId
-                        labelWidth=4 />
-                    <div class="row col-12 align-self-xxl-center">
-                        <a class="link link-underline" href="https://merstham.play-cricket.com/site_admin/users/${member.playerId}/details">
-                            <@spring.messageText code="membership.play-cricket.detail" text="View details" />
-                        </a>
-                        <span class="border-3"> | </span>
-                        <a class="link link-underline" href="https://merstham.play-cricket.com/player_stats/batting/${member.playerId}">
-                            <@spring.messageText code="membership.play-cricket.stats" text="View stats" />
-                        </a>
-                        <span class="border-3"> | </span>
-                        <a class="link link-underline" href="${member.id}/delete-play-cricket-link">
-                            <@spring.messageText code="membership.play-cricket.unlink" text="Unlink" />
-                        </a>
+            <#if player??>
+                <@admin.section title="membership.play-cricket.linked" action="" footer=playerStats headerRight=playCricketUnlink footerClasses="">
+                    <div class="media">
+                        <div class="avatar mr-3">
+                            <img class="avatar-img" src="${resourcePrefix}/mcc/img/play-cricket-small.png" alt="Linked to PlayCricket">
+                        </div>
+                        <div class="media-body">
+                            <span class="d-block h5 text-hover-primary mb-0">${player.name}</span>
+                            <span class="d-block font-size-sm text-body">ID: ${player.id?c}</span>
+                            <span class="d-block font-size-sm text-body">
+                                <a class="link link-underline" href="https://merstham.play-cricket.com/site_admin/users/${member.playerId}/details">
+                                    <@spring.messageText code="membership.play-cricket.detail" text="View details" />
+                                </a>
+                                <span class="border-3"> | </span>
+                                <a class="link link-underline" href="https://merstham.play-cricket.com/player_stats/batting/${member.playerId}">
+                                    <@spring.messageText code="membership.play-cricket.stats" text="View stats" />
+                                </a>
+                            </span>
+                        </div>
                     </div>
                 </@admin.section>
             <#else>
-                <@admin.section title="membership.play-cricket.link" action="${member.id}/play-cricket-link" buttons=detailsFormButtons>
+                <@admin.section title="membership.play-cricket.link" action="${member.id}/play-cricket-link" footer=detailsFormButtons>
                     <select name="play-cricket-id" class="js-select2-custom custom-select" size="1" style="opacity: 0;"
                             data-hs-select2-options='{
                               "placeholder": "Select a player...",
@@ -160,3 +160,34 @@
         </div>
     </div>
 </@layout.mainLayout>
+
+<#macro playCricketUnlink>
+    <a class="link link-underline" href="${member.id}/delete-play-cricket-link">
+        <@spring.messageText code="membership.play-cricket.unlink" text="Unlink" />
+    </a>
+</#macro>
+
+<#macro playerStats>
+    <div class="row">
+        <div class="col">
+            <span class="h3">${player.fixturesThisYear}</span>
+            <span class="d-block font-size-sm">
+                <@spring.messageText code="membership.play-cricket.this-year" text="This Year" />
+            </span>
+        </div>
+
+        <div class="col column-divider">
+            <span class="h3">${player.fixturesLastYear}</span>
+            <span class="d-block font-size-sm">
+                <@spring.messageText code="membership.play-cricket.last-year" text="Last Year" />
+            </span>
+        </div>
+
+        <div class="col column-divider">
+            <span class="h3">${(player.earliestDate).format('yyyy')!""}</span>
+            <span class="d-block font-size-sm">
+                <@spring.messageText code="membership.play-cricket.first-game" text="Year of first game" />
+            </span>
+        </div>
+    </div>
+</#macro>
