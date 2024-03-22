@@ -36,6 +36,7 @@ public class MemberSummary implements Serializable {
     @JsonProperty String paymentTypes;
     @JsonProperty String description;
     @JsonProperty List<String> declarations;
+    @JsonProperty List<String> identifiers;
 
     @JsonProperty
     @Transient

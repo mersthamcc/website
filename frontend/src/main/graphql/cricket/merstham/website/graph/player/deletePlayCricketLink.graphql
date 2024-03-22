@@ -1,5 +1,5 @@
-mutation playCricketLink ($id: Int!, $playCricketId: Int!) {
-    associateMemberToPlayer(id: $id, playerId: $playCricketId) {
+mutation deletePlayCricketLink ($id: Int!) {
+    deleteMemberToPlayerLink(id: $id) {
         id
         ownerUserId
         registrationDate

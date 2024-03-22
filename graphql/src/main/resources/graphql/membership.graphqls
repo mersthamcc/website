@@ -169,6 +169,7 @@ type MemberSummary {
     paymentTypes: String
     description: String
     declarations: [String]
+    identifiers: [String]
 }
 
 extend type Query {
@@ -187,4 +188,5 @@ extend type Mutation {
     createOrder(uuid: String!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
+    deleteMemberToPlayerLink(id: Int!): Member
 }

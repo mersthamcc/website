@@ -57,11 +57,11 @@ spotless {
         importOrder '', 'javax', 'java', '\\#'
     }
 
-    sql {
-        target 'sql/**/*.sql'
-
-        dbeaver()
-    }
+//    sql {
+//        target 'sql/**/*.sql'
+//
+//        dbeaver()
+//    }
 
     groovyGradle {
         target '**/*.gradle'

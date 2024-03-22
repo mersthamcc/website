@@ -70,6 +70,10 @@ public class MembershipController extends SspController<MemberSummary> {
                         "memberColumns",
                         List.of(
                                 new DataTableColumn()
+                                        .setKey("membership.play-cricket.table-icon")
+                                        .setFunction(true)
+                                        .setFunctionName("playCricketLink"),
+                                new DataTableColumn()
                                         .setKey("membership.family-name")
                                         .setFieldName("familyName"),
                                 new DataTableColumn()
@@ -241,6 +245,24 @@ public class MembershipController extends SspController<MemberSummary> {
             var playCricketId = Integer.parseInt((String) data.getFirst("play-cricket-id"));
             membershipService.linkToPlayCricketPlayer(
                     id, cognitoAuthentication.getOAuth2AccessToken(), playCricketId);
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
+    @GetMapping(
+            value = "/administration/membership/edit/{id}/delete-play-cricket-link",
+            name = "admin-membership-delete-play-cricket-link")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public RedirectView deletePlayCricketLink(
+            CognitoAuthentication cognitoAuthentication,
+            RedirectAttributes redirectAttributes,
+            @PathVariable int id) {
+        try {
+            membershipService.deletePlayCricketLink(
+                    id, cognitoAuthentication.getOAuth2AccessToken());
         } catch (GraphException ex) {
             LOG.error("Error performing update!", ex);
             redirectAttributes.addFlashAttribute("error", ex.getMessage());

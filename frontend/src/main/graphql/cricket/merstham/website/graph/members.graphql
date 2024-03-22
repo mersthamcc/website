@@ -15,5 +15,6 @@ query members {
         paymentTypes
         description
         declarations
+        identifiers
     }
 }

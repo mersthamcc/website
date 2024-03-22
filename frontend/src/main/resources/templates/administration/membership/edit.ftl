@@ -136,6 +136,10 @@
                         <a class="link link-underline" href="https://merstham.play-cricket.com/player_stats/batting/${member.playerId}">
                             <@spring.messageText code="membership.play-cricket.stats" text="View stats" />
                         </a>
+                        <span class="border-3"> | </span>
+                        <a class="link link-underline" href="${member.id}/delete-play-cricket-link">
+                            <@spring.messageText code="membership.play-cricket.unlink" text="Unlink" />
+                        </a>
                     </div>
                 </@admin.section>
             <#else>
