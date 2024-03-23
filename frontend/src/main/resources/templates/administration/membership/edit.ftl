@@ -226,7 +226,13 @@
         </div>
 
         <div class="col column-divider">
-            <span class="h3">${(player.earliestDate).format('yyyy')!""}</span>
+            <span class="h3">
+                <#if player.earliestDate??>
+                    ${(player.earliestDate).format('yyyy')!"?"}
+                <#else>
+                    ?
+                </#if>
+            </span>
             <span class="d-block font-size-sm">
                 <@spring.messageText code="membership.play-cricket.first-game" text="Year of first game" />
             </span>
