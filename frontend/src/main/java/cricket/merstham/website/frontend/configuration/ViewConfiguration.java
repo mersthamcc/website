@@ -66,7 +66,6 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             var principal = request.getUserPrincipal();
             if (principal != null && principal instanceof CognitoAuthentication) {
                 model.put("user", createUserView(principal));
-                model.put("accessToken", ((CognitoAuthentication) principal).getAccessToken());
             }
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
