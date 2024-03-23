@@ -49,6 +49,11 @@ public class MemberFilterEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> genders;
 
+    @Column(name = "subs_descriptions")
+    @Convert(converter = JpaJsonbToStringListConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> subsDescriptions;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

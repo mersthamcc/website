@@ -26,4 +26,5 @@ public class MemberFilter implements Serializable {
     @JsonProperty private List<String> categories = List.of();
     @JsonProperty private List<Integer> yearsOfBirth = List.of();
     @JsonProperty private List<String> genders = List.of();
+    @JsonProperty private List<String> subsDescriptions = List.of();
 }

@@ -31,24 +31,37 @@ public interface MemberSummaryRepository
             }
 
             if (!filter.getYearsOfBirth().isEmpty()) {
+                List<Predicate> dobPredicates = new ArrayList<>();
                 filter.getYearsOfBirth()
                         .forEach(
                                 year -> {
-                                    predicates.add(
+                                    dobPredicates.add(
                                             criteriaBuilder.between(
                                                     root.get("dob"),
                                                     LocalDate.of(year - 1, 9, 1),
                                                     LocalDate.of(year, 8, 31)));
                                 });
+                predicates.add(criteriaBuilder.or(dobPredicates.toArray(new Predicate[0])));
             }
 
             if (!filter.getGenders().isEmpty()) {
+                var in = criteriaBuilder.in(root.get("gender"));
                 filter.getGenders()
                         .forEach(
-                                gender -> {
-                                    predicates.add(
-                                            criteriaBuilder.equal(root.get("gender"), gender));
+                                c -> {
+                                    in.value(c);
                                 });
+                predicates.add(in);
+            }
+
+            if (!filter.getSubsDescriptions().isEmpty()) {
+                var in = criteriaBuilder.in(root.get("description"));
+                filter.getSubsDescriptions()
+                        .forEach(
+                                c -> {
+                                    in.value(c);
+                                });
+                predicates.add(in);
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
