@@ -288,116 +288,97 @@ public class MembershipController extends SspController<MemberSummary> {
 
     private Map<String, ?> buildModelData(
             Member member, Locale locale, OAuth2AccessToken accessToken) {
-        var model =
-                new HashMap<String, Object>(
-                        Map.of(
-                                "member",
-                                member,
-                                "subscription",
-                                member.getSubscription().get(0),
-                                "data",
-                                member.getAttributes().stream()
-                                        .collect(
-                                                Collectors.toMap(
-                                                        a -> a.getDefinition().getKey(),
-                                                        a ->
-                                                                convert(
-                                                                        a.getDefinition(),
-                                                                        a.getValue(),
-                                                                        locale))),
-                                "subscriptionHistory",
-                                member.getSubscription().stream()
-                                        .map(
-                                                s ->
-                                                        Map.of(
-                                                                "membership.year",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                Integer.toString(
-                                                                                        s
-                                                                                                .getYear())),
-                                                                "membership.description",
-                                                                new DataTableValue()
-                                                                        .setValue(
+        var model = new HashMap<String, Object>();
+        model.put("member", member);
+        model.put("subscription", member.getSubscription().get(0));
+        model.put(
+                "data",
+                member.getAttributes().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        a -> a.getDefinition().getKey(),
+                                        a -> convert(a.getDefinition(), a.getValue(), locale))));
+        model.put(
+                "subscriptionHistory",
+                member.getSubscription().stream()
+                        .map(
+                                s ->
+                                        Map.of(
+                                                "membership.year",
+                                                new DataTableValue()
+                                                        .setValue(Integer.toString(s.getYear())),
+                                                "membership.description",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                s.getPriceListItem()
+                                                                        .getDescription()),
+                                                "membership.category",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                messageSource.getMessage(
+                                                                        format(
+                                                                                "membership.{0}",
                                                                                 s.getPriceListItem()
-                                                                                        .getDescription()),
-                                                                "membership.category",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                messageSource
-                                                                                        .getMessage(
-                                                                                                format(
-                                                                                                        "membership.{0}",
-                                                                                                        s.getPriceListItem()
-                                                                                                                .getMemberCategory()
-                                                                                                                .getKey()),
-                                                                                                null,
-                                                                                                locale)),
-                                                                "membership.price",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                NumberFormat
-                                                                                        .getCurrencyInstance()
-                                                                                        .format(
-                                                                                                s
-                                                                                                        .getPrice()))))
-                                        .toList(),
-                                "subscriptionHistoryColumns",
-                                List.of(
-                                        new DataTableColumn().setKey("membership.year"),
-                                        new DataTableColumn().setKey("membership.description"),
-                                        new DataTableColumn().setKey("membership.category"),
-                                        new DataTableColumn().setKey("membership.price")),
-                                "payments",
-                                member.getSubscription().get(0).getOrder().getPayment().stream()
-                                        .map(
-                                                p ->
-                                                        Map.of(
-                                                                "payments.date",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                p.getDate()
-                                                                                        .format(
-                                                                                                DateTimeFormatter
-                                                                                                        .ofLocalizedDate(
-                                                                                                                FormatStyle
-                                                                                                                        .SHORT))),
-                                                                "payments.type",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                messageSource
-                                                                                        .getMessage(
-                                                                                                format(
-                                                                                                        "payments.{0}-short",
-                                                                                                        p
-                                                                                                                .getType()),
-                                                                                                null,
-                                                                                                locale)),
-                                                                "payments.reference",
-                                                                new DataTableValue()
-                                                                        .setValue(p.getReference()),
-                                                                "payments.collected",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                p.getCollected()
-                                                                                        ? "Yes"
-                                                                                        : "No"),
-                                                                "payments.amount",
-                                                                new DataTableValue()
-                                                                        .setValue(
-                                                                                NumberFormat
-                                                                                        .getCurrencyInstance()
-                                                                                        .format(
-                                                                                                p
-                                                                                                        .getAmount()))))
-                                        .toList(),
-                                "paymentsColumns",
-                                List.of(
-                                        new DataTableColumn().setKey("payments.date"),
-                                        new DataTableColumn().setKey("payments.type"),
-                                        new DataTableColumn().setKey("payments.reference"),
-                                        new DataTableColumn().setKey("payments.collected"),
-                                        new DataTableColumn().setKey("payments.amount"))));
+                                                                                        .getMemberCategory()
+                                                                                        .getKey()),
+                                                                        null,
+                                                                        locale)),
+                                                "membership.price",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                NumberFormat.getCurrencyInstance()
+                                                                        .format(s.getPrice()))))
+                        .toList());
+        model.put(
+                "subscriptionHistoryColumns",
+                List.of(
+                        new DataTableColumn().setKey("membership.year"),
+                        new DataTableColumn().setKey("membership.description"),
+                        new DataTableColumn().setKey("membership.category"),
+                        new DataTableColumn().setKey("membership.price")));
+        model.put(
+                "payments",
+                member.getSubscription().get(0).getOrder().getPayment().stream()
+                        .map(
+                                p ->
+                                        Map.of(
+                                                "payments.date",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                p.getDate()
+                                                                        .format(
+                                                                                DateTimeFormatter
+                                                                                        .ofLocalizedDate(
+                                                                                                FormatStyle
+                                                                                                        .SHORT))),
+                                                "payments.type",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                messageSource.getMessage(
+                                                                        format(
+                                                                                "payments.{0}-short",
+                                                                                p.getType()),
+                                                                        null,
+                                                                        locale)),
+                                                "payments.reference",
+                                                new DataTableValue().setValue(p.getReference()),
+                                                "payments.collected",
+                                                new DataTableValue()
+                                                        .setValue(p.getCollected() ? "Yes" : "No"),
+                                                "payments.amount",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                NumberFormat.getCurrencyInstance()
+                                                                        .format(p.getAmount()))))
+                        .toList());
+        model.put(
+                "paymentsColumns",
+                List.of(
+                        new DataTableColumn().setKey("payments.date"),
+                        new DataTableColumn().setKey("payments.type"),
+                        new DataTableColumn().setKey("payments.reference"),
+                        new DataTableColumn().setKey("payments.collected"),
+                        new DataTableColumn().setKey("payments.amount")));
 
         if (nonNull(member.getPlayerId())) {
             var id = Integer.parseInt(member.getPlayerId());

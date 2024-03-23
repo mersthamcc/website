@@ -277,10 +277,6 @@
 											<span class="text-truncate pr-2" title="Settings">Settings</span>
 										</a>
 
-										<form class="dropdown-item">
-											<input readonly="readonly" value="${accessToken}">
-										</form>
-
 										<div class="dropdown-divider"></div>
 
 										<a class="dropdown-item" href="/logout">
