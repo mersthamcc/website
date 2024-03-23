@@ -32,6 +32,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,7 @@ public class MembershipController extends SspController<MemberSummary> {
                                 new DataTableColumn()
                                         .setKey("membership.play-cricket.table-icon")
                                         .setFunction(true)
+                                        .setSortable(false)
                                         .setFunctionName("playCricketLink"),
                                 new DataTableColumn()
                                         .setKey("membership.family-name")
@@ -183,18 +185,7 @@ public class MembershipController extends SspController<MemberSummary> {
                 membershipService
                         .getMemberSummary(cognitoAuthentication.getOAuth2AccessToken())
                         .stream()
-                        .filter(
-                                m ->
-                                        m.getFamilyName().toLowerCase().contains(search)
-                                                || m.getGivenName().toLowerCase().contains(search)
-                                                || m.getLastSubsCategory()
-                                                        .toLowerCase()
-                                                        .contains(search)
-                                                || m.getLastSubsYear().contains(search)
-                                                || (nonNull(m.getAgeGroup())
-                                                        && m.getAgeGroup().equalsIgnoreCase(search))
-                                                || (nonNull(m.getGender())
-                                                        && m.getGender().equalsIgnoreCase(search)))
+                        .filter(m -> matchesCriteria(m, search))
                         .sorted(comparator)
                         .toList();
         return SspResponse.<SspResponseDataWrapper<MemberSummary>>builder()
@@ -227,9 +218,25 @@ public class MembershipController extends SspController<MemberSummary> {
                 .build();
     }
 
+    private boolean matchesCriteria(MemberSummary member, String search) {
+        return Arrays.stream(search.split(" "))
+                .map(
+                        s ->
+                                member.getFamilyName().toLowerCase().contains(s)
+                                        || member.getGivenName().toLowerCase().contains(s)
+                                        || member.getLastSubsCategory().toLowerCase().contains(s)
+                                        || member.getLastSubsYear().contains(s)
+                                        || (nonNull(member.getAgeGroup())
+                                                && member.getAgeGroup().equalsIgnoreCase(s))
+                                        || (nonNull(member.getGender())
+                                                && member.getGender().equalsIgnoreCase(s)))
+                .allMatch(Boolean::booleanValue);
+    }
+
     private Comparator<MemberSummary> createComparator(SspRequest request) {
         return request.getOrder().stream()
                 .findFirst()
+                .filter(f -> !request.getColumns().get(f.getColumn()).getData().equals("function"))
                 .map(
                         c -> {
                             String column = request.getColumns().get(c.getColumn()).getData();
