@@ -6,6 +6,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.shared.extensions.StringExtensions;
+import cricket.merstham.website.frontend.model.ChangePassword;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.security.CognitoChallengeAuthentication;
@@ -44,10 +45,12 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdate
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AssociateSoftwareTokenRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ChangePasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CodeMismatchException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmForgotPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.DescribeUserPoolRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ExpiredCodeException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ForgotPasswordResponse;
@@ -71,6 +74,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -787,12 +791,75 @@ public class CognitoService {
                     return List.of();
                 } catch (Exception ex) {
                     LOG.error("Error updating user", ex);
-                    return List.of("accounts.error.unknown-error");
+                    return List.of("account.error.unknown-error");
                 }
             }
         } catch (ParseException e) {
             return List.of("account.error.invalid-phone-number");
         }
         throw new AccessDeniedException("Not authorised to update attributes");
+    }
+
+    public Map<String, String> getPasswordRequirements() {
+        var pool =
+                client.describeUserPool(
+                        DescribeUserPoolRequest.builder().userPoolId(userPoolId).build());
+
+        var requirements = new HashMap<String, String>();
+        var policy = pool.userPool().policies().passwordPolicy();
+        if (nonNull(policy.minimumLength())) {
+            requirements.put("account.password.min-length", policy.minimumLength().toString());
+        }
+        if (Boolean.TRUE.equals(policy.requireLowercase())) {
+            requirements.put("account.password.lower-case", "");
+        }
+        if (Boolean.TRUE.equals(policy.requireUppercase())) {
+            requirements.put("account.password.upper-case", "");
+        }
+        if (Boolean.TRUE.equals(policy.requireNumbers())) {
+            requirements.put("account.password.numbers", "");
+        }
+        if (Boolean.TRUE.equals(policy.requireSymbols())) {
+            requirements.put("account.password.symbols", "");
+        }
+        return requirements;
+    }
+
+    public List<String> changePassword(ChangePassword changePassword) {
+        var context = SecurityContextHolder.getContext();
+        var authentication = (CognitoAuthentication) context.getAuthentication();
+
+        try {
+            client.changePassword(
+                    ChangePasswordRequest.builder()
+                            .accessToken(authentication.getAccessToken())
+                            .previousPassword(changePassword.getCurrentPassword())
+                            .proposedPassword(changePassword.getPassword())
+                            .build());
+            return List.of();
+        } catch (NotAuthorizedException ex) {
+            return List.of("account.error.old-password-not-correct");
+        } catch (InvalidPasswordException ex) {
+            return List.of("account.error.bad-password");
+        } catch (LimitExceededException ex) {
+            return List.of("account.error.too-many-requests");
+        } catch (Exception ex) {
+            return List.of("account.error.unknown-error-change-password");
+        }
+    }
+
+    public boolean isIdentityProviderUser() {
+        var context = SecurityContextHolder.getContext();
+        var authentication = (CognitoAuthentication) context.getAuthentication();
+
+        try {
+            return authentication
+                    .getIdTokenJwt()
+                    .getJWTClaimsSet()
+                    .getClaims()
+                    .containsKey("identities");
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

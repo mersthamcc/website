@@ -18,6 +18,18 @@
                     <#if errors??>
                         <@components.formMessages errors=errors errorKey="account.error.title" />
                     </#if>
+                    <#if info??>
+                        <div class="alert alert-info" role="alert">
+                            <h5 class="alert-heading">
+                                <@spring.message code="account.success.title"/>
+                            </h5>
+                            <#list info as code>
+                                <p class="text-inherit">
+                                    <@spring.messageText code=code text=code />
+                                </p>
+                            </#list>
+                        </div>
+                    </#if>
 
                     <div class="row form-group">
                         <label for="givenNameLabel" class="col-sm-3 col-form-label input-label">
