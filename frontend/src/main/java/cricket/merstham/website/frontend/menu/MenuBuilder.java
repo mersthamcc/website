@@ -252,14 +252,14 @@ public class MenuBuilder {
                                                     null,
                                                     List.of(),
                                                     null,
-                                                    "fa-users"),
-                                            new Menu(
-                                                    "account-members-billing",
-                                                    null,
-                                                    null,
-                                                    List.of(),
-                                                    null,
-                                                    "fa-credit-card"))));
+                                                    "fa-users"))));
+    //                                            new Menu(
+    //                                                    "account-members-billing",
+    //                                                    null,
+    //                                                    null,
+    //                                                    List.of(),
+    //                                                    null,
+    //                                                    "fa-credit-card"))));
     private final MenuService menuService;
     private final PageService pageService;
 
