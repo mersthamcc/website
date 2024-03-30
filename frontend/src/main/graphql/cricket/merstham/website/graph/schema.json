@@ -4707,6 +4707,22 @@
               "deprecationReason": null
             },
             {
+              "name": "myMembers",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MemberSummary",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "myOrders",
               "description": null,
               "args": [],

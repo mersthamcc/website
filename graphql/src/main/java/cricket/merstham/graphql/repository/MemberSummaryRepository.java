@@ -17,6 +17,8 @@ public interface MemberSummaryRepository
                 PagingAndSortingRepository<MemberSummaryEntity, Integer>,
                 JpaSpecificationExecutor<MemberSummaryEntity> {
 
+    List<MemberSummaryEntity> findAllByOwnerUserIdEquals(String ownerUserId);
+
     default Specification<MemberSummaryEntity> getMemberSpecification(MemberFilter filter) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

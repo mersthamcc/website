@@ -3,6 +3,7 @@ DROP
 
 CREATE VIEW member_summary AS
 SELECT m.id,
+       m.owner_user_id,
        familyname.value::JSONB ->> 0 AS familyname,
        givenname.value::JSONB ->> 0  AS givenname,
        m.registration_date           AS first_registration_date,
@@ -41,7 +42,7 @@ SELECT m.id,
        pl.description,
        declarations.value::JSONB     AS declarations,
        identifiers.list              AS identifiers
-FROM MEMBER m
+FROM "member" m
          INNER JOIN(SELECT member_id,
                            MAX(YEAR) AS YEAR
                     FROM member_subscription

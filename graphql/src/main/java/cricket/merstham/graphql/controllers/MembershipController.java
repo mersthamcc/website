@@ -39,6 +39,11 @@ public class MembershipController {
     }
 
     @QueryMapping
+    public List<MemberSummary> myMembers(Principal principal) {
+        return membershipService.getMyMembers(principal);
+    }
+
+    @QueryMapping
     public Member member(@Argument int id, Principal principal) {
         return membershipService.getMember(id, principal);
     }

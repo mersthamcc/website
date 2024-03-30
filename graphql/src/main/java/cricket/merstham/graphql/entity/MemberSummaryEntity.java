@@ -35,6 +35,9 @@ public class MemberSummaryEntity {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "owner_user_id", length = Integer.MAX_VALUE)
+    private String ownerUserId;
+
     @Column(name = "familyname", length = Integer.MAX_VALUE)
     private String familyName;
 

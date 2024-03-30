@@ -3,7 +3,7 @@
 <#import "../base.ftl" as layout>
 <#import "/spring.ftl" as spring />
 
-<@layout.mainLayout formName="menu.account">
+<@layout.mainLayout formName="menu.account" withButtonResponsiveButton=true>
     <@home.homeLayout userDetails=userDetails>
         <div class="card mb-3 mb-lg-5">
             <div class="card-header">

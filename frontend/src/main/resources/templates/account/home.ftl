@@ -3,7 +3,7 @@
 <#import "../components.ftl" as components>
 <#import "/spring.ftl" as spring />
 
-<@layout.mainLayout formName="menu.account">
+<@layout.mainLayout formName="menu.account" withButtonResponsiveButton=true>
     <@home.homeLayout userDetails=userDetails>
         <form method="post" name="user-details-form" action="/account">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

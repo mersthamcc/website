@@ -19,6 +19,7 @@ import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.account.MyMembersQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
@@ -342,6 +343,18 @@ public class MembershipService {
             return modelMapper.map(
                     requireNonNull(result.getData()).getDeleteMemberToPlayerLink(),
                     cricket.merstham.shared.dto.Member.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<MemberSummary> getMyMembers(OAuth2AccessToken accessToken) {
+        try {
+            Response<MyMembersQuery.Data> result =
+                    graphService.executeQuery(new MyMembersQuery(), accessToken);
+            return result.getData().getMyMembers().stream()
+                    .map(m -> modelMapper.map(m, MemberSummary.class))
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

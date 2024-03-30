@@ -1,4 +1,5 @@
 <#import "../base.ftl" as layout>
+<#import "../components.ftl" as components>
 <#import "/spring.ftl" as spring />
 
 <#macro homeLayout userDetails>
@@ -10,9 +11,7 @@
                         <div class="card mb-5">
                             <div class="card-body">
                                 <div class="d-none d-lg-block text-center mb-5">
-                                    <div class="avatar avatar-xxl avatar-soft-dark avatar-circle avatar-border-lg avatar-centered mb-3">
-                                        <span class="avatar-initials">${userDetails.givenName?cap_first[0]}${userDetails.familyName?cap_first[0]}</span>
-                                    </div>
+                                    <@components.avatar givenName=userDetails.givenName familyName=userDetails.familyName />
 
                                     <h4 class="card-title">${userDetails.givenName} ${userDetails.familyName}</h4>
                                     <p class="card-text font-size-1">${userDetails.email}</p>

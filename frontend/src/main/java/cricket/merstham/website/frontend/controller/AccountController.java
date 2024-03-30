@@ -2,7 +2,9 @@ package cricket.merstham.website.frontend.controller;
 
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.website.frontend.model.ChangePassword;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
+import cricket.merstham.website.frontend.service.MembershipService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +35,12 @@ public class AccountController {
     private static final String INFO = "INFO";
 
     private final CognitoService service;
+    private final MembershipService membershipService;
 
     @Autowired
-    public AccountController(CognitoService service) {
+    public AccountController(CognitoService service, MembershipService membershipService) {
         this.service = service;
+        this.membershipService = membershipService;
     }
 
     @GetMapping(value = "/account", name = "account-home")
@@ -101,8 +105,16 @@ public class AccountController {
     }
 
     @GetMapping(value = "/account/members", name = "account-members")
-    public ModelAndView membersHome(HttpServletRequest request) {
-        return home(request);
+    public ModelAndView membersHome(
+            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) {
+        var model = baseModel(request);
+        model.put(
+                "members",
+                membershipService.getMyMembers(cognitoAuthentication.getOAuth2AccessToken()));
+        return new ModelAndView(
+                "account/member-list",
+                model,
+                model.containsKey("errors") ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
     }
 
     @GetMapping(value = "/account/billing", name = "account-members-billing")

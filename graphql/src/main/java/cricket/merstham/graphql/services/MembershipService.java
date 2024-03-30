@@ -289,4 +289,10 @@ public class MembershipService {
                 .findById(principal.getName())
                 .map(f -> modelMapper.map(f, MemberFilter.class));
     }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<MemberSummary> getMyMembers(Principal principal) {
+        var members = summaryRepository.findAllByOwnerUserIdEquals(getSubject(principal));
+        return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
+    }
 }
