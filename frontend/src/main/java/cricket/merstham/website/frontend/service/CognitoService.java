@@ -1,6 +1,10 @@
 package cricket.merstham.website.frontend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import cricket.merstham.shared.dto.User;
 import cricket.merstham.shared.extensions.StringExtensions;
 import cricket.merstham.website.frontend.model.UserSignUp;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
@@ -22,12 +26,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserAttributesRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminRespondToAuthChallengeRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminRespondToAuthChallengeResponse;
@@ -60,6 +69,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +98,11 @@ public class CognitoService {
     private static final String COGNITO_USERNAME_CLAIM = "cognito:username";
     private static final String GIVEN_NAME_CLAIM = "given_name";
     private static final String FAMILY_NAME_CLAIM = "family_name";
+    private static final String EMAIL_NAME_CLAIM = "email";
+    private static final String EMAIL_NAME_VERIFIED_CLAIM = "email_verified";
     public static final String ANSWER = "ANSWER";
+    public static final String PHONE_NUMBER_CLAIM = "phone_number";
+    public static final String PHONE_NUMBER_VERIFIED_CLAIM = "phone_number_verified";
 
     private final String salt;
     private final CognitoIdentityProviderClient client;
@@ -97,6 +111,7 @@ public class CognitoService {
     private final String clientSecret;
     private final String baseUri;
     private final String hostedUiUri;
+    private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
     @Autowired
     public CognitoService(
@@ -443,7 +458,7 @@ public class CognitoService {
                         .userAttributes(
                                 List.of(
                                         AttributeType.builder()
-                                                .name("phone_number")
+                                                .name(PHONE_NUMBER_CLAIM)
                                                 .value(phoneNumber)
                                                 .build()))
                         .build());
@@ -648,5 +663,136 @@ public class CognitoService {
 
     private String constructRedirectUrl() {
         return UriBuilder.fromUri(baseUri).path("/login/code").build().toString();
+    }
+
+    public User getUserDetails() {
+        var context = SecurityContextHolder.getContext();
+        var authentication = (CognitoAuthentication) context.getAuthentication();
+
+        AdminGetUserResponse user = null;
+        try {
+            user =
+                    client.adminGetUser(
+                            AdminGetUserRequest.builder()
+                                    .userPoolId(userPoolId)
+                                    .username(
+                                            authentication
+                                                    .getIdTokenJwt()
+                                                    .getJWTClaimsSet()
+                                                    .getStringClaim(COGNITO_USERNAME_CLAIM))
+                                    .build());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        return User.builder()
+                .subjectId(user.username())
+                .username(getUserAttribute(user.userAttributes(), COGNITO_USERNAME_CLAIM))
+                .givenName(getUserAttribute(user.userAttributes(), GIVEN_NAME_CLAIM))
+                .familyName(getUserAttribute(user.userAttributes(), FAMILY_NAME_CLAIM))
+                .email(getUserAttribute(user.userAttributes(), EMAIL_NAME_CLAIM))
+                .phoneNumber(getUserAttribute(user.userAttributes(), PHONE_NUMBER_CLAIM))
+                .roles(
+                        authentication.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .toList())
+                .build();
+    }
+
+    private String getUserAttribute(List<AttributeType> attributes, String name) {
+        return attributes.stream()
+                .filter(a -> a.name().equals(name))
+                .findFirst()
+                .map(a -> a.value())
+                .orElse("");
+    }
+
+    public List<String> updateUser(User user) {
+        var context = SecurityContextHolder.getContext();
+        var authentication = (CognitoAuthentication) context.getAuthentication();
+
+        try {
+            if (authentication
+                    .getIdTokenJwt()
+                    .getJWTClaimsSet()
+                    .getStringClaim(COGNITO_USERNAME_CLAIM)
+                    .equals(user.getSubjectId())) {
+                try {
+                    var attributes = new ArrayList<AttributeType>();
+                    attributes.addAll(
+                            List.of(
+                                    AttributeType.builder()
+                                            .name(GIVEN_NAME_CLAIM)
+                                            .value(user.getGivenName())
+                                            .build(),
+                                    AttributeType.builder()
+                                            .name(FAMILY_NAME_CLAIM)
+                                            .value(user.getFamilyName())
+                                            .build(),
+                                    AttributeType.builder()
+                                            .name(EMAIL_NAME_CLAIM)
+                                            .value(user.getEmail())
+                                            .build(),
+                                    AttributeType.builder()
+                                            .name(EMAIL_NAME_VERIFIED_CLAIM)
+                                            .value("true")
+                                            .build()));
+
+                    if (!Strings.isNullOrEmpty(user.getPhoneNumber())) {
+                        try {
+                            var phoneNumber = phoneUtil.parse(user.getPhoneNumber(), "GB");
+                            if (phoneUtil.isValidNumber(phoneNumber)) {
+                                attributes.add(
+                                        AttributeType.builder()
+                                                .name(PHONE_NUMBER_CLAIM)
+                                                .value(
+                                                        phoneUtil.format(
+                                                                phoneNumber,
+                                                                PhoneNumberUtil.PhoneNumberFormat
+                                                                        .E164))
+                                                .build());
+                                attributes.add(
+                                        AttributeType.builder()
+                                                .name(PHONE_NUMBER_VERIFIED_CLAIM)
+                                                .value("true")
+                                                .build());
+                            } else {
+                                return List.of("account.error.invalid-phone-number");
+                            }
+                        } catch (NumberParseException ex) {
+                            return List.of("account.error.invalid-phone-number");
+                        }
+                    }
+
+                    client.adminUpdateUserAttributes(
+                            AdminUpdateUserAttributesRequest.builder()
+                                    .userPoolId(userPoolId)
+                                    .username(user.getSubjectId())
+                                    .userAttributes(attributes)
+                                    .build());
+
+                    if (Strings.isNullOrEmpty(user.getPhoneNumber())
+                            && !Strings.isNullOrEmpty(
+                                    authentication
+                                            .getIdTokenJwt()
+                                            .getJWTClaimsSet()
+                                            .getStringClaim(PHONE_NUMBER_CLAIM))) {
+                        client.adminDeleteUserAttributes(
+                                AdminDeleteUserAttributesRequest.builder()
+                                        .userPoolId(userPoolId)
+                                        .username(user.getSubjectId())
+                                        .userAttributeNames(List.of(PHONE_NUMBER_CLAIM))
+                                        .build());
+                    }
+                    return List.of();
+                } catch (Exception ex) {
+                    LOG.error("Error updating user", ex);
+                    return List.of("accounts.error.unknown-error");
+                }
+            }
+        } catch (ParseException e) {
+            return List.of("account.error.invalid-phone-number");
+        }
+        throw new AccessDeniedException("Not authorised to update attributes");
     }
 }

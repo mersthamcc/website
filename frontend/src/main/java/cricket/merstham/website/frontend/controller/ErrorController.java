@@ -50,14 +50,15 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
     @ExceptionHandler(RuntimeException.class)
     public RedirectView handleError(
-            HttpServletRequest request, Exception exception, RedirectAttributes redirectAttributes)
-            throws Exception {
+            HttpServletRequest request,
+            RuntimeException exception,
+            RedirectAttributes redirectAttributes) {
         if (nonNull(AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class))
                 || exception instanceof AccessDeniedException) {
             throw exception;
         }
 
-        redirectAttributes.addFlashAttribute(EXCEPTION_FLASH);
+        redirectAttributes.addFlashAttribute(EXCEPTION_FLASH, exception.getLocalizedMessage());
         LOG.error("An unexpected error occurred", exception);
         return redirectTo("/error");
     }
