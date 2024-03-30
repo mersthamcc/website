@@ -1,0 +1,20 @@
+query myMembers {
+    myMembers {
+        id
+        familyName
+        givenName
+        firstRegistrationDate
+        dob
+        ageGroup
+        gender
+        mostRecentSubscription
+        lastSubsDate
+        lastSubsPrice
+        lastSubsCategory
+        received
+        paymentTypes
+        description
+        declarations
+        identifiers
+    }
+}

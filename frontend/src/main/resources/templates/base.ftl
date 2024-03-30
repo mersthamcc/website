@@ -9,7 +9,7 @@
 
 </#macro>
 
-<#macro mainLayout formName="" headers=defaultHeaders script=defaultScripts>
+<#macro mainLayout formName="" headers=defaultHeaders script=defaultScripts withButtonResponsiveButton=false>
     <!DOCTYPE html>
     <html lang="en">
         <head>
@@ -198,7 +198,9 @@
                         formName=formName
                         resourcePrefix=resourcePrefix
                         breadcrumbs=breadcrumbs
-                        currentRoute=currentRoute />
+                        currentRoute=currentRoute
+                        withButtonResponsiveButton=withButtonResponsiveButton
+                    />
                 </#if>
                 <#nested />
             </main>

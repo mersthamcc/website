@@ -49,176 +49,18 @@
 			<#if headers?is_directive><@headers /><#else>${headers}</#if>
 		</head>
 		<body class="bg-light">
-			<!-- Search Form -->
-			<div id="searchDropdown" class="hs-unfold-content dropdown-unfold search-fullwidth d-md-none">
-				<form class="input-group input-group-merge input-group-borderless">
-					<div class="input-group-prepend">
-						<div class="input-group-text">
-							<i class="tio-search"></i>
-						</div>
-					</div>
-
-					<input class="form-control rounded-0" type="search" placeholder="Search in front" aria-label="Search in front">
-
-					<div class="input-group-append">
-						<div class="input-group-text">
-							<div class="hs-unfold">
-								<a class="js-hs-unfold-invoker" href="javascript:;"
-								   data-hs-unfold-options='{
-										 "target": "#searchDropdown",
-										 "type": "css-animation",
-										 "animationIn": "fadeIn",
-										 "hasOverlay": "rgba(46, 52, 81, 0.1)",
-										 "closeBreakpoint": "md"
-									   }'>
-									<i class="tio-clear tio-lg"></i>
-								</a>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<!-- End Search Form -->
-
 			<!-- ========== HEADER ========== -->
 			<header id="header" class="navbar navbar-expand-lg navbar-fixed-lg navbar-container navbar-light">
 				<div class="navbar-nav-wrap">
 					<div class="navbar-brand-wrapper">
-						<!-- Logo -->
 						<a class="navbar-brand" href="/administration" aria-label="Admin Home">
 							<img class="navbar-brand-logo" src="${resourcePrefix}${config.logo}" alt="${config.clubName}">
 						</a>
-						<!-- End Logo -->
 					</div>
 
-					<div class="navbar-nav-wrap-content-left">
-						<!-- Search Form -->
-						<div class="d-none d-lg-block">
-							<form class="position-relative">
-								<!-- Input Group -->
-								<div class="input-group input-group-merge navbar-input-group">
-									<div class="input-group-prepend">
-										<div class="input-group-text">
-											<i class="tio-search"></i>
-										</div>
-									</div>
-									<input type="search" class="js-form-search form-control" placeholder="Search in front" aria-label="Search in front"
-										   data-hs-form-search-options='{
-											   "clearIcon": "#clearSearchResultsIcon",
-											   "dropMenuElement": "#searchDropdownMenu",
-											   "dropMenuOffset": 20,
-											   "toggleIconOnFocus": true,
-											   "activeClass": "focus"
-											 }'>
-									<a class="input-group-append" href="javascript:;">
-										<span class="input-group-text">
-										  <i id="clearSearchResultsIcon" class="tio-clear" style="display: none;"></i>
-										</span>
-									</a>
-								</div>
-								<!-- End Input Group -->
-
-								<!-- Card Search Content -->
-								<div id="searchDropdownMenu" class="hs-form-search-menu-content card dropdown-menu dropdown-card overflow-hidden">
-									<!-- Body -->
-									<div class="card-body-height py-3">
-										<small class="dropdown-header mb-n2">Recent searches</small>
-
-										<div class="dropdown-item bg-transparent text-wrap my-2">
-											<span class="h4 mr-1">
-												<a class="btn btn-xs btn-soft-dark btn-pill" href="../index.html">
-												  Gulp <i class="tio-search ml-1"></i>
-												</a>
-											</span>
-											<span class="h4">
-												<a class="btn btn-xs btn-soft-dark btn-pill" href="../index.html">
-												  Notification panel <i class="tio-search ml-1"></i>
-												</a>
-											</span>
-										</div>
-
-										<div class="dropdown-divider my-3"></div>
-
-										<small class="dropdown-header mb-n2">Tutorials</small>
-
-										<a class="dropdown-item my-2" href="../index.html">
-											<div class="media align-items-center">
-												<span class="icon icon-xs icon-soft-dark icon-circle mr-2">
-												  <i class="tio-tune"></i>
-												</span>
-
-												<div class="media-body text-truncate">
-													<span>How to set up Gulp?</span>
-												</div>
-											</div>
-										</a>
-
-										<a class="dropdown-item my-2" href="../index.html">
-											<div class="media align-items-center">
-												<span class="icon icon-xs icon-soft-dark icon-circle mr-2">
-												  <i class="tio-paint-bucket"></i>
-												</span>
-
-												<div class="media-body text-truncate">
-													<span>How to change theme color?</span>
-												</div>
-											</div>
-										</a>
-
-										<div class="dropdown-divider my-3"></div>
-
-										<small class="dropdown-header mb-n2">Members</small>
-
-										<a class="dropdown-item my-2" href="../index.html">
-											<div class="media align-items-center">
-												<img class="avatar avatar-xs avatar-circle mr-2" src="${resourcePrefix}/front/admin/assets/img/160x160/img10.jpg" alt="Image Description">
-												<div class="media-body text-truncate">
-													<span>Amanda Harvey <i class="tio-verified text-primary" data-toggle="tooltip" data-placement="top" title="Top endorsed"></i></span>
-												</div>
-											</div>
-										</a>
-
-										<a class="dropdown-item my-2" href="../index.html">
-											<div class="media align-items-center">
-												<img class="avatar avatar-xs avatar-circle mr-2" src="${resourcePrefix}/front/admin/assets/img/160x160/img3.jpg" alt="Image Description">
-												<div class="media-body text-truncate">
-													<span>David Harrison</span>
-												</div>
-											</div>
-										</a>
-
-										<a class="dropdown-item my-2" href="../index.html">
-											<div class="media align-items-center">
-												<div class="avatar avatar-xs avatar-soft-info avatar-circle mr-2">
-													<span class="avatar-initials">A</span>
-												</div>
-												<div class="media-body text-truncate">
-													<span>Anne Richard</span>
-												</div>
-											</div>
-										</a>
-									</div>
-									<!-- End Body -->
-
-									<!-- Footer -->
-									<a class="card-footer text-center" href="../index.html">
-										See all results
-										<i class="tio-chevron-right"></i>
-									</a>
-									<!-- End Footer -->
-								</div>
-								<!-- End Card Search Content -->
-							</form>
-						</div>
-						<!-- End Search Form -->
-					</div>
-
-					<!-- Secondary Content -->
 					<div class="navbar-nav-wrap-content-right">
-						<!-- Navbar -->
 						<ul class="navbar-nav align-items-center flex-row">
 							<li class="nav-item d-lg-none">
-								<!-- Search Trigger -->
 								<div class="hs-unfold">
 									<a class="js-hs-unfold-invoker btn btn-icon btn-ghost-secondary rounded-circle" href="javascript:;"
 									   data-hs-unfold-options='{
@@ -231,11 +73,9 @@
 										<i class="tio-search"></i>
 									</a>
 								</div>
-								<!-- End Search Trigger -->
 							</li>
 
 							<li class="nav-item">
-								<!-- Account -->
 								<div class="hs-unfold">
 									<a class="js-hs-unfold-invoker navbar-dropdown-account-wrapper" href="javascript:;"
 													   data-hs-unfold-options='{
@@ -269,13 +109,19 @@
 
 										<div class="dropdown-divider"></div>
 
-										<a class="dropdown-item" href="#">
-											<span class="text-truncate pr-2" title="Profile &amp; account">Profile &amp; account</span>
+										<a class="dropdown-item" href="/account">
+											<span class="text-truncate pr-2" title="<@spring.message code="menu.account" />">
+												<@spring.message code="menu.account" />
+											</span>
 										</a>
 
-										<a class="dropdown-item" href="#">
-											<span class="text-truncate pr-2" title="Settings">Settings</span>
-										</a>
+										<#if accessToken??>
+											<a class="dropdown-item" href="#" data-toggle="modal" data-target="#accessTokenModal">
+												<span class="text-truncate pr-2" title="<@spring.message code="menu.access-token" />">
+													<@spring.message code="menu.access-token" />
+												</span>
+											</a>
+										</#if>
 
 										<div class="dropdown-divider"></div>
 
@@ -287,17 +133,12 @@
 										</a>
 									</div>
 								</div>
-								<!-- End Account -->
 							</li>
 						</ul>
-						<!-- End Navbar -->
 					</div>
-					<!-- End Secondary Content -->
 				</div>
 			</header>
-			<!-- ========== END HEADER ========== -->
 
-			<!-- ========== MAIN CONTENT ========== -->
 			<main id="content" role="main" class="main">
 				<!-- Content -->
 				<div class="bg-dark">
@@ -1028,6 +869,45 @@
 			<!-- End Welcome Message Modal -->
 			<!-- ========== END SECONDARY CONTENTS ========== -->
 
+			<#if accessToken??>
+				<div class="modal fade" id="accessTokenModal" tabindex="-1" role="dialog" aria-labelledby="accessTokenModal" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<!-- Header -->
+							<div class="modal-header">
+								<h5 class="modal-title" id="accessTokenModalLabel">
+									<@spring.message code="menu.access-token" />
+								</h5>
+								<button type="button" class="btn btn-icon btn-sm btn-ghost-secondary" data-dismiss="modal" aria-label="Close">
+									<i class="tio-clear tio-lg" aria-hidden="true"></i>
+								</button>
+							</div>
+
+							<div class="modal-body">
+								<div class="input-group input-group-merge">
+									<input type="text" id="accessToken" class="form-control" value="${accessToken}">
+
+									<a class="js-clipboard input-group-append" href="javascript:;" data-toggle="tooltip" title="Copy to clipboard!"
+									   data-hs-clipboard-options='{
+										   "type": "tooltip",
+										   "successText": "Copied!",
+										   "contentTarget": "#accessToken",
+										   "container": "#accessTokenModal"
+										 }'>
+										<span class="input-group-text">
+										  <i class="tio-copy"></i>
+										</span>
+									</a>
+								</div>
+							</div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</#if>
 			<!-- JS Global Compulsory  -->
 			<script src="${resourcePrefix}/front/admin/assets/vendor/jquery/dist/jquery.min.js"></script>
 			<script src="${resourcePrefix}/front/admin/assets/vendor/jquery-migrate/dist/jquery-migrate.min.js"></script>
@@ -1049,7 +929,7 @@
 			<script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
 			<script src="${resourcePrefix}/mcc/js/ckeditor/ckeditor.js"></script>
 			<script src="${resourcePrefix}/mcc/js/node_modules/@ckeditor/ckeditor5-inspector/build/inspector.js"></script>
-
+			<script src="${resourcePrefix}/front/admin/assets/vendor/clipboard/dist/clipboard.min.js"></script>
 			<#if script?is_directive><@script /><#else>${script}</#if>
 
 			<!-- JS Plugins Init. -->
@@ -1079,6 +959,9 @@
 					});
 					$('.js-flatpickr').each(function () {
 						$.HSCore.components.HSFlatpickr.init($(this));
+					});
+					$('.js-clipboard').each(function() {
+						$.HSCore.components.HSClipboard.init(this);
 					});
 					if (typeof onPageLoad === "function") onPageLoad();
 				});

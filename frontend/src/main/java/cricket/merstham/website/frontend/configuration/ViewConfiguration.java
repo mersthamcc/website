@@ -42,15 +42,18 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     private final MenuBuilder menuBuilderProvider;
     private final ClubConfiguration clubConfiguration;
     private final String resourcePrefix;
+    private final boolean debug;
 
     @Autowired
     public ViewConfiguration(
             MenuBuilder menuBuilderProvider,
             ClubConfiguration clubConfiguration,
-            @Value("${resources.base-url}") String resourcePrefix) {
+            @Value("${resources.base-url}") String resourcePrefix,
+            @Value("${debug}") boolean debug) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;
+        this.debug = debug;
     }
 
     @Override
@@ -66,16 +69,22 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             var principal = request.getUserPrincipal();
             if (principal != null && principal instanceof CognitoAuthentication) {
                 model.put("user", createUserView(principal));
+                if (debug) {
+                    model.put("accessToken", ((CognitoAuthentication) principal).getAccessToken());
+                }
             }
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
             model.put("userMenu", menuBuilderProvider.getUserMenu());
             model.put("mainMenu", menuBuilderProvider.getFrontEndMenu());
+            model.put("accountMenu", menuBuilderProvider.getAccountMenu());
+
             var currentRoute = getCurrentRoute(request, handler);
             model.put("currentRoute", currentRoute);
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
             model.put("resourcePrefix", resourcePrefix);
             model.put("dashboardMenu", menuBuilderProvider.getDashboardMenu());
+
             var adminMenus = new LinkedHashMap<>();
             adminMenus.put("content", menuBuilderProvider.getAdminContentMenu());
             adminMenus.put("administration", menuBuilderProvider.getAdminAdministrationMenu());

@@ -177,6 +177,7 @@ extend type Query {
     member(id: Int!): Member
     members: [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
+    myMembers: [MemberSummary]
     myOrders: [Order]
     orders(year: Int!): [Order]
     order(id: Int!): Order

@@ -33,7 +33,10 @@ public class MenuBuilder {
                             null));
     //                    new Menu("help", null, URI.create("/help"), List.of(), null));
 
-    private final List<Menu> userMenu = List.of(new Menu("logout", null, null, List.of(), null));
+    private final List<Menu> userMenu =
+            List.of(
+                    new Menu("account", null, URI.create("/account"), List.of(), null),
+                    new Menu("logout", null, null, List.of(), null));
 
     private final List<Menu> frontEndMenu =
             List.of(
@@ -213,6 +216,50 @@ public class MenuBuilder {
                                                     null)),
                             "tio-tune"));
 
+    private final List<Menu> accountMenu =
+            List.of(
+                    new Menu(
+                            "account-home-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "account-home",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-id-card"),
+                                            new Menu(
+                                                    "account-home-security",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-shield-alt"))),
+                    new Menu(
+                            "account-members-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "account-members",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-users"))));
+    //                                            new Menu(
+    //                                                    "account-members-billing",
+    //                                                    null,
+    //                                                    null,
+    //                                                    List.of(),
+    //                                                    null,
+    //                                                    "fa-credit-card"))));
     private final MenuService menuService;
     private final PageService pageService;
 
@@ -276,6 +323,10 @@ public class MenuBuilder {
 
     public List<Menu> getFrontEndMenu() {
         return frontEndMenu;
+    }
+
+    public List<Menu> getAccountMenu() {
+        return accountMenu;
     }
 
     public LinkedHashMap<String, String> buildParams(String... params) {

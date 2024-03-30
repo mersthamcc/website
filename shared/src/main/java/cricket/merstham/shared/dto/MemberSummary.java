@@ -14,29 +14,29 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-/** DTO for {@link cricket.merstham.graphql.entity.MemberSummaryEntity} */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonSerialize
 @Accessors(chain = true)
 public class MemberSummary implements Serializable {
-    @JsonProperty Integer id;
-    @JsonProperty String familyName;
-    @JsonProperty String givenName;
-    @JsonProperty Instant firstRegistrationDate;
-    @JsonProperty LocalDate dob;
-    @JsonProperty String ageGroup;
-    @JsonProperty String gender;
-    @JsonProperty Integer mostRecentSubscription;
-    @JsonProperty LocalDate lastSubsDate;
-    @JsonProperty BigDecimal lastSubsPrice;
-    @JsonProperty String lastSubsCategory;
-    @JsonProperty BigDecimal received;
-    @JsonProperty String paymentTypes;
-    @JsonProperty String description;
-    @JsonProperty List<String> declarations;
-    @JsonProperty List<String> identifiers;
+    @JsonProperty private Integer id;
+    @JsonProperty private String ownerUserId;
+    @JsonProperty private String familyName;
+    @JsonProperty private String givenName;
+    @JsonProperty private Instant firstRegistrationDate;
+    @JsonProperty private LocalDate dob;
+    @JsonProperty private String ageGroup;
+    @JsonProperty private String gender;
+    @JsonProperty private Integer mostRecentSubscription;
+    @JsonProperty private LocalDate lastSubsDate;
+    @JsonProperty private BigDecimal lastSubsPrice;
+    @JsonProperty private String lastSubsCategory;
+    @JsonProperty private BigDecimal received;
+    @JsonProperty private String paymentTypes;
+    @JsonProperty private String description;
+    @JsonProperty private List<String> declarations;
+    @JsonProperty private List<String> identifiers;
 
     @JsonProperty
     @Transient
