@@ -54,4 +54,19 @@ public class AccountController {
         }
         return redirectTo("/account");
     }
+
+    @GetMapping(value = "/account/security", name = "account-home-security")
+    public ModelAndView securityHome(HttpServletRequest request) {
+        return home(request);
+    }
+
+    @GetMapping(value = "/account/members", name = "account-members")
+    public ModelAndView membersHome(HttpServletRequest request) {
+        return home(request);
+    }
+
+    @GetMapping(value = "/account/billing", name = "account-members-billing")
+    public ModelAndView billingHome(HttpServletRequest request) {
+        return home(request);
+    }
 }

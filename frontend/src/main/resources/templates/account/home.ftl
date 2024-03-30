@@ -11,7 +11,7 @@
             <div class="card mb-3 mb-lg-5">
                 <div class="card-header">
                     <h5 class="card-title">
-                        <@spring.message code="account.menu-personal-info" />
+                        <@spring.message code="account.menu.account-home" />
                     </h5>
                 </div>
                 <div class="card-body">
