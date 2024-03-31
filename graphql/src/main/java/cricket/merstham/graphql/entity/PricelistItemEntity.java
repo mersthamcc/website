@@ -64,7 +64,11 @@ public class PricelistItemEntity {
     public BigDecimal getCurrentPrice() {
         LocalDate today = LocalDate.now();
         return priceList.stream()
-                .filter(p -> today.isAfter(p.getDateFrom()) && today.isBefore(p.getDateTo()))
+                .filter(
+                        p ->
+                                (today.isAfter(p.getDateFrom()) || today.isEqual(p.getDateFrom()))
+                                        && (today.isBefore(p.getDateTo())
+                                                || today.isEqual(p.getDateTo())))
                 .findFirst()
                 .orElse(PricelistEntity.builder().price(BigDecimal.ZERO).build())
                 .getPrice();
