@@ -16,5 +16,7 @@ query myMembers {
         description
         declarations
         identifiers
+        uuid
+        applePassSerial
     }
 }

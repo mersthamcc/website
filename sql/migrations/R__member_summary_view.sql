@@ -4,12 +4,12 @@ DROP
 CREATE VIEW member_summary AS
 SELECT m.id,
        m.owner_user_id,
-       familyname.value::JSONB ->> 0 AS familyname,
-       givenname.value::JSONB ->> 0  AS givenname,
-       m.registration_date           AS first_registration_date,
+       familyname.value::JSONB ->> 0  AS familyname,
+       givenname.value::JSONB ->> 0   AS givenname,
+       m.registration_date            AS first_registration_date,
        (
            dob.value::JSONB ->> 0
-           )::DATE                   AS dob,
+           )::DATE                    AS dob,
        CASE
            WHEN dob.value IS NULL THEN NULL
            ELSE 'U' || EXTRACT(
@@ -31,17 +31,19 @@ SELECT m.id,
                                )::DATE
                    )
                        )
-           END                       AS agegroup,
-       gender.value::JSONB ->> 0     AS gender,
-       subs.year                     AS most_recent_subscription,
-       subs.added_date               AS last_subs_date,
-       subs.price                    AS last_subs_price,
-       cat.key                       AS last_subs_category,
-       payments.received             AS received,
-       payments.types                AS payment_types,
+           END                        AS agegroup,
+       gender.value::JSONB ->> 0      AS gender,
+       subs.year                      AS most_recent_subscription,
+       subs.added_date                AS last_subs_date,
+       subs.price                     AS last_subs_price,
+       cat.key                        AS last_subs_category,
+       payments.received              AS received,
+       payments.types                 AS payment_types,
        pl.description,
-       declarations.value::JSONB     AS declarations,
-       identifiers.list              AS identifiers
+       declarations.value::JSONB      AS declarations,
+       identifiers.list               AS identifiers,
+       m.uuid,
+       apple_pass_serial_number.value AS apple_pass_serial_number
 FROM "member" m
          INNER JOIN(SELECT member_id,
                            MAX(YEAR) AS YEAR
@@ -101,6 +103,9 @@ FROM "member" m
                          FROM member_identifier
                          GROUP BY member_id) identifiers ON
     m.id = identifiers.member_id
+         LEFT OUTER JOIN member_identifier apple_pass_serial_number ON apple_pass_serial_number.member_id = m.id AND
+                                                                       apple_pass_serial_number.name =
+                                                                       'APPLE_PASS_SERIAL'
 WHERE m.cancelled IS NULL
 ORDER BY familyname,
          givenname
