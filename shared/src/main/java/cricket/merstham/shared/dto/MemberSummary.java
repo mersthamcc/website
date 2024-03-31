@@ -35,6 +35,8 @@ public class MemberSummary implements Serializable {
     @JsonProperty private BigDecimal received;
     @JsonProperty private String paymentTypes;
     @JsonProperty private String description;
+    @JsonProperty private String uuid;
+    @JsonProperty private String applePassSerial;
     @JsonProperty private List<String> declarations;
     @JsonProperty private List<String> identifiers;
 

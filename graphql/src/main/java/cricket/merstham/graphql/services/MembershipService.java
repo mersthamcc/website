@@ -40,6 +40,7 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
@@ -167,6 +168,7 @@ public class MembershipService {
                 MemberEntity.builder()
                         .registrationDate(now)
                         .ownerUserId(getSubject(principal))
+                        .uuid(UUID.randomUUID().toString())
                         .type("member")
                         .build();
 
@@ -294,5 +296,13 @@ public class MembershipService {
     public List<MemberSummary> getMyMembers(Principal principal) {
         var members = summaryRepository.findAllByOwnerUserIdEquals(getSubject(principal));
         return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Member addMemberIdentifier(int id, String name, String value, Principal principal) {
+        var member =
+                memberRepository.findByIdAndOwnerUserId(id, getSubject(principal)).orElseThrow();
+        member.getIdentifiers().put(name, value);
+        return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 }

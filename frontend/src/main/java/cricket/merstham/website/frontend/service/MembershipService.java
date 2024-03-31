@@ -19,6 +19,7 @@ import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
+import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
@@ -46,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static java.util.Objects.isNull;
@@ -355,6 +357,16 @@ public class MembershipService {
             return result.getData().getMyMembers().stream()
                     .map(m -> modelMapper.map(m, MemberSummary.class))
                     .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void addApplePassSerial(Integer id, String serialNumber, OAuth2AccessToken accessToken) {
+        try {
+            graphService.executeMutation(
+                    new AddMemberIdentifierMutation(id, APPLE_PASS_SERIAL, serialNumber),
+                    accessToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

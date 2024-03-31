@@ -133,7 +133,7 @@ public class SecurityConfiguration {
                                         .loginProcessingUrl(LOGIN_PROCESSING_URL)
                                         .usernameParameter("email")
                                         .passwordParameter("password")
-                                        .defaultSuccessUrl("/", false)
+                                        .defaultSuccessUrl("/account", false)
                                         .failureHandler(failureHandler))
                 .addFilterBefore(cognitoChallengeFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(cognitoChallengeProcessingFilter, CognitoChallengeFilter.class)

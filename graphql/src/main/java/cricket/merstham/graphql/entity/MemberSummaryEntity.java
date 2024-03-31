@@ -87,4 +87,10 @@ public class MemberSummaryEntity {
     @Convert(converter = JpaJsonbConverter.class)
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode identifiers;
+
+    @Column(name = "uuid", unique = true)
+    private String uuid;
+
+    @Column(name = "apple_pass_serial_number", unique = true)
+    private String applePassSerial;
 }

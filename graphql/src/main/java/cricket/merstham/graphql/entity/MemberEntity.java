@@ -55,6 +55,9 @@ public class MemberEntity {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
+    @Column(name = "uuid", unique = true)
+    private String uuid;
+
     @OneToMany(
             fetch = FetchType.LAZY,
             mappedBy = "primaryKey.member",

@@ -5,26 +5,35 @@ import cricket.merstham.website.frontend.model.ChangePassword;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.MembershipService;
+import cricket.merstham.website.frontend.service.account.PassGeneratorService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Controller
@@ -36,11 +45,16 @@ public class AccountController {
 
     private final CognitoService service;
     private final MembershipService membershipService;
+    private final PassGeneratorService passGeneratorService;
 
     @Autowired
-    public AccountController(CognitoService service, MembershipService membershipService) {
+    public AccountController(
+            CognitoService service,
+            MembershipService membershipService,
+            PassGeneratorService passGeneratorService) {
         this.service = service;
         this.membershipService = membershipService;
+        this.passGeneratorService = passGeneratorService;
     }
 
     @GetMapping(value = "/account", name = "account-home")
@@ -120,6 +134,32 @@ public class AccountController {
     @GetMapping(value = "/account/billing", name = "account-members-billing")
     public ModelAndView billingHome(HttpServletRequest request) {
         return home(request);
+    }
+
+    @GetMapping(value = "/account/pass/{uuid}/apple", name = "apple-wallet-membership-card")
+    public ResponseEntity<Resource> appleWalletMemberShipCard(
+            @PathVariable String uuid, CognitoAuthentication cognitoAuthentication)
+            throws IOException {
+        var member =
+                membershipService
+                        .getMyMembers(cognitoAuthentication.getOAuth2AccessToken())
+                        .stream()
+                        .filter(m -> m.getUuid().equals(uuid))
+                        .findFirst()
+                        .orElseThrow();
+        var serialNumber = member.getApplePassSerial();
+        if (isNull(member.getApplePassSerial())) {
+            serialNumber = UUID.randomUUID().toString();
+            membershipService.addApplePassSerial(
+                    member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
+        }
+        var entity =
+                new ByteArrayResource(
+                        passGeneratorService.createAppleWalletPass(member, serialNumber));
+        return ResponseEntity.ok()
+                .contentLength(entity.contentLength())
+                .contentType(MediaType.valueOf("application/vnd.apple.pkpass"))
+                .body(entity);
     }
 
     private Map<String, Object> baseModel(HttpServletRequest request) {

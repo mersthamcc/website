@@ -170,6 +170,8 @@ type MemberSummary {
     description: String
     declarations: [String]
     identifiers: [String]
+    uuid: String!
+    applePassSerial: String
 }
 
 extend type Query {
@@ -190,4 +192,5 @@ extend type Mutation {
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
     deleteMemberToPlayerLink(id: Int!): Member
+    addMemberIdentifier(id: Int!, name: String!, value: String!): Member!
 }

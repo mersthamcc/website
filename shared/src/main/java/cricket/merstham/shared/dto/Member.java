@@ -39,6 +39,7 @@ public class Member implements Serializable {
     @JsonProperty private String type;
     @JsonProperty private Instant registrationDate;
     @JsonProperty private String ownerUserId;
+    @JsonProperty private String uuid;
     @JsonProperty private List<MemberAttribute> attributes = new ArrayList<>();
     @JsonProperty private List<MemberSubscription> subscription = new ArrayList<>();
     @JsonProperty private List<KeyValuePair> identifiers = new ArrayList<>();

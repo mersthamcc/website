@@ -55,10 +55,9 @@
                                             </div>
 
                                             <div class="col-auto">
-<#--                                                <a class="d-block text-body font-size-1 mb-1" href="javascript:;">-->
-<#--                                                    <i class="far fa-trash-alt text-hover-primary mr-1"></i>-->
-<#--                                                    <span class="font-size-1 text-hover-primary">Remove</span>-->
-<#--                                                </a>-->
+                                                <a class="d-block text-body font-size-1 mb-1" href="/account/pass/${member.uuid}/apple">
+                                                    <img src="${resourcePrefix}/mcc/img/pass/apple-wallet.svg" />
+                                                </a>
 
 <#--                                                <a class="d-block text-body font-size-1" href="javascript:;">-->
 <#--                                                    <i class="fas fa-shopping-cart fa-sm text-hover-primary mr-1"></i>-->

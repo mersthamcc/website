@@ -100,4 +100,10 @@ public class MembershipController {
     public Member deleteMemberToPlayerLink(@Argument int id) {
         return membershipService.deleteMemberToPlayerLink(id);
     }
+
+    @MutationMapping
+    public Member addMemberIdentifier(
+            @Argument int id, @Argument String name, @Argument String value, Principal principal) {
+        return membershipService.addMemberIdentifier(id, name, value, principal);
+    }
 }

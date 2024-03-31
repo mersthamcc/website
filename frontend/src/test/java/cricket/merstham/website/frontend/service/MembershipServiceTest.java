@@ -983,7 +983,9 @@ class MembershipServiceTest {
                                         "cash",
                                         "Adult Membership",
                                         List.of(),
-                                        List.of()))
+                                        List.of(),
+                                        UUID.randomUUID().toString(),
+                                        null))
                 .sorted(Comparator.comparing(MembersQuery.Member::getId))
                 .toList();
     }
