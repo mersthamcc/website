@@ -20,4 +20,5 @@ public class ClubConfiguration {
     private String googleAnalyticsKey;
     private String googleMapsApiKey;
     private FundraisingConfiguration fundraising;
+    private String kitStoreUrl;
 }
