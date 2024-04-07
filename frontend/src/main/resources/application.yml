@@ -100,6 +100,7 @@ club:
         cookieNames:
           - "_utma"
           - "gid"
+  kit-store-url: ${KIT_STORE_URL:}
 graph:
   graph-uri: ${GRAPH_URI:http://localhost:8090/graphql}
 
