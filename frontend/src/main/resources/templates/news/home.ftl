@@ -74,23 +74,25 @@
         <div class="row justify-content-lg-between">
             <div class="col-lg-9">
                 <#list news as n>
-                    <article class="row mb-7">
-                        <#if n.hasImages()>
-                            <#if n?is_odd_item>
-                                <@itemImages n=n />
-                                <@itemBody n=n />
+                    <#if n.published || (user?? && user.hasRole("ROLE_NEWS"))>
+                        <article class="row mb-7">
+                            <#if n.hasImages()>
+                                <#if n?is_odd_item>
+                                    <@itemImages n=n />
+                                    <@itemBody n=n />
+                                <#else>
+                                    <@itemBody n=n />
+                                    <@itemImages n=n />
+                                </#if>
                             <#else>
-                                <@itemBody n=n />
-                                <@itemImages n=n />
+                                <@itemBody n=n width=12 />
                             </#if>
-                        <#else>
-                            <@itemBody n=n width=12 />
+                        </article>
+                        <#if n?has_next>
+                            <div class="text-center mb-5">
+                                <span class="divider divider-text"><i class="fas fa-layer-group">&nbsp;</i></span>
+                            </div>
                         </#if>
-                    </article>
-                    <#if n?has_next>
-                        <div class="text-center mb-5">
-                            <span class="divider divider-text"><i class="fas fa-layer-group">&nbsp;</i></span>
-                        </div>
                     </#if>
                 </#list>
                 <!-- Sticky Block End Point -->
