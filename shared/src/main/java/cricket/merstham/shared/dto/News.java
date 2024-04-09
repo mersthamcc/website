@@ -127,4 +127,8 @@ public class News implements Serializable {
                 : getAttributes().stream()
                         .collect(Collectors.toMap(KeyValuePair::getKey, KeyValuePair::getValue));
     }
+
+    public boolean isPublished() {
+        return !draft && publishDate.isBefore(Instant.now());
+    }
 }

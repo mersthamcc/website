@@ -161,6 +161,10 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             return false;
         }
 
+        public boolean hasRole(String role) {
+            return this.roles.contains(role);
+        }
+
         public String getGravatarHash() {
             return DigestUtils.md5DigestAsHex(getEmail().toLowerCase().getBytes()).toLowerCase();
         }
