@@ -5,6 +5,7 @@
 
 <#macro dataScript>
     <script>
+        const debug = ${debug?c};
         ClassicEditor
             .create(document.querySelector('#body-editor'), {
                 toolbar: [
@@ -35,7 +36,7 @@
                 }
             })
             .then(editor => {
-                CKEditorInspector.attach(editor);
+                if (debug) CKEditorInspector.attach(editor);
             })
             .catch( error => {
                 console.error(error);

@@ -73,6 +73,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
                     model.put("accessToken", ((CognitoAuthentication) principal).getAccessToken());
                 }
             }
+            model.put("debug", debug);
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
             model.put("userMenu", menuBuilderProvider.getUserMenu());
