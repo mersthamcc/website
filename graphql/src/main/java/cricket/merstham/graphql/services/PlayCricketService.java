@@ -33,7 +33,7 @@ import static java.text.MessageFormat.format;
 public class PlayCricketService {
 
     private static final String BASE_URL = "https://www.play-cricket.com/api/v2";
-    private static final String TEAMS_ENDPOINT = "/teams.json";
+    private static final String TEAMS_ENDPOINT = "/sites/{0,number,#}/teams.json";
     private static final String MATCHES_ENDPOINT = "/matches.json";
     private static final String MATCH_DETAIL_ENDPOINT = "/match_detail.json";
     private static final String LEAGUE_ENDPOINT = "/league_table.json";
@@ -57,7 +57,7 @@ public class PlayCricketService {
     }
 
     public List<PlayCricketTeam> getTeams() {
-        var request = createGetRequest(TEAMS_ENDPOINT, Map.of(SITE_ID, Integer.toString(siteId)));
+        var request = createGetRequest(format(TEAMS_ENDPOINT, siteId), Map.of());
         var result = request.invoke(PlayCricketTeamResponse.class);
 
         return result.getTeams().stream().filter(t -> t.getSiteId() == siteId).toList();
@@ -104,7 +104,7 @@ public class PlayCricketService {
                                 "include_historic", "yes"));
         var result = request.invoke(JsonNode.class);
 
-        return StreamSupport.stream(result.get("players").spliterator(), true)
+        return StreamSupport.stream(result.get("players").spliterator(), false)
                 .collect(Collectors.toMap(n -> n.get("member_id").asInt(), n -> n));
     }
 
