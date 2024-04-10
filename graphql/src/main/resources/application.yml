@@ -2,8 +2,8 @@ server:
   port: 8090
 
 spring:
-#  mvc:
-#    log-request-details: true
+  mvc:
+    log-request-details: ${DEBUG_LOG_REQUESTS:false}
   devtools:
     livereload:
       enabled: ${DEVTOOLS_LIVE_RELOAD:false}
@@ -58,26 +58,26 @@ management:
       exposure:
         include: health,info,prometheus
 
-debug: false
+debug: ${DEBUG:false}
 
 configuration:
   database-secret: ${DATABASE_SECRET:}
-  scheduler-zone: "Europe/London"
+  scheduler-zone: "${SCHEDULER_ZONE:Europe/London}"
   region: eu-west-2
   epos-now:
-    customer-refresh-cron: "0 */10 * * * ?"
+    customer-refresh-cron: "${EPOS_CUSTOMER_REFRESH_CRON:-}"
     create-function-arn: "${EPOS_CREATE_CUSTOMER_FUNCTION_ARN:}"
-    dry-run: true
+    dry-run: false
   accounting:
-    sync-cron: "0 */5 * * * ?"
+    sync-cron: "${ACCOUNTING_SYNC_CRON:-}"
     create-sales-order-arn: "${CREATE_SALES_ORDER_ARN:}"
     create-payment-arn: "${CREATE_PAYMENT_ARN:}"
     get-payments-arn: "${GET_PAYMENTS_ARN:}"
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
-    team-refresh-cron: "${PLAY_CRICKET_TEAM_CRON:0 0 */2 * * ?}"
-    fixture-refresh-cron: "${PLAY_CRICKET_FIXTURE_CRON:0 */10 * * * ?}"
+    team-refresh-cron: "${PLAY_CRICKET_TEAM_CRON:-}"
+    fixture-refresh-cron: "${PLAY_CRICKET_FIXTURE_CRON:-}"
   webhooks:
     stripe:
       secret: ${STRIPE_WEBHOOK_SECRET:}

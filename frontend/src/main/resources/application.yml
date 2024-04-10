@@ -11,11 +11,13 @@ spring:
       region: eu-west-2
       endpoint: ${DYNAMO_ENDPOINT:}
       create-table: ${DYNAMO_SESSION_CREATE_TABLE:true}
+  mvc:
+    log-request-details: ${DEBUG_LOG_REQUESTS:false}
   devtools:
     livereload:
-      enabled: false
+      enabled: ${DEVTOOLS_LIVE_RELOAD:false}
     restart:
-      enabled: false
+      enabled: ${DEVTOOLS_RESTART:false}
   freemarker:
     template-loader-path: "classpath:/templates"
     suffix: .ftl
