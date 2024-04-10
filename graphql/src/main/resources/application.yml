@@ -23,7 +23,7 @@ spring:
 
   graphql:
     graphiql:
-      enabled: true
+      enabled: ${GRAPHIQL_ENABLED:true}
     schema:
       printer:
         enabled: true
@@ -76,8 +76,8 @@ configuration:
   play-cricket:
     api-token: ${PLAY_CRICKET_API_TOKEN:}
     site-id: ${PLAY_CRICKET_SITE_ID:}
-    team-refresh-cron: "0 0 */2 * * ?"
-    fixture-refresh-cron: "0 */10 * * * ?"
+    team-refresh-cron: "${PLAY_CRICKET_TEAM_CRON:0 0 */2 * * ?}"
+    fixture-refresh-cron: "${PLAY_CRICKET_FIXTURE_CRON:0 */10 * * * ?}"
   webhooks:
     stripe:
       secret: ${STRIPE_WEBHOOK_SECRET:}
@@ -86,9 +86,9 @@ configuration:
     gocardless:
       secret: ${GOCARDLESS_WEBHOOK_SECRET:}
       access-token: ${GOCARDLESS_ACCESS_TOKEN:}
-      sandbox: true
+      sandbox: ${GOCARDLESS_SANDBOX:true}
     paypal:
       client-id: ${PAYPAL_CLIENT_ID:}
       client-secret: ${PAYPAL_CLIENT_SECRET:}
-      sandbox: true
+      sandbox: ${PAYPAL_SANDBOX:true}
       webhook-id: ${PAYPAL_WEBHOOK_ID:}

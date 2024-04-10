@@ -51,7 +51,7 @@ spring:
           website:
             issuer-uri: ${COGNITO_ISSUER_URI:}
 
-debug: false
+debug: ${DEBUG:false}
 server:
   port: 8080
   forward-headers-strategy: framework
@@ -120,7 +120,7 @@ payments:
     disabled-reason: ~
     client-id: ${PAYPAL_CLIENT_ID:}
     client-secret: ${PAYPAL_CLIENT_SECRET:}
-    sandbox: true
+    sandbox: ${PAYPAL_SANDBOX:true}
   stripe:
     enabled: true
     disabled-reason: ~
@@ -130,7 +130,7 @@ payments:
     enabled: true
     disabled-reason: ~
     access-token: ${GOCARDLESS_ACCESS_TOKEN:}
-    sandbox: true
+    sandbox: ${GOCARDLESS_SANDBOX:true}
     mandate-description: Membership and Match Fees
     schedule-end-date: 2024-11-30
   bank:
@@ -216,7 +216,7 @@ wallet:
   foreground-colour: "${WALLET_PASS_FOREGROUND_COLOUR:}"
   wallet-logo: "${WALLET_LOGO_URL:}"
   barcode-pattern: "${WALLET_PASS_BARCODE_PATTERN:}"
-  location-prompt: "${WaLLET_PASS_LOCATION_PROMPT:}"
+  location-prompt: "${WALLET_PASS_LOCATION_PROMPT:}"
   location-longitude: "${WALLET_PASS_LOCATION_LONGITUDE:}"
   location-latitude: "${WALLET_PASS_LOCATION_LATITUDE:}"
   apple:
