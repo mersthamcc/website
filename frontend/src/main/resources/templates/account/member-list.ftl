@@ -10,6 +10,11 @@
                 <h5 class="card-title">
                     <@spring.message code="account.menu.account-members" />
                 </h5>
+                <div class="right-align">
+                    <a href="/register" class="btn btn-ghost-primary">
+                        <@spring.message code="account.menu.register-new" />
+                    </a>
+                </div>
             </div>
 
             <div class="card-body">
