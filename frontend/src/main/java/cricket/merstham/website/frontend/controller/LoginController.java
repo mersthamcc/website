@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -164,6 +165,11 @@ public class LoginController {
                 var context = SecurityContextHolder.getContext();
                 context.setAuthentication(authentication);
 
+                var savedRequest =
+                        (SavedRequest) session.getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+                if (nonNull(savedRequest) && nonNull(savedRequest.getRedirectUrl())) {
+                    return redirectTo(savedRequest.getRedirectUrl());
+                }
                 return redirectTo("/administration");
             }
             redirectAttributes.addFlashAttribute(ERROR_FLASH, List.of("Invalid request state"));

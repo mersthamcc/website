@@ -911,7 +911,8 @@
         <div class="card-header">
             <!-- Avatar -->
             <div class="avatar avatar-xl avatar-soft-dark avatar-circle avatar-border-lg avatar-centered mb-3">
-                <span class="avatar-initials"><#list contact.name?split(" ")[0..1] as n>${n?cap_first[0]}</#list></span>
+                <#assign name><#if (contact.name?word_list?size > 0)><#list contact.name?word_list as n>${n?cap_first[0]}</#list><#else>TBC</#if></#assign>
+                <span class="avatar-initials">${name[0..*3]}</span>
                 <span class="avatar-status avatar-sm-status"></span>
             </div>
             <!-- End Avatar -->
