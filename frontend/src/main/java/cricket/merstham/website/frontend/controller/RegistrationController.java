@@ -111,7 +111,11 @@ public class RegistrationController {
                     "registration/select-membership",
                     Map.of(
                             "categories",
-                            membershipService.getMembershipCategories(),
+                            membershipService.getMembershipCategories().stream()
+                                    .sorted(
+                                            Comparator.comparing(MemberCategory::getSortOrder)
+                                                    .thenComparing(MemberCategory::getKey))
+                                    .toList(),
                             "subscription",
                             subscription,
                             "subscriptionId",
@@ -131,7 +135,10 @@ public class RegistrationController {
                             Map.of(
                                     "categories",
                                     membershipService.getMembershipCategories().stream()
-                                            .sorted(Comparator.comparing(MemberCategory::getId))
+                                            .sorted(
+                                                    Comparator.comparing(
+                                                                    MemberCategory::getSortOrder)
+                                                            .thenComparing(MemberCategory::getKey))
                                             .toList(),
                                     "subscription",
                                     subscription,

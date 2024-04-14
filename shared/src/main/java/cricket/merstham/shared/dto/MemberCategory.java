@@ -1,5 +1,6 @@
 package cricket.merstham.shared.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,10 @@ import java.util.List;
 public class MemberCategory implements Serializable {
     @Serial private static final long serialVersionUID = -430962754454769790L;
 
-    private Integer id;
-    private String key;
-    private String registrationCode;
-    private List<MemberCategoryFormSection> form;
-    private List<PriceListItem> priceListItem;
+    @JsonProperty private Integer id;
+    @JsonProperty private String key;
+    @JsonProperty private String registrationCode;
+    @JsonProperty private int sortOrder;
+    @JsonProperty private List<MemberCategoryFormSection> form;
+    @JsonProperty private List<PriceListItem> priceListItem;
 }

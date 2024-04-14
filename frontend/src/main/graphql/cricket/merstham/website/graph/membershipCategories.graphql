@@ -5,6 +5,7 @@ query membershipCategories($key: StringFilter!) {
     id
     key
     registrationCode
+    sortOrder
     priceListItem {
       id
       description

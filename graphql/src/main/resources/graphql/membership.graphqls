@@ -42,6 +42,7 @@ type MemberCategory {
     id: Int
     key: String!
     registrationCode: String
+    sortOrder: Int
     form: [MemberCategoryFormSection!]!
     priceListItem: [PriceListItem!]!
 }
