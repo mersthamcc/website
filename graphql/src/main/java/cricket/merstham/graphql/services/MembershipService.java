@@ -108,7 +108,7 @@ public class MembershipService {
         var categories = memberCategoryEntityRepository.findAll();
         return categories.stream()
                 .filter(category -> isNull(where) || where.matches(category))
-                .sorted(Comparator.comparing(MemberCategoryEntity::getId))
+                .sorted(Comparator.comparing(MemberCategoryEntity::getSortOrder))
                 .map(c -> modelMapper.map(c, MemberCategory.class))
                 .toList();
     }

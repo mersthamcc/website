@@ -39,6 +39,9 @@ public class MemberCategoryEntity {
     @Column(name = "registration_code", length = 64)
     private String registrationCode;
 
+    @Column(name = "sort_order")
+    private int sortOrder;
+
     @OneToMany(
             fetch = FetchType.LAZY,
             mappedBy = "primaryKey.memberCategory",

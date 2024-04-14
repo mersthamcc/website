@@ -320,6 +320,7 @@ class MembershipServiceTest {
                                                 1,
                                                 "adult",
                                                 null,
+                                                10,
                                                 List.of(
                                                         new MembershipCategoriesQuery.PriceListItem(
                                                                 "PriceListItem",
@@ -422,6 +423,7 @@ class MembershipServiceTest {
                                                 1,
                                                 "adult",
                                                 null,
+                                                10,
                                                 List.of(
                                                         new MembershipCategoriesQuery.PriceListItem(
                                                                 "PriceListItem",
