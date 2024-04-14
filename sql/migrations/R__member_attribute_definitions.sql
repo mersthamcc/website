@@ -1,173 +1,113 @@
 INSERT
-    INTO
-        member_category(
-            "key",
-            registration_code
-        )
-    VALUES(
-        'adult',
-        NULL
-    ),
-    (
-        'junior',
-        '${junior_code}'
-    ),
-    (
-        'disability',
-        NULL
-    ),
-    (
-        'social',
-        NULL
-    ) ON
-    CONFLICT("key") DO UPDATE
-    SET
-        registration_code = EXCLUDED.registration_code;
+INTO member_category("key",
+                     registration_code,
+                     sort_order)
+VALUES ('adult',
+        NULL,
+        20),
+       ('junior',
+        '${junior_code}',
+        10),
+       ('disability',
+        NULL,
+        30),
+       ('social',
+        NULL,
+        40)
+ON CONFLICT("key") DO UPDATE
+    SET registration_code = EXCLUDED.registration_code,
+        sort_order        = EXCLUDED.sort_order;
 
 INSERT
-    INTO
-        attribute_definition(
-            KEY,
-            TYPE,
-            choices
-        )
-    VALUES(
-        'given-name',
+INTO attribute_definition(KEY,
+                          TYPE,
+                          choices)
+VALUES ('given-name',
         'String',
-        NULL
-    ),
-    (
-        'family-name',
+        NULL),
+       ('family-name',
         'String',
-        NULL
-    ),
-    (
-        'school',
+        NULL),
+       ('school',
         'String',
-        NULL
-    ),
-    (
-        'dob',
+        NULL),
+       ('dob',
         'Date',
-        NULL
-    ),
-    (
-        'parent-name-1',
+        NULL),
+       ('parent-name-1',
         'String',
-        NULL
-    ),
-    (
-        'parent-name-2',
+        NULL),
+       ('parent-name-2',
         'String',
-        NULL
-    ),
-    (
-        'parent-number-1',
+        NULL),
+       ('parent-number-1',
         'String',
-        NULL
-    ),
-    (
-        'parent-number-2',
+        NULL),
+       ('parent-number-2',
         'String',
-        NULL
-    ),
-    (
-        'parent-email-1',
+        NULL),
+       ('parent-email-1',
         'Email',
-        NULL
-    ),
-    (
-        'parent-email-2',
+        NULL),
+       ('parent-email-2',
         'Email',
-        NULL
-    ),
-    (
-        'address-1',
+        NULL),
+       ('address-1',
         'String',
-        NULL
-    ),
-    (
-        'address-2',
+        NULL),
+       ('address-2',
         'String',
-        NULL
-    ),
-    (
-        'city',
+        NULL),
+       ('city',
         'String',
-        NULL
-    ),
-    (
-        'county',
+        NULL),
+       ('county',
         'String',
-        NULL
-    ),
-    (
-        'postal-code',
+        NULL),
+       ('postal-code',
         'String',
-        NULL
-    ),
-    (
-        'email',
+        NULL),
+       ('email',
         'Email',
-        NULL
-    ),
-    (
-        'phone',
+        NULL),
+       ('phone',
         'String',
-        NULL
-    ),
-    (
-        'gender',
+        NULL),
+       ('gender',
         'Option',
         '[
           "MALE",
           "FEMALE"
-        ]'::JSONB
-    ),
-    (
-        'skills',
+        ]'::JSONB),
+       ('skills',
         'List',
         '[
           "BOWL",
           "BAT",
           "KEEPER"
-        ]'::JSONB
-    ),
-    (
-        'preferred-days',
+        ]'::JSONB),
+       ('preferred-days',
         'List',
         '[
           "SATURDAY",
           "SUNDAY"
-        ]'::JSONB
-    ),
-    (
-        'open-age-allowed',
+        ]'::JSONB),
+       ('open-age-allowed',
         'Boolean',
-        NULL
-    ),
-    (
-        'medical-conditions',
+        NULL),
+       ('medical-conditions',
         'String',
-        NULL
-    ),
-    (
-        'emergency-contact-name',
+        NULL),
+       ('emergency-contact-name',
         'String',
-        NULL
-    ),
-    (
-        'emergency-contact-relationship',
+        NULL),
+       ('emergency-contact-relationship',
         'String',
-        NULL
-    ),
-    (
-        'emergency-contact-phone',
+        NULL),
+       ('emergency-contact-phone',
         'String',
-        NULL
-    ),
-    (
-        'junior-declarations',
+        NULL),
+       ('junior-declarations',
         'List',
         '[
           "ACCEPT-DECLARATION",
@@ -175,1290 +115,614 @@ INSERT
           "OPENAGE",
           "PHOTOS-COACHING",
           "PHOTOS-MARKETING"
-        ]'::JSONB
-    ) ON
-    CONFLICT(KEY) DO UPDATE
-    SET
-        TYPE = EXCLUDED.type,
+        ]'::JSONB)
+ON CONFLICT(KEY) DO UPDATE
+    SET TYPE    = EXCLUDED.type,
         choices = EXCLUDED.choices;
 
 INSERT
-    INTO
-        member_category(KEY)
-    VALUES('adult'),
-    ('junior'),
-    ('disability'),
-    ('social') ON
-    CONFLICT DO NOTHING;
+INTO member_category(KEY)
+VALUES ('adult'),
+       ('junior'),
+       ('disability'),
+       ('social')
+ON CONFLICT DO NOTHING;
 
 INSERT
-    INTO
-        member_form_section(KEY)
-    VALUES('contact'),
-    ('parent'),
-    ('address'),
-    ('adult-cricket'),
-    ('junior-cricket'),
-    ('adult-basics'),
-    ('junior-basics'),
-    ('emergency-contact'),
-    ('medical-conditions'),
-    ('junior-policy') ON
-    CONFLICT DO NOTHING;
+INTO member_form_section(KEY)
+VALUES ('contact'),
+       ('parent'),
+       ('address'),
+       ('adult-cricket'),
+       ('junior-cricket'),
+       ('adult-basics'),
+       ('junior-basics'),
+       ('emergency-contact'),
+       ('medical-conditions'),
+       ('junior-policy')
+ON CONFLICT DO NOTHING;
 
 INSERT
-    INTO
-        member_form_section_attribute(
-            member_form_section_id,
-            attribute_definition_id,
-            sort_order,
-            mandatory
-        )
-    VALUES(
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'given-name'
-        ),
+INTO member_form_section_attribute(member_form_section_id,
+                                   attribute_definition_id,
+                                   sort_order,
+                                   mandatory)
+VALUES ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'given-name'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'family-name'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'family-name'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'dob'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'dob'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'gender'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'gender'),
         40,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'school'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'school'),
         50,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'given-name'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'given-name'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'family-name'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'family-name'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-basics'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'gender'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'gender'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'contact'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'phone'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'contact'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'phone'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'contact'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'email'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'contact'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'email'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-name-1'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-name-1'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-email-1'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-email-1'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-number-1'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-number-1'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-name-2'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-name-2'),
         40,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-email-2'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-email-2'),
         50,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'parent-number-2'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'parent-number-2'),
         60,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'address-1'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'address-1'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'address-2'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'address-2'),
         20,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'city'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'city'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'county'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'county'),
         40,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'postal-code'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'postal-code'),
         50,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-cricket'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'skills'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-cricket'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'skills'),
         10,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-cricket'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'preferred-days'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-cricket'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'preferred-days'),
         20,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-cricket'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'skills'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-cricket'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'skills'),
         10,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-cricket'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'preferred-days'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-cricket'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'preferred-days'),
         20,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'emergency-contact'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'emergency-contact-name'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'emergency-contact'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'emergency-contact-name'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'emergency-contact'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'emergency-contact-phone'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'emergency-contact'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'emergency-contact-phone'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'emergency-contact'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'emergency-contact-relationship'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'emergency-contact'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'emergency-contact-relationship'),
         30,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'medical-conditions'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'medical-conditions'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'medical-conditions'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'medical-conditions'),
         10,
-        FALSE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-policy'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                attribute_definition
-            WHERE
-                KEY = 'junior-declarations'
-        ),
+        FALSE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-policy'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'junior-declarations'),
         10,
-        FALSE
-    ) ON
-    CONFLICT(
-        member_form_section_id,
-        attribute_definition_id
+        FALSE)
+ON CONFLICT(
+    member_form_section_id,
+    attribute_definition_id
     ) DO UPDATE
-    SET
-        sort_order = EXCLUDED.sort_order,
-        mandatory = EXCLUDED.mandatory;
+    SET sort_order = EXCLUDED.sort_order,
+        mandatory  = EXCLUDED.mandatory;
 
 INSERT
-    INTO
-        member_category_form_section(
-            member_category_id,
-            member_form_section_id,
-            sort_order,
-            show_on_registration
-        )
-    VALUES(
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
+INTO member_category_form_section(member_category_id,
+                                  member_form_section_id,
+                                  sort_order,
+                                  show_on_registration)
+VALUES ((SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'medical-conditions'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'medical-conditions'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-policy'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-policy'),
         40,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-basics'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'contact'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'contact'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'emergency-contact'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'emergency-contact'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'disability'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'junior-basics'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'disability'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'junior-basics'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'disability'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'parent'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'disability'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'parent'),
         20,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'disability'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'address'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'disability'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'address'),
         30,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'social'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'adult-basics'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'social'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
         10,
-        TRUE
-    ),
-    (
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'social'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                member_form_section
-            WHERE
-                KEY = 'contact'
-        ),
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'social'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'contact'),
         20,
-        TRUE
-    ) ON
-    CONFLICT(
-        member_category_id,
-        member_form_section_id
+        TRUE)
+ON CONFLICT(
+    member_category_id,
+    member_form_section_id
     ) DO UPDATE
-    SET
-        sort_order = EXCLUDED.sort_order,
+    SET sort_order           = EXCLUDED.sort_order,
         show_on_registration = EXCLUDED.show_on_registration;
 
 DELETE
-FROM
-    member_category_form_section
-WHERE
-    member_category_id =(
-        SELECT
-            id
-        FROM
-            member_category
-        WHERE
-            KEY = 'junior'
-    )
-    AND member_form_section_id =(
-        SELECT
-            id
-        FROM
-            member_form_section
-        WHERE
-            KEY = 'junior-cricket'
-    );
+FROM member_category_form_section
+WHERE member_category_id = (SELECT id
+                            FROM member_category
+                            WHERE KEY = 'junior')
+  AND member_form_section_id = (SELECT id
+                                FROM member_form_section
+                                WHERE KEY = 'junior-cricket');
 
 DELETE
-FROM
-    member_category_form_section
-WHERE
-    member_category_id =(
-        SELECT
-            id
-        FROM
-            member_category
-        WHERE
-            KEY = 'adult'
-    )
-    AND member_form_section_id =(
-        SELECT
-            id
-        FROM
-            member_form_section
-        WHERE
-            KEY = 'adult-cricket'
-    );
+FROM member_category_form_section
+WHERE member_category_id = (SELECT id
+                            FROM member_category
+                            WHERE KEY = 'adult')
+  AND member_form_section_id = (SELECT id
+                                FROM member_form_section
+                                WHERE KEY = 'adult-cricket');
 
 DELETE
-FROM
-    member_category_form_section
-WHERE
-    member_category_id =(
-        SELECT
-            id
-        FROM
-            member_category
-        WHERE
-            KEY = 'disability'
-    )
-    AND member_form_section_id =(
-        SELECT
-            id
-        FROM
-            member_form_section
-        WHERE
-            KEY = 'junior-cricket'
-    );
+FROM member_category_form_section
+WHERE member_category_id = (SELECT id
+                            FROM member_category
+                            WHERE KEY = 'disability')
+  AND member_form_section_id = (SELECT id
+                                FROM member_form_section
+                                WHERE KEY = 'junior-cricket');
 
 INSERT
-    INTO
-        pricelist_item(
-            id,
-            category_id,
-            min_age,
-            max_age,
-            description,
-            includes_match_fees
-        )
-    VALUES(
-        1,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
+INTO pricelist_item(id,
+                    category_id,
+                    min_age,
+                    max_age,
+                    description,
+                    includes_match_fees)
+VALUES (1,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
         5,
         7,
         'Juniors (under 7)',
-        NULL
-    ),
-    (
-        2,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'junior'
-        ),
+        NULL),
+       (2,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
         8,
         15,
         'Juniors (U8 - U15)',
-        NULL
-    ),
-    (
-        3,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        NULL),
+       (3,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         16,
         NULL,
-        'Students (U16 and older)',
-        FALSE
-    ),
-    (
-        4,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        'Students (aged 16 and older)',
+        FALSE),
+       (4,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         16,
         NULL,
         'Students (all inclusive)',
-        FALSE
-    ),
-    (
-        5,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        FALSE),
+       (5,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         16,
         NULL,
         'Adults',
-        FALSE
-    ),
-    (
-        6,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        FALSE),
+       (6,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         16,
         NULL,
         'Adults (all inclusive)',
-        TRUE
-    ),
-    (
-        7,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        TRUE),
+       (7,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         15,
         NULL,
-        'Ladies (15 years and older)',
-        NULL
-    ),
-    (
-        8,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'disability'
-        ),
+        'Ladies (aged 15 years and older)',
+        NULL),
+       (8,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'disability'),
         5,
         NULL,
         'Magics Memberships',
-        NULL
-    ),
-    (
-        9,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'social'
-        ),
+        NULL),
+       (9,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'social'),
         16,
         NULL,
         'Social',
-        NULL
-    ),
-    (
-        10,
-        (
-            SELECT
-                id
-            FROM
-                member_category
-            WHERE
-                KEY = 'adult'
-        ),
+        NULL),
+       (10,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'adult'),
         18,
         NULL,
         'Walking Cricket',
-        NULL
-    ) ON
-    CONFLICT(id) DO UPDATE
-    SET
-        category_id = EXCLUDED.category_id,
-        min_age = EXCLUDED.min_age,
-        max_age = EXCLUDED.max_age,
-        description = EXCLUDED.description,
+        NULL)
+ON CONFLICT(id) DO UPDATE
+    SET category_id         = EXCLUDED.category_id,
+        min_age             = EXCLUDED.min_age,
+        max_age             = EXCLUDED.max_age,
+        description         = EXCLUDED.description,
         includes_match_fees = EXCLUDED.includes_match_fees;
 
 INSERT
-    INTO
-        pricelist(
-            pricelist_item_id,
-            date_from,
-            date_to,
-            price
-        )
-    VALUES(
-        1,
+INTO pricelist(pricelist_item_id,
+               date_from,
+               date_to,
+               price)
+VALUES (1,
         '2021-01-01',
         '2021-12-31',
-        40.00
-    ),
-    (
-        2,
+        40.00),
+       (2,
         '2021-01-01',
         '2021-12-31',
-        70.00
-    ),
-    (
-        3,
+        70.00),
+       (3,
         '2021-01-01',
         '2021-05-31',
-        50.00
-    ),
-    (
-        3,
+        50.00),
+       (3,
         '2021-06-01',
         '2021-12-31',
-        60.00
-    ),
-    (
-        4,
+        60.00),
+       (4,
         '2021-01-01',
         '2021-05-31',
-        155.00
-    ),
-    (
-        5,
+        155.00),
+       (5,
         '2021-01-01',
         '2021-05-31',
-        90.00
-    ),
-    (
-        5,
+        90.00),
+       (5,
         '2021-06-01',
         '2021-12-31',
-        110.00
-    ),
-    (
-        6,
+        110.00),
+       (6,
         '2021-01-01',
         '2021-05-31',
-        300.00
-    ),
-    (
-        7,
+        300.00),
+       (7,
         '2021-01-01',
         '2021-12-31',
-        40.00
-    ),
-    (
-        8,
+        40.00),
+       (8,
         '2021-01-01',
         '2021-12-31',
-        40.00
-    ),
-    (
-        9,
+        40.00),
+       (9,
         '2021-01-01',
         '2021-12-31',
-        25.00
-    ),
-    (
-        1,
+        25.00),
+       (1,
         '2024-01-01',
         '2024-12-31',
-        75.00
-    ),
-    (
-        2,
+        75.00),
+       (2,
         '2024-01-01',
         '2024-12-31',
-        100.00
-    ),
-    (
-        3,
+        100.00),
+       (3,
         '2024-01-01',
         '2024-03-31',
-        90.00
-    ),
-    (
-        3,
+        90.00),
+       (3,
         '2024-04-01',
         '2024-12-31',
-        100.00
-    ),
-    (
-        4,
+        100.00),
+       (4,
         '2024-01-01',
         '2024-03-31',
-        250.00
-    ),
-    (
-        5,
+        250.00),
+       (5,
         '2024-01-01',
         '2024-03-31',
-        130.00
-    ),
-    (
-        5,
+        130.00),
+       (5,
         '2024-04-01',
         '2024-12-31',
-        150.00
-    ),
-    (
-        6,
+        150.00),
+       (6,
         '2024-01-01',
         '2024-03-31',
-        450.00
-    ),
-    (
-        7,
+        450.00),
+       (7,
         '2024-01-01',
         '2024-12-31',
-        75.00
-    ),
-    (
-        8,
+        75.00),
+       (8,
         '2024-01-01',
         '2024-12-31',
-        75.00
-    ),
-    (
-        9,
+        75.00),
+       (9,
         '2024-01-01',
         '2024-12-31',
-        40.00
-    ),
-    (
-        10,
+        40.00),
+       (10,
         '2024-01-01',
         '2024-12-31',
-        50.00
-    ) ON
-    CONFLICT(
-        pricelist_item_id,
-        date_from,
-        date_to
+        50.00)
+ON CONFLICT(
+    pricelist_item_id,
+    date_from,
+    date_to
     ) DO UPDATE
-    SET
-        price = EXCLUDED.price;
+    SET price = EXCLUDED.price;
