@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -208,11 +209,14 @@ public class MembershipService {
     }
 
     @PreAuthorize("isAuthenticated()")
-    public Order createOrder(String uuid, Principal principal) {
+    public Order createOrder(
+            String uuid, BigDecimal total, BigDecimal discount, Principal principal) {
         var order =
                 OrderEntity.builder()
                         .ownerUserId(getSubject(principal))
                         .uuid(uuid)
+                        .total(total)
+                        .discount(discount)
                         .createDate(LocalDate.now())
                         .build();
         order = orderEntityRepository.saveAndFlush(order);

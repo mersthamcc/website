@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -42,6 +43,12 @@ public class OrderEntity {
 
     @Column(name = "accounting_error")
     private String accountingError;
+
+    @Column(name = "total")
+    private BigDecimal total;
+
+    @Column(name = "discount")
+    private BigDecimal discount;
 
     @OneToMany(mappedBy = "order")
     @OrderBy("date")

@@ -103,6 +103,8 @@ type Order {
     accountingId: String
     uuid: String
     createDate: Date
+    total: Float
+    discount: Float
     memberSubscription: [MemberSubscription!]!
     payment: [Payment!]!
 }
@@ -189,7 +191,7 @@ extend type Query {
 extend type Mutation {
     createMember(data: MemberInput!): Member
     updateMember(id: Int!, data: [AttributeInput]!): Member
-    createOrder(uuid: String!): Order
+    createOrder(uuid: String!, total: Float!, discount: Float!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
     deleteMemberToPlayerLink(id: Int!): Member
