@@ -15,9 +15,12 @@ mutation addPaymentToOrder(
         reconciled
         order {
             id
+            uuid
+            ownerUserId
             accountingId
             createDate
-            uuid
+            total
+            discount
         }
     }
 }

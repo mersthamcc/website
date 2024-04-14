@@ -29,7 +29,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -317,7 +316,6 @@ public class AccountingService {
         root.put(DATE, order.getCreateDate().format(DateTimeFormatter.ISO_DATE));
         root.put(OWNER, order.getOwnerUserId());
         var lines = objectMapper.createArrayNode();
-        AtomicReference<BigDecimal> runningTotal = new AtomicReference<>(BigDecimal.ZERO);
         order.getMemberSubscription()
                 .forEach(
                         sub -> {

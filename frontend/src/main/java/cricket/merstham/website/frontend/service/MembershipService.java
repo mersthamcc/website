@@ -68,7 +68,13 @@ public class MembershipService {
 
     public Order registerMembersFromBasket(
             RegistrationBasket basket, OAuth2AccessToken accessToken, Locale locale) {
-        var createOrder = new CreateOrderMutation(basket.getId());
+        var createOrder =
+                new CreateOrderMutation(
+                        basket.getId(),
+                        basket.getBasketTotal().doubleValue(),
+                        basket.getDiscounts().values().stream()
+                                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .doubleValue());
         var order = new Order();
         try {
             Response<CreateOrderMutation.Data> orderResult =
@@ -82,9 +88,7 @@ public class MembershipService {
                                                 .map(error -> error.getMessage())
                                                 .toList()));
             }
-            order.setId(orderResult.getData().getCreateOrder().getId())
-                    .setUuid(orderResult.getData().getCreateOrder().getUuid())
-                    .setTotal(basket.getBasketTotal());
+            order = modelMapper.map(orderResult.getData().getCreateOrder(), Order.class);
         } catch (IOException e) {
             LOG.error("Error creating order", e);
             throw new RuntimeException("Error creating order", e);

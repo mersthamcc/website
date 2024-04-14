@@ -22,8 +22,12 @@ query member($id: Int!) {
             price
             order {
                 id
+                uuid
+                ownerUserId
                 accountingId
                 createDate
+                total
+                discount
                 payment {
                     id
                     accountingId
@@ -35,7 +39,6 @@ query member($id: Int!) {
                     reference
                     type
                 }
-                uuid
             }
             priceListItem {
                 id

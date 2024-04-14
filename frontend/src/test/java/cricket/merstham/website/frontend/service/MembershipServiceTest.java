@@ -137,9 +137,13 @@ class MembershipServiceTest {
                                         "Order",
                                         orderId,
                                         subsId.toString(),
-                                        LocalDate.now(),
                                         USER_ID,
-                                        "")),
+                                        "",
+                                        LocalDate.now(),
+                                        member.getSubscription().stream()
+                                                .mapToDouble(s -> s.getPrice().doubleValue())
+                                                .sum(),
+                                        0.00)),
                 mutation ->
                         new CreateMemberMutation.Data(
                                 new CreateMemberMutation.CreateMember(
@@ -238,7 +242,13 @@ class MembershipServiceTest {
     @Test
     void shouldCorrectlyCreatePayment() throws IOException {
         var accessToken = createAccessToken();
-        var order = Order.builder().id(1).ownerUserId(USER_ID).createDate(LocalDate.now()).build();
+        var order =
+                Order.builder()
+                        .id(1)
+                        .uuid(UUID.randomUUID().toString())
+                        .ownerUserId(USER_ID)
+                        .createDate(LocalDate.now())
+                        .build();
         var paymentReference = UUID.randomUUID().toString();
         var mutationCaptor = ArgumentCaptor.forClass(AddPaymentToOrderMutation.class);
 
@@ -262,9 +272,12 @@ class MembershipServiceTest {
                                     new AddPaymentToOrderMutation.Order(
                                             "Order",
                                             order.getId(),
+                                            order.getUuid(),
+                                            USER_ID,
                                             order.getAccountingId(),
                                             order.getCreateDate(),
-                                            order.getUuid())));
+                                            10.0,
+                                            0.00)));
                 });
 
         var paymentDate = LocalDateTime.now();
@@ -603,7 +616,11 @@ class MembershipServiceTest {
                                                                         i,
                                                                         UUID.randomUUID()
                                                                                 .toString(),
+                                                                        USER_ID,
+                                                                        "",
                                                                         LocalDate.now(),
+                                                                        10.00,
+                                                                        0.00,
                                                                         List.of(
                                                                                 new MemberQuery
                                                                                         .Payment(
@@ -622,9 +639,7 @@ class MembershipServiceTest {
                                                                                         false,
                                                                                         UUID.randomUUID()
                                                                                                 .toString(),
-                                                                                        "card")),
-                                                                        UUID.randomUUID()
-                                                                                .toString()),
+                                                                                        "card"))),
                                                                 new MemberQuery.PriceListItem(
                                                                         "Subscription",
                                                                         1,
