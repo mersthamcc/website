@@ -29,7 +29,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -317,7 +316,6 @@ public class AccountingService {
         root.put(DATE, order.getCreateDate().format(DateTimeFormatter.ISO_DATE));
         root.put(OWNER, order.getOwnerUserId());
         var lines = objectMapper.createArrayNode();
-        AtomicReference<BigDecimal> runningTotal = new AtomicReference<>(BigDecimal.ZERO);
         order.getMemberSubscription()
                 .forEach(
                         sub -> {
@@ -331,24 +329,15 @@ public class AccountingService {
                             line.put(CATEGORY, sub.getPriceListItem().getMemberCategory().getKey());
                             line.put(PRICE, sub.getPrice());
                             line.put(YEAR, sub.getYear());
-                            runningTotal.set(runningTotal.get().add(sub.getPrice()));
 
                             lines.add(line);
                         });
+        if (order.getDiscount().compareTo(BigDecimal.ZERO) != 0) {
+            root.put(DISCOUNT, order.getDiscount().negate());
+        }
         root.putArray(LINES).addAll(lines);
 
-        if (!order.getPayment().isEmpty()) {
-            AtomicReference<BigDecimal> totalPayments = new AtomicReference<>(BigDecimal.ZERO);
-            order.getPayment()
-                    .forEach(
-                            payment -> {
-                                totalPayments.set(totalPayments.get().add(payment.getAmount()));
-                            });
-            if (!totalPayments.equals(runningTotal)) {
-                root.put(DISCOUNT, totalPayments.get().subtract(runningTotal.get()));
-            }
-        }
-        root.put(TOTAL, runningTotal.get());
+        root.put(TOTAL, order.getTotal());
         return root;
     }
 }

@@ -3,7 +3,10 @@ query order ($id: Int!){
         id
         uuid
         ownerUserId
+        accountingId
         createDate
+        total
+        discount
         payment {
             id
             date

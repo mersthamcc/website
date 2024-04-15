@@ -16,6 +16,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -75,8 +76,12 @@ public class MembershipController {
     }
 
     @MutationMapping
-    public Order createOrder(@Argument String uuid, Principal principal) {
-        return membershipService.createOrder(uuid, principal);
+    public Order createOrder(
+            @Argument String uuid,
+            @Argument BigDecimal total,
+            @Argument BigDecimal discount,
+            Principal principal) {
+        return membershipService.createOrder(uuid, total, discount, principal);
     }
 
     @MutationMapping

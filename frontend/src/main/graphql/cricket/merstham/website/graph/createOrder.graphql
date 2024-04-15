@@ -1,9 +1,11 @@
-mutation createOrder ($uuid: String!) {
-    createOrder(uuid: $uuid) {
+mutation createOrder ($uuid: String!, $total: Float!, $discount: Float!) {
+    createOrder(uuid: $uuid, total: $total, discount: $discount) {
         id
         uuid
-        createDate
         ownerUserId
         accountingId
+        createDate
+        total
+        discount
     }
 }

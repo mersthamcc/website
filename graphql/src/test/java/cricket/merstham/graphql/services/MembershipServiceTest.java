@@ -577,6 +577,8 @@ class MembershipServiceTest {
         var orderUuid = UUID.randomUUID().toString();
         var userId = UUID.randomUUID().toString();
         var principal = mock(JwtAuthenticationToken.class);
+        var total = BigDecimal.TEN;
+        var discount = BigDecimal.ONE;
         when(principal.getName()).thenReturn(userId);
 
         when(orderEntityRepository.saveAndFlush(any(OrderEntity.class)))
@@ -591,14 +593,18 @@ class MembershipServiceTest {
                                         .ownerUserId(
                                                 ((OrderEntity) invocation.getArgument(0))
                                                         .getOwnerUserId())
+                                        .total(total)
+                                        .discount(discount)
                                         .build());
 
-        var result = service.createOrder(orderUuid, principal);
+        var result = service.createOrder(orderUuid, total, discount, principal);
 
         assertThat(result.getId(), equalTo(ORDERS.size()));
         assertThat(result.getUuid(), equalTo(orderUuid));
         assertThat(result.getCreateDate(), equalTo(LocalDate.now()));
         assertThat(result.getOwnerUserId(), equalTo(userId));
+        assertThat(result.getTotal(), equalTo(total));
+        assertThat(result.getDiscount(), equalTo(discount));
     }
 
     @Test

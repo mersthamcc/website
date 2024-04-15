@@ -22,8 +22,12 @@ mutation addMemberIdentifier($id: Int!, $name: String!, $value: String!  ) {
             price
             order {
                 id
+                uuid
+                ownerUserId
                 accountingId
                 createDate
+                total
+                discount
                 payment {
                     id
                     accountingId

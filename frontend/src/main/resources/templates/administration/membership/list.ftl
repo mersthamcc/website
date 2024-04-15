@@ -4,7 +4,7 @@
 <#macro dataScript>
     <script>
         function playCricketLink(row, type, set, meta) {
-            if (row.data.identifiers.includes("PLAYER_ID")) {
+            if (row.data.identifiers && row.data.identifiers.includes("PLAYER_ID")) {
                 return `<div class="avatar mr-3">
                             <img class="avatar-img" src="${resourcePrefix}/mcc/img/play-cricket-small.png" alt="Linked to PlayCricket">
                         </div>`;
