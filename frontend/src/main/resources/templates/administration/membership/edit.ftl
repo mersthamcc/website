@@ -31,6 +31,17 @@
             </#list>
 
             <@admin.adminTableCard
+                id="subscriptionHistoryTable"
+                selectable=false
+                searchable=false
+                defaultPageLength=10
+                pageLengths=[10,25,50]
+                title="membership.history"
+                columns=subscriptionHistoryColumns
+                data=subscriptionHistory
+            />
+
+            <@admin.adminTableCard
                 id="paymentsTable"
                 selectable=false
                 searchable=false
@@ -39,17 +50,7 @@
                 title="membership.payments"
                 columns=paymentsColumns
                 data=payments
-            />
-
-            <@admin.adminTableCard
-                    id="subscriptionHistoryTable"
-                    selectable=false
-                    searchable=false
-                    defaultPageLength=10
-                    pageLengths=[10,25,50]
-                    title="membership.history"
-                    columns=subscriptionHistoryColumns
-                    data=subscriptionHistory
+                rightHeader=orderLabel
             />
 
             <@components.buttonGroup>
@@ -237,5 +238,13 @@
                 <@spring.messageText code="membership.play-cricket.first-game" text="Year of first game" />
             </span>
         </div>
+    </div>
+</#macro>
+
+<#macro orderLabel>
+    <div class="h2">
+        <span class="badge badge-pill badge-soft-primary">
+            ${subscription.order.webReference}
+        </span>
     </div>
 </#macro>

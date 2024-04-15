@@ -344,7 +344,10 @@ public class MembershipController extends SspController<MemberSummary> {
                                                 new DataTableValue()
                                                         .setValue(
                                                                 NumberFormat.getCurrencyInstance()
-                                                                        .format(s.getPrice()))))
+                                                                        .format(s.getPrice())),
+                                                "membership.order",
+                                                new DataTableValue()
+                                                        .setValue(s.getOrder().getWebReference())))
                         .toList());
         model.put(
                 "subscriptionHistoryColumns",
@@ -352,7 +355,8 @@ public class MembershipController extends SspController<MemberSummary> {
                         new DataTableColumn().setKey("membership.year"),
                         new DataTableColumn().setKey("membership.description"),
                         new DataTableColumn().setKey("membership.category"),
-                        new DataTableColumn().setKey("membership.price")));
+                        new DataTableColumn().setKey("membership.price"),
+                        new DataTableColumn().setKey("membership.order")));
         model.put(
                 "payments",
                 member.getSubscription().get(0).getOrder().getPayment().stream()
