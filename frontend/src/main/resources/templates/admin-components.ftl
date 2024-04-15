@@ -336,13 +336,19 @@
     </div>
 </#macro>
 
-<#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100]>
+<#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100] rightHeader="">
     <div class="card ${cardClass}">
         <!-- Header -->
         <div class="card-header">
             <h5 class="card-header-title">
                 <@spring.messageText code=title text=title />
             </h5>
+
+            <#if rightHeader?is_directive>
+                <@rightHeader />
+            <#else>
+                ${rightHeader}
+            </#if>
 
             <#if selectable>
                 <!-- Datatable Info -->
