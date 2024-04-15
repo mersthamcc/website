@@ -98,4 +98,8 @@ jacocoTestReport {
     }
 }
 
+processResources{
+    exclude 'static/'
+}
+
 test.finalizedBy jacocoTestReport

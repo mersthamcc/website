@@ -101,7 +101,17 @@ public class MembershipController extends SspController<MemberSummary> {
                                         .setFieldName("gender"),
                                 new DataTableColumn()
                                         .setKey("membership.last-subscription")
-                                        .setFieldName("mostRecentSubscription"))));
+                                        .setFieldName("mostRecentSubscription"),
+                                new DataTableColumn()
+                                        .setKey("membership.status")
+                                        .setFunction(true)
+                                        .setFunctionName("unpaid")
+                                        .setSortable(false),
+                                new DataTableColumn()
+                                        .setKey("membership.tags")
+                                        .setFunction(true)
+                                        .setFunctionName("tags")
+                                        .setSortable(false))));
     }
 
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
