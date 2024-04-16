@@ -175,15 +175,17 @@ public class CognitoService {
                                         new SealedString(password, result.session(), salt)))
                         .build();
             }
+        } catch (UserNotFoundException | NotAuthorizedException ex) {
+            throw new BadCredentialsException("Invalid Credentials");
         } catch (PasswordResetRequiredException ex) {
             LOG.warn("Password reset required for user {}, requesting code.", username);
             return resetPasswordRequest(username);
         } catch (UserNotConfirmedException ex) {
             throw new CognitoUserNotVerifiedException("User not confirmed", ex);
-        } catch (CognitoIdentityProviderException ex) {
-            LOG.error("Cognito Error", ex);
+        } catch (Exception ex) {
+            LOG.error("Unknown Cognito Error", ex);
+            throw new BadCredentialsException("Unexpected exception calling Cognito");
         }
-        throw new BadCredentialsException("Invalid Credentials");
     }
 
     public CognitoAuthentication refresh(CognitoAuthentication authentication) {
