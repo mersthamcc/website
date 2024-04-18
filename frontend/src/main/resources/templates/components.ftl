@@ -215,7 +215,12 @@
                             <li class="nav-item">
                                 <a class="nav-link ${classes}" href="${subItem.destinationUrl}" title="${subTitle}">
                                     <span class="tio-circle nav-indicator-icon"></span>
-                                    <span class="text-truncate">${subTitle}</span>
+                                    <span class="text-truncate">
+                                        <@spring.messageText
+                                            code="menu.${subTitle}"
+                                            text=subTitle
+                                        />
+                                    </span>
                                 </a>
                             </li>
                         </#list>
