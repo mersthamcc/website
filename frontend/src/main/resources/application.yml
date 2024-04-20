@@ -221,10 +221,15 @@ wallet:
   location-prompt: "${WALLET_PASS_LOCATION_PROMPT:}"
   location-longitude: "${WALLET_PASS_LOCATION_LONGITUDE:}"
   location-latitude: "${WALLET_PASS_LOCATION_LATITUDE:}"
+  pass-description: "Membership card"
   apple:
     pass-identifier: "${APPLE_PASS_IDENTIFIER:}"
-    pass-description: "Membership card"
     team-id: "${APPLE_DEVELOPER_TEAM_ID:}"
     signing-certificate: "${APPLE_WALLET_SIGNING_CERTIFICATE:}"
     signing-key: "${APPLE_WALLET_SIGNING_KEY:}"
     apple-intermediary-ca-cert: "${APPLE_CA_CERTIFICATE:}"
+  google:
+    credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
+    application-name: ${GOOGLE_APPLICATION_NAME:}
+    issuer: ${GOOGLE_ISSUER_ID:}
+    class-name: ${GOOGLE_CLASS_NAME:}

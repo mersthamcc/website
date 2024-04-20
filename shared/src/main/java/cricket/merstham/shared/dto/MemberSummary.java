@@ -38,6 +38,7 @@ public class MemberSummary implements Serializable {
     @JsonProperty private String description;
     @JsonProperty private String uuid;
     @JsonProperty private String applePassSerial;
+    @JsonProperty private String googlePassSerial;
     @JsonProperty private List<String> declarations;
     @JsonProperty private List<String> identifiers;
 

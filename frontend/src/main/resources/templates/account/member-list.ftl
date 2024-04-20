@@ -60,14 +60,13 @@
                                             </div>
 
                                             <div class="col-auto">
-                                                <a class="d-block text-body font-size-1 mb-1" href="/account/pass/${member.uuid}/apple">
-                                                    <img src="${resourcePrefix}/mcc/img/pass/apple-wallet.svg" />
+                                                <a class="d-block text-body font-size-1 mb-3" href="/account/pass/${member.uuid}/apple">
+                                                    <img src="${resourcePrefix}/mcc/img/pass/apple-wallet.svg" width="130" />
                                                 </a>
 
-<#--                                                <a class="d-block text-body font-size-1" href="javascript:;">-->
-<#--                                                    <i class="fas fa-shopping-cart fa-sm text-hover-primary mr-1"></i>-->
-<#--                                                    <span class="font-size-1 text-hover-primary">Move to cart</span>-->
-<#--                                                </a>-->
+                                                <a class="d-block text-body font-size-1 mb-3" href="/account/pass/${member.uuid}/google">
+                                                    <img src="${resourcePrefix}/mcc/img/pass/google-add-wallet-badge.svg" width="130" />
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

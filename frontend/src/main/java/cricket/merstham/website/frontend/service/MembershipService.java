@@ -50,6 +50,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
+import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static java.util.Objects.isNull;
@@ -386,6 +387,17 @@ public class MembershipService {
         try {
             graphService.executeMutation(
                     new AddMemberIdentifierMutation(id, APPLE_PASS_SERIAL, serialNumber),
+                    accessToken);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void addGooglePassSerial(
+            Integer id, String serialNumber, OAuth2AccessToken accessToken) {
+        try {
+            graphService.executeMutation(
+                    new AddMemberIdentifierMutation(id, GOOGLE_PASS_SERIAL, serialNumber),
                     accessToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
