@@ -65,7 +65,8 @@ SELECT m.id,
        declarations.value::JSONB      AS declarations,
        identifiers.list               AS identifiers,
        m.uuid,
-       apple_pass_serial_number.value AS apple_pass_serial_number
+       apple_pass_serial_number.value AS apple_pass_serial_number,
+       google_pass_serial_number.value AS google_pass_serial_number
 FROM "member" m
          INNER JOIN(SELECT member_id,
                            MAX(YEAR) AS YEAR
@@ -128,6 +129,10 @@ FROM "member" m
          LEFT OUTER JOIN member_identifier apple_pass_serial_number ON apple_pass_serial_number.member_id = m.id AND
                                                                        apple_pass_serial_number.name =
                                                                        'APPLE_PASS_SERIAL'
+         LEFT OUTER JOIN member_identifier google_pass_serial_number ON google_pass_serial_number.member_id = m.id AND
+                                                                        google_pass_serial_number.name =
+                                                                       'GOOGLE_PASS_SERIAL'
+
 WHERE m.cancelled IS NULL
 ORDER BY familyname,
          givenname
