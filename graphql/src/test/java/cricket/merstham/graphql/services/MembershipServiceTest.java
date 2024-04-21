@@ -35,8 +35,10 @@ import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.types.AttributeType;
+import cricket.merstham.shared.types.ReportFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.math.BigDecimal;
@@ -389,7 +391,7 @@ class MembershipServiceTest {
                                                                 m.getId(),
                                                                 invocation.getArgument(0)))
                                         .findFirst());
-        when(memberSummaryRepository.findAll())
+        when(memberSummaryRepository.findAll(any(Specification.class)))
                 .thenReturn(
                         MEMBERS.stream()
                                 .map(
@@ -404,7 +406,7 @@ class MembershipServiceTest {
                                                                         "firstname"))
                                                         .build())
                                 .toList());
-        var year = LocalDate.now().getYear();
+
         when(orderEntityRepository.findByCreateDateBetween(
                         any(LocalDate.class), any(LocalDate.class)))
                 .then(
@@ -470,6 +472,8 @@ class MembershipServiceTest {
         var principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test-user");
         when(memberFilterEntityRepository.findById(any())).thenReturn(Optional.empty());
+        when(memberSummaryRepository.getBaseSpecification(ReportFilter.ALL))
+                .thenReturn(mock(Specification.class));
         var result = service.getMembers(principal);
 
         assertThat(result.size(), equalTo(MEMBERS.size()));

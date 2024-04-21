@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.MemberSummary;
+import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
@@ -10,7 +11,6 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,34 +31,30 @@ import static java.lang.Math.min;
 import static java.util.Objects.nonNull;
 
 @Controller("AdminMembershipReportController")
-public class MembershipReportsController extends SspController<MemberSummary> {
+public class MembershipReportsController {
 
     private static final Logger LOG = LogManager.getLogger(MembershipReportsController.class);
-    private final MessageSource messageSource;
 
-    private final MembershipService membershipService;
+    private final MembershipService service;
 
     @Autowired
-    public MembershipReportsController(
-            MessageSource messageSource,
-            MembershipService membershipService) {
-        this.messageSource = messageSource;
-        this.membershipService = membershipService;
+    public MembershipReportsController(MembershipService membershipService) {
+        this.service = membershipService;
     }
 
-    @GetMapping(value = "/administration/membership-report/{report}", name = "admin-membership-report")
+    @GetMapping(
+            value = "/administration/membership-report/{report}",
+            name = "admin-membership-report")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public ModelAndView reports(@PathVariable String report, CognitoAuthentication cognitoAuthentication) {
+    public ModelAndView reports(
+            @PathVariable String report, CognitoAuthentication cognitoAuthentication) {
         return new ModelAndView(
                 "administration/membership-report/report",
                 Map.of(
+                        "report",
+                        report,
                         "memberColumns",
                         List.of(
-                                new DataTableColumn()
-                                        .setKey("membership.play-cricket.table-icon")
-                                        .setFunction(true)
-                                        .setSortable(false)
-                                        .setFunctionName("playCricketLink"),
                                 new DataTableColumn()
                                         .setKey("membership.family-name")
                                         .setFieldName("familyName"),
@@ -92,14 +88,17 @@ public class MembershipReportsController extends SspController<MemberSummary> {
     @PostMapping(
             consumes = "application/json",
             produces = "application/json",
-            path = "/administration/membership-report/get-data")
+            path = "/administration/membership-report/{report}/get-data")
     public @ResponseBody SspResponse<SspResponseDataWrapper<MemberSummary>> getData(
-            CognitoAuthentication cognitoAuthentication, @RequestBody SspRequest request) {
+            @PathVariable String report,
+            CognitoAuthentication cognitoAuthentication,
+            @RequestBody SspRequest request) {
         Comparator<MemberSummary> comparator = createComparator(request);
         String search = request.getSearch().getValue().toLowerCase();
         List<MemberSummary> members =
-                membershipService
-                        .getMemberSummary(cognitoAuthentication.getOAuth2AccessToken())
+                service
+                        .getFilteredMemberSummary(
+                                reportFilter(report), cognitoAuthentication.getOAuth2AccessToken())
                         .stream()
                         .filter(m -> matchesCriteria(m, search))
                         .sorted(comparator)
@@ -132,6 +131,14 @@ public class MembershipReportsController extends SspController<MemberSummary> {
                 .recordsTotal(members.size())
                 .recordsFiltered(members.size())
                 .build();
+    }
+
+    private ReportFilter reportFilter(String report) {
+        return switch (report) {
+            case "unpaid-members-report" -> ReportFilter.UNPAID;
+            case "openage-junior-report" -> ReportFilter.OPENAGE;
+            default -> throw new IllegalStateException("Unexpected value: " + report);
+        };
     }
 
     private boolean matchesCriteria(MemberSummary member, String search) {

@@ -50,6 +50,9 @@ public class MemberSummaryEntity {
     @Column(name = "dob")
     private LocalDate dob;
 
+    @Column(name = "age")
+    private Integer age;
+
     @Column(name = "agegroup", length = Integer.MAX_VALUE)
     private String ageGroup;
 

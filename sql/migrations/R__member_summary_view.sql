@@ -12,6 +12,28 @@ SELECT m.id,
            )::DATE                    AS dob,
        CASE
            WHEN dob.value IS NULL THEN NULL
+           ELSE EXTRACT(
+                   YEAR
+                   FROM
+                   AGE(
+                           format(
+                                   '%s-%s-%s',
+                                   EXTRACT(
+                                           YEAR
+                                           FROM
+                                           CURRENT_DATE
+                                   ),
+                                   08,
+                                   31
+                           )::DATE,
+                           (
+                               dob.value::JSONB ->> 0
+                               )::DATE
+                   )
+                )
+           END                        AS age,
+       CASE
+           WHEN dob.value IS NULL THEN NULL
            ELSE 'U' || EXTRACT(
                    YEAR
                    FROM

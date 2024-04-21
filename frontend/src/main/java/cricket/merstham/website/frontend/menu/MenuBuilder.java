@@ -210,8 +210,14 @@ public class MenuBuilder {
                                                     buildParams("report", "unpaid-members-report"),
                                                     null,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "openage-junior-report"),
+                                                    null,
+                                                    List.of(),
                                                     null)),
-                            " tio-report-outlined"));
+                            "tio-chart-bar-4"));
 
     private final List<Menu> adminSystemMenu =
             List.of(

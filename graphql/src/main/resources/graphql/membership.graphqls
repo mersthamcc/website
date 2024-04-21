@@ -181,6 +181,7 @@ extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
     members: [MemberSummary]
+    filteredMembers(filter: String!): [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myMembers: [MemberSummary]
     myOrders: [Order]

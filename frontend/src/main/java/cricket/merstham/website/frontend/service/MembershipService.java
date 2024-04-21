@@ -8,12 +8,14 @@ import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.types.AttributeType;
+import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
 import cricket.merstham.website.graph.CreateMemberMutation;
 import cricket.merstham.website.graph.CreateOrderMutation;
+import cricket.merstham.website.graph.FilteredMembersQuery;
 import cricket.merstham.website.graph.MemberQuery;
 import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
@@ -215,6 +217,20 @@ public class MembershipService {
     @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
     public List<MemberSummary> getMemberSummary(OAuth2AccessToken accessToken) {
         return getAllMembers(accessToken);
+    }
+
+    public List<MemberSummary> getFilteredMemberSummary(
+            ReportFilter filter, OAuth2AccessToken accessToken) {
+        var query = new FilteredMembersQuery(filter.asText());
+        try {
+            Response<FilteredMembersQuery.Data> result =
+                    graphService.executeQuery(query, accessToken);
+            return result.getData().getFilteredMembers().stream()
+                    .map(m -> modelMapper.map(m, MemberSummary.class))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Optional<Member> get(int id, OAuth2AccessToken accessToken) {

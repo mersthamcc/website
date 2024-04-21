@@ -39,7 +39,7 @@
                 id="memberTable"
                 selectable=true
                 columns=memberColumns
-                ajaxSrc="get-data"
+                ajaxSrc=report + "/get-data"
             />
         };
     </script>

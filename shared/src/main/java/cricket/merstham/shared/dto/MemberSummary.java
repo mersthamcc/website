@@ -26,6 +26,7 @@ public class MemberSummary implements Serializable {
     @JsonProperty private String givenName;
     @JsonProperty private Instant firstRegistrationDate;
     @JsonProperty private LocalDate dob;
+    @JsonProperty private Integer age;
     @JsonProperty private String ageGroup;
     @JsonProperty private String gender;
     @JsonProperty private Integer mostRecentSubscription;
