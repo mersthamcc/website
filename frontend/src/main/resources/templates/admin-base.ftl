@@ -151,10 +151,16 @@
 										<#if pageTitle??>
 											${pageTitle}
 										<#else>
-											<@spring.messageArgsText
-											code="menu.${currentRoute.name}"
-											args=currentRoute.argumentValues
-											text=currentRoute.name
+											<#assign title>
+												<@spring.messageArgsText
+													code="menu.${currentRoute.name}"
+													args=currentRoute.argumentValues
+													text=currentRoute.name
+												/>
+											</#assign>
+											<@spring.messageText
+												code="menu.${title}"
+												text=title
 											/>
 										</#if>
 									</h1>

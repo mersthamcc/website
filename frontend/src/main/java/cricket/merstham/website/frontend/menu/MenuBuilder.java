@@ -197,7 +197,27 @@ public class MenuBuilder {
                                                     null,
                                                     List.of(),
                                                     null)),
-                            "tio-group-senior"));
+                            "tio-group-senior"),
+                    new Menu(
+                            "admin-membership-reports",
+                            null,
+                            SCRIPT_LINK,
+                            List.of("ROLE_MEMBERSHIP"),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "unpaid-members-report"),
+                                                    null,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "openage-junior-report"),
+                                                    null,
+                                                    List.of(),
+                                                    null)),
+                            "tio-chart-bar-4"));
 
     private final List<Menu> adminSystemMenu =
             List.of(

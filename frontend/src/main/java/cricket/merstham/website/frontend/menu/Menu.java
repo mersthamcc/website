@@ -9,8 +9,8 @@ import javax.inject.Provider;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -19,7 +19,7 @@ public class Menu {
     private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
 
     private final String name;
-    private final LinkedHashMap<String, String> arguments;
+    private final Map<String, String> arguments;
     private final URI destinationUrl;
     private final List<String> roles;
     private final Provider<List<Menu>> children;
@@ -28,7 +28,7 @@ public class Menu {
 
     public Menu(
             String name,
-            LinkedHashMap<String, String> arguments,
+            Map<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
             Provider<List<Menu>> children,
@@ -45,7 +45,7 @@ public class Menu {
 
     public Menu(
             String name,
-            LinkedHashMap<String, String> arguments,
+            Map<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
             Provider<List<Menu>> children,
@@ -55,7 +55,7 @@ public class Menu {
 
     public Menu(
             String name,
-            LinkedHashMap<String, String> arguments,
+            Map<String, String> arguments,
             URI destinationUrl,
             List<String> roles,
             Provider<List<Menu>> children) {
@@ -66,7 +66,7 @@ public class Menu {
         return name;
     }
 
-    public LinkedHashMap<String, String> getArguments() {
+    public Map<String, String> getArguments() {
         return arguments;
     }
 

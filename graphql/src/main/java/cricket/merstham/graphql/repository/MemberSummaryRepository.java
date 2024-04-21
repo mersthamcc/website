@@ -2,6 +2,7 @@ package cricket.merstham.graphql.repository;
 
 import cricket.merstham.graphql.entity.MemberSummaryEntity;
 import cricket.merstham.shared.dto.MemberFilter;
+import cricket.merstham.shared.types.ReportFilter;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static cricket.merstham.graphql.jpa.Expressions.jsonb_contains;
 
 public interface MemberSummaryRepository
         extends JpaRepository<MemberSummaryEntity, Integer>,
@@ -76,6 +79,33 @@ public interface MemberSummaryRepository
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(base.toPredicate(root, query, criteriaBuilder));
             predicates.add(criteriaBuilder.equal(root.get("id"), id));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    default Specification<MemberSummaryEntity> getBaseSpecification(ReportFilter reportFilter) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            switch (reportFilter) {
+                case UNPAID -> {
+                    predicates.add(
+                            criteriaBuilder.or(
+                                    criteriaBuilder.equal(root.get("received"), 0.00),
+                                    criteriaBuilder.isNull(root.get("received"))));
+                }
+                case OPENAGE -> {
+                    predicates.add(
+                            criteriaBuilder.or(
+                                    criteriaBuilder.greaterThanOrEqualTo(root.get("age"), 13),
+                                    criteriaBuilder.isNull(root.get("age"))));
+                    predicates.add(
+                            criteriaBuilder.isTrue(
+                                    jsonb_contains(
+                                            root, criteriaBuilder, "declarations", "OPENAGE")));
+                }
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

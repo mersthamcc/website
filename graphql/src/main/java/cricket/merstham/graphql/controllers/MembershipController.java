@@ -11,6 +11,7 @@ import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
+import cricket.merstham.shared.types.ReportFilter;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -37,6 +38,11 @@ public class MembershipController {
     @QueryMapping
     public List<MemberSummary> members(Principal principal) {
         return membershipService.getMembers(principal);
+    }
+
+    @QueryMapping
+    public List<MemberSummary> filteredMembers(Principal principal, @Argument ReportFilter filter) {
+        return membershipService.getMembers(principal, filter);
     }
 
     @QueryMapping

@@ -7,6 +7,7 @@ import cricket.merstham.graphql.entity.MemberCategoryEntity;
 import cricket.merstham.graphql.entity.MemberEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
+import cricket.merstham.graphql.entity.MemberSummaryEntity;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
 import cricket.merstham.graphql.inputs.AttributeInput;
@@ -28,8 +29,10 @@ import cricket.merstham.shared.dto.MemberFilter;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
+import cricket.merstham.shared.types.ReportFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
+import static cricket.merstham.shared.types.ReportFilter.ALL;
 import static java.util.Objects.isNull;
 
 @Component
@@ -94,14 +98,23 @@ public class MembershipService {
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public List<MemberSummary> getMembers(Principal principal) {
+        return getMembers(principal, ALL);
+    }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public List<MemberSummary> getMembers(Principal principal, ReportFilter reportFilter) {
         var filter = getUserFilter(principal);
+        Specification<MemberSummaryEntity> baseSpecification =
+                summaryRepository.getBaseSpecification(reportFilter);
 
         var members =
                 filter.map(
                                 f ->
                                         summaryRepository.findAll(
-                                                summaryRepository.getMemberSpecification(f)))
-                        .orElse(summaryRepository.findAll());
+                                                baseSpecification.and(
+                                                        summaryRepository.getMemberSpecification(
+                                                                f))))
+                        .orElse(summaryRepository.findAll(baseSpecification));
         return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
     }
 
