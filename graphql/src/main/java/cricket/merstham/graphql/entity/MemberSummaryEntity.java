@@ -96,4 +96,7 @@ public class MemberSummaryEntity {
 
     @Column(name = "apple_pass_serial_number", unique = true)
     private String applePassSerial;
+
+    @Column(name = "google_pass_serial_number", unique = true)
+    private String googlePassSerial;
 }

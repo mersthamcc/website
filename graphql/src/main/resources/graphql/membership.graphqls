@@ -175,6 +175,7 @@ type MemberSummary {
     identifiers: [String]
     uuid: String!
     applePassSerial: String
+    googlePassSerial: String
 }
 
 extend type Query {

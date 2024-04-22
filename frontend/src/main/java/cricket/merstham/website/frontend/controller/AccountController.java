@@ -162,6 +162,25 @@ public class AccountController {
                 .body(entity);
     }
 
+    @GetMapping(value = "/account/pass/{uuid}/google", name = "google-wallet-membership-card")
+    public RedirectView googleWalletMemberShipCard(
+            @PathVariable String uuid, CognitoAuthentication cognitoAuthentication) {
+        var member =
+                membershipService
+                        .getMyMembers(cognitoAuthentication.getOAuth2AccessToken())
+                        .stream()
+                        .filter(m -> m.getUuid().equals(uuid))
+                        .findFirst()
+                        .orElseThrow();
+        var serialNumber = member.getGooglePassSerial();
+        if (isNull(member.getGooglePassSerial())) {
+            serialNumber = UUID.randomUUID().toString();
+            membershipService.addGooglePassSerial(
+                    member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
+        }
+        return redirectTo(passGeneratorService.createGoogleWalletPass(member, serialNumber));
+    }
+
     private Map<String, Object> baseModel(HttpServletRequest request) {
         var model = new HashMap<String, Object>();
         model.put("userDetails", service.getUserDetails());

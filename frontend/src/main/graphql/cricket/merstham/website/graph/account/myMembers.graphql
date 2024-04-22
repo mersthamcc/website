@@ -18,5 +18,6 @@ query myMembers {
         identifiers
         uuid
         applePassSerial
+        googlePassSerial
     }
 }
