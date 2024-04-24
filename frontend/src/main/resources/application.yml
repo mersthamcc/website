@@ -103,6 +103,8 @@ club:
           - "_utma"
           - "gid"
   kit-store-url: ${KIT_STORE_URL:}
+  rss:
+    feed-description: ${RSS_FEED_DESCRIPTION:}
 graph:
   graph-uri: ${GRAPH_URI:http://localhost:8090/graphql}
 
