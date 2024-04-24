@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.auth0:jwks-rsa:0.22.1'
     implementation 'com.google.api-client:google-api-client:2.4.0'
     implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240312-2.0.0'
+    implementation "com.rometools:rome:2.1.0"
     implementation project(":shared")
 
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
