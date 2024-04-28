@@ -20,6 +20,8 @@ type Fixture {
     opposition: String!
     date: Date
     start: String
+    homeAway: String!
+    groundId: Int
     detail: Json
 }
 
@@ -37,7 +39,7 @@ extend type Query {
     fixtures(season: Int!): [Fixture]
     fixtureArchiveSeasons: [Int]
     players: [Player]
-#    fixturesByTeam(season: Int!, team: Int!): [Fixture]
+    allFixturesForTeam(id: Int!): [Fixture]
 #    leaguesForTeam(season: Int!, team: Int!): [League]
 }
 

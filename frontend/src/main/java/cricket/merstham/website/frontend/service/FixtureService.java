@@ -1,9 +1,12 @@
 package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.shared.dto.Fixture;
 import cricket.merstham.shared.dto.Team;
 import cricket.merstham.website.graph.ActiveTeamsQuery;
-import cricket.merstham.website.graph.FixturesByTeamQuery;
+import cricket.merstham.website.graph.fixture.AllFixturesForTeamQuery;
+import cricket.merstham.website.graph.fixture.FixturesByTeamQuery;
+import cricket.merstham.website.graph.fixture.GetTeamQuery;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,22 @@ public class FixtureService {
                 FixturesByTeamQuery.builder().season(season).team(teamId).build();
         Response<FixturesByTeamQuery.Data> result = graphService.executeQuery(query);
 
+        return modelMapper.map(result.getData().getTeam(), Team.class);
+    }
+
+    public List<Fixture> allFixturesForTeam(int teamId) throws IOException {
+        AllFixturesForTeamQuery query = AllFixturesForTeamQuery.builder().id(teamId).build();
+
+        Response<AllFixturesForTeamQuery.Data> result = graphService.executeQuery(query);
+
+        return result.getData().getAllFixturesForTeam().stream()
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .toList();
+    }
+
+    public Team getTeam(int teamId) throws IOException {
+        GetTeamQuery query = GetTeamQuery.builder().id(teamId).build();
+        Response<GetTeamQuery.Data> result = graphService.executeQuery(query);
         return modelMapper.map(result.getData().getTeam(), Team.class);
     }
 }

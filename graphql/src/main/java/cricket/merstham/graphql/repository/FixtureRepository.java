@@ -19,6 +19,8 @@ public interface FixtureRepository
 
     List<FixtureEntity> findByDateIsBetweenOrderByDateAscStartAsc(LocalDate start, LocalDate end);
 
+    List<FixtureEntity> findAllByTeamId(TeamEntity teamId);
+
     @Query(
             value =
                     "SELECT DISTINCT detail->>'competition_id' "
