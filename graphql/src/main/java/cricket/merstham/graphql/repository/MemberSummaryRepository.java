@@ -104,8 +104,25 @@ public interface MemberSummaryRepository
                                     jsonb_contains(
                                             root, criteriaBuilder, "declarations", "OPENAGE")));
                 }
+                case NO_PHOTOS_MEDIA -> {
+                    predicates.add(
+                            criteriaBuilder.isFalse(
+                                    jsonb_contains(
+                                            root,
+                                            criteriaBuilder,
+                                            "declarations",
+                                            "PHOTOS-MARKETING")));
+                }
+                case NO_PHOTOS_COACHING -> {
+                    predicates.add(
+                            criteriaBuilder.isFalse(
+                                    jsonb_contains(
+                                            root,
+                                            criteriaBuilder,
+                                            "declarations",
+                                            "PHOTOS-COACHING")));
+                }
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
