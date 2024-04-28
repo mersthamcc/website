@@ -42,6 +42,8 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     private final MenuBuilder menuBuilderProvider;
     private final ClubConfiguration clubConfiguration;
     private final String resourcePrefix;
+    private final String baseUrl;
+
     private final boolean debug;
 
     @Autowired
@@ -49,10 +51,12 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             MenuBuilder menuBuilderProvider,
             ClubConfiguration clubConfiguration,
             @Value("${resources.base-url}") String resourcePrefix,
+            @Value("${base-url}") String baseUrl,
             @Value("${debug}") boolean debug) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;
+        this.baseUrl = baseUrl;
         this.debug = debug;
     }
 
@@ -84,6 +88,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             model.put("currentRoute", currentRoute);
             model.put("breadcrumbs", menuBuilderProvider.getBreadcrumbs(currentRoute));
             model.put("resourcePrefix", resourcePrefix);
+            model.put("baseUrl", baseUrl);
             model.put("dashboardMenu", menuBuilderProvider.getDashboardMenu());
 
             var adminMenus = new LinkedHashMap<>();

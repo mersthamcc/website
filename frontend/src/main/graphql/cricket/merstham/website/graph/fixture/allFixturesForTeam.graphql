@@ -1,0 +1,19 @@
+query allFixturesForTeam($id: Int!) {
+    allFixturesForTeam(id: $id) {
+        id
+        date
+        start
+        homeAway
+        groundId
+        opposition
+        detail
+        team {
+            name
+            status
+            captain {
+                id
+                name
+            }
+        }
+    }
+}

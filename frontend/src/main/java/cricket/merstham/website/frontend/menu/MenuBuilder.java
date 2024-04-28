@@ -216,6 +216,18 @@ public class MenuBuilder {
                                                     buildParams("report", "openage-junior-report"),
                                                     null,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "no-photos-coaching"),
+                                                    null,
+                                                    List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "no-photos-media"),
+                                                    null,
+                                                    List.of(),
                                                     null)),
                             "tio-chart-bar-4"));
 

@@ -3,7 +3,9 @@ package cricket.merstham.shared.types;
 public enum ReportFilter {
     ALL("ALL"),
     UNPAID("UNPAID"),
-    OPENAGE("OPENAGE");
+    OPENAGE("OPENAGE"),
+    NO_PHOTOS_COACHING("NO_PHOTOS_COACHING"),
+    NO_PHOTOS_MEDIA("NO_PHOTOS_MEDIA");
 
     private final String value;
 

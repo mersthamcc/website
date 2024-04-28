@@ -38,6 +38,11 @@ public class FixtureController {
         return fixtureService.getFixtures(season);
     }
 
+    @QueryMapping
+    public List<Fixture> allFixturesForTeam(@Argument("id") int id) {
+        return fixtureService.getFixturesForTeam(id);
+    }
+
     @SchemaMapping(typeName = "Team", field = "fixtures")
     public List<Fixture> fixturesByTeam(Team team, @Argument("season") int season) {
         return fixtureService.getFixtures(season, team.getId());

@@ -22,7 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ import java.util.Objects;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 
@@ -120,6 +123,14 @@ public class FixtureService {
         return saveFixtures(fixtures).stream().map(f -> modelMapper.map(f, Fixture.class)).toList();
     }
 
+    @Cacheable(value = TEAM_FIXTURE_CACHE, key = "#id")
+    public List<Fixture> getFixturesForTeam(int id) {
+        var team = teamRepository.findById(id).orElseThrow();
+        return fixtureRepository.findAllByTeamId(team).stream()
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .toList();
+    }
+
     public List<League> getLeaguesForTeam(int season, int teamId) {
         var firstDayOfYear = LocalDate.of(season, 1, 1);
         var lastDayOfYear = LocalDate.of(season, 12, 31);
@@ -181,6 +192,11 @@ public class FixtureService {
     @Timed(
             value = "playcricket.teams.refresh",
             description = "Time taken to process teams from PlayCricket")
+    @Caching(
+            evict = {
+                @CacheEvict(value = TEAM_CACHE, allEntries = true),
+                @CacheEvict(value = ACTIVE_TEAM_CACHE, allEntries = true),
+            })
     public void refreshTeams() {
         LOG.info("Starting PlayCricket team refresh...");
         try {
@@ -228,6 +244,13 @@ public class FixtureService {
     @Timed(
             value = "playcricket.fixtures.refresh",
             description = "Time taken to process fixtures from PlayCricket")
+    @Caching(
+            evict = {
+                @CacheEvict(value = FIXTURE_CACHE, allEntries = true),
+                @CacheEvict(value = TEAM_FIXTURE_CACHE, allEntries = true),
+                @CacheEvict(value = TEAM_CACHE, allEntries = true),
+                @CacheEvict(value = ACTIVE_TEAM_CACHE, allEntries = true),
+            })
     public void refreshFixtures() {
         LOG.info("Starting PlayCricket fixture refresh... ");
         try {

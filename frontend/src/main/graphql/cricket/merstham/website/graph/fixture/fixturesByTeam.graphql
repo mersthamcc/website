@@ -14,13 +14,14 @@ query fixturesByTeam ($season: Int!, $team: Int!) {
             lastUpdate
             table
         }
-
         fixtures(season: $season) {
             id
             opposition
             date
             start
             detail
+            homeAway
+            groundId
         }
     }
 }

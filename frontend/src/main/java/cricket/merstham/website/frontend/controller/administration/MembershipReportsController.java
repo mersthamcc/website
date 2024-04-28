@@ -137,6 +137,8 @@ public class MembershipReportsController {
         return switch (report) {
             case "unpaid-members-report" -> ReportFilter.UNPAID;
             case "openage-junior-report" -> ReportFilter.OPENAGE;
+            case "no-photos-coaching" -> ReportFilter.NO_PHOTOS_COACHING;
+            case "no-photos-media" -> ReportFilter.NO_PHOTOS_MEDIA;
             default -> throw new IllegalStateException("Unexpected value: " + report);
         };
     }
