@@ -96,6 +96,7 @@ public class PaymentsController {
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
             HttpSession session) {
+        if (basket.getSubscriptions().isEmpty()) return new ModelAndView("redirect:/registration");
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
         var orderId = (int) session.getAttribute(ORDER);
         var order = membershipService.getOrder(orderId);

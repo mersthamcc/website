@@ -91,12 +91,14 @@
                 </div>
                 <!-- End Search -->
 
-<#--                <div class="alert alert-warning alert-dismissible fade show" role="alert">-->
-<#--                    <strong>Friday training and cricket cancelled!</strong> Unfortunately, due to the recent weather conditions, this week&apos;s Friday night training and weekend cricket is cancelled <a href="/news/2024/04/09/cricket-training-cancelled-but-volunteers-needed">read more here</a>!-->
-<#--                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
-<#--                        <span aria-hidden="true">&times;</span>-->
-<#--                    </button>-->
-<#--                </div>-->
+                <#if banner?? && banner.current>
+                    <div class="alert ${banner.messageClass} alert-dismissible fade show" role="alert">
+                        ${banner.cleanMessage}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </#if>
 
                 <div class="header-section">
                     <!-- Topbar -->

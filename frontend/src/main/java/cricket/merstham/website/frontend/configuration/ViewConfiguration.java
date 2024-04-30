@@ -90,6 +90,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             model.put("resourcePrefix", resourcePrefix);
             model.put("baseUrl", baseUrl);
             model.put("dashboardMenu", menuBuilderProvider.getDashboardMenu());
+            model.put("banner", menuBuilderProvider.getBannerMessage());
 
             var adminMenus = new LinkedHashMap<>();
             adminMenus.put("content", menuBuilderProvider.getAdminContentMenu());
