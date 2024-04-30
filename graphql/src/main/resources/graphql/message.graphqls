@@ -1,0 +1,26 @@
+type Message {
+    key: String!
+    messageClass: String!
+    messageText: String
+    enabled: Boolean
+    startDate: DateTime
+    endDate: DateTime
+}
+
+input MessageInput {
+    key: String!
+    messageClass: String!
+    messageText: String
+    enabled: Boolean
+    startDate: DateTime
+    endDate: DateTime
+}
+
+extend type Query {
+    messages: [Message]
+    message(key: String!): Message
+}
+
+extend type Mutation {
+    saveMessage(message: MessageInput!): Message
+}

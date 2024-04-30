@@ -1,0 +1,10 @@
+mutation saveMessage($message: MessageInput!) {
+    saveMessage(message: $message) {
+        key
+        messageClass
+        messageText
+        startDate
+        endDate
+        enabled
+    }
+}

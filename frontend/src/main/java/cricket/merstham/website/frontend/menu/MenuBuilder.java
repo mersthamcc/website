@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.shared.dto.ContactCategory;
+import cricket.merstham.shared.dto.Message;
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import cricket.merstham.website.frontend.service.MenuService;
 import cricket.merstham.website.frontend.service.PageService;
@@ -109,6 +110,20 @@ public class MenuBuilder {
                                             new Menu(
                                                     "admin-news-new", null, null, List.of(), null)),
                             "tio-feed-outlined"),
+                    new Menu(
+                            "admin-message-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of("ROLE_NEWS"),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-message-edit",
+                                                    buildParams("message", "banner"),
+                                                    null,
+                                                    List.of(),
+                                                    null)),
+                            "tio-message-outlined"),
                     new Menu(
                             "admin-event-top",
                             null,
@@ -397,5 +412,9 @@ public class MenuBuilder {
 
     public List<Menu> getAdminSystemMenu() {
         return adminSystemMenu;
+    }
+
+    public Message getBannerMessage() {
+        return menuService.getDynamicMenuItems().getBanner();
     }
 }

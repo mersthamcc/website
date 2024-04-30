@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import cricket.merstham.shared.dto.ContactCategory;
+import cricket.merstham.shared.dto.Message;
 import cricket.merstham.shared.dto.Venue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,5 @@ public class DynamicMenu {
     private List<Venue> venues;
     private List<Integer> seasons;
     private List<ContactCategory> contactCategories;
+    private Message banner;
 }

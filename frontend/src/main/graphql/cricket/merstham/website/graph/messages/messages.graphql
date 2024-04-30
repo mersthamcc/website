@@ -1,0 +1,10 @@
+query message($key: String!) {
+    message(key: $key) {
+        key
+        messageClass
+        messageText
+        startDate
+        endDate
+        enabled
+    }
+}

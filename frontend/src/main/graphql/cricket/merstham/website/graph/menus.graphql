@@ -13,4 +13,13 @@ query menus {
     }
 
     fixtureArchiveSeasons
+
+    message(key: "banner") {
+        key
+        messageClass
+        messageText
+        startDate
+        endDate
+        enabled
+    }
 }
