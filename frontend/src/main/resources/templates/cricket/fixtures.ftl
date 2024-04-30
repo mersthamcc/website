@@ -48,7 +48,7 @@
                                 </div>
 
                                 <div class="col-lg-auto align-self-lg-end text-lg-right">
-                                    <a class="btn btn-sm btn-outline-primary mb-1" href="${baseUrl}/feeds/fixtures/${activeTeam.id?c}.ical">
+                                    <a class="btn btn-sm btn-outline-primary mb-1" href="webcal:${baseUrl?keep_after(":")}/feeds/fixtures/${activeTeam.id?c}.ical">
                                         <i class="fas fa-calendar-plus fa-sm mr-1"></i> Add to calendar
                                     </a>
                                     <small class="d-block">Add this teams fixtures to your calendar</small>
