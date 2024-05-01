@@ -48,10 +48,29 @@
                                 </div>
 
                                 <div class="col-lg-auto align-self-lg-end text-lg-right">
-                                    <a class="btn btn-sm btn-outline-primary mb-1" href="webcal:${baseUrl?keep_after(":")}/feeds/fixtures/${activeTeam.id?c}.ical">
-                                        <i class="fas fa-calendar-plus fa-sm mr-1"></i> Add to calendar
-                                    </a>
-                                    <small class="d-block">Add this teams fixtures to your calendar</small>
+                                    <div class="hs-unfold">
+                                        <a class="js-hs-unfold-invoker btn btn-sm btn-primary dropdown-toggle" href="javascript:;"
+                                           data-hs-unfold-options='{
+                                               "target": "#calendarSubscription",
+                                               "type": "css-animation",
+                                               "event": "hover"
+                                             }'>
+                                            <i class="fas fa-calendar-plus fa-sm mr-1"></i>&nbsp;
+                                            <@spring.message code="calendar.add" />
+                                        </a>
+
+                                        <div id="calendarSubscription" class="hs-unfold-content dropdown-menu">
+                                            <a class="dropdown-item active" href="webcal:${baseUrl?keep_after(":")}/feeds/fixtures/${activeTeam.id?c}.ical">
+                                                <@spring.message code="calendar.add-to-device" />
+                                            </a>
+                                            <a class="dropdown-item" href="https://calendar.google.com/calendar/render?cid=webcal:${baseUrl?keep_after(":")?replace("/", "%2F")}%2Ffeeds%2Ffixtures%2F${activeTeam.id?c}.ical">
+                                                <@spring.message code="calendar.add-to-google" />
+                                            </a>
+                                            <a class="dropdown-item" href="/feeds/fixtures/${activeTeam.id?c}.ical">
+                                                <@spring.message code="calendar.download" />
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
