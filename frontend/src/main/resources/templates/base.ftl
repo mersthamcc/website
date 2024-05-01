@@ -47,7 +47,7 @@
             <link rel="stylesheet" href="${resourcePrefix}/front/assets/css/theme.min.css">
 
             <link rel="stylesheet" href="${resourcePrefix}/mcc/css/custom.css">
-
+            <link rel="stylesheet" href="${resourcePrefix}/mcc/js/fancybox/fancybox/fancybox.css" />
             <#if headers?is_directive><@headers /><#else>${headers}</#if>
         </head>
 
@@ -389,6 +389,7 @@
             <script src="${resourcePrefix}/front/assets/vendor/typed.js/lib/typed.min.js"></script>
             <script src="${resourcePrefix}/front/assets/vendor/aos/dist/aos.js"></script>
             <script src="${resourcePrefix}/front/assets/vendor/slick-carousel/slick/slick.js"></script>
+            <script src="${resourcePrefix}/mcc/js/fancybox/fancybox/fancybox.umd.js"></script>
 
             <!-- JS Front -->
             <script src="${resourcePrefix}/front/assets/js/theme.min.js"></script>
@@ -459,6 +460,10 @@
                     $('.js-go-to').each(function () {
                         var goTo = new HSGoTo($(this)).init();
                     });
+
+                    Fancybox.bind(".image > img", {
+                        groupAll: true,
+                    })
                 });
             </script>
 
