@@ -136,6 +136,7 @@ VALUES ('contact'),
        ('adult-cricket'),
        ('junior-cricket'),
        ('adult-basics'),
+       ('disability-basics'),
        ('junior-basics'),
        ('emergency-contact'),
        ('medical-conditions'),
@@ -186,7 +187,41 @@ VALUES ((SELECT id
          FROM attribute_definition
          WHERE KEY = 'school'),
         50,
+        FALSE),
+
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'disability-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'given-name'),
+        10,
         TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'disability-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'family-name'),
+        20,
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'disability-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'dob'),
+        30,
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'disability-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'gender'),
+        40,
+        TRUE),
+
        ((SELECT id
          FROM member_form_section
          WHERE KEY = 'adult-basics'),
@@ -460,7 +495,7 @@ VALUES ((SELECT id
          WHERE KEY = 'disability'),
         (SELECT id
          FROM member_form_section
-         WHERE KEY = 'junior-basics'),
+         WHERE KEY = 'disability-basics'),
         10,
         TRUE),
        ((SELECT id
@@ -470,6 +505,14 @@ VALUES ((SELECT id
          FROM member_form_section
          WHERE KEY = 'parent'),
         20,
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'disability'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'medical-conditions'),
+        25,
         TRUE),
        ((SELECT id
          FROM member_category
@@ -506,28 +549,10 @@ DELETE
 FROM member_category_form_section
 WHERE member_category_id = (SELECT id
                             FROM member_category
-                            WHERE KEY = 'junior')
-  AND member_form_section_id = (SELECT id
-                                FROM member_form_section
-                                WHERE KEY = 'junior-cricket');
-
-DELETE
-FROM member_category_form_section
-WHERE member_category_id = (SELECT id
-                            FROM member_category
-                            WHERE KEY = 'adult')
-  AND member_form_section_id = (SELECT id
-                                FROM member_form_section
-                                WHERE KEY = 'adult-cricket');
-
-DELETE
-FROM member_category_form_section
-WHERE member_category_id = (SELECT id
-                            FROM member_category
                             WHERE KEY = 'disability')
   AND member_form_section_id = (SELECT id
                                 FROM member_form_section
-                                WHERE KEY = 'junior-cricket');
+                                WHERE KEY = 'junior-basics');
 
 INSERT
 INTO pricelist_item(id,
