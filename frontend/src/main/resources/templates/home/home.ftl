@@ -79,7 +79,9 @@
             <div class="col-lg-12">
                 <div class="mb-5 mt-5">
                     <h1 class="mb-3">
-                        ${page.title}
+                        <#if page?? && page.title??>
+                            ${page.title}
+                        </#if>
                     </h1>
 
                     ${page.content}
