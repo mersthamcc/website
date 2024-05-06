@@ -117,6 +117,9 @@ public class LoginController {
     public ModelAndView login(
             @RequestParam(value = ERROR_PARAMETER, required = false) String error,
             HttpServletRequest request) {
+        LOG.info(
+                "Entering login() method, session ID = {}",
+                isNull(request.getSession()) ? "no-session" : request.getSession().getId());
         var errors =
                 isNull(error) ? List.of() : List.of(LOGIN_ERRORS_MESSAGE_CATEGORY.concat(error));
         var model = new HashMap<String, Object>();
