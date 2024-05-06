@@ -79,8 +79,8 @@ public class SecurityConfiguration {
                     cognitoUsernamePasswordAuthenticationProvider,
             CognitoRefreshTokenAuthenticationProvider cognitoRefreshTokenAuthenticationProvider) {
         return new ProviderManager(
-                cognitoUsernamePasswordAuthenticationProvider,
-                cognitoRefreshTokenAuthenticationProvider);
+                cognitoRefreshTokenAuthenticationProvider,
+                cognitoUsernamePasswordAuthenticationProvider);
     }
 
     @Bean
