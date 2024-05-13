@@ -295,14 +295,14 @@ public class Fixture implements Serializable {
     @JsonIgnore
     @Transient
     public boolean inningsBattingPresent(int innings) {
-        var inningsNode = detail.at(format("/innings/{0}/bat", innings));
+        var inningsNode = detail.at(format("/innings/{0}/bat", innings - 1));
         return inningsNode.isArray() && inningsNode.size() > 0;
     }
 
     @JsonIgnore
     @Transient
     public boolean inningsBowlingPresent(int innings) {
-        var inningsNode = detail.at(format("/innings/{0}/bowl", innings));
+        var inningsNode = detail.at(format("/innings/{0}/bowl", innings - 1));
         return inningsNode.isArray() && inningsNode.size() > 0;
     }
 }
