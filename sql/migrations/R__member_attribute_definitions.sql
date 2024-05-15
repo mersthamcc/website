@@ -640,6 +640,14 @@ VALUES (1,
         18,
         NULL,
         'Walking Cricket',
+        NULL),
+       (11,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        6,
+        10,
+        'U10 Girls',
         NULL)
 ON CONFLICT(id) DO UPDATE
     SET category_id         = EXCLUDED.category_id,
@@ -742,6 +750,10 @@ VALUES (1,
         '2024-12-31',
         40.00),
        (10,
+        '2024-01-01',
+        '2024-12-31',
+        50.00),
+       (11,
         '2024-01-01',
         '2024-12-31',
         50.00)
