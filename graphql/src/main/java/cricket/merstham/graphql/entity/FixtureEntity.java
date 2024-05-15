@@ -40,7 +40,7 @@ public class FixtureEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "team_id", nullable = false)
-    private TeamEntity teamId;
+    private TeamEntity team;
 
     @Column(name = "opposition_team_id")
     private Integer oppositionTeamId;

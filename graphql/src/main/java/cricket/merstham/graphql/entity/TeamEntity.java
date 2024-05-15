@@ -15,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -53,7 +54,11 @@ public class TeamEntity implements Serializable {
     private PlayerEntity captain;
 
     @Column(name = "hidden")
-    private boolean hidden = false;
+    private boolean hidden;
+
+    @ColumnDefault("false")
+    @Column(name = "include_in_selection", nullable = false)
+    private boolean includedInSelection;
 
     @Override
     public boolean equals(Object o) {
