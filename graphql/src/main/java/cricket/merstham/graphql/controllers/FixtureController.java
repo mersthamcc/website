@@ -63,6 +63,11 @@ public class FixtureController {
         return fixtureService.getAllFixtureSeasons();
     }
 
+    @QueryMapping("thisWeeksSelection")
+    public List<Fixture> thisWeeksSelection() {
+        return fixtureService.getThisWeeksSelection();
+    }
+
     @MutationMapping
     public List<Fixture> refreshFixtures(@Argument("season") int season) {
         return fixtureService.refreshFixtures(season);

@@ -37,9 +37,12 @@ import java.util.Objects;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.SELECTION_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
+import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
 import static java.text.MessageFormat.format;
+import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 
 @Service
@@ -325,7 +328,7 @@ public class FixtureService {
                                                     ? fixture.getAwayClubName()
                                                     : fixture.getHomeClubName())
                                     .setHomeAway(fixture.getHomeAway())
-                                    .setTeamId(team.orElseThrow())
+                                    .setTeam(team.orElseThrow())
                                     .setDetail(fixture.getDetails())
                                     .setGroundId(home ? fixture.getGroundId() : null)
                                     .setOppositionTeamId(additionalTeamId);
@@ -344,5 +347,23 @@ public class FixtureService {
 
     public List<Integer> getAllFixtureSeasons() {
         return fixtureRepository.findDistinctYears();
+    }
+
+    @Cacheable(value = SELECTION_CACHE)
+    public List<Fixture> getThisWeeksSelection() {
+        var fixtures = fixtureRepository.findAllByDateIn(getThisWeekendsDates(now()));
+
+        fixtures.forEach(
+                fixture -> fixture.setDetail(playCricketService.getMatchDetails(fixture.getId())));
+
+        fixtureRepository.saveAllAndFlush(fixtures);
+        return fixtures.stream()
+                .filter(f -> f.getTeam().isIncludedInSelection())
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .toList();
+    }
+
+    private List<FixtureEntity> getFixturesForDates(List<LocalDate> thisWeekendsDates) {
+        return fixtureRepository.findAllByDateIn(thisWeekendsDates);
     }
 }

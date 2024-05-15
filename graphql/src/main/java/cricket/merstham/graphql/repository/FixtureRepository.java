@@ -21,6 +21,8 @@ public interface FixtureRepository
 
     List<FixtureEntity> findAllByTeamId(TeamEntity teamId);
 
+    List<FixtureEntity> findAllByDateIn(List<LocalDate> dates);
+
     @Query(
             value =
                     "SELECT DISTINCT detail->>'competition_id' "
