@@ -12,14 +12,14 @@ import java.util.List;
 
 public interface FixtureRepository
         extends CrudRepository<FixtureEntity, Integer>, JpaRepository<FixtureEntity, Integer> {
-    List<FixtureEntity> findByTeamIdAndDateIsBetweenOrderByDateAscStartAsc(
-            TeamEntity teamId, LocalDate start, LocalDate end);
+    List<FixtureEntity> findByTeamIsAndDateIsBetweenOrderByDateAscStartAsc(
+            TeamEntity team, LocalDate start, LocalDate end);
 
     List<FixtureEntity> findByDateAfterOrderByDateAscStartAsc(LocalDate date);
 
     List<FixtureEntity> findByDateIsBetweenOrderByDateAscStartAsc(LocalDate start, LocalDate end);
 
-    List<FixtureEntity> findAllByTeamId(TeamEntity teamId);
+    List<FixtureEntity> findAllByTeam(TeamEntity team);
 
     List<FixtureEntity> findAllByDateIn(List<LocalDate> dates);
 
