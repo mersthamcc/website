@@ -113,7 +113,7 @@ public class FixtureService {
         var lastDayOfYear = LocalDate.of(season, 12, 31);
         var team = teamRepository.findById(teamId).orElseThrow();
         return fixtureRepository
-                .findByTeamIdAndDateIsBetweenOrderByDateAscStartAsc(
+                .findByTeamIsAndDateIsBetweenOrderByDateAscStartAsc(
                         team, firstDayOfYear, lastDayOfYear)
                 .stream()
                 .map(f -> modelMapper.map(f, Fixture.class).setFocusTeam(teamId))
@@ -129,7 +129,7 @@ public class FixtureService {
     @Cacheable(value = TEAM_FIXTURE_CACHE, key = "#id")
     public List<Fixture> getFixturesForTeam(int id) {
         var team = teamRepository.findById(id).orElseThrow();
-        return fixtureRepository.findAllByTeamId(team).stream()
+        return fixtureRepository.findAllByTeam(team).stream()
                 .map(f -> modelMapper.map(f, Fixture.class))
                 .toList();
     }
@@ -140,7 +140,7 @@ public class FixtureService {
         var team = teamRepository.findById(teamId).orElseThrow();
         var leagues =
                 fixtureRepository
-                        .findByTeamIdAndDateIsBetweenOrderByDateAscStartAsc(
+                        .findByTeamIsAndDateIsBetweenOrderByDateAscStartAsc(
                                 team, firstDayOfYear, lastDayOfYear)
                         .stream()
                         .map(f -> f.getDetail().at("/competition_id").asInt())
