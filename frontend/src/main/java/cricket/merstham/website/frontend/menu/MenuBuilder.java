@@ -50,6 +50,7 @@ public class MenuBuilder {
                             List.of(),
                             () ->
                                     List.of(
+                                            new Menu("selection", null, null, List.of(), null),
                                             new Menu("fixtures", null, null, List.of(), null),
                                             new Menu(
                                                     "result-archive",

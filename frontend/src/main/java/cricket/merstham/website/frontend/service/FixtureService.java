@@ -7,6 +7,7 @@ import cricket.merstham.website.graph.ActiveTeamsQuery;
 import cricket.merstham.website.graph.fixture.AllFixturesForTeamQuery;
 import cricket.merstham.website.graph.fixture.FixturesByTeamQuery;
 import cricket.merstham.website.graph.fixture.GetTeamQuery;
+import cricket.merstham.website.graph.fixture.ThisWeeksSelectionQuery;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,5 +61,13 @@ public class FixtureService {
         GetTeamQuery query = GetTeamQuery.builder().id(teamId).build();
         Response<GetTeamQuery.Data> result = graphService.executeQuery(query);
         return modelMapper.map(result.getData().getTeam(), Team.class);
+    }
+
+    public List<Fixture> getSelection() throws IOException {
+        var query = ThisWeeksSelectionQuery.builder().build();
+        Response<ThisWeeksSelectionQuery.Data> result = graphService.executeQuery(query);
+        return result.getData().getThisWeeksSelection().stream()
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .toList();
     }
 }

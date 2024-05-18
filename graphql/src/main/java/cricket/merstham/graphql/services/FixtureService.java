@@ -369,8 +369,4 @@ public class FixtureService {
                                 .thenComparingLong(f -> f.getTeam().getSortOrder()))
                 .toList();
     }
-
-    private List<FixtureEntity> getFixturesForDates(List<LocalDate> thisWeekendsDates) {
-        return fixtureRepository.findAllByDateIn(thisWeekendsDates);
-    }
 }
