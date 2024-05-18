@@ -444,7 +444,7 @@ services:
       - backendnetwork
     restart: unless-stopped
     healthcheck:
-      test: wget http://localhost:8081 -S -O -
+      test: wget http://127.0.0.1:8081 -S -O -
       interval: 5s
       retries: 30
     depends_on:
