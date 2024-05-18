@@ -1,0 +1,19 @@
+query thisWeeksSelection {
+    thisWeeksSelection {
+        id
+        date
+        start
+        opposition
+        homeAway
+        groundId
+        team {
+            id
+            name
+        }
+        players {
+            name
+            captain
+            wicketKeeper
+        }
+    }
+}

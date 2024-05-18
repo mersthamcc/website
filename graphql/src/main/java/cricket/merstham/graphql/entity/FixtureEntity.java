@@ -6,9 +6,11 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +25,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Table(name = "fixture")
@@ -40,7 +43,7 @@ public class FixtureEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "team_id", nullable = false)
-    private TeamEntity teamId;
+    private TeamEntity team;
 
     @Column(name = "opposition_team_id")
     private Integer oppositionTeamId;
@@ -64,6 +67,13 @@ public class FixtureEntity {
     @Convert(converter = JpaJsonbConverter.class)
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode detail;
+
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            mappedBy = "primaryKey.fixture",
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    private List<FixturePlayerEntity> players;
 
     @Override
     public boolean equals(Object o) {

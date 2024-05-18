@@ -1,0 +1,2 @@
+ALTER TABLE team
+    ADD COLUMN include_in_selection BOOLEAN NOT NULL DEFAULT FALSE;

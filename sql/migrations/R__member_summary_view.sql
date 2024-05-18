@@ -1,15 +1,13 @@
-DROP
-    VIEW IF EXISTS member_summary;
-
-CREATE VIEW member_summary AS
+DROP VIEW IF EXISTS member_summary;
+CREATE OR REPLACE VIEW member_summary AS
 SELECT m.id,
        m.owner_user_id,
-       familyname.value::JSONB ->> 0  AS familyname,
-       givenname.value::JSONB ->> 0   AS givenname,
-       m.registration_date            AS first_registration_date,
+       INITCAP(familyname.value::JSONB ->> 0) AS familyname,
+       INITCAP(givenname.value::JSONB ->> 0)  AS givenname,
+       m.registration_date                    AS first_registration_date,
        (
            dob.value::JSONB ->> 0
-           )::DATE                    AS dob,
+           )::DATE                            AS dob,
        CASE
            WHEN dob.value IS NULL THEN NULL
            ELSE EXTRACT(
@@ -31,7 +29,7 @@ SELECT m.id,
                                )::DATE
                    )
                 )
-           END                        AS age,
+           END                                AS age,
        CASE
            WHEN dob.value IS NULL THEN NULL
            ELSE 'U' || EXTRACT(
@@ -53,20 +51,20 @@ SELECT m.id,
                                )::DATE
                    )
                        )
-           END                        AS agegroup,
-       gender.value::JSONB ->> 0      AS gender,
-       subs.year                      AS most_recent_subscription,
-       subs.added_date                AS last_subs_date,
-       subs.price                     AS last_subs_price,
-       cat.key                        AS last_subs_category,
-       payments.received              AS received,
-       payments.types                 AS payment_types,
+           END                                AS agegroup,
+       gender.value::JSONB ->> 0              AS gender,
+       subs.year                              AS most_recent_subscription,
+       subs.added_date                        AS last_subs_date,
+       subs.price                             AS last_subs_price,
+       cat.key                                AS last_subs_category,
+       payments.received                      AS received,
+       payments.types                         AS payment_types,
        pl.description,
-       declarations.value::JSONB      AS declarations,
-       identifiers.list               AS identifiers,
+       declarations.value::JSONB              AS declarations,
+       identifiers.list                       AS identifiers,
        m.uuid,
-       apple_pass_serial_number.value AS apple_pass_serial_number,
-       google_pass_serial_number.value AS google_pass_serial_number
+       apple_pass_serial_number.value         AS apple_pass_serial_number,
+       google_pass_serial_number.value        AS google_pass_serial_number
 FROM "member" m
          INNER JOIN(SELECT member_id,
                            MAX(YEAR) AS YEAR
@@ -131,7 +129,7 @@ FROM "member" m
                                                                        'APPLE_PASS_SERIAL'
          LEFT OUTER JOIN member_identifier google_pass_serial_number ON google_pass_serial_number.member_id = m.id AND
                                                                         google_pass_serial_number.name =
-                                                                       'GOOGLE_PASS_SERIAL'
+                                                                        'GOOGLE_PASS_SERIAL'
 
 WHERE m.cancelled IS NULL
 ORDER BY familyname,

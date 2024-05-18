@@ -32,13 +32,16 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.SELECTION_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
+import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 
@@ -325,7 +328,7 @@ public class FixtureService {
                                                     ? fixture.getAwayClubName()
                                                     : fixture.getHomeClubName())
                                     .setHomeAway(fixture.getHomeAway())
-                                    .setTeamId(team.orElseThrow())
+                                    .setTeam(team.orElseThrow())
                                     .setDetail(fixture.getDetails())
                                     .setGroundId(home ? fixture.getGroundId() : null)
                                     .setOppositionTeamId(additionalTeamId);
@@ -344,5 +347,26 @@ public class FixtureService {
 
     public List<Integer> getAllFixtureSeasons() {
         return fixtureRepository.findDistinctYears();
+    }
+
+    @Cacheable(value = SELECTION_CACHE)
+    public List<Fixture> getThisWeeksSelection() {
+        var dates = getThisWeekendsDates(LocalDate.now());
+        var fixtures = fixtureRepository.findAllByDateInAndTeamIncludedInSelectionIsTrue(dates);
+
+        fixtures.stream()
+                .forEach(
+                        fixture ->
+                                fixture.setDetail(
+                                        playCricketService.getMatchDetails(fixture.getId())));
+
+        fixtureRepository.saveAllAndFlush(fixtures);
+
+        return fixtures.stream()
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .sorted(
+                        Comparator.comparing(Fixture::getDate)
+                                .thenComparingLong(f -> f.getTeam().getSortOrder()))
+                .toList();
     }
 }

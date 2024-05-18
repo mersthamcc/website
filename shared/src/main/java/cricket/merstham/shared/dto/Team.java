@@ -41,6 +41,9 @@ public class Team implements Serializable {
     @JsonProperty("slug")
     private String slug;
 
+    @JsonProperty("include_in_selection")
+    private boolean includeInSelection;
+
     @JsonProperty("captain")
     private Player captain;
 

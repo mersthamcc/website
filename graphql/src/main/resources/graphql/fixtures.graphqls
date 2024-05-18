@@ -1,6 +1,24 @@
 type Player {
     id: Int!
     name: String!
+    captain: Boolean
+    wicketKeeper: Boolean
+
+    statistics(year: Int!, league: Boolean): Statistics
+}
+
+type Statistics {
+    player: Player
+    runs: Int
+    fours: Int
+    sixes: Int
+    out: Boolean
+    dnb: Boolean
+    balls: Int
+    wickets: Int
+    overs: Int
+    maidens: Int
+    catches: Int
 }
 
 type Team {
@@ -23,6 +41,7 @@ type Fixture {
     homeAway: String!
     groundId: Int
     detail: Json
+    players: [Player]
 }
 
 type League {
@@ -40,6 +59,7 @@ extend type Query {
     fixtureArchiveSeasons: [Int]
     players: [Player]
     allFixturesForTeam(id: Int!): [Fixture]
+    thisWeeksSelection: [Fixture]
 #    leaguesForTeam(season: Int!, team: Int!): [League]
 }
 

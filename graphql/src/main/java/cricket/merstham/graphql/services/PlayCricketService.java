@@ -114,13 +114,7 @@ public class PlayCricketService {
         result.getMatches()
                 .forEach(
                         playCricketMatch -> {
-                            var detailRequest =
-                                    createGetRequest(
-                                            MATCH_DETAIL_ENDPOINT,
-                                            Map.of(
-                                                    "match_id",
-                                                    Integer.toString(playCricketMatch.getId())));
-                            var detail = detailRequest.invoke(JsonNode.class);
+                            var detail = getMatchDetails(playCricketMatch.getId());
 
                             var home = Objects.equals(playCricketMatch.getHomeClubId(), siteId);
                             playCricketMatch
@@ -132,6 +126,12 @@ public class PlayCricketService {
                                     .setHomeAway(home ? "HOME" : "AWAY");
                         });
         return result.getMatches();
+    }
+
+    public JsonNode getMatchDetails(int id) {
+        var detailRequest =
+                createGetRequest(MATCH_DETAIL_ENDPOINT, Map.of("match_id", Integer.toString(id)));
+        return detailRequest.invoke(JsonNode.class).get("match_details").get(0);
     }
 
     private Invocation createGetRequest(
