@@ -16,6 +16,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import static java.text.MessageFormat.format;
 
@@ -56,6 +57,9 @@ public class Fixture implements Serializable {
 
     @JsonProperty("detail")
     private JsonNode detail;
+
+    @JsonProperty("players")
+    private List<FixturePlayer> players;
 
     private int focusTeam;
 

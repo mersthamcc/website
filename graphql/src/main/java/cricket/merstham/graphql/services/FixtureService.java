@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +43,6 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CAC
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
 import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
 import static java.text.MessageFormat.format;
-import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 
 @Service
@@ -351,15 +351,22 @@ public class FixtureService {
 
     @Cacheable(value = SELECTION_CACHE)
     public List<Fixture> getThisWeeksSelection() {
-        var fixtures = fixtureRepository.findAllByDateIn(getThisWeekendsDates(now()));
+        var dates = getThisWeekendsDates(LocalDate.now());
+        var fixtures = fixtureRepository.findAllByDateInAndTeamIncludedInSelectionIsTrue(dates);
 
-        fixtures.forEach(
-                fixture -> fixture.setDetail(playCricketService.getMatchDetails(fixture.getId())));
+        fixtures.stream()
+                .forEach(
+                        fixture ->
+                                fixture.setDetail(
+                                        playCricketService.getMatchDetails(fixture.getId())));
 
         fixtureRepository.saveAllAndFlush(fixtures);
+
         return fixtures.stream()
-                .filter(f -> f.getTeam().isIncludedInSelection())
                 .map(f -> modelMapper.map(f, Fixture.class))
+                .sorted(
+                        Comparator.comparing(Fixture::getDate)
+                                .thenComparingLong(f -> f.getTeam().getSortOrder()))
                 .toList();
     }
 

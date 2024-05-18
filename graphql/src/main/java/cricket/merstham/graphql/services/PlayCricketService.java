@@ -131,7 +131,7 @@ public class PlayCricketService {
     public JsonNode getMatchDetails(int id) {
         var detailRequest =
                 createGetRequest(MATCH_DETAIL_ENDPOINT, Map.of("match_id", Integer.toString(id)));
-        return detailRequest.invoke(JsonNode.class);
+        return detailRequest.invoke(JsonNode.class).get("match_details").get(0);
     }
 
     private Invocation createGetRequest(
