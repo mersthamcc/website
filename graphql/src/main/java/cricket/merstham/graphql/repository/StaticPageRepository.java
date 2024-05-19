@@ -18,4 +18,6 @@ public interface StaticPageRepository
                             + "ORDER BY sort_order ASC, title ASC "
                             + "LIMIT :length OFFSET :start")
     List<StaticPageEntity> adminSearch(int start, int length, String searchString);
+
+    List<StaticPageEntity> findAllByMenuIsNotNull();
 }

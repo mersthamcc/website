@@ -3,6 +3,7 @@ type Page {
     title: String!
     content: String!
     sortOrder: Int!
+    menu: String
 }
 
 input PageInput {
@@ -10,11 +11,13 @@ input PageInput {
     title: String!
     content: String!
     sortOrder: Int!
+    menu: String
 }
 
 extend type Query {
     page(slug: String!): Page
     pages(start: Int!, length: Int!, searchString: String): [Page]
+    pagesForMenus: [Page]
     pageTotals(searchString: String): Totals
 }
 

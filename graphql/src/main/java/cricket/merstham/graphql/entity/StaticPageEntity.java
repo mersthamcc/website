@@ -41,4 +41,7 @@ public class StaticPageEntity {
     @Column(name = "sort_order", nullable = false)
     @JsonProperty
     private int sortOrder;
+
+    @Column(name = "menu", length = Integer.MAX_VALUE)
+    private String menu;
 }

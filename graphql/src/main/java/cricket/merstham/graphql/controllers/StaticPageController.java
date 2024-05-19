@@ -41,6 +41,11 @@ public class StaticPageController {
         return service.getAdminEntryList(start, length, searchString);
     }
 
+    @QueryMapping
+    public List<StaticPage> pagesForMenus() {
+        return service.pagesForMenus();
+    }
+
     @MutationMapping
     public StaticPage savePage(@Argument("page") StaticPage page) {
         return service.save(page);
