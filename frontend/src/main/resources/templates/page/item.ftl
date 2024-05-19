@@ -1,4 +1,5 @@
 <#import "../base.ftl" as layout>
+
 <@layout.mainLayout>
     <div class="container space-1">
         <div class="row justify-content-lg-between">

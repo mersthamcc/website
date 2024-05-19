@@ -25,6 +25,6 @@ public class PageController {
     @GetMapping(value = PAGES_ITEM_ROUTE, name = "pages-item")
     public ModelAndView getItem(Principal principal, @PathVariable String slug) throws IOException {
         var page = service.get(slug);
-        return new ModelAndView("page/item", Map.of("page", page));
+        return new ModelAndView("page/item", Map.of("page", page, "pageTitle", page.getTitle()));
     }
 }

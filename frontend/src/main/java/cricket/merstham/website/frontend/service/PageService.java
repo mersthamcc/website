@@ -91,6 +91,7 @@ public class PageService {
                         .title(page.getTitle())
                         .sortOrder(page.getSortOrder())
                         .content(page.getContent())
+                        .menu(page.getMenu())
                         .build();
         var saveRequest = SavePageMutation.builder().page(input).build();
         Response<SavePageMutation.Data> result =

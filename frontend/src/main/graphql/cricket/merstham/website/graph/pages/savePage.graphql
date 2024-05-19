@@ -4,5 +4,6 @@ mutation savePage ($page: PageInput!) {
         title
         sortOrder
         content
+        menu
     }
 }

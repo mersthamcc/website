@@ -22,4 +22,11 @@ query menus {
         endDate
         enabled
     }
+
+    pagesForMenus {
+        menu
+        slug
+        sortOrder
+        title
+    }
 }

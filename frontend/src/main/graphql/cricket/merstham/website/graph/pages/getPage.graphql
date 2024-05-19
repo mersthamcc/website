@@ -4,5 +4,6 @@ query getPage($slug: String!) {
         title
         sortOrder
         content
+        menu
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.PAGE_ITEM_BY_ID_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.PAGE_MENU_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.PAGE_SUMMARY_TOTAL_CACHE;
 
 @Component
@@ -51,7 +52,8 @@ public class StaticPageService {
     @Caching(
             evict = {
                 @CacheEvict(value = PAGE_SUMMARY_TOTAL_CACHE, key = "'totals'"),
-                @CacheEvict(value = PAGE_ITEM_BY_ID_CACHE, key = "#page.slug")
+                @CacheEvict(value = PAGE_ITEM_BY_ID_CACHE, key = "#page.slug"),
+                @CacheEvict(value = PAGE_MENU_CACHE, allEntries = true)
             })
     public StaticPage save(StaticPage page) {
         var entity = repository.findById(page.getSlug()).orElseGet(StaticPageEntity::new);
@@ -63,12 +65,18 @@ public class StaticPageService {
     @Caching(
             evict = {
                 @CacheEvict(value = PAGE_SUMMARY_TOTAL_CACHE, key = "'totals'"),
-                @CacheEvict(value = PAGE_ITEM_BY_ID_CACHE, key = "#slug")
+                @CacheEvict(value = PAGE_ITEM_BY_ID_CACHE, key = "#slug"),
+                @CacheEvict(value = PAGE_MENU_CACHE, allEntries = true)
             })
     public StaticPage delete(String slug) {
         var entity = repository.findById(slug).orElseThrow();
         repository.delete(entity);
         return convertToDto(entity);
+    }
+
+    @Cacheable(value = PAGE_MENU_CACHE)
+    public List<StaticPage> pagesForMenus() {
+        return repository.findAllByMenuIsNotNull().stream().map(this::convertToDto).toList();
     }
 
     private StaticPage convertToDto(StaticPageEntity page) {

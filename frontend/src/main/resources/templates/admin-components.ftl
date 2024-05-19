@@ -208,7 +208,9 @@
                    value="${data}"
                     ${requiredAttribute}>
                 <#list options?keys as option>
-                    <option value="${option}" <#if option==data>selected="selected"</#if>>${options[option]}</option>
+                    <option value="${option}" <#if option==data>selected="selected"</#if>>
+                        <@spring.messageText code=options[option] text=options[option] />
+                    </option>
                 </#list>
             </select>
         </div>

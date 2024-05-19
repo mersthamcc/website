@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.StaticPage;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
+import cricket.merstham.website.frontend.menu.MenuBuilder;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,12 +49,15 @@ public class PageController extends SspController<StaticPage> {
     public static final String HAS_ROLE_ROLE_PAGES = "hasRole('ROLE_PAGES')";
     public static final String PAGE = "page";
     public static final String ERRORS = "errors";
+    public static final String MENUS = "menus";
 
     private final PageService service;
+    private final MenuBuilder menuBuilder;
 
     @Autowired
-    public PageController(PageService service) {
+    public PageController(PageService service, MenuBuilder menuBuilder) {
         this.service = service;
+        this.menuBuilder = menuBuilder;
     }
 
     @GetMapping(value = ADMIN_PAGE_BASE, name = "admin-page-list")
@@ -73,11 +78,13 @@ public class PageController extends SspController<StaticPage> {
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || flash.isEmpty()) {
             var page = StaticPage.builder().build();
-            return new ModelAndView(ADMINISTRATION_PAGE_EDIT, Map.of(PAGE, page));
-        } else {
-            StaticPage contact = (StaticPage) flash.get(PAGE);
             return new ModelAndView(
-                    ADMINISTRATION_PAGE_EDIT, Map.of(PAGE, contact, ERRORS, flash.get(ERRORS)));
+                    ADMINISTRATION_PAGE_EDIT, Map.of(PAGE, page, MENUS, getMenus()));
+        } else {
+            StaticPage page = (StaticPage) flash.get(PAGE);
+            return new ModelAndView(
+                    ADMINISTRATION_PAGE_EDIT,
+                    Map.of(PAGE, page, ERRORS, flash.get(ERRORS), MENUS, getMenus()));
         }
     }
 
@@ -87,7 +94,7 @@ public class PageController extends SspController<StaticPage> {
             CognitoAuthentication cognitoAuthentication, @PathVariable("slug") String slug)
             throws IOException {
         var contact = service.get(cognitoAuthentication.getOAuth2AccessToken(), slug);
-        return new ModelAndView(ADMINISTRATION_PAGE_EDIT, Map.of(PAGE, contact));
+        return new ModelAndView(ADMINISTRATION_PAGE_EDIT, Map.of(PAGE, contact, MENUS, getMenus()));
     }
 
     @GetMapping(value = ADMIN_PAGE_DELETE_ROUTE, name = "admin-page-delete")
@@ -142,5 +149,14 @@ public class PageController extends SspController<StaticPage> {
                     .error(Optional.of(List.of(e.getMessage())))
                     .build();
         }
+    }
+
+    private Map<String, String> getMenus() {
+        var menus = new LinkedHashMap<String, String>();
+        menus.put("", "menu.none");
+        menuBuilder.getFrontEndMenu().stream()
+                .filter(m -> m.getChildren() != null)
+                .forEach(menu -> menus.put(menu.getName(), "menu." + menu.getDisplayName()));
+        return menus;
     }
 }

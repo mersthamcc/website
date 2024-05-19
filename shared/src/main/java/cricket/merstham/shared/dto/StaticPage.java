@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
@@ -19,8 +20,11 @@ import java.io.Serializable;
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaticPage implements Serializable {
-    @JsonProperty String slug;
-    @JsonProperty String title;
-    @JsonProperty String content;
-    @JsonProperty int sortOrder;
+    @Serial private static final long serialVersionUID = -947526036574542772L;
+
+    @JsonProperty private String slug;
+    @JsonProperty private String title;
+    @JsonProperty private String content;
+    @JsonProperty private int sortOrder;
+    @JsonProperty private String menu;
 }

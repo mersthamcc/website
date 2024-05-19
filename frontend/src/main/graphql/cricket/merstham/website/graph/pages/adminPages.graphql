@@ -5,6 +5,7 @@ query adminPages($start: Int!, $length: Int!, $search: String) {
         title
         sortOrder
         content
+        menu
     }
 
     pageTotals (searchString: $search){

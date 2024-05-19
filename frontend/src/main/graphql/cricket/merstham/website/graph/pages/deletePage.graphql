@@ -4,5 +4,6 @@ mutation deletePage($slug: String!) {
         title
         sortOrder
         content
+        menu
     }
 }

@@ -51,6 +51,7 @@
                     <@admin.adminFormField name="slug" data=page.slug!"" required=true type="text" localeCategory="page" />
                     <@admin.adminFormField name="title" data=page.title!"" required=true type="text" localeCategory="page" />
                     <@admin.adminFormField name="sortOrder" data=page.sortOrder?c!"" required=true type="number" localeCategory="page" />
+                    <@admin.adminSelectField name="menu" data=page.menu!"" required=false options=menus localeCategory="page" />
                     <@admin.adminCkEditorField name="content" data=page.content!"" required=true type="text" localeCategory="page" rows=40/>
                 </@admin.card>
 
