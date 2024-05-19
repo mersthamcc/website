@@ -32,37 +32,54 @@
                                     <h5 class="text-center">${fixture.opposition}</h5>
                                     <div class="text-body">
                                         <div class="list-group list-group-lg list-group-flush list-group-no-gutters">
-                                            <#list fixture.players as player>
+                                            <#if (fixture.players?? && fixture.players?size > 0) >
+                                                <#list fixture.players as player>
+                                                    <div class="list-group-item">
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="row">
+                                                                    <div class="col-sm mb-1 mb-sm-0">
+                                                                        <h6 class="mb-0">
+                                                                            ${player.name}
+                                                                            <#if player.captain>
+                                                                                <span class="badge badge-soft-primary ml-1">
+                                                                                    <@spring.message code="fixtures.captain" />
+                                                                                </span>
+                                                                            </#if>
+                                                                            <#if player.wicketKeeper>
+                                                                                <span class="badge badge-soft-secondary ml-1">
+                                                                                    <@spring.message code="fixtures.wicket-keeper" />
+                                                                                </span>
+                                                                            </#if>
+                                                                        </h6>
+    <#--                                                                    <small><strong>This years stats:</strong> </small>-->
+    <#--                                                                    <small>|</small>-->
+    <#--                                                                    <small><strong>This years stats:</strong></small>-->
+                                                                    </div>
+
+                                                                    <div class="col-sm-auto">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </#list>
+                                            <#else>
                                                 <div class="list-group-item">
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="row">
                                                                 <div class="col-sm mb-1 mb-sm-0">
                                                                     <h6 class="mb-0">
-                                                                        ${player.name}
-                                                                        <#if player.captain>
-                                                                            <span class="badge badge-soft-primary ml-1">
-                                                                                <@spring.message code="fixtures.captain" />
-                                                                            </span>
-                                                                        </#if>
-                                                                        <#if player.wicketKeeper>
-                                                                            <span class="badge badge-soft-secondary ml-1">
-                                                                                <@spring.message code="fixtures.wicket-keeper" />
-                                                                            </span>
-                                                                        </#if>
+                                                                        <@spring.message code="fixtures.no-selection" />
                                                                     </h6>
-<#--                                                                    <small><strong>This years stats:</strong> </small>-->
-<#--                                                                    <small>|</small>-->
-<#--                                                                    <small><strong>This years stats:</strong></small>-->
-                                                                </div>
-
-                                                                <div class="col-sm-auto">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </#list>
+
+                                            </#if>
                                         </div>
                                     </div>
                                 </div>
