@@ -101,7 +101,7 @@ public class Menu {
     }
 
     public boolean onActivePath(ViewConfiguration.CurrentRoute currentRoute) {
-        LOG.debug(
+        LOG.info(
                 "onActivePath(name = {}, params = {}) called on name = {}, params = {}",
                 currentRoute.getName(),
                 currentRoute.getPathVariables(),
