@@ -9,14 +9,14 @@
 
 </#macro>
 
-<#macro mainLayout formName="" headers=defaultHeaders script=defaultScripts withButtonResponsiveButton=false>
+<#macro mainLayout formName="" headers=defaultHeaders script=defaultScripts withButtonResponsiveButton=false pageTitle=false>
     <!DOCTYPE html>
     <html lang="en">
         <head>
             <!-- Title -->
             <title>
                 ${config.clubName} -
-                <#if pageTitle??>
+                <#if pageTitle?is_string>
                     ${pageTitle}
                 <#else>
                     <@spring.messageArgsText

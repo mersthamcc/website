@@ -104,11 +104,13 @@ public class MenuBuilder {
                         .map(
                                 p ->
                                         new Menu(
-                                                p.getTitle(),
+                                                "pages-item",
+                                                buildParams("slug", p.getSlug()),
                                                 null,
-                                                URI.create("/pages/" + p.getSlug()),
                                                 List.of(),
-                                                null))
+                                                null,
+                                                null,
+                                                p.getTitle()))
                         .toList());
         return menu;
     }

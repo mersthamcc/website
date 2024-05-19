@@ -1,13 +1,10 @@
 <#import "../base.ftl" as layout>
 
-<@layout.mainLayout>
+<@layout.mainLayout pageTitle=page.title>
     <div class="container space-1">
         <div class="row justify-content-lg-between">
-            <div class="w-lg-60 mx-lg-auto">
+            <div class="col-12">
                 ${page.content}
-            </div>
-
-            <div class="col-lg-3">
             </div>
         </div>
     </div>

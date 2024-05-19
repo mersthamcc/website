@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.PAGES_ITEM_ROUTE;
@@ -23,8 +22,8 @@ public class PageController {
     }
 
     @GetMapping(value = PAGES_ITEM_ROUTE, name = "pages-item")
-    public ModelAndView getItem(Principal principal, @PathVariable String slug) throws IOException {
+    public ModelAndView getItem(@PathVariable("slug") String slug) throws IOException {
         var page = service.get(slug);
-        return new ModelAndView("page/item", Map.of("page", page, "pageTitle", page.getTitle()));
+        return new ModelAndView("page/item", Map.of("page", page));
     }
 }
