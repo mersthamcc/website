@@ -4,6 +4,7 @@ import com.apollographql.apollo.api.Response;
 import com.google.common.collect.Lists;
 import cricket.merstham.shared.dto.ContactCategory;
 import cricket.merstham.shared.dto.Message;
+import cricket.merstham.shared.dto.StaticPage;
 import cricket.merstham.shared.dto.Venue;
 import cricket.merstham.website.frontend.model.DynamicMenu;
 import cricket.merstham.website.graph.MenusQuery;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -44,6 +46,10 @@ public class MenuService {
                             nonNull(result.getData().getMessage())
                                     ? modelMapper.map(result.getData().getMessage(), Message.class)
                                     : null)
+                    .menus(
+                            result.getData().getPagesForMenus().stream()
+                                    .map(p -> modelMapper.map(p, StaticPage.class))
+                                    .collect(Collectors.groupingBy(StaticPage::getMenu)))
                     .build();
         } catch (IOException e) {
             return DynamicMenu.builder().build();

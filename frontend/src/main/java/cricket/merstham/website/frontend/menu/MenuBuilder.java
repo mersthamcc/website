@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.shared.dto.ContactCategory;
 import cricket.merstham.shared.dto.Message;
+import cricket.merstham.shared.dto.StaticPage;
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import cricket.merstham.website.frontend.service.MenuService;
 import cricket.merstham.website.frontend.service.PageService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -49,15 +51,27 @@ public class MenuBuilder {
                             URI.create("#"),
                             List.of(),
                             () ->
-                                    List.of(
-                                            new Menu("selection", null, null, List.of(), null),
-                                            new Menu("fixtures", null, null, List.of(), null),
-                                            new Menu(
-                                                    "result-archive",
-                                                    null,
-                                                    SCRIPT_LINK,
-                                                    List.of(),
-                                                    this::getFixtureArchive))),
+                                    buildMenuFor(
+                                            "cricket",
+                                            List.of(
+                                                    new Menu(
+                                                            "selection",
+                                                            null,
+                                                            null,
+                                                            List.of(),
+                                                            null),
+                                                    new Menu(
+                                                            "fixtures",
+                                                            null,
+                                                            null,
+                                                            List.of(),
+                                                            null),
+                                                    new Menu(
+                                                            "result-archive",
+                                                            null,
+                                                            SCRIPT_LINK,
+                                                            List.of(),
+                                                            this::getFixtureArchive)))),
                     new Menu("events", null, URI.create("/events"), List.of(), null),
                     new Menu(
                             "about",
@@ -65,14 +79,39 @@ public class MenuBuilder {
                             URI.create("#"),
                             List.of(),
                             () ->
-                                    List.of(
-                                            new Menu(
-                                                    "contacts",
-                                                    null,
-                                                    URI.create("#"),
-                                                    List.of(),
-                                                    this::getContactCategories))),
-                    new Menu("venue", null, URI.create("#"), List.of(), this::getVenueList));
+                                    buildMenuFor(
+                                            "about",
+                                            List.of(
+                                                    new Menu(
+                                                            "contacts",
+                                                            null,
+                                                            URI.create("#"),
+                                                            List.of(),
+                                                            this::getContactCategories)))),
+                    new Menu(
+                            "venue",
+                            null,
+                            URI.create("#"),
+                            List.of(),
+                            () -> buildMenuFor("venue", getVenueList())));
+
+    private List<Menu> buildMenuFor(String name, List<Menu> items) {
+        var menu = new ArrayList<Menu>();
+        menu.addAll(items);
+        menu.addAll(
+                menuService.getDynamicMenuItems().getMenus().getOrDefault(name, List.of()).stream()
+                        .sorted(Comparator.comparingInt(StaticPage::getSortOrder))
+                        .map(
+                                p ->
+                                        new Menu(
+                                                p.getTitle(),
+                                                null,
+                                                URI.create("/pages/" + p.getSlug()),
+                                                List.of(),
+                                                null))
+                        .toList());
+        return menu;
+    }
 
     private final List<Menu> dashboardMenu =
             List.of(
