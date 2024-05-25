@@ -14,6 +14,8 @@ RUN gradle :${COMPONENT}:bootJar -x test -x spotlessCheck
 ARG JAVA_VERSION=17
 FROM eclipse-temurin:${JAVA_VERSION}-jre
 ARG COMPONENT
+LABEL org.opencontainers.image.source=https://github.com/mersthamcc/website
+LABEL org.opencontainers.image.description="Club website ${COMPONENT} component"
 
 EXPOSE 8090
 RUN addgroup --system spring
