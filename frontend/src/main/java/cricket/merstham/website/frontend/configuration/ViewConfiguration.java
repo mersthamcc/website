@@ -15,7 +15,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +25,12 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,8 +175,11 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             return this.roles.contains(role);
         }
 
-        public String getGravatarHash() {
-            return DigestUtils.md5DigestAsHex(getEmail().toLowerCase().getBytes()).toLowerCase();
+        public String getGravatarHash() throws NoSuchAlgorithmException {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of()
+                    .formatHex(
+                            md.digest(getEmail().toLowerCase().getBytes(StandardCharsets.UTF_8)));
         }
     }
 

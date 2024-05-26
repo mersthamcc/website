@@ -84,7 +84,7 @@
 										 }'>
 										<div class="avatar avatar-sm avatar-circle">
 											<img class="avatar-img"
-												 src="//www.gravatar.com/avatar/${user.gravatarHash}?s=100&d=identicon"
+												 src="//gravatar.com/avatar/${user.gravatarHash}?s=100&d=identicon"
 												 alt="Image Description">
 											<span class="avatar-status avatar-sm-status avatar-status-success"></span>
 										</div>
@@ -97,7 +97,7 @@
 											<div class="media align-items-center">
 												<div class="avatar avatar-sm avatar-circle mr-2">
 													<img class="avatar-img"
-														 src="//www.gravatar.com/avatar/${user.gravatarHash}?s=100&d=identicon"
+														 src="//gravatar.com/avatar/${user.gravatarHash}?s=100&d=identicon"
 														 alt="Image Description">
 												</div>
 												<div class="media-body">
