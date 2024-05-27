@@ -4,7 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller("AdminHomeController")
+@Controller("adminHomeController")
 public class HomeController {
     @GetMapping(value = "/administration", name = "admin-home")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

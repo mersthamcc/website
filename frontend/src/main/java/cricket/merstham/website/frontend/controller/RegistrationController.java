@@ -55,6 +55,9 @@ public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
     public static final String CURRENT_SUBSCRIPTION = "current-subscription";
     public static final String ERRORS = "errors";
+    public static final String SUBSCRIPTION = "subscription";
+    public static final String SUBSCRIPTION_ID = "subscriptionId";
+    public static final String MODEL_ERRORS = "errors";
 
     private final MembershipService membershipService;
     private final PaymentServiceManager paymentServiceManager;
@@ -116,9 +119,9 @@ public class RegistrationController {
                                             Comparator.comparing(MemberCategory::getSortOrder)
                                                     .thenComparing(MemberCategory::getKey))
                                     .toList(),
-                            "subscription",
+                            SUBSCRIPTION,
                             subscription,
-                            "subscriptionId",
+                            SUBSCRIPTION_ID,
                             editMember));
         } else {
             switch (action) {
@@ -140,9 +143,9 @@ public class RegistrationController {
                                                                     MemberCategory::getSortOrder)
                                                             .thenComparing(MemberCategory::getKey))
                                             .toList(),
-                                    "subscription",
+                                    SUBSCRIPTION,
                                     subscription,
-                                    "subscriptionId",
+                                    SUBSCRIPTION_ID,
                                     subscriptionId.toString()));
                 case "next":
                     var errors = validateBasket(basket, declarations);
@@ -151,6 +154,8 @@ public class RegistrationController {
                     }
                     redirectAttributes.addFlashAttribute(ERRORS, errors);
                     break;
+                default:
+                    LOG.warn("Unknown action: {}", action);
             }
         }
         return redirectTo("/register");
@@ -193,10 +198,14 @@ public class RegistrationController {
                 return new ModelAndView(
                         "registration/enter-code",
                         Map.of(
-                                "errors", errors,
-                                "category", category,
-                                "uuid", uuid.toString(),
-                                "priceListItemId", priceListItemId));
+                                MODEL_ERRORS,
+                                errors,
+                                "category",
+                                category,
+                                "uuid",
+                                uuid.toString(),
+                                "priceListItemId",
+                                priceListItemId));
             }
             storeCode(session, category, code);
         }
@@ -204,16 +213,20 @@ public class RegistrationController {
         return new ModelAndView(
                 "registration/membership-form",
                 Map.of(
-                        "form", membershipCategory.getForm(),
-                        "subscription", subscription,
-                        "category", membershipCategory,
-                        "subscriptionId", uuid.toString(),
+                        "form",
+                        membershipCategory.getForm(),
+                        SUBSCRIPTION,
+                        subscription,
+                        "category",
+                        membershipCategory,
+                        SUBSCRIPTION_ID,
+                        uuid.toString(),
                         "data",
-                                addDefaults(
-                                        memberToFormData(subscription),
-                                        authentication,
-                                        category,
-                                        sessionDefaults)));
+                        addDefaults(
+                                memberToFormData(subscription),
+                                authentication,
+                                category,
+                                sessionDefaults)));
     }
 
     @PostMapping(
@@ -321,9 +334,9 @@ public class RegistrationController {
                         .forEach(
                                 d -> {
                                     if ((!attributes.containsKey(d))
-                                            || Strings.isBlank((String) attributes.getFirst(d))) {
-                                        if (sessionDefaults.containsKey(d))
-                                            attributes.put(d, List.of(sessionDefaults.get(d)));
+                                            || Strings.isBlank((String) attributes.getFirst(d))
+                                                    && (sessionDefaults.containsKey(d))) {
+                                        attributes.put(d, List.of(sessionDefaults.get(d)));
                                     }
                                 });
             }

@@ -156,7 +156,7 @@ public class CkFinderController {
                                         config.getImagesConfig().getSizes().entrySet().stream()
                                                 .collect(
                                                         Collectors.toMap(
-                                                                s -> s.getKey(),
+                                                                Map.Entry::getKey,
                                                                 s ->
                                                                         imageSize(
                                                                                 s.getValue()
@@ -592,8 +592,7 @@ public class CkFinderController {
         int errorCode = ErrorCode.UNKNOWN;
         var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        if (ex instanceof CKFinderException) {
-            var ckfinderException = (CKFinderException) ex;
+        if (ex instanceof CKFinderException ckfinderException) {
             errorCode = ckfinderException.getErrorCode();
             httpStatus = ckfinderException.getHttpStatus();
         }
@@ -665,12 +664,10 @@ public class CkFinderController {
 
     private Config.ResourceType getResourceType(Map<String, String> params, String name) {
         var resourceTypes = ckFinderRequestConfiguration.resourcesForRequest(params);
-        var resourceType =
-                resourceTypes.stream()
-                        .filter(t -> t.getName().equals(name))
-                        .findFirst()
-                        .orElseThrow();
-        return resourceType;
+        return resourceTypes.stream()
+                .filter(t -> t.getName().equals(name))
+                .findFirst()
+                .orElseThrow();
     }
 
     private URI currentFolderUrl(Config.ResourceType resourceType, String currentFolder) {
@@ -730,7 +727,7 @@ public class CkFinderController {
 
     private ImageSize getAdjustedSize(ImageSize requestedSize) {
         List<ImageSize> allowedSizes = config.getThumbnailsConfig().getSizes();
-        Iterator iterator = allowedSizes.iterator();
+        Iterator<ImageSize> iterator = allowedSizes.iterator();
 
         ImageSize imageSize;
         do {
@@ -738,7 +735,7 @@ public class CkFinderController {
                 return allowedSizes.get(allowedSizes.size() - 1);
             }
 
-            imageSize = (ImageSize) iterator.next();
+            imageSize = iterator.next();
         } while (imageSize.getWidth() < requestedSize.getWidth()
                 || imageSize.getHeight() < requestedSize.getHeight());
 

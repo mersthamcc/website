@@ -14,8 +14,6 @@ import java.security.Principal;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
-import static cricket.merstham.website.frontend.helpers.RoleHelper.EVENTS;
-import static cricket.merstham.website.frontend.helpers.RoleHelper.hasRole;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.EVENTS_HOME_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.EVENTS_ITEM_LEGACY_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.EVENTS_ITEM_ROUTE;
@@ -48,7 +46,7 @@ public class EventsController {
 
     @GetMapping(value = EVENTS_ITEM_LEGACY_ROUTE, name = "events-item-legacy")
     public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-        return redirectTo(service.get(id).getPath().toString());
+        return redirectTo(service.get(id).getPath());
     }
 
     @GetMapping(value = EVENTS_ITEM_ROUTE, name = "events-item")
@@ -70,9 +68,5 @@ public class EventsController {
                                                 "slug", slug))
                                 .toString());
         return new ModelAndView("events/item", Map.of("event", event));
-    }
-
-    private boolean isAdmin(Principal principal) {
-        return hasRole(principal, EVENTS);
     }
 }

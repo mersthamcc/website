@@ -46,7 +46,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_CONTA
 import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller("AdminContactController")
+@Controller("adminContactController")
 public class ContactController extends SspController<Contact> {
     private static final Logger LOG = LoggerFactory.getLogger(ContactController.class);
     public static final String ADMINISTRATION_CONTACT_EDIT = "administration/contacts/edit";

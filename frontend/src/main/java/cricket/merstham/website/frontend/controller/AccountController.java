@@ -42,6 +42,7 @@ public class AccountController {
 
     public static final String ERRORS = "ERRORS";
     private static final String INFO = "INFO";
+    public static final String ERROR_KEY = "errors";
 
     private final CognitoService service;
     private final MembershipService membershipService;
@@ -63,7 +64,7 @@ public class AccountController {
         return new ModelAndView(
                 "account/home",
                 model,
-                model.containsKey("errors") ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
     }
 
     @PostMapping(value = "/account", name = "account-home-update-user")
@@ -90,7 +91,9 @@ public class AccountController {
             return new ModelAndView(
                     "account/change-password",
                     model,
-                    model.containsKey("errors") ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+                    model.containsKey(ERROR_KEY)
+                            ? HttpStatus.INTERNAL_SERVER_ERROR
+                            : HttpStatus.OK);
         }
     }
 
@@ -128,7 +131,7 @@ public class AccountController {
         return new ModelAndView(
                 "account/member-list",
                 model,
-                model.containsKey("errors") ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
     }
 
     @GetMapping(value = "/account/billing", name = "account-members-billing")
@@ -187,7 +190,7 @@ public class AccountController {
 
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (nonNull(flash)) {
-            if (flash.containsKey(ERRORS)) model.put("errors", flash.get(ERRORS));
+            if (flash.containsKey(ERRORS)) model.put(ERROR_KEY, flash.get(ERRORS));
             if (flash.containsKey(INFO)) model.put("info", flash.get(INFO));
         }
         return model;

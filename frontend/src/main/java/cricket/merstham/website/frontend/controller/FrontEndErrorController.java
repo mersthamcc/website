@@ -25,9 +25,10 @@ import static java.util.Objects.nonNull;
 
 @Controller
 @ControllerAdvice
-public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
+public class FrontEndErrorController
+        implements org.springframework.boot.web.servlet.error.ErrorController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FrontEndErrorController.class);
     public static final String EXCEPTION_FLASH = "exception";
 
     @GetMapping(value = "/error")

@@ -30,7 +30,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_MEMBE
 import static java.lang.Math.min;
 import static java.util.Objects.nonNull;
 
-@Controller("AdminMembershipReportController")
+@Controller("adminMembershipReportController")
 public class MembershipReportsController {
 
     private static final Logger LOG = LogManager.getLogger(MembershipReportsController.class);

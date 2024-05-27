@@ -17,8 +17,6 @@ import software.amazon.awssdk.services.dynamodb.model.KeyType;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 import software.amazon.awssdk.services.dynamodb.model.TableClass;
-import software.amazon.awssdk.services.dynamodb.model.TimeToLiveSpecification;
-import software.amazon.awssdk.services.dynamodb.model.UpdateTimeToLiveRequest;
 
 import static java.util.Objects.nonNull;
 
@@ -66,14 +64,14 @@ public class SessionConfiguration extends SpringHttpSessionConfiguration {
                                         .build())
                         .build());
         client.updateTimeToLive(
-                UpdateTimeToLiveRequest.builder()
-                        .tableName(configuration.getTableName())
-                        .timeToLiveSpecification(
-                                TimeToLiveSpecification.builder()
-                                        .attributeName(configuration.getTtlAttributeName())
-                                        .enabled(true)
-                                        .build())
-                        .build());
+                builder ->
+                        builder.tableName(configuration.getTableName())
+                                .timeToLiveSpecification(
+                                        ttlBuilder ->
+                                                ttlBuilder
+                                                        .attributeName(
+                                                                configuration.getTtlAttributeName())
+                                                        .enabled(true)));
     }
 
     private static boolean tableExists(

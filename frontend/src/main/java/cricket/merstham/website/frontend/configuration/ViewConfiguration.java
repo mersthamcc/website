@@ -28,14 +28,11 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.text.MessageFormat.format;
 
 @Configuration
 public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor {
@@ -74,10 +71,10 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
         if (handler instanceof HandlerMethod && modelAndView != null) {
             Map<String, Object> model = new HashMap<>();
             var principal = request.getUserPrincipal();
-            if (principal != null && principal instanceof CognitoAuthentication) {
-                model.put("user", createUserView(principal));
+            if (principal instanceof CognitoAuthentication authentication) {
+                model.put("user", createUserView(authentication));
                 if (debug) {
-                    model.put("accessToken", ((CognitoAuthentication) principal).getAccessToken());
+                    model.put("accessToken", authentication.getAccessToken());
                 }
             }
             model.put("debug", debug);
@@ -106,11 +103,12 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
         }
     }
 
-    private UserView createUserView(Principal principal) {
+    private UserView createUserView(CognitoAuthentication authentication) {
         List<String> roles =
-                ((CognitoAuthentication) principal)
-                        .getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-        return new UserView((OidcUser) ((CognitoAuthentication) principal).getPrincipal(), roles);
+                authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList();
+        return new UserView((OidcUser) authentication.getPrincipal(), roles);
     }
 
     private CurrentRoute getCurrentRoute(HttpServletRequest request, Object handler) {
@@ -124,14 +122,6 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
         } catch (Exception ex) {
             LOG.warn("No parameters to cast", ex);
         }
-        LOG.debug(
-                "Matched route = {}, parameters = {}",
-                route.getName(),
-                String.join(
-                        ", ",
-                        route.getPathVariables().entrySet().stream()
-                                .map(e -> format("{0}={1}", e.getKey(), e.getValue()))
-                                .toList()));
         return route;
     }
 
@@ -215,12 +205,12 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
 
         public String getName() {
             for (var annotation : method.getAnnotations()) {
-                if (annotation instanceof RequestMapping) {
-                    return ((RequestMapping) annotation).name();
-                } else if (annotation instanceof GetMapping) {
-                    return ((GetMapping) annotation).name();
-                } else if (annotation instanceof PostMapping) {
-                    return ((PostMapping) annotation).name();
+                if (annotation instanceof RequestMapping requestMapping) {
+                    return requestMapping.name();
+                } else if (annotation instanceof GetMapping getMapping) {
+                    return getMapping.name();
+                } else if (annotation instanceof PostMapping postMapping) {
+                    return postMapping.name();
                 }
             }
             return "no-mapping-attribute";
@@ -230,8 +220,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName)
             throws BeansException {
-        if (bean instanceof FreeMarkerConfigurer) {
-            FreeMarkerConfigurer configurer = (FreeMarkerConfigurer) bean;
+        if (bean instanceof FreeMarkerConfigurer configurer) {
             configurer
                     .getConfiguration()
                     .setObjectWrapper(
