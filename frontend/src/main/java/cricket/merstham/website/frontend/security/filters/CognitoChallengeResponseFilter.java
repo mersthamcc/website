@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static cricket.merstham.shared.helpers.InputSanitizer.encodeForLog;
 import static cricket.merstham.website.frontend.controller.LoginController.CHALLENGE_PROCESSING_URL;
 import static cricket.merstham.website.frontend.helpers.OtpHelper.getCodeFromRequestParameters;
 import static cricket.merstham.website.frontend.security.CognitoChallengeAuthentication.Step.SETUP_SMS_MFA;
@@ -73,9 +74,10 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
                 return chooseMfaType(request, response, authentication);
             }
             default -> {
-                LOG.error(
-                        "Unsupported Cognito challenge experienced: {}",
-                        authentication.getChallengeName());
+                if (LOG.isErrorEnabled())
+                    LOG.error(
+                            "Unsupported Cognito challenge experienced: {}",
+                            encodeForLog(authentication.getChallengeName().toString()));
                 return null;
             }
         }
