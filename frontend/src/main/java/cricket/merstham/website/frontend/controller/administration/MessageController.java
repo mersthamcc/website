@@ -43,12 +43,12 @@ public class MessageController {
     public RedirectView save(
             @PathVariable("key") String key,
             Message message,
-            CognitoAuthentication cognitoAuthentication) {
-        try {
-            service.saveMessage(cognitoAuthentication.getOAuth2AccessToken(), message);
-            return redirectTo(key);
-        } catch (Exception ex) {
-            return redirectTo(key);
+            CognitoAuthentication cognitoAuthentication)
+            throws IOException {
+        if (message.getKey().equals(key)) {
+            var result = service.saveMessage(cognitoAuthentication.getOAuth2AccessToken(), message);
+            return redirectTo(result.getKey());
         }
+        return redirectTo(message.getKey());
     }
 }
