@@ -13,5 +13,4 @@ public final class RouteNames {
             "forgot-password"; // pragma: allowlist secret
 
     private RouteNames() {}
-    ;
 }

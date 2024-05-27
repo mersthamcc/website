@@ -155,7 +155,7 @@ public class RegistrationController {
                     redirectAttributes.addFlashAttribute(ERRORS, errors);
                     break;
                 default:
-                    LOG.warn("Unknown action: {}", action);
+                    LOG.warn("Unknown action");
             }
         }
         return redirectTo("/register");
