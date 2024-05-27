@@ -30,7 +30,7 @@ public class FeedController {
 
     @GetMapping("/feeds/rss/stripped")
     public View getStrippedFeed() {
-        return rssFeed;
+        return getFeed();
     }
 
     @GetMapping("/feeds/fixtures/{id}.ical")

@@ -49,7 +49,7 @@ public class GraphService {
             GraphConfiguration graphConfiguration,
             AccessTokenManager accessTokenManager,
             ObjectMapper objectMapper,
-            @Named("graphql-client") Client client) {
+            @Named("graphqlClient") Client client) {
         this.graphConfiguration = graphConfiguration;
         this.accessTokenManager = accessTokenManager;
         this.objectMapper = objectMapper;

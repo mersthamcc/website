@@ -146,7 +146,7 @@ public class SecurityConfiguration {
 
     @Bean
     public GrantedAuthoritiesMapper userAuthoritiesMapper() {
-        return (authorities) -> {
+        return authorities -> {
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
 
             authorities.forEach(

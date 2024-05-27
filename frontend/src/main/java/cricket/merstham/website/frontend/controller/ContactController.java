@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
-import static cricket.merstham.website.frontend.helpers.RoleHelper.CONTACT;
-import static cricket.merstham.website.frontend.helpers.RoleHelper.hasRole;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.CONTACTS_CATEGORY_HOME_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.CONTACTS_HOME_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.CONTACTS_ITEM_ROUTE;
@@ -44,11 +42,6 @@ public class ContactController {
                 "contacts/home", Map.of("categories", items.getData(), "current", category));
     }
 
-    //    @GetMapping(value = CONTACTS_ITEM_LEGACY_ROUTE, name = "contacts-item-legacy")
-    //    public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-    //        return redirectTo(service.get(id).getSlug().toString());
-    //    }
-
     @GetMapping(value = CONTACTS_ITEM_ROUTE, name = "contact-item")
     public ModelAndView getItem(
             Principal principal,
@@ -57,9 +50,5 @@ public class ContactController {
             throws IOException {
         var item = service.get(slug);
         return new ModelAndView("contacts/item", Map.of("contact", item));
-    }
-
-    private boolean isAdmin(Principal principal) {
-        return hasRole(principal, CONTACT);
     }
 }

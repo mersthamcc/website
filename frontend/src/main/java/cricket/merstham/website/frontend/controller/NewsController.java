@@ -23,7 +23,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ITEM_R
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.NEWS_ROUTE_TEMPLATE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.buildRoute;
 
-@Controller("NewsController")
+@Controller("newsController")
 public class NewsController {
     private final NewsService newsService;
 
@@ -49,7 +49,7 @@ public class NewsController {
 
     @GetMapping(value = NEWS_ITEM_LEGACY_ROUTE, name = "news-item-legacy")
     public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-        return redirectTo(newsService.get(id).getPath().toString());
+        return redirectTo(newsService.get(id).getPath());
     }
 
     @GetMapping(value = NEWS_ITEM_ROUTE, name = "news")

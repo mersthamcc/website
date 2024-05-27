@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HttpClientConfiguration {
 
-    @Bean(name = "graphql-client")
+    @Bean(name = "graphqlClient")
     public Client getGraphQLClient() {
         return ClientBuilder.newBuilder().build();
     }

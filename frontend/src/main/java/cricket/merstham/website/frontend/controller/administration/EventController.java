@@ -42,7 +42,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_EVENT
 import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller("AdminEventController")
+@Controller("adminEventController")
 public class EventController extends SspController<Event> {
     private static final Logger LOG = LoggerFactory.getLogger(EventController.class);
     public static final String ADMINISTRATION_EVENT_EDIT = "administration/event/edit";

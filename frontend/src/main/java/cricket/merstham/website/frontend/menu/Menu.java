@@ -1,8 +1,6 @@
 package cricket.merstham.website.frontend.menu;
 
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.inject.Provider;
@@ -16,8 +14,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class Menu {
-    private static final Logger LOG = LoggerFactory.getLogger(Menu.class);
-
     private final String name;
     private final Map<String, String> arguments;
     private final URI destinationUrl;
@@ -101,12 +97,6 @@ public class Menu {
     }
 
     public boolean onActivePath(ViewConfiguration.CurrentRoute currentRoute) {
-        LOG.info(
-                "onActivePath(name = {}, params = {}) called on name = {}, params = {}",
-                currentRoute.getName(),
-                currentRoute.getPathVariables(),
-                this.name,
-                this.getArguments());
         if (isActiveNode(currentRoute)) return true;
         if (children != null) {
             for (var child : getChildren()) {

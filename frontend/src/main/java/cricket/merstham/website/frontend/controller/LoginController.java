@@ -124,10 +124,8 @@ public class LoginController {
                 isNull(error) ? List.of() : List.of(LOGIN_ERRORS_MESSAGE_CATEGORY.concat(error));
         var model = new HashMap<String, Object>();
         var flash = RequestContextUtils.getInputFlashMap(request);
-        if (nonNull(flash)) {
-            if (flash.containsKey(INFO)) {
-                model.put(MODEL_INFO, flash.get(INFO));
-            }
+        if (nonNull(flash) && (flash.containsKey(INFO))) {
+            model.put(MODEL_INFO, flash.get(INFO));
         }
         var providers = cognitoService.getProviders();
         model.put(MODEL_PROCESSING_URL, LOGIN_PROCESSING_URL);
@@ -369,7 +367,7 @@ public class LoginController {
 
     @PostMapping(value = FORGOT_PASSWORD_URL, name = RouteNames.ROUTE_FORGOT_PASSWORD)
     public RedirectView forgotPasswordRequest(
-            @RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+            @RequestParam(MODEL_EMAIL) String email, RedirectAttributes redirectAttributes) {
         cognitoService.forgotPassword(email);
         redirectAttributes.addFlashAttribute(EMAIL, email);
         return redirectTo(FORGOT_PASSWORD_CODE_URL);

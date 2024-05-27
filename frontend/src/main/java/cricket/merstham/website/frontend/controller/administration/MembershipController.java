@@ -49,7 +49,7 @@ import static java.lang.Math.min;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
 
-@Controller("AdminMembershipController")
+@Controller("adminMembershipController")
 public class MembershipController extends SspController<MemberSummary> {
 
     private static final Logger LOG = LogManager.getLogger(MembershipController.class);
