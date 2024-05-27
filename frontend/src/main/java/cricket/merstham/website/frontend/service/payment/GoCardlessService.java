@@ -124,7 +124,7 @@ public class GoCardlessService implements PaymentService {
                         .create()
                         .withDescription(mandateDescription)
                         .withIdempotencyKey(UUID.randomUUID().toString())
-                        .withSessionToken(request.getRequestedSessionId())
+                        .withSessionToken(basket.getId())
                         .withSuccessRedirectUrl(
                                 format("{0}/payments/{1}/execute", baseUri, SERVICE_NAME))
                         .withPrefilledCustomerEmail(request.getUserPrincipal().getName())
@@ -165,12 +165,8 @@ public class GoCardlessService implements PaymentService {
                         .orElseThrow();
 
         var redirectFlow =
-                client.redirectFlows()
-                        .complete(flowId)
-                        .withSessionToken(request.getRequestedSessionId())
-                        .execute();
+                client.redirectFlows().complete(flowId).withSessionToken(basket.getId()).execute();
         var mandate = client.mandates().get(redirectFlow.getLinks().getMandate()).execute();
-        var customer = client.customers().get(redirectFlow.getLinks().getCustomer()).execute();
 
         List<LocalDate> chargeDates = calculateDates(mandate, dayOfMonth, numberOfPayments);
         LOG.info(
