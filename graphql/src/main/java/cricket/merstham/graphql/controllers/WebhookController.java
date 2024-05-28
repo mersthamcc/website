@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import static cricket.merstham.shared.helpers.InputSanitizer.encodeForLog;
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -55,7 +56,8 @@ public class WebhookController {
                                                 .message("Webhook Received")
                                                 .build());
                     }
-                    LOG.error("Invalid Webhook: {}", body);
+                    var logBody = encodeForLog(body);
+                    LOG.error("Invalid Webhook: {}", logBody);
                     return ResponseEntity.badRequest()
                             .body(
                                     WebhookResult.builder()
