@@ -333,9 +333,10 @@ public class RegistrationController {
                         .getPersistFields()
                         .forEach(
                                 d -> {
-                                    if ((!attributes.containsKey(d))
-                                            || Strings.isBlank((String) attributes.getFirst(d))
-                                                    && (sessionDefaults.containsKey(d))) {
+                                    if ((!attributes.containsKey(d)
+                                                    || Strings.isBlank(
+                                                            (String) attributes.getFirst(d)))
+                                            && (sessionDefaults.containsKey(d))) {
                                         attributes.put(d, List.of(sessionDefaults.get(d)));
                                     }
                                 });
