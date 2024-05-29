@@ -303,37 +303,43 @@ public class FixtureService {
 
         fixtures.forEach(
                 fixture -> {
-                    LOG.info("Processing fixture {}", fixture);
-                    var home = fixture.getHomeAway().equals("HOME");
-                    var team =
-                            teamRepository.findById(
-                                    home ? fixture.getHomeTeamId() : fixture.getAwayTeamId());
-                    var additionalTeamId =
-                            (Objects.equals(fixture.getHomeClubId(), fixture.getAwayClubId())
-                                            && home)
-                                    ? fixture.getAwayTeamId()
-                                    : null;
-                    var entity =
-                            fixtureRepository
-                                    .findById(fixture.getId())
-                                    .orElseGet(
-                                            () ->
-                                                    FixtureEntity.builder()
-                                                            .id(fixture.getId())
-                                                            .build())
-                                    .setDate(fixture.getMatchDate())
-                                    .setStart(fixture.getMatchTime())
-                                    .setOpposition(
-                                            home
-                                                    ? fixture.getAwayClubName()
-                                                    : fixture.getHomeClubName())
-                                    .setHomeAway(fixture.getHomeAway())
-                                    .setTeam(team.orElseThrow())
-                                    .setDetail(fixture.getDetails())
-                                    .setGroundId(home ? fixture.getGroundId() : null)
-                                    .setOppositionTeamId(additionalTeamId);
+                    try {
+                        LOG.info("Processing fixture {}", fixture);
+                        var home = "HOME".equals(fixture.getHomeAway());
+                        var team =
+                                teamRepository.findById(
+                                        home ? fixture.getHomeTeamId() : fixture.getAwayTeamId());
+                        var additionalTeamId =
+                                (Objects.equals(fixture.getHomeClubId(), fixture.getAwayClubId())
+                                                && home)
+                                        ? fixture.getAwayTeamId()
+                                        : null;
+                        var entity =
+                                fixtureRepository
+                                        .findById(fixture.getId())
+                                        .orElseGet(
+                                                () ->
+                                                        FixtureEntity.builder()
+                                                                .id(fixture.getId())
+                                                                .build())
+                                        .setDate(fixture.getMatchDate())
+                                        .setStart(fixture.getMatchTime())
+                                        .setOpposition(
+                                                home
+                                                        ? fixture.getAwayClubName()
+                                                        : fixture.getHomeClubName())
+                                        .setHomeAway(fixture.getHomeAway())
+                                        .setTeam(team.orElseThrow())
+                                        .setDetail(fixture.getDetails())
+                                        .setGroundId(home ? fixture.getGroundId() : null)
+                                        .setOppositionTeamId(additionalTeamId);
 
-                    updates.add(entity);
+                        updates.add(entity);
+                    } catch (Exception ex) {
+                        LOG.atError()
+                                .withThrowable(ex)
+                                .log("Error preparing fixture {} for update", fixture.getId());
+                    }
                 });
 
         if (updates.isEmpty()) {
