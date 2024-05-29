@@ -50,6 +50,7 @@ public class PlayCricketService {
     public static final String MATCH_DETAILS = "match_details";
     public static final String HOME = "HOME";
     public static final String AWAY = "AWAY";
+    public static final String MATCH_ID = "match_id";
     private final Client client;
     private final String apiToken;
     private final int siteId;
@@ -128,17 +129,12 @@ public class PlayCricketService {
                             if (nonNull(detail) && detail.has(MATCH_DETAILS)) {
                                 var home = Objects.equals(playCricketMatch.getHomeClubId(), siteId);
                                 playCricketMatch
-                                        .setDetails(detail.get(MATCH_DETAILS).get(0))
+                                        .setDetails(detail)
                                         .setTeamId(
                                                 home
                                                         ? playCricketMatch.getHomeTeamId()
                                                         : playCricketMatch.getAwayTeamId())
                                         .setHomeAway(home ? HOME : AWAY);
-                            } else {
-                                LOG.atError()
-                                        .setMessage("Error with match detail response: {}")
-                                        .addArgument(() -> encodeForLog(detail.toString()))
-                                        .log();
                             }
                         });
         return result.getMatches();
@@ -146,8 +142,17 @@ public class PlayCricketService {
 
     public JsonNode getMatchDetails(int id) {
         var detailRequest =
-                createGetRequest(MATCH_DETAIL_ENDPOINT, Map.of("match_id", Integer.toString(id)));
-        return detailRequest.invoke(JsonNode.class).get(MATCH_DETAILS).get(0);
+                createGetRequest(MATCH_DETAIL_ENDPOINT, Map.of(MATCH_ID, Integer.toString(id)));
+        var result = detailRequest.invoke(JsonNode.class);
+        if (nonNull(result) && result.has(MATCH_DETAILS)) {
+            return result.get(MATCH_DETAILS).get(0);
+        }
+        LOG.atError()
+                .setMessage("Error getting with match detail for {}, response = {}")
+                .addArgument(id)
+                .addArgument(() -> encodeForLog(result.toString()))
+                .log();
+        return null;
     }
 
     private Invocation createGetRequest(
