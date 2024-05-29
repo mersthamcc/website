@@ -74,10 +74,11 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
                 return chooseMfaType(request, response, authentication);
             }
             default -> {
-                if (LOG.isErrorEnabled())
-                    LOG.error(
-                            "Unsupported Cognito challenge experienced: {}",
-                            encodeForLog(authentication.getChallengeName().toString()));
+                LOG.atError()
+                        .setMessage("Unsupported Cognito challenge experienced: {}")
+                        .addArgument(
+                                () -> encodeForLog(authentication.getChallengeName().toString()))
+                        .log();
                 return null;
             }
         }
@@ -138,7 +139,10 @@ public class CognitoChallengeResponseFilter extends AbstractAuthenticationProces
                 return authentication.toBuilder().step(SETUP_SMS_MFA).build();
             }
             default -> {
-                LOG.error("Unexpected MFA type in request: {}", mfaType);
+                LOG.atError()
+                        .setMessage("Unexpected MFA type in request: {}")
+                        .addArgument(() -> encodeForLog(mfaType))
+                        .log();
                 return null;
             }
         }

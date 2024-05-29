@@ -56,8 +56,10 @@ public class WebhookController {
                                                 .message("Webhook Received")
                                                 .build());
                     }
-                    var logBody = encodeForLog(body);
-                    LOG.error("Invalid Webhook: {}", logBody);
+                    LOG.atError()
+                            .setMessage("Invalid Webhook: {}")
+                            .addArgument(() -> encodeForLog(body))
+                            .log();
                     return ResponseEntity.badRequest()
                             .body(
                                     WebhookResult.builder()
