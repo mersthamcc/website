@@ -11,6 +11,8 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static cricket.merstham.shared.helpers.InputSanitizer.encodeForLog;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.nonNull;
 
 @Service
 public class PlayCricketService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PlayCricketService.class);
 
     private static final String BASE_URL = "https://www.play-cricket.com/api/v2";
     private static final String TEAMS_ENDPOINT = "/sites/{0,number,#}/teams.json";
@@ -41,6 +47,9 @@ public class PlayCricketService {
     private static final String FROM_ENTRY_DATE = "from_entry_date";
     private static final String END_ENTRY_DATE = "end_entry_date";
     public static final String SITE_ID = "site_id";
+    public static final String MATCH_DETAILS = "match_details";
+    public static final String HOME = "HOME";
+    public static final String AWAY = "AWAY";
     private final Client client;
     private final String apiToken;
     private final int siteId;
@@ -116,14 +125,21 @@ public class PlayCricketService {
                         playCricketMatch -> {
                             var detail = getMatchDetails(playCricketMatch.getId());
 
-                            var home = Objects.equals(playCricketMatch.getHomeClubId(), siteId);
-                            playCricketMatch
-                                    .setDetails(detail.get("match_details").get(0))
-                                    .setTeamId(
-                                            home
-                                                    ? playCricketMatch.getHomeTeamId()
-                                                    : playCricketMatch.getAwayTeamId())
-                                    .setHomeAway(home ? "HOME" : "AWAY");
+                            if (nonNull(detail) && detail.has(MATCH_DETAILS)) {
+                                var home = Objects.equals(playCricketMatch.getHomeClubId(), siteId);
+                                playCricketMatch
+                                        .setDetails(detail.get(MATCH_DETAILS).get(0))
+                                        .setTeamId(
+                                                home
+                                                        ? playCricketMatch.getHomeTeamId()
+                                                        : playCricketMatch.getAwayTeamId())
+                                        .setHomeAway(home ? HOME : AWAY);
+                            } else {
+                                LOG.atError()
+                                        .setMessage("Error with match detail response: {}")
+                                        .addArgument(() -> encodeForLog(detail.toString()))
+                                        .log();
+                            }
                         });
         return result.getMatches();
     }
@@ -131,7 +147,7 @@ public class PlayCricketService {
     public JsonNode getMatchDetails(int id) {
         var detailRequest =
                 createGetRequest(MATCH_DETAIL_ENDPOINT, Map.of("match_id", Integer.toString(id)));
-        return detailRequest.invoke(JsonNode.class).get("match_details").get(0);
+        return detailRequest.invoke(JsonNode.class).get(MATCH_DETAILS).get(0);
     }
 
     private Invocation createGetRequest(
