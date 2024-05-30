@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.configuration;
 import cricket.merstham.website.frontend.menu.MenuBuilder;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.templates.PhoneNumberFormatter;
+import freemarker.template.TemplateExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import no.api.freemarker.java8.Java8ObjectWrapper;
@@ -225,6 +226,12 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
                     .getConfiguration()
                     .setObjectWrapper(
                             new Java8ObjectWrapper(freemarker.template.Configuration.getVersion()));
+            if (!debug) {
+                configurer
+                        .getConfiguration()
+                        .setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
+                configurer.getConfiguration().setLogTemplateExceptions(true);
+            }
         }
         return bean;
     }
