@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,13 +121,13 @@ public class PlayCricketService {
 
     private List<PlayCricketMatch> getPlayCricketMatches(Invocation request) {
         var result = request.invoke(PlayCricketMatchSummaryResponse.class);
-
+        var fixtures = new ArrayList<PlayCricketMatch>();
         result.getMatches()
                 .forEach(
                         playCricketMatch -> {
                             var detail = getMatchDetails(playCricketMatch.getId());
 
-                            if (nonNull(detail) && detail.has(MATCH_DETAILS)) {
+                            if (nonNull(detail)) {
                                 var home = Objects.equals(playCricketMatch.getHomeClubId(), siteId);
                                 playCricketMatch
                                         .setDetails(detail)
@@ -135,9 +136,10 @@ public class PlayCricketService {
                                                         ? playCricketMatch.getHomeTeamId()
                                                         : playCricketMatch.getAwayTeamId())
                                         .setHomeAway(home ? HOME : AWAY);
+                                fixtures.add(playCricketMatch);
                             }
                         });
-        return result.getMatches();
+        return fixtures;
     }
 
     public JsonNode getMatchDetails(int id) {
