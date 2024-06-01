@@ -262,7 +262,14 @@ public class FixtureService {
             var lastUpdate = lastUpdateEntity.map(LastUpdateEntity::getLastUpdate);
             var fixtures = playCricketService.getFixtures(lastUpdate, now);
 
-            saveFixtures(fixtures);
+            saveFixtures(fixtures.stream().filter(f -> f.getStatus().equals("New")).toList());
+
+            fixtureRepository.deleteAllByIdInBatch(fixtures
+                    .stream()
+                    .filter(f -> f.getStatus().equals("Deleted"))
+                    .map(f -> f.getId())
+                    .toList());
+
             lastUpdateRepository.saveAndFlush(
                     lastUpdateEntity
                             .orElseGet(() -> LastUpdateEntity.builder().key(FIXTURES).build())
@@ -314,27 +321,34 @@ public class FixtureService {
                                                 && home)
                                         ? fixture.getAwayTeamId()
                                         : null;
-                        var entity =
-                                fixtureRepository
-                                        .findById(fixture.getId())
-                                        .orElseGet(
-                                                () ->
-                                                        FixtureEntity.builder()
-                                                                .id(fixture.getId())
-                                                                .build())
-                                        .setDate(fixture.getMatchDate())
-                                        .setStart(fixture.getMatchTime())
-                                        .setOpposition(
-                                                home
-                                                        ? fixture.getAwayClubName()
-                                                        : fixture.getHomeClubName())
-                                        .setHomeAway(fixture.getHomeAway())
-                                        .setTeam(team.orElseThrow())
-                                        .setDetail(fixture.getDetails())
-                                        .setGroundId(home ? fixture.getGroundId() : null)
-                                        .setOppositionTeamId(additionalTeamId);
+                        if (isNull(team)) {
+                            LOG.warn(
+                                    "Team not found {} - {}",
+                                    home ? fixture.getHomeTeamId() : fixture.getAwayTeamId(),
+                                    home ? fixture.getHomeTeamName() : fixture.getAwayTeamName());
+                        } else {
+                            var entity =
+                                    fixtureRepository
+                                            .findById(fixture.getId())
+                                            .orElseGet(
+                                                    () ->
+                                                            FixtureEntity.builder()
+                                                                    .id(fixture.getId())
+                                                                    .build())
+                                            .setDate(fixture.getMatchDate())
+                                            .setStart(fixture.getMatchTime())
+                                            .setOpposition(
+                                                    home
+                                                            ? fixture.getAwayClubName()
+                                                            : fixture.getHomeClubName())
+                                            .setHomeAway(fixture.getHomeAway())
+                                            .setTeam(team.orElseThrow())
+                                            .setDetail(fixture.getDetails())
+                                            .setGroundId(home ? fixture.getGroundId() : null)
+                                            .setOppositionTeamId(additionalTeamId);
 
-                        updates.add(entity);
+                            updates.add(entity);
+                        }
                     } catch (Exception ex) {
                         LOG.atError()
                                 .withThrowable(ex)
