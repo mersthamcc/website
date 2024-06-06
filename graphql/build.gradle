@@ -54,11 +54,12 @@ dependencies {
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'com.thedeanda:lorem:2.1'
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
     testImplementation "org.testcontainers:junit-jupiter"
-    testImplementation 'org.assertj:assertj-core:3.23.1'
+    testImplementation 'org.assertj:assertj-core:3.25.1'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
 dependencyManagement {

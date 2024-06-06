@@ -1,11 +1,13 @@
 package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.graphql.dto.PlayCricketLeague;
 import cricket.merstham.graphql.dto.PlayCricketMatch;
 import cricket.merstham.graphql.dto.PlayCricketMatchSummaryResponse;
 import cricket.merstham.graphql.dto.PlayCricketTeam;
 import cricket.merstham.graphql.dto.PlayCricketTeamResponse;
+import cricket.merstham.graphql.entity.FixtureEntity;
 import jakarta.inject.Named;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Invocation;
@@ -52,19 +54,34 @@ public class PlayCricketService {
     public static final String HOME = "HOME";
     public static final String AWAY = "AWAY";
     public static final String MATCH_ID = "match_id";
+    public static final String INNINGS = "/innings";
+    public static final String TEAM_BATTING_ID = "team_batting_id";
+    public static final String BATSMAN_ID = "batsman_id";
+    public static final String BOWLER_ID = "bowler_id";
+    public static final String PLAYER_ID = "player_id";
+    public static final String MEMBER_ID = "member_id";
+    public static final String NAME = "name";
+    public static final String PLAYER_NAME = "player_name";
+    public static final String HOW_OUT = "how_out";
+    public static final String FIELDER_ID = "fielder_id";
+    public static final String BAT = "bat";
+    public static final String BOWL = "bowl";
     private final Client client;
     private final String apiToken;
     private final int siteId;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public PlayCricketService(
             @Named("play-cricket-client") Client client,
             @Value("${configuration.play-cricket.api-token}") String apiToken,
-            @Value("${configuration.play-cricket.site-id}") int siteId) {
+            @Value("${configuration.play-cricket.site-id}") int siteId,
+            ObjectMapper objectMapper) {
         this.client = client;
         this.apiToken = apiToken;
         this.siteId = siteId;
+        this.objectMapper = objectMapper;
     }
 
     public List<PlayCricketTeam> getTeams() {
@@ -116,7 +133,7 @@ public class PlayCricketService {
         var result = request.invoke(JsonNode.class);
 
         return StreamSupport.stream(result.get("players").spliterator(), false)
-                .collect(Collectors.toMap(n -> n.get("member_id").asInt(), n -> n));
+                .collect(Collectors.toMap(n -> n.get(MEMBER_ID).asInt(), n -> n));
     }
 
     private List<PlayCricketMatch> getPlayCricketMatches(Invocation request) {
@@ -155,6 +172,70 @@ public class PlayCricketService {
                 .addArgument(() -> encodeForLog(result.toString()))
                 .log();
         return null;
+    }
+
+    public List<JsonNode> getPlayers(FixtureEntity fixture) {
+        var result = new ArrayList<JsonNode>();
+
+        var key =
+                HOME.equals(fixture.getHomeAway())
+                        ? "/players/0/home_team"
+                        : "/players/1/away_team";
+        for (JsonNode player : fixture.getDetail().withArray(key)) {
+            if (player.get(PLAYER_ID).asInt() > 0) {
+                result.add(player);
+            }
+        }
+
+        return result;
+    }
+
+    public JsonNode getBatting(FixtureEntity fixture, Integer p) {
+        for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
+            if (innings.get(TEAM_BATTING_ID).asInt() == fixture.getTeam().getId()) {
+                for (JsonNode batting : innings.withArray(BAT)) {
+                    if (batting.get(BATSMAN_ID).asInt() == p) {
+                        return batting;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public JsonNode getBowling(FixtureEntity fixture, Integer p) {
+        for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
+            if (innings.get(TEAM_BATTING_ID).asInt() != fixture.getTeam().getId()) {
+                for (JsonNode bowling : innings.withArray(BOWL)) {
+                    if (bowling.get(BOWLER_ID).asInt() == p) {
+                        return bowling;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public Integer getCatches(FixtureEntity fixture, Integer playerId) {
+        int result = 0;
+        for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
+            if (innings.get(TEAM_BATTING_ID).asInt() != fixture.getTeam().getId()) {
+                for (JsonNode batting : innings.withArray(BAT)) {
+                    if (batting.get(HOW_OUT).asText().equals("ct")
+                            && batting.get(FIELDER_ID).asText().equals(playerId.toString())) {
+                        result++;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public JsonNode createPlayer(JsonNode player) {
+        return objectMapper
+                .createObjectNode()
+                .put(MEMBER_ID, player.get(PLAYER_ID).asInt())
+                .put(NAME, player.get(PLAYER_NAME).asText());
     }
 
     private Invocation createGetRequest(

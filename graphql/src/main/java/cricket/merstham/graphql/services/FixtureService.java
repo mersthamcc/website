@@ -2,10 +2,13 @@ package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.dto.PlayCricketMatch;
 import cricket.merstham.graphql.entity.FixtureEntity;
+import cricket.merstham.graphql.entity.FixturePlayerSummaryEntity;
+import cricket.merstham.graphql.entity.FixturePlayerSummaryEntityId;
 import cricket.merstham.graphql.entity.LastUpdateEntity;
 import cricket.merstham.graphql.entity.LeagueEntity;
 import cricket.merstham.graphql.entity.PlayerEntity;
 import cricket.merstham.graphql.entity.TeamEntity;
+import cricket.merstham.graphql.repository.FixturePlayerSummaryEntityRepository;
 import cricket.merstham.graphql.repository.FixtureRepository;
 import cricket.merstham.graphql.repository.LastUpdateRepository;
 import cricket.merstham.graphql.repository.LeagueRepository;
@@ -29,6 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,8 +46,10 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.SELECTIO
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
 import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
+import static cricket.merstham.graphql.services.PlayCricketService.PLAYER_ID;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Service
 @ExtensionMethod({StringExtensions.class})
@@ -59,6 +65,7 @@ public class FixtureService {
     private final FixtureRepository fixtureRepository;
     private final LeagueRepository leagueRepository;
     private final PlayerRepository playerRepository;
+    private final FixturePlayerSummaryEntityRepository playerSummaryRepository;
 
     @Autowired
     public FixtureService(
@@ -68,7 +75,8 @@ public class FixtureService {
             LastUpdateRepository lastUpdateRepository,
             FixtureRepository fixtureRepository,
             LeagueRepository leagueRepository,
-            PlayerRepository playerRepository) {
+            PlayerRepository playerRepository,
+            FixturePlayerSummaryEntityRepository playerSummaryRepository) {
         this.playCricketService = playCricketService;
         this.modelMapper = modelMapper;
         this.teamRepository = teamRepository;
@@ -76,6 +84,7 @@ public class FixtureService {
         this.fixtureRepository = fixtureRepository;
         this.leagueRepository = leagueRepository;
         this.playerRepository = playerRepository;
+        this.playerSummaryRepository = playerSummaryRepository;
     }
 
     @Cacheable(value = ACTIVE_TEAM_CACHE)
@@ -264,11 +273,11 @@ public class FixtureService {
 
             saveFixtures(fixtures.stream().filter(f -> f.getStatus().equals("New")).toList());
 
-            fixtureRepository.deleteAllByIdInBatch(fixtures
-                    .stream()
-                    .filter(f -> f.getStatus().equals("Deleted"))
-                    .map(f -> f.getId())
-                    .toList());
+            fixtureRepository.deleteAllByIdInBatch(
+                    fixtures.stream()
+                            .filter(f -> f.getStatus().equals("Deleted"))
+                            .map(PlayCricketMatch::getId)
+                            .toList());
 
             lastUpdateRepository.saveAndFlush(
                     lastUpdateEntity
@@ -321,7 +330,7 @@ public class FixtureService {
                                                 && home)
                                         ? fixture.getAwayTeamId()
                                         : null;
-                        if (isNull(team)) {
+                        if (team.isEmpty()) {
                             LOG.warn(
                                     "Team not found {} - {}",
                                     home ? fixture.getHomeTeamId() : fixture.getAwayTeamId(),
@@ -342,12 +351,13 @@ public class FixtureService {
                                                             ? fixture.getAwayClubName()
                                                             : fixture.getHomeClubName())
                                             .setHomeAway(fixture.getHomeAway())
-                                            .setTeam(team.orElseThrow())
+                                            .setTeam(team.get())
                                             .setDetail(fixture.getDetails())
                                             .setGroundId(home ? fixture.getGroundId() : null)
                                             .setOppositionTeamId(additionalTeamId);
 
-                            updates.add(entity);
+                            playerSummaryRepository.saveAllAndFlush(processPlayerStats(entity));
+                            updates.add(fixtureRepository.save(entity));
                         }
                     } catch (Exception ex) {
                         LOG.atError()
@@ -358,11 +368,101 @@ public class FixtureService {
 
         if (updates.isEmpty()) {
             LOG.info("No fixture updates found!");
-            return List.of();
         } else {
-            LOG.info("Saving {} updates to database ...", updates.size());
-            return fixtureRepository.saveAllAndFlush(updates);
+            LOG.info("Saved {} updated fixtures to database ...", updates.size());
         }
+        return updates;
+    }
+
+    private List<FixturePlayerSummaryEntity> processPlayerStats(FixtureEntity fixture) {
+        List<FixturePlayerSummaryEntity> result = new ArrayList<>();
+
+        var players = playCricketService.getPlayers(fixture);
+        var playerEntities =
+                playerRepository.findAllById(
+                        players.stream().map(p -> p.get(PLAYER_ID).asInt()).toList());
+
+        if (players.size() != playerEntities.size()) {
+            LOG.atWarn()
+                    .log(
+                            "Players not found for fixture {}: {}",
+                            fixture.getId(),
+                            players.stream()
+                                    .filter(
+                                            player ->
+                                                    playerEntities.stream()
+                                                            .filter(
+                                                                    p ->
+                                                                            p.getId()
+                                                                                    .equals(
+                                                                                            player.get(
+                                                                                                            PLAYER_ID)
+                                                                                                    .asInt()))
+                                                            .findFirst()
+                                                            .isEmpty())
+                                    .toList());
+        }
+        players.forEach(
+                p -> {
+                    var playerId = p.get(PLAYER_ID).asInt();
+                    var batting = playCricketService.getBatting(fixture, playerId);
+                    var bowling = playCricketService.getBowling(fixture, playerId);
+
+                    var id =
+                            FixturePlayerSummaryEntityId.builder()
+                                    .fixtureId(fixture.getId())
+                                    .playerId(playerId)
+                                    .build();
+                    var player =
+                            playerEntities.stream()
+                                    .filter(playerEntity -> playerEntity.getId().equals(playerId))
+                                    .findFirst()
+                                    .orElseGet(
+                                            () ->
+                                                    playerRepository.save(
+                                                            PlayerEntity.builder()
+                                                                    .id(playerId)
+                                                                    .detail(
+                                                                            playCricketService
+                                                                                    .createPlayer(
+                                                                                            p))
+                                                                    .build()));
+
+                    var entity =
+                            playerSummaryRepository
+                                    .findById(id)
+                                    .orElseGet(
+                                            () ->
+                                                    FixturePlayerSummaryEntity.builder()
+                                                            .id(
+                                                                    FixturePlayerSummaryEntityId
+                                                                            .builder()
+                                                                            .build())
+                                                            .player(player)
+                                                            .fixture(fixture)
+                                                            .build());
+
+                    if (nonNull(batting)) {
+                        entity.setRuns(batting.get("runs").asInt());
+                        entity.setBalls(batting.get("balls").asInt());
+                        entity.setOut(!batting.get("how_out").asText().equals("not out"));
+                        entity.setDnb(batting.get("how_out").asText().equals("did not bat"));
+                        entity.setFours(batting.get("fours").asInt());
+                        entity.setSixes(batting.get("sixes").asInt());
+                    }
+
+                    if (nonNull(bowling)) {
+                        entity.setWickets(bowling.get("wickets").asInt());
+                        entity.setOvers(BigDecimal.valueOf(bowling.get("overs").asDouble()));
+                        entity.setMaidens(bowling.get("maidens").asInt());
+                        entity.setConcededRuns(bowling.get("runs").asInt());
+                    }
+                    entity.setCatches(playCricketService.getCatches(fixture, playerId));
+
+                    result.add(entity);
+                });
+
+        return result;
     }
 
     public List<Integer> getAllFixtureSeasons() {
