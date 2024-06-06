@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Entity
@@ -52,7 +54,7 @@ public class FixturePlayerSummaryEntity {
     private Integer wickets;
 
     @Column(name = "overs")
-    private Integer overs;
+    private BigDecimal overs;
 
     @Column(name = "maidens")
     private Integer maidens;
@@ -65,4 +67,7 @@ public class FixturePlayerSummaryEntity {
 
     @Column(name = "sixes")
     private Integer sixes;
+
+    @Column(name = "conceded_runs")
+    private Integer concededRuns;
 }

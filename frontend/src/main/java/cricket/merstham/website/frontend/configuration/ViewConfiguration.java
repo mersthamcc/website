@@ -225,7 +225,9 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             configurer
                     .getConfiguration()
                     .setObjectWrapper(
-                            new Java8ObjectWrapper(freemarker.template.Configuration.getVersion()));
+                            new Java8ObjectWrapper(
+                                    freemarker.template.Configuration
+                                            .DEFAULT_INCOMPATIBLE_IMPROVEMENTS));
             if (!debug) {
                 configurer
                         .getConfiguration()
