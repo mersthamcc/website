@@ -1,5 +1,7 @@
 package cricket.merstham.website.frontend.controller;
 
+import com.apollographql.apollo.api.Error;
+import cricket.merstham.website.frontend.exception.GraphException;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.util.Objects.isNull;
@@ -59,8 +62,20 @@ public class FrontEndErrorController
             throw exception;
         }
 
+        if (exception instanceof GraphException graphException) {
+            LOG.atError()
+                    .setMessage("GraphQL Errors: {}")
+                    .addArgument(
+                            () ->
+                                    graphException.getErrors().stream()
+                                            .map(Error::getMessage)
+                                            .collect(Collectors.joining(", ")))
+                    .setCause(graphException)
+                    .log();
+        } else {
+            LOG.atError().setMessage("An unexpected error occurred").setCause(exception).log();
+        }
         redirectAttributes.addFlashAttribute(EXCEPTION_FLASH, exception.getLocalizedMessage());
-        LOG.error("An unexpected error occurred", exception);
         return redirectTo("/error");
     }
 }
