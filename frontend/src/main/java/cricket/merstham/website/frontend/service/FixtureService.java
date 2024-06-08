@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 
+import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
+import static java.text.MessageFormat.format;
+
 @Service
 public class FixtureService {
     private static final Logger LOG = LoggerFactory.getLogger(FixtureService.class);
@@ -34,7 +37,11 @@ public class FixtureService {
         ActiveTeamsQuery query = ActiveTeamsQuery.builder().build();
         Response<ActiveTeamsQuery.Data> result = graphService.executeQuery(query);
 
-        return result.getData().getActiveTeams().stream()
+        return requireGraphData(
+                        result,
+                        ActiveTeamsQuery.Data::getActiveTeams,
+                        () -> "Error getting active teams")
+                .stream()
                 .map(t -> modelMapper.map(t, Team.class))
                 .toList();
     }
@@ -44,7 +51,16 @@ public class FixtureService {
                 FixturesByTeamQuery.builder().season(season).team(teamId).build();
         Response<FixturesByTeamQuery.Data> result = graphService.executeQuery(query);
 
-        return modelMapper.map(result.getData().getTeam(), Team.class);
+        return modelMapper.map(
+                requireGraphData(
+                        result,
+                        FixturesByTeamQuery.Data::getTeam,
+                        () ->
+                                format(
+                                        "Error getting fixtures for team {0,number,#######} - season {1,number,####}",
+                                        teamId,
+                                        season)),
+                Team.class);
     }
 
     public List<Fixture> allFixturesForTeam(int teamId) throws IOException {
@@ -52,7 +68,11 @@ public class FixtureService {
 
         Response<AllFixturesForTeamQuery.Data> result = graphService.executeQuery(query);
 
-        return result.getData().getAllFixturesForTeam().stream()
+        return requireGraphData(
+                        result,
+                        AllFixturesForTeamQuery.Data::getAllFixturesForTeam,
+                        () -> format("Error getting fixtures for team {0,number,#######}", teamId))
+                .stream()
                 .map(f -> modelMapper.map(f, Fixture.class))
                 .toList();
     }
@@ -66,7 +86,11 @@ public class FixtureService {
     public List<Fixture> getSelection() throws IOException {
         var query = ThisWeeksSelectionQuery.builder().build();
         Response<ThisWeeksSelectionQuery.Data> result = graphService.executeQuery(query);
-        return result.getData().getThisWeeksSelection().stream()
+        return requireGraphData(
+                        result,
+                        ThisWeeksSelectionQuery.Data::getThisWeeksSelection,
+                        () -> "Error getting selection data")
+                .stream()
                 .map(f -> modelMapper.map(f, Fixture.class))
                 .toList();
     }
