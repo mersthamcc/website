@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -39,3 +39,92 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./gradlew build sonarqube --info
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - test-and-analyse
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build frontend image
+        id: build-frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            mersthamcc/frontend:test
+            ghcr.io/mersthamcc/website-frontend:test
+          build-args: |
+            COMPONENT=frontend
+
+      - name: Build GraphQL image
+        id: build-graphql
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            mersthamcc/graphql:test
+            ghcr.io/mersthamcc/website-graphql:test
+          build-args: |
+            COMPONENT=graphql
+
+      - name: Build Flyway image
+        id: build-flyway
+        uses: docker/build-push-action@v5
+        with:
+          context: sql/
+          push: true
+          tags: |
+            mersthamcc/flyway:test
+            ghcr.io/mersthamcc/website-flyway:test
+
+      - name: Dispatch deployment event
+        uses: actions/github-script@v7
+        env:
+          GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
+          FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
+          FLYWAY_DIGEST: ${{ steps.build-flyway.outputs.digest }}
+          IMAGE_TAG: test
+        with:
+          github-token: ${{ secrets.DEPLOYMENT_PAT }}
+          script: |
+            const { GRAPHQL_DIGEST, FRONTEND_DIGEST, FLYWAY_DIGEST, IMAGE_TAG } = process.env
+
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'mersthamcc',
+              repo: 'infrastructure',
+              event_type: 'test-app-deploy',
+              client_payload: {
+                "graphql_digest": GRAPHQL_DIGEST,
+                "frontend_digest": FRONTEND_DIGEST,
+                "flyway_digest": FLYWAY_DIGEST,
+                "image_tag": IMAGE_TAG
+              }
+            });

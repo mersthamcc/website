@@ -31,7 +31,7 @@ spring:
     type: redis
     redis:
       time-to-live: 300s
-      key-prefix: "graph-cache:"
+      key-prefix: "${REDIS_CACHE_PREFIX:graph-cache}:"
       use-key-prefix: true
       enable-statistics: true
 
