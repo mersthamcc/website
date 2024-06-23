@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Integer.min;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -36,11 +37,11 @@ public class MenuService {
     public DynamicMenu getDynamicMenuItems() {
         try {
             Response<MenusQuery.Data> result = graphService.executeQuery(new MenusQuery());
+            var seasons = Lists.reverse(result.getData().getFixtureArchiveSeasons());
+            if (!seasons.isEmpty()) seasons = seasons.subList(1, min(20, seasons.size()));
             return DynamicMenu.builder()
                     .venues(venues(result.getData()))
-                    .seasons(
-                            Lists.reverse(result.getData().getFixtureArchiveSeasons())
-                                    .subList(1, 20))
+                    .seasons(seasons)
                     .contactCategories(categories(result.getData()))
                     .banner(
                             nonNull(result.getData().getMessage())
