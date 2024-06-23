@@ -65,4 +65,5 @@ extend type Query {
 
 extend type Mutation {
     refreshFixtures(season: Int!): [Fixture]
+    refreshTeams: [Team]
 }
