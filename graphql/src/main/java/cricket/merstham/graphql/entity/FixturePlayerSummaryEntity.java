@@ -70,4 +70,7 @@ public class FixturePlayerSummaryEntity {
 
     @Column(name = "conceded_runs")
     private Integer concededRuns;
+
+    @Column(name = "how_out")
+    private String howOut;
 }
