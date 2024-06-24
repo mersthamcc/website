@@ -67,7 +67,7 @@ configuration:
   epos-now:
     customer-refresh-cron: "${EPOS_CUSTOMER_REFRESH_CRON:-}"
     create-function-arn: "${EPOS_CREATE_CUSTOMER_FUNCTION_ARN:}"
-    dry-run: "${EPOS_DRY_RUN:-true}"
+    dry-run: "${EPOS_DRY_RUN:true}"
   accounting:
     sync-cron: "${ACCOUNTING_SYNC_CRON:-}"
     create-sales-order-arn: "${CREATE_SALES_ORDER_ARN:}"

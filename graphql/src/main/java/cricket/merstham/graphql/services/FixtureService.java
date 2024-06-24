@@ -58,6 +58,8 @@ public class FixtureService {
     private static final Logger LOG = LogManager.getLogger(FixtureService.class);
     private static final String OTHER = "Other";
     private static final String FIXTURES = "fixtures";
+    private static final List<String> NOT_OUT =
+            List.of("not out", "did not bat", "retired not out");
     private final PlayCricketService playCricketService;
     private final ModelMapper modelMapper;
     private final TeamRepository teamRepository;
@@ -443,19 +445,20 @@ public class FixtureService {
                                                             .build());
 
                     if (nonNull(batting)) {
-                        entity.setRuns(batting.get("runs").asInt());
-                        entity.setBalls(batting.get("balls").asInt());
-                        entity.setOut(!batting.get("how_out").asText().equals("not out"));
+                        entity.setRuns(batting.get("runs").asInt(0));
+                        entity.setBalls(batting.get("balls").asInt(0));
+                        entity.setOut(!NOT_OUT.contains(batting.get("how_out").asText()));
                         entity.setDnb(batting.get("how_out").asText().equals("did not bat"));
-                        entity.setFours(batting.get("fours").asInt());
-                        entity.setSixes(batting.get("sixes").asInt());
+                        entity.setFours(batting.get("fours").asInt(0));
+                        entity.setSixes(batting.get("sixes").asInt(0));
+                        entity.setHowOut(batting.get("how_out").asText());
                     }
 
                     if (nonNull(bowling)) {
-                        entity.setWickets(bowling.get("wickets").asInt());
+                        entity.setWickets(bowling.get("wickets").asInt(0));
                         entity.setOvers(BigDecimal.valueOf(bowling.get("overs").asDouble()));
-                        entity.setMaidens(bowling.get("maidens").asInt());
-                        entity.setConcededRuns(bowling.get("runs").asInt());
+                        entity.setMaidens(bowling.get("maidens").asInt(0));
+                        entity.setConcededRuns(bowling.get("runs").asInt(0));
                     }
                     entity.setCatches(playCricketService.getCatches(fixture, playerId));
 

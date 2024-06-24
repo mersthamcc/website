@@ -37,4 +37,6 @@ public class FixturePlayerSummary implements Serializable {
     @JsonProperty private Integer catches;
     @JsonProperty private Integer fours;
     @JsonProperty private Integer sixes;
+    @JsonProperty private String howOut;
+    @JsonProperty private Integer concededRuns;
 }
