@@ -20,5 +20,7 @@ FROM fixture_player_summary fp
          INNER JOIN player p ON fp.player_id = p.id
          INNER JOIN team t ON f.team_id = t.id
 WHERE t.include_in_selection = TRUE
-  AND f.detail ->> 'competition_type' = 'League'
+  AND EXTRACT(isodow FROM f.date) = 6
+  AND (f.detail ->> 'competition_type' = 'League'
+    OR fp.fixture_id IN (6616890, 6593210))
 GROUP BY 1, 2, 3
