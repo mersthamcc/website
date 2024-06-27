@@ -4,21 +4,22 @@ type Player {
     captain: Boolean
     wicketKeeper: Boolean
 
-    statistics(year: Int!, league: Boolean): Statistics
+    statistics(season: Int!): Statistics
 }
 
 type Statistics {
     player: Player
+    matches: Int
     runs: Int
-    fours: Int
-    sixes: Int
-    out: Boolean
-    dnb: Boolean
-    balls: Int
     wickets: Int
-    overs: Int
-    maidens: Int
     catches: Int
+    maidens: Int
+    fifties: Int
+    hundreds: Int
+    ducks: Int
+    concededRuns: Int
+    notOut: Int
+    overs: Float
 }
 
 type Team {

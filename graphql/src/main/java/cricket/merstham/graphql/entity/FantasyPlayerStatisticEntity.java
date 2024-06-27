@@ -22,6 +22,9 @@ public class FantasyPlayerStatisticEntity {
     @Column(name = "name", length = Integer.MAX_VALUE)
     private String name;
 
+    @Column(name = "matches")
+    private Long matches;
+
     @Column(name = "runs")
     private Long runs;
 
@@ -48,4 +51,7 @@ public class FantasyPlayerStatisticEntity {
 
     @Column(name = "overs")
     private BigDecimal overs;
+
+    @Column(name = "not_out")
+    private Long notOut;
 }

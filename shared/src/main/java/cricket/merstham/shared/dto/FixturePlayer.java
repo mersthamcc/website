@@ -29,4 +29,5 @@ public class FixturePlayer implements Serializable {
     @JsonProperty private String name;
     @JsonProperty private Boolean captain;
     @JsonProperty private Boolean wicketKeeper;
+    @JsonProperty private FantasyPlayerStatistic statistics;
 }
