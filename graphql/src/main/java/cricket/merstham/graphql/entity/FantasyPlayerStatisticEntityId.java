@@ -2,7 +2,10 @@ package cricket.merstham.graphql.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,11 +15,14 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FantasyPlayerStatisticEntityId implements Serializable {
     private static final long serialVersionUID = 3267291576424133286L;
 
     @Column(name = "year")
-    private Double year;
+    private Integer year;
 
     @Column(name = "id")
     private Integer id;

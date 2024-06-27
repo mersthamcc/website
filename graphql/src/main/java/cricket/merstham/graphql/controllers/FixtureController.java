@@ -1,7 +1,9 @@
 package cricket.merstham.graphql.controllers;
 
 import cricket.merstham.graphql.services.FixtureService;
+import cricket.merstham.shared.dto.FantasyPlayerStatistic;
 import cricket.merstham.shared.dto.Fixture;
+import cricket.merstham.shared.dto.FixturePlayer;
 import cricket.merstham.shared.dto.League;
 import cricket.merstham.shared.dto.Team;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,11 @@ public class FixtureController {
     @QueryMapping("thisWeeksSelection")
     public List<Fixture> thisWeeksSelection() {
         return fixtureService.getThisWeeksSelection();
+    }
+
+    @SchemaMapping(typeName = "Player", field = "statistics")
+    public FantasyPlayerStatistic statistics(FixturePlayer player, @Argument("season") int season) {
+        return fixtureService.getPlayerStatistics(player, season);
     }
 
     @MutationMapping

@@ -1,6 +1,8 @@
 package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.dto.PlayCricketMatch;
+import cricket.merstham.graphql.entity.FantasyPlayerStatisticEntity;
+import cricket.merstham.graphql.entity.FantasyPlayerStatisticEntityId;
 import cricket.merstham.graphql.entity.FixtureEntity;
 import cricket.merstham.graphql.entity.FixturePlayerSummaryEntity;
 import cricket.merstham.graphql.entity.FixturePlayerSummaryEntityId;
@@ -8,13 +10,16 @@ import cricket.merstham.graphql.entity.LastUpdateEntity;
 import cricket.merstham.graphql.entity.LeagueEntity;
 import cricket.merstham.graphql.entity.PlayerEntity;
 import cricket.merstham.graphql.entity.TeamEntity;
+import cricket.merstham.graphql.repository.FantasyPlayerStatisticRepository;
 import cricket.merstham.graphql.repository.FixturePlayerSummaryEntityRepository;
 import cricket.merstham.graphql.repository.FixtureRepository;
 import cricket.merstham.graphql.repository.LastUpdateRepository;
 import cricket.merstham.graphql.repository.LeagueRepository;
 import cricket.merstham.graphql.repository.PlayerRepository;
 import cricket.merstham.graphql.repository.TeamRepository;
+import cricket.merstham.shared.dto.FantasyPlayerStatistic;
 import cricket.merstham.shared.dto.Fixture;
+import cricket.merstham.shared.dto.FixturePlayer;
 import cricket.merstham.shared.dto.League;
 import cricket.merstham.shared.dto.Team;
 import cricket.merstham.shared.extensions.StringExtensions;
@@ -68,6 +73,7 @@ public class FixtureService {
     private final LeagueRepository leagueRepository;
     private final PlayerRepository playerRepository;
     private final FixturePlayerSummaryEntityRepository playerSummaryRepository;
+    private final FantasyPlayerStatisticRepository fantasyPlayerStatisticRepository;
 
     @Autowired
     public FixtureService(
@@ -78,7 +84,8 @@ public class FixtureService {
             FixtureRepository fixtureRepository,
             LeagueRepository leagueRepository,
             PlayerRepository playerRepository,
-            FixturePlayerSummaryEntityRepository playerSummaryRepository) {
+            FixturePlayerSummaryEntityRepository playerSummaryRepository,
+            FantasyPlayerStatisticRepository fantasyPlayerStatisticRepository) {
         this.playCricketService = playCricketService;
         this.modelMapper = modelMapper;
         this.teamRepository = teamRepository;
@@ -87,6 +94,7 @@ public class FixtureService {
         this.leagueRepository = leagueRepository;
         this.playerRepository = playerRepository;
         this.playerSummaryRepository = playerSummaryRepository;
+        this.fantasyPlayerStatisticRepository = fantasyPlayerStatisticRepository;
     }
 
     @Cacheable(value = ACTIVE_TEAM_CACHE)
@@ -314,6 +322,21 @@ public class FixtureService {
             LOG.error("Error in PlayCricket fixture refresh", ex);
         }
         LOG.info("Finished PlayCricket fixture refresh!");
+    }
+
+    public FantasyPlayerStatistic getPlayerStatistics(FixturePlayer player, int season) {
+        var id =
+                FantasyPlayerStatisticEntityId.builder()
+                        .id(player.getPlayerId())
+                        .year(season)
+                        .build();
+
+        var result =
+                fantasyPlayerStatisticRepository
+                        .findDistinctByIdIs(id)
+                        .orElseGet(FantasyPlayerStatisticEntity::new);
+
+        return modelMapper.map(result, FantasyPlayerStatistic.class);
     }
 
     private List<FixtureEntity> saveFixtures(List<PlayCricketMatch> fixtures) {

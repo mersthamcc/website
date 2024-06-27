@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +33,9 @@ public class FixturePlayerEntity {
 
     @Column(name = "wicket_keeper")
     private Boolean wicketKeeper;
+
+    @Transient
+    public int getPlayerId() {
+        return primaryKey.getPlayerId();
+    }
 }
