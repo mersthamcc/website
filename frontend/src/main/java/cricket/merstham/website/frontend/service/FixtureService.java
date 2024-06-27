@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
@@ -84,14 +85,18 @@ public class FixtureService {
     }
 
     public List<Fixture> getSelection() throws IOException {
-        var query = ThisWeeksSelectionQuery.builder().build();
+        var query = ThisWeeksSelectionQuery.builder().season(LocalDate.now().getYear()).build();
         Response<ThisWeeksSelectionQuery.Data> result = graphService.executeQuery(query);
         return requireGraphData(
                         result,
                         ThisWeeksSelectionQuery.Data::getThisWeeksSelection,
                         () -> "Error getting selection data")
                 .stream()
-                .map(f -> modelMapper.map(f, Fixture.class))
+                .map(
+                        f -> {
+                            var fixture = modelMapper.map(f, Fixture.class);
+                            return fixture;
+                        })
                 .toList();
     }
 }

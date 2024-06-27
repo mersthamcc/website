@@ -1,4 +1,4 @@
-query thisWeeksSelection {
+query thisWeeksSelection($season: Int!) {
     thisWeeksSelection {
         id
         date
@@ -14,6 +14,20 @@ query thisWeeksSelection {
             name
             captain
             wicketKeeper
+
+            statistics(season: $season) {
+                matches
+                runs
+                wickets
+                catches
+                maidens
+                fifties
+                hundreds
+                ducks
+                concededRuns
+                notOut
+                overs
+            }
         }
     }
 }
