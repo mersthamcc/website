@@ -68,20 +68,20 @@
                                                                         </small>
                                                                         <small>|</small>
                                                                         <#if ((player.statistics.ducks!0) > 0)>
-                                                                        <small>
-                                                                            <img src="${resourcePrefix}/mcc/img/cricket-icons/duck.png" width="24px" alt="<@spring.message code="fixtures.ducks" />"/>
-                                                                            ${player.statistics.ducks!0}
-                                                                        </small>
-                                                                        <small>|</small>
+                                                                            <small>
+                                                                                <img src="${resourcePrefix}/mcc/img/cricket-icons/duck.png" width="24px" alt="<@spring.message code="fixtures.ducks" />"/>
+                                                                                ${player.statistics.ducks!0}
+                                                                            </small>
+                                                                            <small>|</small>
                                                                         </#if>
                                                                         <#if ((player.statistics.notOut!0) > 0)>
-                                                                        <small>
-                                                                            <img src="${resourcePrefix}/mcc/img/cricket-icons/not_out.png" width="24px" alt="<@spring.message code="fixtures.not-out" />"/>
-                                                                            ${player.statistics.notOut!0}
-                                                                        </small>
+                                                                            <small>
+                                                                                <img src="${resourcePrefix}/mcc/img/cricket-icons/not_out.png" width="24px" alt="<@spring.message code="fixtures.not-out" />"/>
+                                                                                ${player.statistics.notOut!0}
+                                                                            </small>
+                                                                            <small>|</small>
                                                                         </#if>
                                                                         <#if ((player.statistics.hundreds!0) + (player.statistics.fifties!0) > 0)>
-                                                                            <small>|</small>
                                                                             <small>
                                                                                 <img src="${resourcePrefix}/mcc/img/cricket-icons/cricket-player.png" width="24px" alt="<@spring.message code="fixtures.honors" />"/>
                                                                                 <#if (player.statistics.fifties > 0)>
@@ -91,8 +91,8 @@
                                                                                     ${player.statistics.hundreds} <b style="color: cornflowerblue">&nbsp;100s&nbsp;</b>
                                                                                 </#if>
                                                                             </small>
+                                                                            <small>|</small>
                                                                         </#if>
-                                                                        <small>|</small>
                                                                         <small>
                                                                             <img src="${resourcePrefix}/mcc/img/cricket-icons/wicket.png" width="24px" alt="<@spring.message code="fixtures.wickets" />"/>
                                                                             ${player.statistics.wickets!0}
