@@ -160,7 +160,7 @@ public class AccountingService {
     }
 
     private List<PaymentEntity> syncOfflinePayments() {
-        var since = Instant.now().minus(24, ChronoUnit.HOURS);
+        var since = Instant.now().minus(28, ChronoUnit.DAYS);
         Map<String, Object> request = Map.of("since", since);
         List<PaymentEntity> result = new ArrayList<>();
         try {
@@ -204,7 +204,10 @@ public class AccountingService {
                                                                                         p.get(
                                                                                                         "reference")
                                                                                                 .asText())
-                                                                                .type("bank")
+                                                                                .type(
+                                                                                        p.get(
+                                                                                                        "type")
+                                                                                                .asText())
                                                                                 .order(o)
                                                                                 .amount(
                                                                                         BigDecimal

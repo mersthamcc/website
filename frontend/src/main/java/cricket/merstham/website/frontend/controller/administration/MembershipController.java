@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberSummary;
+import cricket.merstham.shared.dto.Payment;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.DataTableValue;
@@ -360,6 +361,7 @@ public class MembershipController extends SspController<MemberSummary> {
         model.put(
                 "payments",
                 member.getSubscription().get(0).getOrder().getPayment().stream()
+                        .sorted(Comparator.comparing(Payment::getDate))
                         .map(
                                 p ->
                                         Map.of(
