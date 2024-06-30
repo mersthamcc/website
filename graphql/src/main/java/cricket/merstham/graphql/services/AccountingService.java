@@ -204,7 +204,10 @@ public class AccountingService {
                                                                                         p.get(
                                                                                                         "reference")
                                                                                                 .asText())
-                                                                                .type(p.get("type").asText())
+                                                                                .type(
+                                                                                        p.get(
+                                                                                                        "type")
+                                                                                                .asText())
                                                                                 .order(o)
                                                                                 .amount(
                                                                                         BigDecimal
