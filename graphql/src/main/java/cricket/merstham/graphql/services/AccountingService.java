@@ -160,7 +160,7 @@ public class AccountingService {
     }
 
     private List<PaymentEntity> syncOfflinePayments() {
-        var since = Instant.now().minus(28, ChronoUnit.DAYS);
+        var since = Instant.now().minus(24, ChronoUnit.HOURS);
         Map<String, Object> request = Map.of("since", since);
         List<PaymentEntity> result = new ArrayList<>();
         try {
