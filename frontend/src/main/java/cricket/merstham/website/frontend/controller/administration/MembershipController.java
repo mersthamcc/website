@@ -353,11 +353,11 @@ public class MembershipController extends SspController<MemberSummary> {
         model.put(
                 "subscriptionHistoryColumns",
                 List.of(
-                        new DataTableColumn().setKey("membership.year"),
-                        new DataTableColumn().setKey("membership.description"),
-                        new DataTableColumn().setKey("membership.category"),
-                        new DataTableColumn().setKey("membership.price"),
-                        new DataTableColumn().setKey("membership.order")));
+                        new DataTableColumn().setKey("membership.year").setSortable(false),
+                        new DataTableColumn().setKey("membership.description").setSortable(false),
+                        new DataTableColumn().setKey("membership.category").setSortable(false),
+                        new DataTableColumn().setKey("membership.price").setSortable(false),
+                        new DataTableColumn().setKey("membership.order").setSortable(false)));
         model.put(
                 "payments",
                 member.getSubscription().get(0).getOrder().getPayment().stream()
@@ -401,10 +401,10 @@ public class MembershipController extends SspController<MemberSummary> {
                 "paymentsColumns",
                 List.of(
                         new DataTableColumn().setKey("payments.date").setSortable(false),
-                        new DataTableColumn().setKey("payments.status").setDisplay(false),
-                        new DataTableColumn().setKey("payments.type"),
-                        new DataTableColumn().setKey("payments.reference"),
-                        new DataTableColumn().setKey("payments.amount")));
+                        new DataTableColumn().setKey("payments.status").setSortable(false),
+                        new DataTableColumn().setKey("payments.type").setSortable(false),
+                        new DataTableColumn().setKey("payments.reference").setSortable(false),
+                        new DataTableColumn().setKey("payments.amount").setSortable(false)));
 
         if (nonNull(member.getPlayerId())) {
             var id = Integer.parseInt(member.getPlayerId());

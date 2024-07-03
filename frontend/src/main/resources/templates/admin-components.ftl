@@ -423,7 +423,7 @@
                                 </th>
                             </#if>
                             <#list columns as column>
-                                <th class="table-column-pl-0 sorting" tabindex="0" aria-controls="${id}" rowspan="1"
+                                <th class="table-column-pl-0 <#if column.sortable>sorting<#else>sorting_disabled</#if>" tabindex="0" aria-controls="${id}" rowspan="1"
                                     colspan="1" aria-label="<@spring.messageText code=column.key text=column.key />: activate to sort column ascending">
                                     <@spring.messageText code=column.key text=column.key />
                                 </th>
