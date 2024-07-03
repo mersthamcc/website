@@ -5,8 +5,6 @@
 <#macro dataScript>
     <script>
         function onPageLoad() {
-            <@admin.adminTableScript id="subscriptionHistoryTable" />
-            <@admin.adminTableScript id="paymentsTable" />
         };
     </script>
 </#macro>
@@ -46,7 +44,7 @@
                 selectable=false
                 searchable=false
                 defaultPageLength=10
-                pageLengths=[1,5,15]
+                pageLengths=[10,25,50]
                 title="membership.payments"
                 columns=paymentsColumns
                 data=payments
