@@ -121,6 +121,7 @@ type Payment {
     collected: Boolean
     reconciled: Boolean
     order: Order!
+    status: String!
 }
 
 input PaymentInput {
@@ -132,6 +133,7 @@ input PaymentInput {
     processingFees: Float
     collected: Boolean
     reconciled: Boolean
+    status: String
 }
 
 input PaymentWhereUniqueInput {

@@ -222,6 +222,7 @@ public class AccountingService {
                                                                                                 .ZERO)
                                                                                 .reconciled(true)
                                                                                 .collected(true)
+                                                                                .status("complete")
                                                                                 .build()),
                                                         () ->
                                                                 LOG.warn(

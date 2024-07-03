@@ -250,6 +250,10 @@ public class MembershipService {
                                 .collected(payment.isCollected())
                                 .reconciled(payment.isReconciled())
                                 .order(order)
+                                .status(
+                                        isNull(payment.getStatus())
+                                                ? "pending"
+                                                : payment.getStatus())
                                 .build()),
                 Payment.class);
     }

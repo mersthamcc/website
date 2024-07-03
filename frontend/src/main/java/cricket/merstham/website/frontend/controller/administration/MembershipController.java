@@ -374,6 +374,12 @@ public class MembershipController extends SspController<MemberSummary> {
                                                                                         .ofLocalizedDate(
                                                                                                 FormatStyle
                                                                                                         .SHORT))),
+                                                "payments.status",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                format(
+                                                                        "payments.status.{0}",
+                                                                        p.getStatus())),
                                                 "payments.type",
                                                 new DataTableValue()
                                                         .setValue(
@@ -385,9 +391,6 @@ public class MembershipController extends SspController<MemberSummary> {
                                                                         locale)),
                                                 "payments.reference",
                                                 new DataTableValue().setValue(p.getReference()),
-                                                "payments.collected",
-                                                new DataTableValue()
-                                                        .setValue(p.getCollected() ? "Yes" : "No"),
                                                 "payments.amount",
                                                 new DataTableValue()
                                                         .setValue(
@@ -397,10 +400,10 @@ public class MembershipController extends SspController<MemberSummary> {
         model.put(
                 "paymentsColumns",
                 List.of(
-                        new DataTableColumn().setKey("payments.date"),
+                        new DataTableColumn().setKey("payments.date").setSortable(false),
+                        new DataTableColumn().setKey("payments.status").setDisplay(false),
                         new DataTableColumn().setKey("payments.type"),
                         new DataTableColumn().setKey("payments.reference"),
-                        new DataTableColumn().setKey("payments.collected"),
                         new DataTableColumn().setKey("payments.amount")));
 
         if (nonNull(member.getPlayerId())) {

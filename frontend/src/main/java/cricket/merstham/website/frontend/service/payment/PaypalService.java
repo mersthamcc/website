@@ -219,6 +219,7 @@ public class PaypalService implements PaymentService {
                                                     .value()),
                                     false,
                                     false,
+                                    "pending",
                                     accessToken));
 
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));

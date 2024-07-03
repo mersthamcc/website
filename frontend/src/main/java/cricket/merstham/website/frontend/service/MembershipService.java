@@ -150,6 +150,7 @@ public class MembershipService {
             BigDecimal fees,
             boolean collected,
             boolean reconciled,
+            String status,
             OAuth2AccessToken accessToken) {
         var addPaymentToOrderMutation =
                 new AddPaymentToOrderMutation(
@@ -162,6 +163,7 @@ public class MembershipService {
                                 .processingFees(fees.doubleValue())
                                 .collected(collected)
                                 .reconciled(reconciled)
+                                .status(status)
                                 .build());
         try {
             Response<AddPaymentToOrderMutation.Data> result =

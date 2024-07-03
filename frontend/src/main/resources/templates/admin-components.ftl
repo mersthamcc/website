@@ -456,7 +456,7 @@
                                                 </div>
                                             </a>
                                         <#else>
-                                            ${row[column.key].value}
+                                            <@spring.messageText code=row[column.key].value text=row[column.key].value />
                                         </#if>
                                     </td>
                                 </#list>
