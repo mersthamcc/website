@@ -269,6 +269,7 @@ class MembershipServiceTest {
                                     payment.processingFees().doubleValue(),
                                     payment.collected(),
                                     payment.reconciled(),
+                                    payment.status(),
                                     new AddPaymentToOrderMutation.Order(
                                             "Order",
                                             order.getId(),
@@ -291,6 +292,7 @@ class MembershipServiceTest {
                         BigDecimal.ONE,
                         true,
                         false,
+                        "complete",
                         accessToken);
 
         assertThat(result.getId(), equalTo(order.getId()));
@@ -301,6 +303,7 @@ class MembershipServiceTest {
         assertThat(result.getProcessingFees(), equalTo(BigDecimal.ONE.doubleValue()));
         assertThat(result.getCollected(), equalTo(true));
         assertThat(result.getReconciled(), equalTo(false));
+        assertThat(result.getStatus(), equalTo("complete"));
         assertThat(result.getOrder().getId(), equalTo(order.getId()));
         assertThat(result.getOrder().getUuid(), equalTo(order.getUuid()));
         assertThat(result.getOrder().getCreateDate(), equalTo(order.getCreateDate()));
@@ -639,6 +642,7 @@ class MembershipServiceTest {
                                                                                         false,
                                                                                         UUID.randomUUID()
                                                                                                 .toString(),
+                                                                                        "complete",
                                                                                         "card"))),
                                                                 new MemberQuery.PriceListItem(
                                                                         "Subscription",

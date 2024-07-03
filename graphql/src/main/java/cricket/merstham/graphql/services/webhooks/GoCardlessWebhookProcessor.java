@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.gocardless.GoCardlessClient.Environment.LIVE;
 import static com.gocardless.GoCardlessClient.Environment.SANDBOX;
+import static com.gocardless.resources.Event.ResourceType.MANDATES;
+import static com.gocardless.resources.Event.ResourceType.PAYMENTS;
 import static com.gocardless.resources.Event.ResourceType.PAYOUTS;
 import static java.util.Objects.isNull;
 
@@ -29,6 +31,8 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     private static final Logger LOG = LogManager.getLogger(GoCardlessWebhookProcessor.class);
     private static final String NAME = "gocardless";
     public static final String WEBHOOK_SIGNATURE_HEADER = "webhook-signature";
+    public static final List<String> INTERESTING_PAYMENT_ACTIONS =
+            List.of("submitted", "failed", "cancelled");
 
     private final String secret;
     private final GoCardlessClient client;
@@ -74,11 +78,39 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
             List<Event> events = WebhookParser.parse(webhook.toPrettyString());
             LOG.info("Processing GoCardless Payouts...");
             events.stream().filter(this::isPayoutEvent).forEach(this::processPayout);
+            LOG.info("Processing GoCardless Payments...");
+            events.stream().filter(this::isPaymentEvent).forEach(this::processPayment);
+            LOG.info("Processing GoCardless Mandates...");
+            events.stream()
+                    .filter(this::isMandateCancellationEvent)
+                    .forEach(this::processMandateCancellations);
         } catch (Exception ex) {
             LOG.error("Unexpected error processing GoCardless webhook", ex);
             success.set(false);
         }
         return success.get();
+    }
+
+    private void processMandateCancellations(Event event) {
+        LOG.info("Found mandate cancelled event: {}", event.getLinks().getMandate());
+    }
+
+    private void processPayment(Event event) {
+        var paymentId = event.getLinks().getPayment();
+
+        var payment = paymentEntityRepository.findByTypeAndReference(NAME, paymentId);
+
+        payment.ifPresentOrElse(
+                p -> {
+                    LOG.info(
+                            "Updating payment {} ({}) with status '{}'",
+                            p.getId(),
+                            paymentId,
+                            event.getAction());
+                    p.setStatus(event.getAction());
+                    paymentEntityRepository.saveAndFlush(p);
+                },
+                () -> LOG.warn("Could not find payment {}", paymentId));
     }
 
     private void processPayout(Event event) {
@@ -101,6 +133,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
 
                                         p.setProcessingFees(fee);
                                         p.setCollected(true);
+                                        p.setStatus("complete");
                                         paymentEntityRepository.saveAndFlush(p);
                                     },
                                     () ->
@@ -121,5 +154,14 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
 
     private boolean isPayoutEvent(Event event) {
         return event.getResourceType().equals(PAYOUTS) && event.getAction().equals("paid");
+    }
+
+    private boolean isPaymentEvent(Event event) {
+        return event.getResourceType().equals(PAYMENTS)
+                && INTERESTING_PAYMENT_ACTIONS.contains(event.getAction());
+    }
+
+    private boolean isMandateCancellationEvent(Event event) {
+        return event.getResourceType().equals(MANDATES) && event.getAction().equals("cancelled");
     }
 }

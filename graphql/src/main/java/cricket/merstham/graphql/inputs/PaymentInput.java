@@ -27,4 +27,6 @@ public class PaymentInput {
     @JsonProperty private boolean collected;
 
     @JsonProperty private boolean reconciled;
+
+    @JsonProperty private String status;
 }

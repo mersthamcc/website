@@ -114,6 +114,7 @@ public class PaypalWebhookProcessor implements WebhookProcessor {
                     LOG.info("Processing Paypal event ID {}", getId(webhook));
                     if (type.equals(PAYMENT_COMPLETED)) {
                         p.setCollected(true);
+                        p.setStatus("complete");
                         p.setProcessingFees(
                                 BigDecimal.valueOf(
                                         Double.parseDouble(

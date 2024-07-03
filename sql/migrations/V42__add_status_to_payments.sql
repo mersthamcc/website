@@ -1,0 +1,2 @@
+ALTER TABLE payment
+  ADD COLUMN status TEXT NOT NULL DEFAULT 'pending';

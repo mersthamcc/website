@@ -188,6 +188,7 @@ public class GoCardlessService implements PaymentService {
                             .withIdempotencyKey(UUID.randomUUID().toString())
                             .withChargeDate(chargeDate.format(formatter))
                             .withLinksMandate(mandate.getId())
+                            .withRetryIfPossible(true)
                             .withCurrency(GBP)
                             .execute();
 
@@ -200,6 +201,7 @@ public class GoCardlessService implements PaymentService {
                     BigDecimal.ZERO,
                     false,
                     false,
+                    "scheduled",
                     accessToken);
             remaining = remaining.subtract(chargeAmount);
         }

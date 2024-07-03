@@ -205,6 +205,7 @@ public class StripeService implements PaymentService {
                     BigDecimal.ZERO,
                     false,
                     false,
+                    "pending",
                     accessToken);
             return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
 

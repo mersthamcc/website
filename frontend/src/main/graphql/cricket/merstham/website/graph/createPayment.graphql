@@ -13,6 +13,7 @@ mutation addPaymentToOrder(
         processingFees
         collected
         reconciled
+        status
         order {
             id
             uuid

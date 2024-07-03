@@ -26,4 +26,5 @@ public class Payment implements Serializable {
     private String feesAccountingId;
     private Boolean collected;
     private Boolean reconciled;
+    private String status;
 }

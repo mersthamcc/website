@@ -37,6 +37,7 @@ query member($id: Int!) {
                     processingFees
                     reconciled
                     reference
+                    status
                     type
                 }
             }

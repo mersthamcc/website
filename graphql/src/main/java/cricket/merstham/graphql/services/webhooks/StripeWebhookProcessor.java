@@ -95,6 +95,7 @@ public class StripeWebhookProcessor implements WebhookProcessor {
                                             RequestOptions.builder().setApiKey(apiKey).build());
 
                             p.setCollected(true);
+                            p.setStatus("complete");
                             p.setProcessingFees(
                                     BigDecimal.valueOf(transaction.getFee())
                                             .divide(ONE_HUNDRED, SCALE, RoundingMode.HALF_UP));
