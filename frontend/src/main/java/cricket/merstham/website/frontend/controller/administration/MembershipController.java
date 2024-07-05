@@ -12,6 +12,7 @@ import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.PlayerService;
+import cricket.merstham.website.frontend.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -58,15 +60,18 @@ public class MembershipController extends SspController<MemberSummary> {
 
     private final MembershipService membershipService;
     private final PlayerService playerService;
+    private final UserService userService;
 
     @Autowired
     public MembershipController(
             MessageSource messageSource,
             MembershipService membershipService,
-            PlayerService playerService) {
+            PlayerService playerService,
+            UserService userService) {
         this.messageSource = messageSource;
         this.membershipService = membershipService;
         this.playerService = playerService;
+        this.userService = userService;
     }
 
     @GetMapping(value = "/administration/membership", name = "admin-membership-list")
@@ -118,7 +123,8 @@ public class MembershipController extends SspController<MemberSummary> {
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public ModelAndView edit(
-            CognitoAuthentication cognitoAuthentication, Locale locale, @PathVariable int id) {
+            CognitoAuthentication cognitoAuthentication, Locale locale, @PathVariable int id)
+            throws IOException {
         var member =
                 membershipService
                         .get(id, cognitoAuthentication.getOAuth2AccessToken())
@@ -305,7 +311,7 @@ public class MembershipController extends SspController<MemberSummary> {
     }
 
     private Map<String, ?> buildModelData(
-            Member member, Locale locale, OAuth2AccessToken accessToken) {
+            Member member, Locale locale, OAuth2AccessToken accessToken) throws IOException {
         var model = new HashMap<String, Object>();
         model.put("member", member);
         model.put("subscription", member.getSubscription().get(0));
@@ -405,6 +411,8 @@ public class MembershipController extends SspController<MemberSummary> {
                         new DataTableColumn().setKey("payments.type").setSortable(false),
                         new DataTableColumn().setKey("payments.reference").setSortable(false),
                         new DataTableColumn().setKey("payments.amount").setSortable(false)));
+
+        model.put("owner", userService.getUser(member.getOwnerUserId(), accessToken));
 
         if (nonNull(member.getPlayerId())) {
             var id = Integer.parseInt(member.getPlayerId());

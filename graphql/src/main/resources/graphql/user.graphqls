@@ -1,0 +1,21 @@
+type User {
+    subjectId: String
+    username: String
+    givenName: String
+    familyName: String
+    email: String
+    phoneNumber: String
+    enabled: Boolean
+    verified: Boolean
+}
+
+type UserInfo {
+    username: String!
+    subjectId: String!
+    roles: [String!]
+}
+
+extend type Query {
+    getUser(username: String): User
+    userInfo: UserInfo
+}

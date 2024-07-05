@@ -4,12 +4,6 @@ scalar Date
 
 scalar Json
 
-type User {
-    username: String!
-    subjectId: String!
-    roles: [String!]
-}
-
 type KeyValuePair {
     key: String!,
     value: String!
@@ -41,9 +35,7 @@ input StringFilter {
 }
 
 type Query {
-    userInfo: User
 }
 
 type Mutation {
-    userInfo: User
 }

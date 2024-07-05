@@ -198,6 +198,48 @@
                     <!-- End List Item -->
                 </div>
             </@admin.section>
+
+            <#if owner??>
+                <@admin.section title="membership.owner.title" action="">
+                    <div class="list-group list-group-lg list-group-flush list-group-no-gutters">
+                        <!-- List Item -->
+                        <div class="list-group-item">
+                            <div class="media">
+                                <div class="avatar avatar-soft-dark avatar-circle avatar-border-lg avatar-centered mr-3">
+                                    <span class="avatar-initials">${owner.givenName?cap_first[0]}${owner.familyName?cap_first[0]}</span>
+                                    <#if owner.verified>
+                                        <span class="avatar-status avatar-sm-status avatar-status-success"></span>
+                                    </#if>
+                                </div>
+                                <div class="media-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm mb-1 mb-sm-0">
+                                            <h6 class="mb-0">
+                                                ${owner.fullName}
+                                            </h6>
+                                            <div class="small">Email: ${owner.email}</div>
+                                            <div class="small">Phone: ${owner.phoneNumber}</div>
+                                        </div>
+
+                                        <div class="col-sm-auto">
+                                            <#if owner.enabled>
+                                                <span class="badge badge-soft-success ml-2">
+                                                    <@spring.message code="membership.owner.enabled"/>
+                                                </span>
+                                            <#else>
+                                                <span class="badge badge-soft-danger ml-2">
+                                                    <@spring.message code="membership.owner.disabled"/>
+                                                </span>
+                                            </#if>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End List Item -->
+                    </div>
+                </@admin.section>
+            </#if>
         </div>
     </div>
 </@layout.mainLayout>
