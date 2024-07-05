@@ -63,7 +63,9 @@ debug: ${DEBUG:false}
 configuration:
   database-secret: ${DATABASE_SECRET:}
   scheduler-zone: "${SCHEDULER_ZONE:Europe/London}"
-  region: eu-west-2
+  region: ${AWS_REGION:eu-west-2}
+  cognito:
+    user-pool-id: ${COGNITO_USER_POOL_ID:}
   epos-now:
     customer-refresh-cron: "${EPOS_CUSTOMER_REFRESH_CRON:-}"
     create-function-arn: "${EPOS_CREATE_CUSTOMER_FUNCTION_ARN:}"
@@ -92,3 +94,4 @@ configuration:
       client-secret: ${PAYPAL_CLIENT_SECRET:}
       sandbox: ${PAYPAL_SANDBOX:true}
       webhook-id: ${PAYPAL_WEBHOOK_ID:}
+

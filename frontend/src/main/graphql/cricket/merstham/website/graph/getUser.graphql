@@ -1,0 +1,12 @@
+query getUser($username: String) {
+    getUser(username: $username) {
+        subjectId
+        username
+        email
+        givenName
+        familyName
+        phoneNumber
+        enabled
+        verified
+    }
+}
