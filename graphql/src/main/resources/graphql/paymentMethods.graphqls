@@ -1,0 +1,28 @@
+type UserPaymentMethod {
+    id: Int
+    userId: String!
+    provider: String!
+    type: String!
+    customerIdentifier: String
+    methodIdentifier: String
+    createDate: DateTime
+    status: String!
+}
+
+input UserPaymentMethodInput {
+    userId: String!
+    provider: String!
+    type: String!
+    customerIdentifier: String
+    methodIdentifier: String
+    createDate: DateTime
+    status: String!
+}
+
+extend type Query {
+    getPaymentMethods(userId: String): [UserPaymentMethod]
+}
+
+extend type Mutation {
+    addPaymentMethod(paymentMethod: UserPaymentMethodInput): UserPaymentMethod
+}
