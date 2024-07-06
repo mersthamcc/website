@@ -30,4 +30,9 @@ public class PaymentMethodController {
             @Argument("paymentMethod") UserPaymentMethod paymentMethod) {
         return paymentMethodService.savePaymentMethod(paymentMethod);
     }
+
+    @MutationMapping
+    public int importFromGoCardless() {
+        return paymentMethodService.importPaymentMethodsFromGoCardless();
+    }
 }
