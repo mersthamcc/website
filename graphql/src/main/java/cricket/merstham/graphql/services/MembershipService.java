@@ -319,6 +319,12 @@ public class MembershipService {
         return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
     }
 
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public List<MemberSummary> getMembersForUser(String owner) {
+        var members = summaryRepository.findAllByOwnerUserIdEquals(owner);
+        return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
+    }
+
     @PreAuthorize("isAuthenticated()")
     public Member addMemberIdentifier(int id, String name, String value, Principal principal) {
         var member =

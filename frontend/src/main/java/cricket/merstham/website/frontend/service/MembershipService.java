@@ -17,6 +17,7 @@ import cricket.merstham.website.graph.CreateMemberMutation;
 import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.FilteredMembersQuery;
 import cricket.merstham.website.graph.MemberQuery;
+import cricket.merstham.website.graph.MembersOwnedByQuery;
 import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
@@ -215,6 +216,21 @@ public class MembershipService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<MemberSummary> getMembersOwnedBy(
+            String ownerSubjectId, OAuth2AccessToken accessToken) {
+        var query = MembersOwnedByQuery.builder().owner(ownerSubjectId).build();
+        try {
+            Response<MembersOwnedByQuery.Data> result =
+                    graphService.executeQuery(query, accessToken);
+            return result.getData().getMembersOwnedBy().stream()
+                    .map(m -> modelMapper.map(m, MemberSummary.class))
+                    .toList();
+        } catch (IOException e) {
+            LOG.atWarn().setCause(e).log("Error getting members owned by {}", ownerSubjectId);
+        }
+        return List.of();
     }
 
     @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
