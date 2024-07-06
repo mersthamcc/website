@@ -428,6 +428,16 @@ public class MembershipController extends SspController<MemberSummary> {
                     membershipService.getMembersOwnedBy(owner.getSubjectId(), accessToken).stream()
                             .filter(m -> m.getId() != member.getId())
                             .toList());
+            model.put(
+                    "mandates",
+                    membershipService
+                            .getUsersPaymentMethods(owner.getSubjectId(), accessToken)
+                            .stream()
+                            .filter(
+                                    pm ->
+                                            pm.getProvider().equals("gocardless")
+                                                    && pm.getType().equals("mandate"))
+                            .toList());
         }
 
         if (nonNull(member.getPlayerId())) {

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -111,9 +112,7 @@ public class PaymentMethodService {
                                 repository.saveAndFlush(
                                         entity.setCustomerIdentifier(customer.getId())
                                                 .setCreateDate(
-                                                        LocalDateTime.parse(
-                                                                mandate.getCreatedAt(),
-                                                                DateTimeFormatter.ISO_DATE_TIME))
+                                                        Instant.parse(mandate.getCreatedAt()))
                                                 .setStatus(
                                                         mandate.getStatus()
                                                                 .toString()

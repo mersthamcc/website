@@ -241,6 +241,52 @@
                 </@admin.section>
             </#if>
 
+            <#if mandates?has_content>
+                <@admin.section title="membership.mandates.title" action="">
+                    <div class="list-group list-group-lg list-group-flush list-group-no-gutters">
+                        <#list mandates as m>
+                            <div class="list-group-item">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-sm mb-1 mb-sm-0">
+                                                <h6 class="mb-0">
+                                                    ${m.methodIdentifier}
+                                                </h6>
+                                                <div class="small">
+                                                    <@spring.message code="membership.mandates.created" />
+                                                    ${(m.createDate).format("dd/MM/yyyy")}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-auto">
+                                                <#switch m.status>
+                                                    <#case "active">
+                                                        <#assign mandateStatus="success" />
+                                                        <#break />
+                                                    <#case "submitted">
+                                                        <#assign mandateStatus="warning" />
+                                                        <#break />
+                                                    <#case "cancelled">
+                                                        <#assign mandateStatus="danger" />
+                                                        <#break />
+                                                    <#default>
+                                                        <#assign mandateStatus="secondary" />
+                                                        <#break />
+                                                </#switch>
+                                                <span class="badge badge-soft-${mandateStatus} ml-2">
+                                                    <@spring.messageText code="membership.mandates.${m.status}" text=m.status />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </#list>
+                    </div>
+                </@admin.section>
+            </#if>
+
             <#if linkedMembers?has_content>
                 <@admin.section title="membership.linked-members.title" action="">
                     <div class="list-group list-group-lg list-group-flush list-group-no-gutters">

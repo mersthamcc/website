@@ -1,0 +1,12 @@
+query getPaymentMethods($owner: String!) {
+    getPaymentMethods(userId: $owner) {
+        id
+        userId
+        createDate
+        provider
+        type
+        customerIdentifier
+        methodIdentifier
+        status
+    }
+}

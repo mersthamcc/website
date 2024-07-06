@@ -18,7 +18,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 @Getter
@@ -61,7 +61,7 @@ public class UserPaymentMethodEntity {
 
     @NotNull
     @Column(name = "create_date", nullable = false)
-    private LocalDateTime createDate;
+    private Instant createDate;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
     private String status;

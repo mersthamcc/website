@@ -7,6 +7,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.UserPaymentMethod;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
@@ -24,6 +25,7 @@ import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
+import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
@@ -54,6 +56,7 @@ import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
@@ -420,5 +423,20 @@ public class MembershipService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<UserPaymentMethod> getUsersPaymentMethods(
+            String owner, OAuth2AccessToken accessToken) throws IOException {
+        GetPaymentMethodsQuery query = GetPaymentMethodsQuery.builder().owner(owner).build();
+        Response<GetPaymentMethodsQuery.Data> result =
+                graphService.executeQuery(query, accessToken);
+
+        return requireGraphData(
+                        result,
+                        GetPaymentMethodsQuery.Data::getGetPaymentMethods,
+                        () -> "Error getting payment methods")
+                .stream()
+                .map(t -> modelMapper.map(t, UserPaymentMethod.class))
+                .toList();
     }
 }

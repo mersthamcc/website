@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** DTO for {@link cricket.merstham.graphql.entity.UserPaymentMethodEntity} */
 @AllArgsConstructor
@@ -24,6 +24,6 @@ public class UserPaymentMethod implements Serializable {
     @JsonProperty private String type;
     @JsonProperty private String customerIdentifier;
     @JsonProperty private String methodIdentifier;
-    @JsonProperty private LocalDateTime createDate;
+    @JsonProperty private Instant createDate;
     @JsonProperty private String status;
 }
