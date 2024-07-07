@@ -2,10 +2,8 @@ package cricket.merstham.shared.extensions;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
-
-import static java.util.Objects.isNull;
+import org.jsoup.select.Elements;
 
 public class StringExtensions {
     public static String toSlug(String in) {
@@ -35,13 +33,13 @@ public class StringExtensions {
 
     public static String toAbstract(String in) {
         Document doc = Jsoup.parse(in);
-        Element readMoreAnchor = doc.selectFirst("a#readmore");
+        Elements paragraphs = doc.select("p");
+        String result = in;
 
-        if (isNull(readMoreAnchor)) {
-            return Jsoup.clean(in, Safelist.basic());
+        if (paragraphs.size() > 2) {
+            result = paragraphs.get(0).outerHtml() + paragraphs.get(1).outerHtml();
         }
 
-        return Jsoup.clean(
-                in.substring(0, in.indexOf(readMoreAnchor.outerHtml())), Safelist.basic());
+        return Jsoup.clean(result, Safelist.basic());
     }
 }
