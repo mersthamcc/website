@@ -85,9 +85,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
             LOG.info("Processing GoCardless Payments...");
             events.stream().filter(this::isPaymentEvent).forEach(this::processPayment);
             LOG.info("Processing GoCardless Mandates...");
-            events.stream()
-                    .filter(this::isMandateCancellationEvent)
-                    .forEach(this::processMandateUpdates);
+            events.stream().filter(this::isMandateEvent).forEach(this::processMandateUpdates);
         } catch (Exception ex) {
             LOG.error("Unexpected error processing GoCardless webhook", ex);
             success.set(false);
@@ -178,7 +176,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
                 && INTERESTING_PAYMENT_ACTIONS.contains(event.getAction());
     }
 
-    private boolean isMandateCancellationEvent(Event event) {
+    private boolean isMandateEvent(Event event) {
         return event.getResourceType().equals(MANDATES);
     }
 }
