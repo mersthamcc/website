@@ -61,9 +61,11 @@
                     <@admin.adminSwitchField name="draft" checked=news.draft!false localeCategory="news" />
                 </@admin.card>
                 <@admin.card title="Social Media">
-                    <@admin.adminSwitchField name="publishToFacebook" checked=news.publishToFacebook!false localeCategory="news" />
-                    <@admin.adminSwitchField name="publishToTwitter" checked=news.publishToTwitter!false localeCategory="news" />
-                    <@admin.adminFormField name="socialSummary" data=news.socialSummary!"" required=false type="text" localeCategory="news" />
+                    <div class="alert alert-soft-primary" role="alert">
+                        <h5 class="alert-heading">Disabled</h5>
+                        <hr />
+                        Automatic posting to social media currently not available.
+                    </div>
                 </@admin.card>
 
                 <@components.buttonGroup>
