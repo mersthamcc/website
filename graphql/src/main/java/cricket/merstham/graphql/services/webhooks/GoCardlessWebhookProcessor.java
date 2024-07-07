@@ -7,6 +7,7 @@ import com.gocardless.http.WebhookParser;
 import com.gocardless.resources.Event;
 import com.gocardless.resources.PayoutItem;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
+import cricket.merstham.graphql.repository.UserPaymentMethodRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,18 +38,21 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     private final String secret;
     private final GoCardlessClient client;
     private final PaymentEntityRepository paymentEntityRepository;
+    private final UserPaymentMethodRepository userPaymentMethodRepository;
 
     public GoCardlessWebhookProcessor(
             @Value("${configuration.webhooks.gocardless.secret}") String secret,
             @Value("${configuration.webhooks.gocardless.access-token}") String accessToken,
             @Value("${configuration.webhooks.gocardless.sandbox}") boolean sandbox,
-            PaymentEntityRepository paymentEntityRepository) {
+            PaymentEntityRepository paymentEntityRepository,
+            UserPaymentMethodRepository userPaymentMethodRepository) {
         this.secret = secret;
         this.client =
                 GoCardlessClient.newBuilder(accessToken)
                         .withEnvironment(sandbox ? SANDBOX : LIVE)
                         .build();
         this.paymentEntityRepository = paymentEntityRepository;
+        this.userPaymentMethodRepository = userPaymentMethodRepository;
     }
 
     @Override
@@ -83,7 +87,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
             LOG.info("Processing GoCardless Mandates...");
             events.stream()
                     .filter(this::isMandateCancellationEvent)
-                    .forEach(this::processMandateCancellations);
+                    .forEach(this::processMandateUpdates);
         } catch (Exception ex) {
             LOG.error("Unexpected error processing GoCardless webhook", ex);
             success.set(false);
@@ -91,8 +95,21 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
         return success.get();
     }
 
-    private void processMandateCancellations(Event event) {
-        LOG.info("Found mandate cancelled event: {}", event.getLinks().getMandate());
+    private void processMandateUpdates(Event event) {
+        LOG.info("Found mandate event: {}", event.getLinks().getMandate());
+        var mandate =
+                userPaymentMethodRepository.findByProviderAndTypeAndMethodIdentifier(
+                        NAME, "mandate", event.getLinks().getMandate());
+
+        mandate.ifPresent(
+                entity -> {
+                    LOG.info(
+                            "Updating Status of mandate {} to {}",
+                            event.getLinks().getMandate(),
+                            event.getAction());
+                    entity.setStatus(event.getAction());
+                    userPaymentMethodRepository.saveAndFlush(entity);
+                });
     }
 
     private void processPayment(Event event) {
@@ -162,6 +179,6 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     }
 
     private boolean isMandateCancellationEvent(Event event) {
-        return event.getResourceType().equals(MANDATES) && event.getAction().equals("cancelled");
+        return event.getResourceType().equals(MANDATES);
     }
 }

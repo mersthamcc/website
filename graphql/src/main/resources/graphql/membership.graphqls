@@ -184,6 +184,7 @@ extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
     members: [MemberSummary]
+    membersOwnedBy(owner: String!): [MemberSummary]
     filteredMembers(filter: String!): [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myMembers: [MemberSummary]

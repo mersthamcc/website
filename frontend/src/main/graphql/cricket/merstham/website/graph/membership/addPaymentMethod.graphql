@@ -1,0 +1,12 @@
+mutation addPaymentMethod($paymentMethod: UserPaymentMethodInput) {
+    addPaymentMethod(paymentMethod: $paymentMethod) {
+        id
+        createDate
+        userId
+        provider
+        type
+        methodIdentifier
+        customerIdentifier
+        status
+    }
+}

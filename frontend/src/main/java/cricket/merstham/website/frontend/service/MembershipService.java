@@ -7,6 +7,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.UserPaymentMethod;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
@@ -17,12 +18,15 @@ import cricket.merstham.website.graph.CreateMemberMutation;
 import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.FilteredMembersQuery;
 import cricket.merstham.website.graph.MemberQuery;
+import cricket.merstham.website.graph.MembersOwnedByQuery;
 import cricket.merstham.website.graph.MembersQuery;
 import cricket.merstham.website.graph.MembershipCategoriesQuery;
 import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
+import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
+import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.type.AttributeInput;
@@ -30,6 +34,7 @@ import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
 import cricket.merstham.website.graph.type.PaymentInput;
 import cricket.merstham.website.graph.type.StringFilter;
+import cricket.merstham.website.graph.type.UserPaymentMethodInput;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +59,7 @@ import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.website.frontend.configuration.CacheConfiguration.MEMBER_SUMMARY_CACHE;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
+import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
@@ -215,6 +222,21 @@ public class MembershipService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<MemberSummary> getMembersOwnedBy(
+            String ownerSubjectId, OAuth2AccessToken accessToken) {
+        var query = MembersOwnedByQuery.builder().owner(ownerSubjectId).build();
+        try {
+            Response<MembersOwnedByQuery.Data> result =
+                    graphService.executeQuery(query, accessToken);
+            return result.getData().getMembersOwnedBy().stream()
+                    .map(m -> modelMapper.map(m, MemberSummary.class))
+                    .toList();
+        } catch (IOException e) {
+            LOG.atWarn().setCause(e).log("Error getting members owned by {}", ownerSubjectId);
+        }
+        return List.of();
     }
 
     @Cacheable(value = MEMBER_SUMMARY_CACHE, key = "#accessToken.tokenValue")
@@ -404,5 +426,50 @@ public class MembershipService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<UserPaymentMethod> getUsersPaymentMethods(
+            String owner, OAuth2AccessToken accessToken) throws IOException {
+        GetPaymentMethodsQuery query = GetPaymentMethodsQuery.builder().owner(owner).build();
+        Response<GetPaymentMethodsQuery.Data> result =
+                graphService.executeQuery(query, accessToken);
+
+        return requireGraphData(
+                        result,
+                        GetPaymentMethodsQuery.Data::getGetPaymentMethods,
+                        () -> "Error getting payment methods")
+                .stream()
+                .map(t -> modelMapper.map(t, UserPaymentMethod.class))
+                .toList();
+    }
+
+    public UserPaymentMethod createUserPaymentMethod(
+            String provider,
+            String type,
+            String methodId,
+            String customerId,
+            String status,
+            OAuth2AccessToken accessToken)
+            throws IOException {
+        var input =
+                UserPaymentMethodInput.builder()
+                        .provider(provider)
+                        .type(type)
+                        .methodIdentifier(methodId)
+                        .customerIdentifier(customerId)
+                        .status(status)
+                        .createDate(Instant.now())
+                        .build();
+        var mutation = AddPaymentMethodMutation.builder().paymentMethod(input).build();
+
+        Response<AddPaymentMethodMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+
+        return modelMapper.map(
+                requireGraphData(
+                        response,
+                        AddPaymentMethodMutation.Data::getAddPaymentMethod,
+                        () -> "Error adding payment method"),
+                UserPaymentMethod.class);
     }
 }

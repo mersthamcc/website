@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.controller.administration;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Payment;
+import cricket.merstham.shared.dto.User;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.DataTableValue;
@@ -41,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -412,7 +414,32 @@ public class MembershipController extends SspController<MemberSummary> {
                         new DataTableColumn().setKey("payments.reference").setSortable(false),
                         new DataTableColumn().setKey("payments.amount").setSortable(false)));
 
-        model.put("owner", userService.getUser(member.getOwnerUserId(), accessToken));
+        User owner = null;
+        try {
+            owner = userService.getUser(member.getOwnerUserId(), accessToken);
+        } catch (Exception ex) {
+            LOG.atWarn()
+                    .withThrowable(ex)
+                    .log("Could not get owner account details {}", member.getOwnerUserId());
+        }
+        if (nonNull(owner)) {
+            model.put("owner", owner);
+            model.put(
+                    "linkedMembers",
+                    membershipService.getMembersOwnedBy(owner.getSubjectId(), accessToken).stream()
+                            .filter(m -> !Objects.equals(m.getId(), member.getId()))
+                            .toList());
+            model.put(
+                    "mandates",
+                    membershipService
+                            .getUsersPaymentMethods(owner.getSubjectId(), accessToken)
+                            .stream()
+                            .filter(
+                                    pm ->
+                                            pm.getProvider().equals("gocardless")
+                                                    && pm.getType().equals("mandate"))
+                            .toList());
+        }
 
         if (nonNull(member.getPlayerId())) {
             var id = Integer.parseInt(member.getPlayerId());

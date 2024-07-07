@@ -1,0 +1,23 @@
+query membersOwnedBy($owner: String!) {
+    membersOwnedBy(owner: $owner) {
+        id
+        familyName
+        givenName
+        firstRegistrationDate
+        dob
+        ageGroup
+        gender
+        mostRecentSubscription
+        lastSubsDate
+        lastSubsPrice
+        lastSubsCategory
+        received
+        paymentTypes
+        description
+        declarations
+        identifiers
+        uuid
+        applePassSerial
+        googlePassSerial
+    }
+}
