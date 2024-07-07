@@ -308,7 +308,7 @@
                                             </div>
 
                                             <div class="col-sm-auto">
-                                                <a class="js-edit btn btn-sm btn-white" href="/administration/membership/get-data/${m.id}">
+                                                <a class="js-edit btn btn-sm btn-white" href="/administration/membership/edit/${m.id?c}">
                                                     <i class="js-edit-icon tio-edit"></i> Edit
                                                 </a>&nbsp;
                                             </div>
