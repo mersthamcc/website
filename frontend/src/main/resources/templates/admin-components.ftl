@@ -448,12 +448,8 @@
                                 <#list columns as column>
                                     <td class="table-column-pl-0">
                                         <#if row[column.key].link??>
-                                            <a class="d-flex align-items-center" href="${row[column.key].link}" target="_blank">
-                                                <div class="avatar avatar-circle">
-                                                </div>
-                                                <div class="ml-3">
-                                                    <span class="h5 text-hover-primary">${row[column.key].value}</span>
-                                                </div>
+                                            <a href="${row[column.key].link}" target="_blank">
+                                                <span class="text-hover-primary">${row[column.key].value}</span>
                                             </a>
                                         <#else>
                                             <@spring.messageText code=row[column.key].value text=row[column.key].value />
