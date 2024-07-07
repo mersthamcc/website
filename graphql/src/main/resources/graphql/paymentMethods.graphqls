@@ -24,5 +24,4 @@ extend type Query {
 
 extend type Mutation {
     addPaymentMethod(paymentMethod: UserPaymentMethodInput): UserPaymentMethod
-    importFromGoCardless: Int
 }
