@@ -33,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -398,7 +399,12 @@ public class MembershipController extends SspController<MemberSummary> {
                                                                         null,
                                                                         locale)),
                                                 "payments.reference",
-                                                new DataTableValue().setValue(p.getReference()),
+                                                new DataTableValue()
+                                                        .setValue(p.getReference())
+                                                        .setLink(
+                                                                nonNull(p.getLink())
+                                                                        ? URI.create(p.getLink())
+                                                                        : null),
                                                 "payments.amount",
                                                 new DataTableValue()
                                                         .setValue(

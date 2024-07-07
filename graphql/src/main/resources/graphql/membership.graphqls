@@ -122,6 +122,7 @@ type Payment {
     reconciled: Boolean
     order: Order!
     status: String!
+    link: String
 }
 
 input PaymentInput {
