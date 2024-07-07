@@ -51,19 +51,21 @@
                 <@admin.card title="menu.admin-news-new">
                     <input type="hidden" name="id" value="${news.id?long?c}" />
                     <input type="hidden" name="uuid" value="${news.uuid}" />
-                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSX")}" />
+                    <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")}" />
+                    <input type="hidden" name="publishDate" value="${news.publishDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")}" />
                     <@admin.formErrors errors=errors![] errorKey="news.errorSaving"/>
                     <@admin.adminFormDisplayField name="createdDate" data=news.createdDate.format()?datetime.iso?string["dd/MM/yyyy HH:mm"] localeCategory="news" />
                     <@admin.adminFormField name="title" data=news.title!"" required=true type="text" localeCategory="news" />
                     <@admin.adminFormField name="author" data=news.author!"" required=true type="text" localeCategory="news" />
-                    <@admin.adminDateTimeField name="publishDate" data=news.publishDate localeCategory="news" />
                     <@admin.adminCkEditorField name="body" data=news.body!"" required=true type="text" localeCategory="news" rows=40/>
                     <@admin.adminSwitchField name="draft" checked=news.draft!false localeCategory="news" />
                 </@admin.card>
                 <@admin.card title="Social Media">
-                    <@admin.adminSwitchField name="publishToFacebook" checked=news.publishToFacebook!false localeCategory="news" />
-                    <@admin.adminSwitchField name="publishToTwitter" checked=news.publishToTwitter!false localeCategory="news" />
-                    <@admin.adminFormField name="socialSummary" data=news.socialSummary!"" required=false type="text" localeCategory="news" />
+                    <div class="alert alert-soft-primary" role="alert">
+                        <h5 class="alert-heading">Disabled</h5>
+                        <hr />
+                        Automatic posting to social media currently not available.
+                    </div>
                 </@admin.card>
 
                 <@components.buttonGroup>
