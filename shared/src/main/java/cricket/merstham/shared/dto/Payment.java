@@ -27,4 +27,5 @@ public class Payment implements Serializable {
     private Boolean collected;
     private Boolean reconciled;
     private String status;
+    private String link;
 }

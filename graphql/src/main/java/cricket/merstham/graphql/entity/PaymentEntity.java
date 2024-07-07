@@ -69,4 +69,7 @@ public class PaymentEntity {
     @ColumnDefault("'pending'::text")
     @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
     private String status;
+
+    @Column(name = "link", length = Integer.MAX_VALUE)
+    private String link;
 }
