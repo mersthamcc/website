@@ -25,6 +25,7 @@ import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
+import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
@@ -33,6 +34,7 @@ import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
 import cricket.merstham.website.graph.type.PaymentInput;
 import cricket.merstham.website.graph.type.StringFilter;
+import cricket.merstham.website.graph.type.UserPaymentMethodInput;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -438,5 +441,35 @@ public class MembershipService {
                 .stream()
                 .map(t -> modelMapper.map(t, UserPaymentMethod.class))
                 .toList();
+    }
+
+    public UserPaymentMethod createUserPaymentMethod(
+            String provider,
+            String type,
+            String methodId,
+            String customerId,
+            String status,
+            OAuth2AccessToken accessToken)
+            throws IOException {
+        var input =
+                UserPaymentMethodInput.builder()
+                        .provider(provider)
+                        .type(type)
+                        .methodIdentifier(methodId)
+                        .customerIdentifier(customerId)
+                        .status(status)
+                        .createDate(Instant.now())
+                        .build();
+        var mutation = AddPaymentMethodMutation.builder().paymentMethod(input).build();
+
+        Response<AddPaymentMethodMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+
+        return modelMapper.map(
+                requireGraphData(
+                        response,
+                        AddPaymentMethodMutation.Data::getAddPaymentMethod,
+                        () -> "Error adding payment method"),
+                UserPaymentMethod.class);
     }
 }

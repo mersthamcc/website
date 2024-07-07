@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gocardless.GoCardlessClient.Environment.LIVE;
 import static com.gocardless.GoCardlessClient.Environment.SANDBOX;
+import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 
 @Service
 public class PaymentMethodService {
@@ -57,9 +59,11 @@ public class PaymentMethodService {
     }
 
     @PreAuthorize("isAuthenticated()")
-    public UserPaymentMethod savePaymentMethod(UserPaymentMethod paymentMethod) {
+    public UserPaymentMethod savePaymentMethod(
+            UserPaymentMethod paymentMethod, Principal principal) {
         var entity = UserPaymentMethodEntity.builder().build();
-        modelMapper.map(entity, paymentMethod);
+        modelMapper.map(paymentMethod, entity);
+        entity.setUserId(getSubject(principal));
 
         return modelMapper.map(repository.saveAndFlush(entity), UserPaymentMethod.class);
     }

@@ -168,6 +168,21 @@ public class GoCardlessService implements PaymentService {
                 client.redirectFlows().complete(flowId).withSessionToken(basket.getId()).execute();
         var mandate = client.mandates().get(redirectFlow.getLinks().getMandate()).execute();
 
+        LOG.info("Saving mandate {}", mandate.getId());
+        try {
+            membershipService.createUserPaymentMethod(
+                    SERVICE_NAME,
+                    "mandate",
+                    mandate.getId(),
+                    mandate.getLinks().getCustomer(),
+                    "pending",
+                    accessToken);
+        } catch (Exception e) {
+            LOG.atWarn()
+                    .setCause(e)
+                    .log("Unable to save payment method for mandate {}", mandate.getId());
+        }
+
         List<LocalDate> chargeDates = calculateDates(mandate, dayOfMonth, numberOfPayments);
         LOG.info(
                 "Payment dates = {}",

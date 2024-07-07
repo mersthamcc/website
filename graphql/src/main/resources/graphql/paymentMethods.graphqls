@@ -10,7 +10,6 @@ type UserPaymentMethod {
 }
 
 input UserPaymentMethodInput {
-    userId: String!
     provider: String!
     type: String!
     customerIdentifier: String
