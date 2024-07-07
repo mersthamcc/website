@@ -15,4 +15,7 @@ public interface UserPaymentMethodRepository
 
     Optional<UserPaymentMethodEntity> findByUserIdAndProviderAndTypeAndMethodIdentifier(
             String userId, String provider, String type, String methodIdentifier);
+
+    Optional<UserPaymentMethodEntity> findByProviderAndTypeAndMethodIdentifier(
+            String provider, String type, String methodIdentifier);
 }

@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.services.webhooks;
 
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
+import cricket.merstham.graphql.repository.UserPaymentMethodRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,7 +13,8 @@ class GoCardlessWebhookProcessorTest {
 
     private final PaymentEntityRepository repository = mock(PaymentEntityRepository.class);
     private final GoCardlessWebhookProcessor processor =
-            new GoCardlessWebhookProcessor(null, null, false, repository);
+            new GoCardlessWebhookProcessor(
+                    null, null, false, repository, mock(UserPaymentMethodRepository.class));
 
     @Test
     void getName() {

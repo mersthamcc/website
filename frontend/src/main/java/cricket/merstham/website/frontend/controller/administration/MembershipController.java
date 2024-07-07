@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -426,7 +427,7 @@ public class MembershipController extends SspController<MemberSummary> {
             model.put(
                     "linkedMembers",
                     membershipService.getMembersOwnedBy(owner.getSubjectId(), accessToken).stream()
-                            .filter(m -> m.getId() != member.getId())
+                            .filter(m -> !Objects.equals(m.getId(), member.getId()))
                             .toList());
             model.put(
                     "mandates",
