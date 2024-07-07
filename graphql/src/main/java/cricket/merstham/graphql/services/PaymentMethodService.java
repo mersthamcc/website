@@ -82,6 +82,7 @@ public class PaymentMethodService {
                                 LocalDateTime.of(2024, 01, 01, 0, 0)
                                                 .format(DateTimeFormatter.ISO_DATE_TIME)
                                         + "Z")
+                        .withLimit(500)
                         .execute();
 
         results.getItems()
