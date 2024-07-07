@@ -448,7 +448,7 @@
                                 <#list columns as column>
                                     <td class="table-column-pl-0">
                                         <#if row[column.key].link??>
-                                            <a class="d-flex align-items-center" href="${row[column.key].link}">
+                                            <a class="d-flex align-items-center" href="${row[column.key].link}" target="_blank">
                                                 <div class="avatar avatar-circle">
                                                 </div>
                                                 <div class="ml-3">

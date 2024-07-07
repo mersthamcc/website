@@ -1,0 +1,2 @@
+ALTER TABLE payment
+  ADD COLUMN link TEXT NULL;

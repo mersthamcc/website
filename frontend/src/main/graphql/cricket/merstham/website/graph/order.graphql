@@ -13,6 +13,10 @@ query order ($id: Int!){
             type
             reference
             amount
+            status
+            link
+            collected
+            reconciled
         }
     }
 }

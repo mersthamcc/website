@@ -2,7 +2,9 @@ package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cricket.merstham.graphql.entity.LastUpdateEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
+import cricket.merstham.graphql.repository.LastUpdateRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.shared.dto.Order;
@@ -59,7 +61,9 @@ public class AccountingService {
     private final String createSalesOrderArn;
     private final String createPaymentArn;
     private final String getPaymentsArn;
+    private final String getCreditsArn;
     private final LambdaClient client;
+    private final LastUpdateRepository lastUpdateRepository;
 
     @Autowired
     public AccountingService(
@@ -71,7 +75,9 @@ public class AccountingService {
             @Value("${configuration.accounting.create-sales-order-arn}") String createSalesOrderArn,
             @Value("${configuration.accounting.create-payment-arn}") String createPaymentArn,
             @Value("${configuration.accounting.get-payments-arn}") String getPaymentsArn,
-            LambdaClient client) {
+            @Value("${configuration.accounting.get-credits-arn}") String getCreditsArn,
+            LambdaClient client,
+            LastUpdateRepository lastUpdateRepository) {
         this.repository = repository;
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
@@ -80,7 +86,9 @@ public class AccountingService {
         this.createSalesOrderArn = createSalesOrderArn;
         this.createPaymentArn = createPaymentArn;
         this.getPaymentsArn = getPaymentsArn;
+        this.getCreditsArn = getCreditsArn;
         this.client = client;
+        this.lastUpdateRepository = lastUpdateRepository;
     }
 
     @Scheduled(
@@ -156,7 +164,115 @@ public class AccountingService {
         } catch (Exception ex) {
             LOG.error("Error receiving payments to accounting", ex);
         }
+
+        try {
+            LOG.info("Receiving allocated credits...");
+            var credits = syncOfflineCredits();
+            paymentRepository.saveAllAndFlush(credits);
+            LOG.info("Credit sync complete!");
+        } catch (Exception ex) {
+            LOG.error("Error receiving payments to accounting", ex);
+        }
         LOG.info("Finished accounting sync!");
+    }
+
+    private List<PaymentEntity> syncOfflineCredits() {
+        var now = Instant.now();
+        var lastUpdate =
+                lastUpdateRepository
+                        .findById("credits")
+                        .orElseGet(
+                                () ->
+                                        LastUpdateEntity.builder()
+                                                .key("credits")
+                                                .lastUpdate(now)
+                                                .build());
+        Map<String, Object> request = Map.of("since", lastUpdate.getLastUpdate());
+        List<PaymentEntity> result = new ArrayList<>();
+        try {
+            var response =
+                    client.invoke(
+                            InvokeRequest.builder()
+                                    .functionName(getCreditsArn)
+                                    .payload(
+                                            SdkBytes.fromByteArray(
+                                                    objectMapper.writeValueAsBytes(request)))
+                                    .invocationType(InvocationType.REQUEST_RESPONSE)
+                                    .build());
+            var payments = objectMapper.readTree(response.payload().asByteArray());
+            LOG.info("Found {} credits to process!", payments.size());
+            payments.forEach(
+                    p -> {
+                        var id = p.get("id").asText();
+                        LOG.info("Processing accounts credit allocation id {}", id);
+                        var entities = paymentRepository.findByAccountingId(id);
+                        if (entities.isEmpty()) {
+                            p.get("artefact")
+                                    .forEach(
+                                            a -> {
+                                                var order =
+                                                        orderRepository
+                                                                .findOrderEntityByAccountingId(
+                                                                        a.get("id").asText());
+
+                                                order.ifPresentOrElse(
+                                                        o ->
+                                                                result.add(
+                                                                        PaymentEntity.builder()
+                                                                                .accountingId(id)
+                                                                                .date(
+                                                                                        LocalDate
+                                                                                                .parse(
+                                                                                                        p.get(
+                                                                                                                        "date")
+                                                                                                                .asText()))
+                                                                                .reference(
+                                                                                        format(
+                                                                                                "{0} ({1})",
+                                                                                                p.get(
+                                                                                                                "reference")
+                                                                                                        .asText(),
+                                                                                                p.get(
+                                                                                                                "displayedAs")
+                                                                                                        .asText()))
+                                                                                .type(
+                                                                                        p.get(
+                                                                                                        "type")
+                                                                                                .asText())
+                                                                                .order(o)
+                                                                                .amount(
+                                                                                        BigDecimal
+                                                                                                .valueOf(
+                                                                                                        a.get(
+                                                                                                                        "amount")
+                                                                                                                .asDouble()))
+                                                                                .feesAccountingId(
+                                                                                        null)
+                                                                                .processingFees(
+                                                                                        BigDecimal
+                                                                                                .ZERO)
+                                                                                .reconciled(true)
+                                                                                .collected(true)
+                                                                                .status("complete")
+                                                                                .link(
+                                                                                        p.get(
+                                                                                                        "bookmark")
+                                                                                                .asText())
+                                                                                .build()),
+                                                        () ->
+                                                                LOG.warn(
+                                                                        "Error order could not be found during credit sync {}",
+                                                                        a.get("displayedAs")
+                                                                                .asText()));
+                                            });
+                        }
+                    });
+            lastUpdate.setLastUpdate(now);
+            lastUpdateRepository.saveAndFlush(lastUpdate);
+            return result;
+        } catch (Exception ex) {
+            throw new RuntimeException("Error getting offline credit allocations", ex);
+        }
     }
 
     private List<PaymentEntity> syncOfflinePayments() {

@@ -636,6 +636,7 @@ class MembershipServiceTest {
                                                                                         true,
                                                                                         LocalDate
                                                                                                 .now(),
+                                                                                        null,
                                                                                         BigDecimal
                                                                                                 .ONE
                                                                                                 .doubleValue(),
