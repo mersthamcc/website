@@ -14,4 +14,6 @@ public interface PaymentEntityRepository extends JpaRepository<PaymentEntity, In
     Optional<PaymentEntity> findByTypeAndReference(String type, String reference);
 
     List<PaymentEntity> findByAccountingId(String id);
+
+    List<PaymentEntity> findByTypeAndReferenceIn(String type, List<String> references);
 }
