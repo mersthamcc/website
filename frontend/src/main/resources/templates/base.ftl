@@ -461,6 +461,8 @@
                         var goTo = new HSGoTo($(this)).init();
                     });
 
+                    $('blockquote').addClass("blockquote");
+
                     Fancybox.bind(".image > img", {
                         groupAll: true,
                     })
