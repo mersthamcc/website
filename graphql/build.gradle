@@ -25,32 +25,37 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${dependencyVersions.spring_boot}"
 
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-cache:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
-    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation "org.springframework.boot:spring-boot-starter-freemarker:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-graphql:${dependencyVersions.spring_boot}"
-    implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:${dependencyVersions.spring_boot}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
-    implementation "org.springframework.boot:spring-boot-starter-cache:${dependencyVersions.spring_boot}"
-    implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
-    implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
-    implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"
-    implementation "org.modelmapper.extensions:modelmapper-spring:${dependencyVersions.model_mapper}"
-    implementation "commons-codec:commons-codec:1.15"
-    implementation 'com.graphql-java:graphql-java-extended-scalars:19.1'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.0'
+
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
-    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:lambda:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:lambda:${dependencyVersions.aws}"
     implementation "software.amazon.awssdk:sesv2:${dependencyVersions.aws}"
-    implementation "com.paypal.sdk:checkout-sdk:2.0.0"
-    implementation "com.stripe:stripe-java:21.14.0"
+
     implementation "com.gocardless:gocardless-pro:5.8.0"
     implementation "com.google.guava:guava:33.0.0-jre"
+    implementation "com.graphql-java:graphql-java-extended-scalars:19.1"
+    implementation "com.paypal.sdk:checkout-sdk:2.0.0"
+    implementation "com.stripe:stripe-java:21.14.0"
+    implementation "commons-codec:commons-codec:1.15"
+    implementation "io.hypersistence:hypersistence-utils-hibernate-62:3.5.0"
+    implementation "io.rocketbase.mail:email-template-builder-markdown:2.4.1"
+    implementation "io.rocketbase.mail:email-template-builder:2.4.1"
+    implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"
+    implementation "org.modelmapper.extensions:modelmapper-spring:${dependencyVersions.model_mapper}"
+    implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
+    implementation "org.postgresql:postgresql:42.7.2"
 
     implementation project(":shared")
 

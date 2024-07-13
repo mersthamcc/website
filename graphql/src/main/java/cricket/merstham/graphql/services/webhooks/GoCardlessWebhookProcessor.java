@@ -3,20 +3,30 @@ package cricket.merstham.graphql.services.webhooks;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.gocardless.GoCardlessClient;
 import com.gocardless.Webhook;
+import com.gocardless.http.ListResponse;
 import com.gocardless.http.WebhookParser;
 import com.gocardless.resources.Event;
+import com.gocardless.resources.Payment;
 import com.gocardless.resources.PayoutItem;
+import cricket.merstham.graphql.entity.PaymentEntity;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.UserPaymentMethodRepository;
+import cricket.merstham.graphql.services.CognitoService;
+import cricket.merstham.graphql.services.EmailService;
+import cricket.merstham.shared.dto.Order;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.gocardless.GoCardlessClient.Environment.LIVE;
@@ -24,6 +34,7 @@ import static com.gocardless.GoCardlessClient.Environment.SANDBOX;
 import static com.gocardless.resources.Event.ResourceType.MANDATES;
 import static com.gocardless.resources.Event.ResourceType.PAYMENTS;
 import static com.gocardless.resources.Event.ResourceType.PAYOUTS;
+import static cricket.merstham.graphql.services.EmailService.MailTemplate.MANDATE_CANCEL;
 import static java.util.Objects.isNull;
 
 @Service
@@ -34,25 +45,36 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     public static final String WEBHOOK_SIGNATURE_HEADER = "webhook-signature";
     public static final List<String> INTERESTING_PAYMENT_ACTIONS =
             List.of("submitted", "failed", "cancelled");
+    private static final List<Payment.Status> SUCCESSFUL_PAYMENT_STATUSES =
+            List.of(Payment.Status.PAID_OUT, Payment.Status.CONFIRMED);
 
     private final String secret;
     private final GoCardlessClient client;
     private final PaymentEntityRepository paymentEntityRepository;
     private final UserPaymentMethodRepository userPaymentMethodRepository;
+    private final EmailService emailService;
+    private final CognitoService cognitoService;
+    private final ModelMapper modelMapper;
 
     public GoCardlessWebhookProcessor(
             @Value("${configuration.webhooks.gocardless.secret}") String secret,
             @Value("${configuration.webhooks.gocardless.access-token}") String accessToken,
             @Value("${configuration.webhooks.gocardless.sandbox}") boolean sandbox,
             PaymentEntityRepository paymentEntityRepository,
-            UserPaymentMethodRepository userPaymentMethodRepository) {
+            UserPaymentMethodRepository userPaymentMethodRepository,
+            EmailService emailService,
+            CognitoService cognitoService,
+            ModelMapper modelMapper) {
         this.secret = secret;
+        this.emailService = emailService;
+        this.cognitoService = cognitoService;
         this.client =
                 GoCardlessClient.newBuilder(accessToken)
                         .withEnvironment(sandbox ? SANDBOX : LIVE)
                         .build();
         this.paymentEntityRepository = paymentEntityRepository;
         this.userPaymentMethodRepository = userPaymentMethodRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -108,6 +130,9 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
                     entity.setStatus(event.getAction());
                     userPaymentMethodRepository.saveAndFlush(entity);
                 });
+        if ("cancelled".equals(event.getAction())) {
+            processCancellation(event);
+        }
     }
 
     private void processPayment(Event event) {
@@ -178,5 +203,49 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
 
     private boolean isMandateEvent(Event event) {
         return event.getResourceType().equals(MANDATES);
+    }
+
+    public void processCancellation(Event event) {
+        LOG.info("Processing GoCardless cancellation for {}", event.getLinks().getMandate());
+
+        var payments = thisYearsPaymentsForMandate(event.getLinks().getMandate());
+
+        var outstandingPayments =
+                payments.getItems().stream()
+                        .filter(p -> !SUCCESSFUL_PAYMENT_STATUSES.contains(p.getStatus()))
+                        .map(Payment::getId)
+                        .toList();
+
+        if (!outstandingPayments.isEmpty()) {
+            var orders =
+                    paymentEntityRepository
+                            .findByTypeAndReferenceIn(NAME, outstandingPayments)
+                            .stream()
+                            .map(PaymentEntity::getOrder)
+                            .distinct()
+                            .toList();
+
+            orders.forEach(
+                    order -> {
+                        var user = cognitoService.getUserDetails(order.getOwnerUserId());
+                        emailService.sendEmail(
+                                user.getEmail(),
+                                MANDATE_CANCEL,
+                                Map.of(
+                                        "user", user,
+                                        "mandate", event.getLinks().getMandate(),
+                                        "order", modelMapper.map(order, Order.class)));
+                    });
+        }
+    }
+
+    public ListResponse<Payment> thisYearsPaymentsForMandate(String mandate) {
+        return client.payments()
+                .list()
+                .withMandate(mandate)
+                .withChargeDateGt(
+                        LocalDate.of(LocalDate.now().getYear(), 1, 1)
+                                .format(DateTimeFormatter.ISO_DATE))
+                .execute();
     }
 }
