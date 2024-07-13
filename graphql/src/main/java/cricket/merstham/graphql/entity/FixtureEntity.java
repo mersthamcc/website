@@ -20,6 +20,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -74,6 +75,10 @@ public class FixtureEntity {
             orphanRemoval = true,
             cascade = CascadeType.ALL)
     private List<FixturePlayerEntity> players;
+
+    @ColumnDefault("false")
+    @Column(name = "include_in_fantasy")
+    private Boolean includeInFantasy;
 
     @Override
     public boolean equals(Object o) {

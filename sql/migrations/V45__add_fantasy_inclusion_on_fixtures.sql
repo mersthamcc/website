@@ -1,0 +1,2 @@
+ALTER TABLE fixture
+  ADD COLUMN include_in_fantasy BOOLEAN DEFAULT FALSE;

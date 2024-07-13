@@ -38,6 +38,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -368,6 +369,17 @@ public class FixtureService {
                                                     () ->
                                                             FixtureEntity.builder()
                                                                     .id(fixture.getId())
+                                                                    .includeInFantasy(
+                                                                            fixture.getMatchDate()
+                                                                                            .getDayOfWeek()
+                                                                                            .equals(
+                                                                                                    DayOfWeek
+                                                                                                            .SATURDAY)
+                                                                                    && fixture.getCompetitionType()
+                                                                                            .equals(
+                                                                                                    "League")
+                                                                                    && team.get()
+                                                                                            .isIncludedInSelection())
                                                                     .build())
                                             .setDate(fixture.getMatchDate())
                                             .setStart(fixture.getMatchTime())
