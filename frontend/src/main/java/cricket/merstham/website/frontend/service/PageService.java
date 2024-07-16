@@ -3,17 +3,21 @@ package cricket.merstham.website.frontend.service;
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.shared.dto.News;
 import cricket.merstham.shared.dto.StaticPage;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
 import cricket.merstham.website.frontend.exception.ResourceNotFoundException;
 import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.service.processors.ItemProcessor;
+import cricket.merstham.website.graph.HomeQuery;
 import cricket.merstham.website.graph.pages.AdminPagesQuery;
 import cricket.merstham.website.graph.pages.DeletePageMutation;
 import cricket.merstham.website.graph.pages.GetPageQuery;
 import cricket.merstham.website.graph.pages.SavePageMutation;
 import cricket.merstham.website.graph.type.PageInput;
+import lombok.Builder;
+import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_EDIT_ROUTE;
 import static java.util.Objects.isNull;
@@ -125,6 +130,29 @@ public class PageService {
         return get(null, slug);
     }
 
+    public HomePage home() throws IOException {
+        var query = new HomeQuery();
+        Response<HomeQuery.Data> result = graphService.executeQuery(query);
+
+        return HomePage.builder()
+                .content(
+                        modelMapper.map(
+                                requireGraphData(
+                                        result,
+                                        HomeQuery.Data::getPage,
+                                        () -> "Error getting page content"),
+                                StaticPage.class))
+                .topNews(
+                        requireGraphData(
+                                        result,
+                                        HomeQuery.Data::getTopNews,
+                                        () -> "Error getting top news")
+                                .stream()
+                                .map(n -> modelMapper.map(n, News.class))
+                                .toList())
+                .build();
+    }
+
     public boolean delete(OAuth2AccessToken accessToken, String slug) throws IOException {
         var query = new DeletePageMutation(slug);
         Response<DeletePageMutation.Data> result = graphService.executeMutation(query, accessToken);
@@ -132,5 +160,12 @@ public class PageService {
             result.getErrors().forEach(e -> LOG.error(e.getMessage()));
         }
         return !result.hasErrors();
+    }
+
+    @Builder
+    @Getter
+    public static class HomePage {
+        private final StaticPage content;
+        private final List<News> topNews;
     }
 }

@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.repository;
 
 import cricket.merstham.graphql.entity.NewsEntity;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -19,4 +20,6 @@ public interface NewsEntityRepository
                             + "ORDER BY publish_date DESC "
                             + "LIMIT :length OFFSET :start")
     List<NewsEntity> adminSearch(int start, int length, String searchString);
+
+    List<NewsEntity> findByDraftIsFalseOrderByPublishDateDesc(PageRequest page);
 }

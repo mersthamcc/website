@@ -3326,18 +3326,6 @@
               "deprecationReason": null
             },
             {
-              "name": "importFromGoCardless",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "saveVenue",
               "description": null,
               "args": [
@@ -5496,6 +5484,33 @@
               "args": [
                 {
                   "name": "page",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "News",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "topNews",
+              "description": null,
+              "args": [
+                {
+                  "name": "count",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",

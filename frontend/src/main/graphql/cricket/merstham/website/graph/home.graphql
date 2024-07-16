@@ -1,0 +1,15 @@
+query home {
+    page(slug: "home") {
+        slug
+        title
+        content
+    }
+
+    topNews(count: 3){
+        id
+        title
+        author
+        path
+        publishDate
+    }
+}

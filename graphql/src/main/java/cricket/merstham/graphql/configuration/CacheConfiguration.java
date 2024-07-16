@@ -7,6 +7,7 @@ public class CacheConfiguration {
 
     public static final String MEMBER_SUMMARY_CACHE = "member_summary";
     public static final String NEWS_SUMMARY_CACHE = "news_feed";
+    public static final String NEWS_TOP_X_CACHE = "news_top_x";
     public static final String NEWS_SUMMARY_TOTAL_CACHE = "news_feed_totals";
     public static final String NEWS_ITEM_BY_ID_CACHE = "news_item_by_id";
     public static final String NEWS_ITEM_BY_PATH_CACHE = "news_item_by_path";

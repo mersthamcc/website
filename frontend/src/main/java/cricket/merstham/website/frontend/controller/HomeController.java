@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -23,7 +24,9 @@ public class HomeController {
 
     @GetMapping(value = "/", name = "home")
     public ModelAndView homepage() throws IOException {
-        var page = pageService.get("home");
-        return new ModelAndView("home/home", Map.of("page", page));
+        var home = pageService.home();
+        Map<String, Object> model = new HashMap<>();
+        model.put("home", home);
+        return new ModelAndView("home/home", model);
     }
 }
