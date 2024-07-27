@@ -199,7 +199,9 @@ public class AccountingService {
                                                     objectMapper.writeValueAsBytes(request)))
                                     .invocationType(InvocationType.REQUEST_RESPONSE)
                                     .build());
-            var payments = objectMapper.readTree(response.payload().asByteArray());
+            var json = response.payload().asUtf8String();
+            LOG.info("Lambda response = {}", json);
+            var payments = objectMapper.readTree(json);
             LOG.info("Found {} credits to process!", payments.size());
             payments.forEach(
                     p -> {
