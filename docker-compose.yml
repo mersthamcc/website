@@ -584,6 +584,35 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
     restart: unless-stopped
 
+  jupyterhub:
+    build:
+      context: infrastructure/Dockerfiles/jupyterhub
+    networks:
+      - backendnetwork
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jupyterhub.rule=Host(`hub.${DEVDOMAIN}`)
+      - traefik.http.services.jupyterhub.loadbalancer.server.port=8000
+      - traefik.http.routers.jupyterhub.entrypoints=web
+      - traefik.http.routers.jupyterhub.middlewares=forcehttps
+      - traefik.http.routers.jupyterhub-tls.tls=true
+      - traefik.http.routers.jupyterhub-tls.rule=Host(`hub.${DEVDOMAIN}`)
+      - traefik.http.routers.jupyterhub-tls.entrypoints=websecure
+      - traefik.http.routers.jupyterhub-tls.tls.certresolver=le
+      - traefik.http.routers.jupyterhub-tls.tls.domains[0].main=*.${DEVDOMAIN}
+      - com_docker_swarm_service_name=hub
+      - tls-cert-host-check=hub.${DEVDOMAIN}
+    environment:
+      DOCKER_NETWORK_NAME: backendnetwork
+      DOCKER_NOTEBOOK_IMAGE: "jupyter:latest"
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+    restart: unless-stopped
+
   ngrok:
     image: ngrok/ngrok:latest
     restart: unless-stopped

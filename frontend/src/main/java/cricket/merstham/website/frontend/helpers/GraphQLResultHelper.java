@@ -13,6 +13,10 @@ public class GraphQLResultHelper {
 
     private GraphQLResultHelper() {}
 
+    public static <T, R> R requireGraphData(Response<T> result, Function<T, R> function) {
+        return requireGraphData(result, function, () -> "Error getting data");
+    }
+
     public static <T, R> R requireGraphData(
             Response<T> result, Function<T, R> function, Supplier<String> errorMessage) {
         if (result.hasErrors()) {

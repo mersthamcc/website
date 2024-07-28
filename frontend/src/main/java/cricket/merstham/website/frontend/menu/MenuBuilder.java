@@ -82,6 +82,7 @@ public class MenuBuilder {
                                     buildMenuFor(
                                             "about",
                                             List.of(
+                                                    new Menu("about", null, null, List.of(), null),
                                                     new Menu(
                                                             "contacts",
                                                             null,

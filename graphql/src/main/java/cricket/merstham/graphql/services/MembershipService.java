@@ -32,6 +32,9 @@ import cricket.merstham.shared.dto.Payment;
 import cricket.merstham.shared.types.ReportFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -47,6 +50,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
@@ -65,6 +69,7 @@ public class MembershipService {
     private final PriceListItemEntityRepository priceListItemEntityRepository;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
+    private final MemberSummaryRepository memberSummaryRepository;
 
     @Autowired
     public MembershipService(
@@ -77,7 +82,8 @@ public class MembershipService {
             MemberFilterEntityRepository filterEntityRepository,
             PriceListItemEntityRepository priceListItemEntityRepository,
             ModelMapper modelMapper,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            MemberSummaryRepository memberSummaryRepository) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -88,6 +94,7 @@ public class MembershipService {
         this.priceListItemEntityRepository = priceListItemEntityRepository;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
+        this.memberSummaryRepository = memberSummaryRepository;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -125,6 +132,11 @@ public class MembershipService {
                 .sorted(Comparator.comparing(MemberCategoryEntity::getSortOrder))
                 .map(c -> modelMapper.map(c, MemberCategory.class))
                 .toList();
+    }
+
+    @Cacheable(value = MEMBER_COUNT_CACHE)
+    public long getMemberCount() {
+        return memberSummaryRepository.count();
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
@@ -169,6 +181,10 @@ public class MembershipService {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @Caching(
+            evict = {
+                @CacheEvict(value = MEMBER_COUNT_CACHE, allEntries = true),
+            })
     public Member createMember(MemberInput data, Principal principal) {
         var now = Instant.now();
         var currentDate = LocalDate.ofInstant(now, ZoneId.systemDefault());
@@ -259,6 +275,10 @@ public class MembershipService {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @Caching(
+            evict = {
+                @CacheEvict(value = MEMBER_COUNT_CACHE, allEntries = true),
+            })
     public Member updateMember(int id, List<AttributeInput> attributes) {
         var member = memberRepository.findById(id).orElseThrow();
         attributes.forEach(

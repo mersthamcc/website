@@ -373,7 +373,8 @@ class MembershipServiceTest {
                     memberFilterEntityRepository,
                     priceListItemEntityRepository,
                     new ModelMapperConfiguration().modelMapper(),
-                    mock(ObjectMapper.class));
+                    mock(ObjectMapper.class),
+                    mock(MemberSummaryRepository.class));
 
     @BeforeEach
     void setup() {

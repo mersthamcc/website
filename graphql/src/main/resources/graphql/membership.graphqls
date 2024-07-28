@@ -192,6 +192,7 @@ extend type Query {
     myOrders: [Order]
     orders(year: Int!): [Order]
     order(id: Int!): Order
+    memberCount: Int!
 }
 
 extend type Mutation {
