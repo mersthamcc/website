@@ -12,4 +12,18 @@ query home {
         path
         publishDate
     }
+
+    upcomingFixtures(count: 5) {
+        id
+        date
+        start
+        team {
+            id
+            name
+        }
+        opposition
+        detail
+        homeAway
+        groundId
+    }
 }

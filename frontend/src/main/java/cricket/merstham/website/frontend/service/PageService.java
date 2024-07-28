@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.service;
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
+import cricket.merstham.shared.dto.Fixture;
 import cricket.merstham.shared.dto.News;
 import cricket.merstham.shared.dto.StaticPage;
 import cricket.merstham.website.frontend.exception.EntitySaveException;
@@ -150,6 +151,14 @@ public class PageService {
                                 .stream()
                                 .map(n -> modelMapper.map(n, News.class))
                                 .toList())
+                .upcomingFixtures(
+                        requireGraphData(
+                                        result,
+                                        HomeQuery.Data::getUpcomingFixtures,
+                                        () -> "Error getting upcoming fixtures")
+                                .stream()
+                                .map(n -> modelMapper.map(n, Fixture.class))
+                                .toList())
                 .build();
     }
 
@@ -162,10 +171,49 @@ public class PageService {
         return !result.hasErrors();
     }
 
+    public AboutPage about() throws IOException {
+        var query = new AboutQuery();
+        Response<AboutQuery.Data> response = graphService.executeQuery(query);
+        return AboutPage.builder()
+                .general(
+                        modelMapper.map(
+                                requireGraphData(response, AboutQuery.Data::getGeneral),
+                                StaticPage.class))
+                .success(
+                        modelMapper.map(
+                                requireGraphData(response, AboutQuery.Data::getSuccess),
+                                StaticPage.class))
+                .cricket(
+                        modelMapper.map(
+                                requireGraphData(response, AboutQuery.Data::getCricket),
+                                StaticPage.class))
+                .community(
+                        modelMapper.map(
+                                requireGraphData(response, AboutQuery.Data::getCommunity),
+                                StaticPage.class))
+                .members(requireGraphData(response, AboutQuery.Data::getMemberCount))
+                .fixtures(requireGraphData(response, AboutQuery.Data::getFixtureCount))
+                .wins(requireGraphData(response, AboutQuery.Data::getFixtureWinCount))
+                .build();
+    }
+
     @Builder
     @Getter
     public static class HomePage {
         private final StaticPage content;
         private final List<News> topNews;
+        private final List<Fixture> upcomingFixtures;
+    }
+
+    @Builder
+    @Getter
+    public static class AboutPage {
+        private final StaticPage general;
+        private final StaticPage success;
+        private final StaticPage cricket;
+        private final StaticPage community;
+        private final int members;
+        private final int fixtures;
+        private final int wins;
     }
 }

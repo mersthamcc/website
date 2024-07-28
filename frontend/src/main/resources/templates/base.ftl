@@ -509,3 +509,51 @@
         </body>
     </html>
 </#macro>
+
+<#macro fixtureWidget title fixtures>
+    <div class="mb-7">
+        <div class="mb-3">
+            <h3>
+                <@spring.messageText code=title text=title />
+            </h3>
+        </div>
+
+        <#list fixtures as fixture>
+            <article class="mb-3">
+                <a class="card card-frame p-3" href="/fixtures/${fixture.path}">
+                    <div class="media align-items-center">
+                        <div class="media-body mr-2">
+                            <h4 class="h6 mb-0">
+                                ${fixture.team.name} vs ${fixture.opposition}
+                            </h4>
+                            <span class="d-block font-size-1 text-body">
+                                ${(fixture.date).format("dd/MM/yyyy")}
+                                <#if fixture.startTime?has_content>
+                                    ${fixture.startTime}
+                                </#if>
+                            </span>
+                            <span class="d-block font-size-1 text-body">
+                                <#if fixture.friendly>
+                                    <i class="fa fa-handshake"></i>&nbsp;
+                                    ${fixture.matchType!""}
+                                <#else>
+                                    <i class="fa fa-trophy"></i>&nbsp;
+                                    ${fixture.matchType!""} - ${fixture.competitionName!""}
+                                </#if>
+                            </span>
+                            <span class="d-block font-size-1 text-body">
+                                <i class="fa fa-globe"></i>
+                                <#if fixture.homeAway == "HOME">
+                                    <@spring.message code="fixtures.home" />
+                                <#else>
+                                    <@spring.message code="fixtures.away" />
+                                </#if>
+                            </span>
+                        </div>
+                        <i class="fas fa-angle-right"></i>
+                    </div>
+                </a>
+            </article>
+        </#list>
+    </div>
+</#macro>

@@ -32,12 +32,20 @@ public class StringExtensions {
     }
 
     public static String toAbstract(String in) {
+        return toAbstract(in, 2);
+    }
+
+    public static String toAbstract(String in, int paragraphCount) {
         Document doc = Jsoup.parse(in);
         Elements paragraphs = doc.select("p");
         String result = in;
 
-        if (paragraphs.size() > 2) {
-            result = paragraphs.get(0).outerHtml() + paragraphs.get(1).outerHtml();
+        if (paragraphs.size() > paragraphCount) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < paragraphCount; i++) {
+                builder.append(paragraphs.get(i).outerHtml());
+            }
+            result = builder.toString();
         }
 
         return Jsoup.clean(result, Safelist.basic());

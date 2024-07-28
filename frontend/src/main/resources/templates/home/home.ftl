@@ -105,13 +105,13 @@
                 author=springMacroRequestContext.getMessage("home.founded")
             />
 
-            <#assign images=["${resourcePrefix}/mcc/img/club/owzat.png", "${resourcePrefix}/mcc/img/club/aerial.jpeg", "${resourcePrefix}/mcc/img/club/red-sky.png"]>
+            <#assign images=["${resourcePrefix}/mcc/img/club/owzat.png", "${resourcePrefix}/mcc/img/club/aerial.jpeg", "${resourcePrefix}/mcc/img/club/fielding.png"]>
             <#list home.topNews as news>
                 <@slide
                     image=images[news?index]
                     title=news.title
                     cta=springMacroRequestContext.getMessage("home.read-story")
-                    cta_link=news.path
+                    cta_link="/news${news.path}"
                     author=news.displayPublishDate
                 />
             </#list>
@@ -154,7 +154,7 @@
 
     <div class="container space-1">
         <div class="row justify-content-lg-between">
-            <div class="col-lg-12">
+            <div class="col-lg-8">
                 <div class="mb-5 mt-5">
                     <h1 class="mb-3">
                         <#if page?? && page.title??>
@@ -162,7 +162,7 @@
                         </#if>
                     </h1>
 
-                    ${home.content.content}
+                    ${home.content.getAbstract(3)}
 
                     <a class="btn btn-primary btn-wide transition-3d-hover" href="/register">
                         <@spring.messageText code="home.join" text="Join Now" />
@@ -172,6 +172,8 @@
                     </a>
                 </div>
             </div>
-        </div>
+            <div class="col-lg-4">
+                <@layout.fixtureWidget fixtures=home.upcomingFixtures title="home.upcoming-fixtures" />
+            </div>
     </div>
 </@layout.mainLayout>

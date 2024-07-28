@@ -46,6 +46,21 @@ public class FixtureController {
         return fixtureService.getFixturesForTeam(id);
     }
 
+    @QueryMapping
+    public List<Fixture> upcomingFixtures(@Argument("count") int count) {
+        return fixtureService.getUpcomingFixtures(count);
+    }
+
+    @QueryMapping
+    public long fixtureCount() {
+        return fixtureService.getFixtureCount();
+    }
+
+    @QueryMapping
+    public long fixtureWinCount() {
+        return fixtureService.getFixtureWinCount();
+    }
+
     @SchemaMapping(typeName = "Team", field = "fixtures")
     public List<Fixture> fixturesByTeam(Team team, @Argument("season") int season) {
         return fixtureService.getFixtures(season, team.getId());

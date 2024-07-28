@@ -61,6 +61,9 @@ extend type Query {
     players: [Player]
     allFixturesForTeam(id: Int!): [Fixture]
     thisWeeksSelection: [Fixture]
+    fixtureCount: Int!
+    fixtureWinCount: Int!
+    upcomingFixtures(count: Int!): [Fixture]
 #    leaguesForTeam(season: Int!, team: Int!): [League]
 }
 

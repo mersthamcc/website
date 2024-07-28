@@ -25,6 +25,10 @@ public class CacheConfiguration {
     public static final String TEAM_CACHE = "team";
     public static final String ACTIVE_TEAM_CACHE = "active_team";
     public static final String FIXTURE_CACHE = "fixture";
+    public static final String UPCOMING_FIXTURE_CACHE = "upcoming_fixture";
+    public static final String FIXTURE_COUNT_CACHE = "fixture_count";
+    public static final String FIXTURES_WON_COUNT_CACHE = "fixture_won_count";
+    public static final String MEMBER_COUNT_CACHE = "member_count";
     public static final String TEAM_FIXTURE_CACHE = "fixture_by_team";
     public static final String PAGE_SUMMARY_TOTAL_CACHE = "page_feed_totals";
     public static final String PAGE_ITEM_BY_ID_CACHE = "page_item_by_id";
