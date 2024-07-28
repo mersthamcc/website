@@ -81,6 +81,11 @@ public class MembershipController {
         return membershipService.getOrder(id);
     }
 
+    @QueryMapping
+    public long memberCount() {
+        return membershipService.getMemberCount();
+    }
+
     @MutationMapping
     public Member createMember(@Argument MemberInput data, Principal principal) {
         return membershipService.createMember(data, principal);

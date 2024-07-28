@@ -1,0 +1,25 @@
+query about {
+    general: page(slug: "home")  {
+        title
+        content
+    }
+
+    success: page(slug: "success")  {
+        title
+        content
+    }
+
+    cricket: page(slug: "cricket-for-all")  {
+        title
+        content
+    }
+
+    community: page(slug: "community")  {
+        title
+        content
+    }
+
+    memberCount
+    fixtureCount
+    fixtureWinCount
+}

@@ -300,13 +300,23 @@ public class Fixture implements Serializable {
     @Transient
     public boolean inningsBattingPresent(int innings) {
         var inningsNode = detail.at(format("/innings/{0}/bat", innings - 1));
-        return inningsNode.isArray() && inningsNode.size() > 0;
+        return inningsNode.isArray() && !inningsNode.isEmpty();
     }
 
     @JsonIgnore
     @Transient
     public boolean inningsBowlingPresent(int innings) {
         var inningsNode = detail.at(format("/innings/{0}/bowl", innings - 1));
-        return inningsNode.isArray() && inningsNode.size() > 0;
+        return inningsNode.isArray() && !inningsNode.isEmpty();
+    }
+
+    @JsonIgnore
+    @Transient
+    public String getPath() {
+        return format(
+                "{0,number,####}/{1,number,#########}/{2,number,#########}",
+                date.getYear(),
+                team.getId(),
+                id);
     }
 }

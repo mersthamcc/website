@@ -29,6 +29,11 @@ public class NewsController {
     }
 
     @QueryMapping
+    public List<News> topNews(@Argument("count") int count) {
+        return newsService.getTop(count);
+    }
+
+    @QueryMapping
     public Totals newsTotals(@Argument("searchString") String searchString) {
         return newsService.getNewsFeedTotals();
     }

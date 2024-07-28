@@ -1,0 +1,29 @@
+query home {
+    page(slug: "home") {
+        slug
+        title
+        content
+    }
+
+    topNews(count: 3){
+        id
+        title
+        author
+        path
+        publishDate
+    }
+
+    upcomingFixtures(count: 5) {
+        id
+        date
+        start
+        team {
+            id
+            name
+        }
+        opposition
+        detail
+        homeAway
+        groundId
+    }
+}

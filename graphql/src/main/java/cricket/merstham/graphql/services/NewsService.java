@@ -22,6 +22,7 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITE
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITEM_BY_PATH_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_TOTAL_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_TOP_X_CACHE;
 
 @Component
 public class NewsService {
@@ -41,6 +42,15 @@ public class NewsService {
                 .findAll(PageRequest.of(page, 10, Sort.by("publishDate").descending()))
                 .map(this::convertToDto)
                 .stream()
+                .toList();
+    }
+
+    @Cacheable(value = NEWS_TOP_X_CACHE, key = "#count")
+    public List<News> getTop(int count) {
+        return repository
+                .findByDraftIsFalseOrderByPublishDateDesc(PageRequest.of(0, count))
+                .stream()
+                .map(this::convertToDto)
                 .toList();
     }
 
@@ -74,7 +84,8 @@ public class NewsService {
                 @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#news.id"),
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
-                @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)
+                @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true),
+                @CacheEvict(value = NEWS_TOP_X_CACHE, allEntries = true)
             })
     public News save(News news) {
         var entity = repository.findById(news.getId()).orElseGet(() -> new NewsEntity());
@@ -97,7 +108,8 @@ public class NewsService {
                 @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'"),
                 @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#news.id"),
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
-                @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true)
+                @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true),
+                @CacheEvict(value = NEWS_TOP_X_CACHE, allEntries = true)
             })
     public News delete(int id) {
         var news = repository.findById(id).orElseThrow();

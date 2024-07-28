@@ -28,6 +28,7 @@ input NewsInput {
 
 extend type Query {
     feed(page: Int): [News]
+    topNews(count: Int): [News]
     newsItemByPath(path: String!): News
     newsItem(id: Int!): News
     news(start: Int!, length: Int!, searchString: String): [News]

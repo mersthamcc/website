@@ -2,6 +2,7 @@ package cricket.merstham.graphql.repository;
 
 import cricket.merstham.graphql.entity.FixtureEntity;
 import cricket.merstham.graphql.entity.TeamEntity;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -15,7 +16,7 @@ public interface FixtureRepository
     List<FixtureEntity> findByTeamIsAndDateIsBetweenOrderByDateAscStartAsc(
             TeamEntity team, LocalDate start, LocalDate end);
 
-    List<FixtureEntity> findByDateAfterOrderByDateAscStartAsc(LocalDate date);
+    List<FixtureEntity> findByDateAfterOrderByDateAscStartAsc(LocalDate date, PageRequest page);
 
     List<FixtureEntity> findByDateIsBetweenOrderByDateAscStartAsc(LocalDate start, LocalDate end);
 
@@ -41,4 +42,16 @@ public interface FixtureRepository
                             + " ORDER BY Year;",
             nativeQuery = true)
     List<Integer> findDistinctYears();
+
+    long countByDateBetween(LocalDate dateStart, LocalDate dateEnd);
+
+    @Query(
+            value =
+                    "SELECT COUNT(id)"
+                            + "  FROM fixture "
+                            + " WHERE date BETWEEN :start AND :end "
+                            + "   AND (detail ->> 'result') = 'W' "
+                            + "   AND CAST(detail ->> 'result_applied_to' AS INTEGER) IN (SELECT id FROM team WHERE status = 'active')",
+            nativeQuery = true)
+    long countWinsByDateBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

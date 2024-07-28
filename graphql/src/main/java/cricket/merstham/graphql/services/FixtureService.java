@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -47,10 +48,13 @@ import java.util.List;
 import java.util.Objects;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURES_WON_COUNT_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURE_COUNT_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.SELECTION_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
+import static cricket.merstham.graphql.configuration.CacheConfiguration.UPCOMING_FIXTURE_CACHE;
 import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
 import static cricket.merstham.graphql.services.PlayCricketService.PLAYER_ID;
 import static java.text.MessageFormat.format;
@@ -273,6 +277,9 @@ public class FixtureService {
                 @CacheEvict(value = TEAM_FIXTURE_CACHE, allEntries = true),
                 @CacheEvict(value = TEAM_CACHE, allEntries = true),
                 @CacheEvict(value = ACTIVE_TEAM_CACHE, allEntries = true),
+                @CacheEvict(value = FIXTURE_COUNT_CACHE, allEntries = true),
+                @CacheEvict(value = FIXTURES_WON_COUNT_CACHE, allEntries = true),
+                @CacheEvict(value = UPCOMING_FIXTURE_CACHE, allEntries = true),
             })
     public void refreshFixtures() {
         LOG.info("Starting PlayCricket fixture refresh... ");
@@ -526,5 +533,29 @@ public class FixtureService {
                         Comparator.comparing(Fixture::getDate)
                                 .thenComparingLong(f -> f.getTeam().getSortOrder()))
                 .toList();
+    }
+
+    @Cacheable(value = UPCOMING_FIXTURE_CACHE)
+    public List<Fixture> getUpcomingFixtures(int count) {
+        return fixtureRepository
+                .findByDateAfterOrderByDateAscStartAsc(
+                        LocalDate.now().minusDays(1), PageRequest.of(0, count))
+                .stream()
+                .map(f -> modelMapper.map(f, Fixture.class))
+                .toList();
+    }
+
+    @Cacheable(value = FIXTURE_COUNT_CACHE)
+    public long getFixtureCount() {
+        var year = LocalDate.now().getYear();
+        return fixtureRepository.countByDateBetween(
+                LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
+    }
+
+    @Cacheable(value = FIXTURES_WON_COUNT_CACHE)
+    public long getFixtureWinCount() {
+        var year = LocalDate.now().getYear();
+        return fixtureRepository.countWinsByDateBetween(
+                LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
     }
 }

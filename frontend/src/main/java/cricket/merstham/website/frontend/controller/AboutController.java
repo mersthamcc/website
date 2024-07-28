@@ -8,25 +8,23 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 @Controller
-public class HomeController {
-
-    public static final String ROOT_URL = "/";
+public class AboutController {
 
     private final PageService pageService;
 
     @Autowired
-    public HomeController(PageService pageService) {
+    public AboutController(PageService pageService) {
         this.pageService = pageService;
     }
 
-    @GetMapping(value = "/", name = "home")
-    public ModelAndView homepage() throws IOException {
-        var home = pageService.home();
-        Map<String, Object> model = new HashMap<>();
-        model.put("home", home);
-        return new ModelAndView("home/home", model);
+    @GetMapping(value = "/about", name = "about")
+    public ModelAndView about() throws IOException {
+        var about = pageService.about();
+        var model = new HashMap<String, Object>();
+        model.put("about", about);
+
+        return new ModelAndView("about/about", model);
     }
 }
