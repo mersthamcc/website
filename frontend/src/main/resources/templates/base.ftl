@@ -542,7 +542,7 @@
                                 </#if>
                             </span>
                             <span class="d-block font-size-1 text-body">
-                                <i class="fa fa-globe"></i>
+                                <img src="${resourcePrefix}/mcc/img/cricket-icons/location-black.png" width="20px" alt="<@spring.message code="fixtures.venue" />"/>
                                 <#if fixture.homeAway == "HOME">
                                     <@spring.message code="fixtures.home" />
                                 <#else>
