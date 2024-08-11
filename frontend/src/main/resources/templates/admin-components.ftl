@@ -280,7 +280,7 @@
                         id="${name}Label"
                         placeholder="<@spring.messageText code="${localeCategory}.${name}-placeholder" text="" />"
                         data-input
-                        value=${data.format()} />
+                        value=${data.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")} />
             </div>
         </div>
     </div>

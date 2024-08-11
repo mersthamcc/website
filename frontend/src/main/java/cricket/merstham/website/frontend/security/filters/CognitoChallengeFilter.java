@@ -43,7 +43,7 @@ public class CognitoChallengeFilter extends OncePerRequestFilter {
                     response.sendRedirect("/auth/challenge/mfa");
                     return;
                 }
-                case PASSWORD_VERIFIER -> {
+                case NEW_PASSWORD_REQUIRED, PASSWORD_VERIFIER -> {
                     response.sendRedirect("/auth/challenge/reset-password");
                     return;
                 }

@@ -673,36 +673,38 @@ public class CognitoService {
 
     public User getUserDetails() {
         var context = SecurityContextHolder.getContext();
-        var authentication = (CognitoAuthentication) context.getAuthentication();
 
-        AdminGetUserResponse user = null;
-        try {
-            user =
-                    client.adminGetUser(
-                            AdminGetUserRequest.builder()
-                                    .userPoolId(userPoolId)
-                                    .username(
-                                            authentication
-                                                    .getIdTokenJwt()
-                                                    .getJWTClaimsSet()
-                                                    .getStringClaim(COGNITO_USERNAME_CLAIM))
-                                    .build());
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        if (context.getAuthentication() instanceof CognitoAuthentication authentication) {
+            AdminGetUserResponse user = null;
+            try {
+                user =
+                        client.adminGetUser(
+                                AdminGetUserRequest.builder()
+                                        .userPoolId(userPoolId)
+                                        .username(
+                                                authentication
+                                                        .getIdTokenJwt()
+                                                        .getJWTClaimsSet()
+                                                        .getStringClaim(COGNITO_USERNAME_CLAIM))
+                                        .build());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            return User.builder()
+                    .subjectId(user.username())
+                    .username(getUserAttribute(user.userAttributes(), COGNITO_USERNAME_CLAIM))
+                    .givenName(getUserAttribute(user.userAttributes(), GIVEN_NAME_CLAIM))
+                    .familyName(getUserAttribute(user.userAttributes(), FAMILY_NAME_CLAIM))
+                    .email(getUserAttribute(user.userAttributes(), EMAIL_NAME_CLAIM))
+                    .phoneNumber(getUserAttribute(user.userAttributes(), PHONE_NUMBER_CLAIM))
+                    .roles(
+                            authentication.getAuthorities().stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .toList())
+                    .build();
         }
-
-        return User.builder()
-                .subjectId(user.username())
-                .username(getUserAttribute(user.userAttributes(), COGNITO_USERNAME_CLAIM))
-                .givenName(getUserAttribute(user.userAttributes(), GIVEN_NAME_CLAIM))
-                .familyName(getUserAttribute(user.userAttributes(), FAMILY_NAME_CLAIM))
-                .email(getUserAttribute(user.userAttributes(), EMAIL_NAME_CLAIM))
-                .phoneNumber(getUserAttribute(user.userAttributes(), PHONE_NUMBER_CLAIM))
-                .roles(
-                        authentication.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .toList())
-                .build();
+        return null;
     }
 
     private String getUserAttribute(List<AttributeType> attributes, String name) {

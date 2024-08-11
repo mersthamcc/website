@@ -29,27 +29,26 @@ public class CommonSteps {
     @BeforeAll
     public static void startPlaywright() {
         playwright = Playwright.create();
-        browser = playwright
-                .chromium()
-                .launch(
-                        new BrowserType
-                                .LaunchOptions()
-                                .setChromiumSandbox(true)
-                                .setHeadless(true));
+        browser =
+                playwright
+                        .chromium()
+                        .launch(
+                                new BrowserType.LaunchOptions()
+                                        .setChromiumSandbox(true)
+                                        .setHeadless(true));
         context = browser.newContext();
-        context.tracing().start(new Tracing.StartOptions()
-                .setScreenshots(true)
-                .setSnapshots(false)
-                .setSources(false));
+        context.tracing()
+                .start(
+                        new Tracing.StartOptions()
+                                .setScreenshots(true)
+                                .setSnapshots(false)
+                                .setSources(false));
     }
 
     @AfterAll
     public static void stopPlaywright() {
-        context
-                .tracing()
-                .stop(new Tracing.StopOptions()
-                        .setPath(
-                                Paths.get("build/reports/trace.zip")));
+        context.tracing()
+                .stop(new Tracing.StopOptions().setPath(Paths.get("build/reports/trace.zip")));
         browser.close();
         playwright.close();
     }
@@ -61,9 +60,8 @@ public class CommonSteps {
 
     @After
     public void closePage(Scenario scenario) {
-        if (scenario.isFailed()) {
+        if (scenario.isFailed()) {}
 
-        }
         page.close();
     }
 
