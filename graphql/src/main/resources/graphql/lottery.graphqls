@@ -1,0 +1,58 @@
+type LotteryTicket {
+    id: Int!
+    ownerUserId: String!
+    holderName: String!
+    purchaseDate: Date!
+    expiryDate: Date!
+    active: Boolean!
+}
+
+type LotteryPayment {
+    id: Int!
+    paymentMethod: UserPaymentMethod
+    date: Date
+    paymentReference: String!
+    amount: Float!
+    feesAmount: Float!
+    accountingId: String
+    feesAccountingId: String
+    status: String!
+    reconciled: Boolean
+}
+
+type LotteryWinner {
+    id: Int!
+    ownerUserId: String!
+    ticket: LotteryTicket!
+    drawDate: Date!
+    prizeFund: Float
+    prizePercent: Float
+    prizeAmount: Float
+    payoutDate: Date
+}
+
+input LotteryTicketInput {
+    holderName: String!
+    purchaseDate: Date!
+}
+
+input LotteryWinnerInput {
+    ticket: Int!
+    drawDate: Date!
+    prizeFund: Float!
+    prizePercent: Float!
+    prizeAmount: Float!
+}
+
+extend type Query {
+    myLotteryTickets: [LotteryTicket]
+    allLotteryTickets: [LotteryTicket]
+    getActiveTickets: [LotteryTicket]
+    lotteryWinners: [LotteryWinner]
+}
+
+extend type Mutation {
+    addLotteryTicket(ticket: LotteryTicketInput!): LotteryTicket!
+    addLotteryWinner(winner: LotteryWinnerInput!): LotteryWinner!
+    disableTicket(id: Int!): LotteryTicket!
+}
