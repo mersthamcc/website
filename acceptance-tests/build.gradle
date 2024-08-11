@@ -10,8 +10,7 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.7.1'
-    cucumber_version = '6.10.4'
+    cucumber_version = '7.18.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -19,21 +18,17 @@ targetCompatibility = JavaVersion.VERSION_17
 
 dependencies {
     testImplementation "io.cucumber:cucumber-java:${cucumber_version}",
-                       "io.cucumber:cucumber-junit:${cucumber_version}",
-                       "org.seleniumhq.selenium:selenium-java:3.141.59",
-                       "com.codeborne:selenide:5.20.1",
-                       "io.github.bonigarcia:webdrivermanager:4.3.1",
                        "org.assertj:assertj-core:3.19.0",
                        "org.hamcrest:hamcrest:2.2",
                        "org.slf4j:slf4j-simple:1.7.30",
-                       "org.junit.jupiter:junit-jupiter-api:${junitVersion}",
-                       "com.github.javafaker:javafaker:1.0.2"
-
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+                       "com.github.javafaker:javafaker:1.0.2",
+                       "com.microsoft.playwright:playwright:1.41.0"
 }
 
-test {
-    useJUnitPlatform()
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
 }
 
 task cucumber() {
@@ -42,7 +37,10 @@ task cucumber() {
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'uk.gov.di.test.acceptance', 'src/test/resources']
+            args = [
+                    '--plugin', 'pretty',
+                    '--glue', 'cricket.merstham.website.acceptance.acceptance_tests',
+                    'src/test/resources']
         }
     }
 }

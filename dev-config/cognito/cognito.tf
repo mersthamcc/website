@@ -53,7 +53,7 @@ resource "aws_cognito_identity_provider" "saml_provider" {
   provider_type = "SAML"
 
   provider_details = {
-    MetadataFile = file("../../infrastructure/terraform/apps/config/google-idp-metadata.xml")
+    MetadataFile = file("../../infrastructure/config/google-idp-metadata.xml")
   }
 
   attribute_mapping = {

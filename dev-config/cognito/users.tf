@@ -10,7 +10,7 @@ resource "random_password" "developer_password" {
 resource "aws_cognito_user" "developer" {
   user_pool_id       = aws_cognito_user_pool.dev_pool.id
   username           = var.developer_email
-  temporary_password = random_password.developer_password.result
+  password           = random_password.developer_password.result
   enabled            = true
 
   desired_delivery_mediums = ["EMAIL"]
@@ -100,5 +100,27 @@ resource "aws_cognito_user_group" "venues" {
 resource "aws_cognito_user_in_group" "developer_in_venues" {
   user_pool_id = aws_cognito_user_pool.dev_pool.id
   group_name   = aws_cognito_user_group.venues.name
+  username     = aws_cognito_user.developer.username
+}
+
+resource "aws_cognito_user_group" "jupyter_user" {
+  name         = "JUPYTER_USER"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_jupyter_user" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.jupyter_user.name
+  username     = aws_cognito_user.developer.username
+}
+
+resource "aws_cognito_user_group" "jupyter_admin" {
+  name         = "JUPYTER_ADMIN"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_jupyter_admin" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.jupyter_admin.name
   username     = aws_cognito_user.developer.username
 }

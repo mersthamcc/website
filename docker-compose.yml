@@ -603,8 +603,15 @@ services:
       - com_docker_swarm_service_name=hub
       - tls-cert-host-check=hub.${DEVDOMAIN}
     environment:
-      DOCKER_NETWORK_NAME: backendnetwork
-      DOCKER_NOTEBOOK_IMAGE: "jupyter:latest"
+      DOCKER_NETWORK_NAME: website_backendnetwork
+      DOCKER_NOTEBOOK_IMAGE: "mersthamcc/jupyterhub-notebook"
+      OAUTH_CLIENT_ID: ${JUPYTER_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${JUPYTER_CLIENT_SECRET}
+      COGNITO_UI_URI: ${COGNITO_UI_URI}
+      BASE_URL: https://hub.${DEVDOMAIN}
+      IDP_NAME: ${DEVDOMAIN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - loki
     logging:
