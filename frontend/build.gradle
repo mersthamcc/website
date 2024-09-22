@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${dependencyVersions.spring_boot}"
+
     implementation "org.springframework.boot:spring-boot-starter-freemarker:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-jersey:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-mail:${dependencyVersions.spring_boot}"
@@ -37,29 +38,31 @@ dependencies {
     implementation 'com.stripe:stripe-java:21.14.0'
     implementation 'com.gocardless:gocardless-pro:5.8.0'
     implementation "com.cksource:ckfinder3:3.5.2"
-    implementation "com.facebook.business.sdk:facebook-java-business-sdk:16.0.1"
+    implementation "com.facebook.business.sdk:facebook-java-business-sdk:20.0.4"
     implementation 'org.twitter4j:twitter4j-core:4.0.7'
     implementation 'no.api.freemarker:freemarker-java8:2.1.0'
     implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
     implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"
     implementation "org.modelmapper.extensions:modelmapper-spring:${dependencyVersions.model_mapper}"
-    implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
-    implementation "software.amazon.awssdk:s3-transfer-manager:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:sesv2:${dependencyVersions.aws}"
     implementation 'org.passay:passay:1.6.2'
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.google.zxing:javase:3.5.1'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.12'
-    implementation "de.brendamour:jpasskit:0.3.4"
+    implementation "de.brendamour:jpasskit:0.4.2"
     implementation 'com.auth0:java-jwt:4.4.0:'
     implementation 'com.auth0:jwks-rsa:0.22.1'
     implementation 'com.google.api-client:google-api-client:2.4.0'
     implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240312-2.0.0'
     implementation "com.rometools:rome:2.1.0"
     implementation "net.sf.biweekly:biweekly:0.6.8"
+
+    implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
+    implementation "software.amazon.awssdk:s3-transfer-manager:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:sesv2:${dependencyVersions.aws}"
+
     implementation project(":shared")
 
     developmentOnly "org.springframework.boot:spring-boot-devtools:${dependencyVersions.spring_boot}"
