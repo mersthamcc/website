@@ -38,4 +38,5 @@ extend type Mutation {
     saveNews(news: NewsInput!): News
     deleteNews(id: Int!): News
     saveNewsAttributes(id: Int!, attributes: [KeyValuePairInput]!): News
+    removeNewsAttributes(id: Int!, attributes: [String]!): News
 }

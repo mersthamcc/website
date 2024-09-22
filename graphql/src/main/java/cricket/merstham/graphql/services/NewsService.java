@@ -88,7 +88,7 @@ public class NewsService {
                 @CacheEvict(value = NEWS_TOP_X_CACHE, allEntries = true)
             })
     public News save(News news) {
-        var entity = repository.findById(news.getId()).orElseGet(() -> new NewsEntity());
+        var entity = repository.findById(news.getId()).orElseGet(NewsEntity::new);
         mapper.map(news, entity);
         return convertToDto(repository.saveAndFlush(entity));
     }
@@ -97,8 +97,18 @@ public class NewsService {
     @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
     public News saveAttributes(int id, List<KeyValuePair> attributes) {
         var news = repository.findById(id).orElseThrow();
+        news.getAttributes().clear();
 
         attributes.forEach(a -> news.getAttributes().put(a.getKey(), a.getValue()));
+        return convertToDto(repository.saveAndFlush(news));
+    }
+
+    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
+    public News removeAttributes(int id, List<String> attributes) {
+        var news = repository.findById(id).orElseThrow();
+
+        attributes.forEach(a -> news.getAttributes().remove(a));
         return convertToDto(repository.saveAndFlush(news));
     }
 

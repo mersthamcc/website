@@ -117,6 +117,12 @@ public class News implements Serializable {
         return this;
     }
 
+    public News deleteAttribute(String key) {
+        var existing = getAttributes().stream().filter(a -> a.getKey().equals(key)).findFirst();
+        existing.ifPresent(e -> getAttributes().remove(e));
+        return this;
+    }
+
     public boolean hasAttribute(String key) {
         return isNull(attributes) && getAttributes().stream().anyMatch(a -> a.getKey().equals(key));
     }

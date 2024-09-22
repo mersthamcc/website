@@ -219,7 +219,7 @@ class NewsServiceTest {
         assertThat(input.createdDate(), equalTo(news.getCreatedDate()));
         assertThat(input.publishDate(), equalTo(news.getPublishDate()));
         assertThat(input.draft(), equalTo(news.isDraft()));
-        assertThat(input.attributes(), equalTo(List.of()));
+        assertThat(input.attributes(), equalTo(null));
 
         assertThat(newsCaptor.getValue().getId(), equalTo(1));
         assertThat(

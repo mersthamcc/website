@@ -357,7 +357,6 @@ class NewsServiceTest {
     @Test
     void shouldCorrectlyUpdateNewsAttributes() {
         var entity = NEWS_ENTITIES.get(10);
-        var originalAttributeOne = entity.getAttributes().get("ATTRIBUTE_ONE");
 
         var result =
                 service.saveAttributes(
@@ -385,7 +384,6 @@ class NewsServiceTest {
                 result.getAttributeMap(),
                 equalTo(
                         Map.of(
-                                "ATTRIBUTE_ONE", originalAttributeOne,
                                 "ATTRIBUTE_TWO", "a new value",
                                 "ATTRIBUTE_THREE", "a new entry")));
         assertThat(result.getId(), equalTo(entity.getId()));

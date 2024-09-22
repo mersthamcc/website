@@ -44,7 +44,11 @@ public class FacebookPageService {
                         .atZone(ZoneId.systemDefault())
                         .withZoneSameInstant(ZoneId.of("UTC"))
                         .toInstant();
-        var postRequest = page.createFeed().setMessage(message).setLink(link);
+        var postRequest = page.createFeed().setMessage(message);
+
+        if (!link.startsWith("http://localhost")) {
+            postRequest.setLink(link);
+        }
 
         if (scheduledPublishTime.isAfter(Instant.now())) {
             postRequest

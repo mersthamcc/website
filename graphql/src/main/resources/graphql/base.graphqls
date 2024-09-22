@@ -11,7 +11,7 @@ type KeyValuePair {
 
 input KeyValuePairInput {
     key: String!,
-    value: String!
+    value: String
 }
 
 input IntFilter {

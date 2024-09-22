@@ -73,7 +73,7 @@ public class FacebookNewsProcessor implements ItemProcessor<News> {
                     item.setAttribute(FACEBOOK_ID, id);
                 } else if (!item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.deletePost(item.getAttribute(FACEBOOK_ID));
-                    item.setAttribute(FACEBOOK_ID, null);
+                    item.deleteAttribute(FACEBOOK_ID);
                 } else if (item.isPublishToFacebook() && hasFacebookPost(item)) {
                     facebookPageService.updateFacebookPost(
                             item.getAttribute(FACEBOOK_ID),
