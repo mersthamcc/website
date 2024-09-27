@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.service;
+package cricket.merstham.graphql.services;
 
 import com.facebook.ads.sdk.APIContext;
 import com.facebook.ads.sdk.APIException;
@@ -26,9 +26,9 @@ public class FacebookPageService {
 
     @Autowired
     public FacebookPageService(
-            @Value("${facebook.application-secret}") String facebookAppSecret,
-            @Value("${facebook.page-id}") String facebookPageId,
-            @Value("${facebook.access-token}") String accessToken,
+            @Value("${configuration.facebook.application-secret}") String facebookAppSecret,
+            @Value("${configuration.facebook.page-id}") String facebookPageId,
+            @Value("${configuration.facebook.access-token}") String accessToken,
             @Value("${debug}") boolean debug) {
         this.apiContext = new APIContext(accessToken, facebookAppSecret);
         this.facebookPageId = facebookPageId;
@@ -81,7 +81,7 @@ public class FacebookPageService {
     }
 
     public void deletePost(String id) throws APIException {
-        var post = new Post(id, getPageTokenContext()).delete().execute();
+        new Post(id, getPageTokenContext()).delete().execute();
 
         LOG.info("Deleted facebook post {}", id);
     }

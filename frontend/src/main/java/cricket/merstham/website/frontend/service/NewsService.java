@@ -113,6 +113,8 @@ public class NewsService {
                         .path(news.getPath().toString())
                         .draft(news.isDraft())
                         .uuid(news.getUuid())
+                        .publishToFacebook(news.isPublishToFacebook())
+                        .publishToTwitter(news.isPublishToTwitter())
                         .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result =

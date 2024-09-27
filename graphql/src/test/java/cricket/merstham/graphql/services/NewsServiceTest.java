@@ -89,7 +89,7 @@ class NewsServiceTest {
     private NewsEntityRepository repository = mock(NewsEntityRepository.class);
 
     private NewsService service =
-            new NewsService(repository, new ModelMapperConfiguration().modelMapper());
+            new NewsService(repository, new ModelMapperConfiguration().modelMapper(), List.of());
 
     public static Stream<Integer> validIds() {
         return IntStream.range(0, NEWS_STORY_COUNT).boxed();

@@ -38,8 +38,6 @@ dependencies {
     implementation 'com.stripe:stripe-java:21.14.0'
     implementation 'com.gocardless:gocardless-pro:5.8.0'
     implementation "com.cksource:ckfinder3:3.5.2"
-    implementation "com.facebook.business.sdk:facebook-java-business-sdk:20.0.4"
-    implementation 'org.twitter4j:twitter4j-core:4.0.7'
     implementation 'no.api.freemarker:freemarker-java8:2.1.0'
     implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
     implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"

@@ -14,5 +14,7 @@ query getNewsItemByPath($path: String!) {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
     }
 }

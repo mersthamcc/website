@@ -14,5 +14,7 @@ query getNewsItem($id: Int!) {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
     }
 }

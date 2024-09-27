@@ -10,6 +10,9 @@ type News {
     author: String
     draft: Boolean
     attributes: [KeyValuePair]
+
+    publishToFacebook: Boolean!
+    publishToTwitter: Boolean!
 }
 
 input NewsInput {
@@ -24,6 +27,9 @@ input NewsInput {
     draft: Boolean
     socialSummary: String
     attributes: [KeyValuePairInput]
+
+    publishToFacebook: Boolean!
+    publishToTwitter: Boolean!
 }
 
 extend type Query {

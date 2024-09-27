@@ -64,6 +64,7 @@ configuration:
   database-secret: ${DATABASE_SECRET:}
   scheduler-zone: "${SCHEDULER_ZONE:Europe/London}"
   region: ${AWS_REGION:eu-west-2}
+  base-url: "${BASE_URL:http://localhost:8080}"
   mail:
     from-address: ${EMAIL_FROM_ADDRESS:}
     membership-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}
@@ -103,3 +104,14 @@ configuration:
       client-secret: ${PAYPAL_CLIENT_SECRET:}
       sandbox: ${PAYPAL_SANDBOX:true}
       webhook-id: ${PAYPAL_WEBHOOK_ID:}
+  facebook:
+    application-id: ${FACEBOOK_APP_ID}
+    application-secret: ${FACEBOOK_APP_SECRET}
+    page-id: ${FACEBOOK_PAGE_ID}
+    access-token: ${FACEBOOK_PAGE_ACCESS_TOKEN}
+
+  twitter:
+    api-key: ${TWITTER_API_KEY}
+    api-secret: ${TWITTER_API_SECRET}
+    oauth-access-token: ${TWITTER_OAUTH_ACCESS_TOKEN}
+    oauth-access-token-secret: ${TWITTER_OAUTH_ACCESS_TOKEN_SECRET}
