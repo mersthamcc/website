@@ -1,0 +1,7 @@
+mutation putAuthCode($name: String!, $state: String!, $code: String!, $redirectUrl: String!) {
+    putAuthCode(name: $name, state: $state, code: $code, redirectUrl: $redirectUrl) {
+        name
+        success
+        message
+    }
+}

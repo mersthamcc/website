@@ -12,4 +12,9 @@ public class HttpClientConfiguration {
     public Client getPlayCricketClient() {
         return ClientBuilder.newBuilder().build();
     }
+
+    @Bean(name = "token-client")
+    public Client getTokenClient() {
+        return ClientBuilder.newBuilder().build();
+    }
 }
