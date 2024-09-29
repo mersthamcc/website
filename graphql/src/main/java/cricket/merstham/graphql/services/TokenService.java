@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.configuration.TokenConfiguration;
+import cricket.merstham.graphql.configuration.VaultConfiguration;
 import cricket.merstham.shared.dto.AuthRequest;
 import cricket.merstham.shared.dto.AuthResult;
 import jakarta.inject.Named;
@@ -47,6 +48,7 @@ public class TokenService {
     private final OAuthHelperService helper;
     private final Client tokenClient;
     private final String environment;
+    private final VaultConfiguration vaultConfiguration;
 
     @Autowired
     public TokenService(
@@ -54,12 +56,14 @@ public class TokenService {
             VaultService vaultService,
             OAuthHelperService helper,
             @Named("token-client") Client tokenClient,
-            @Value("${configuration.environment}") String environment) {
+            @Value("${configuration.environment}") String environment,
+            VaultConfiguration vaultConfiguration) {
         this.tokenConfiguration = tokenConfiguration;
         this.vaultService = vaultService;
         this.helper = helper;
         this.tokenClient = tokenClient;
         this.environment = environment;
+        this.vaultConfiguration = vaultConfiguration;
     }
 
     @PreAuthorize(HAS_SYSTEM_ROLE)
@@ -188,5 +192,14 @@ public class TokenService {
             return URI.create((String) options.get(TOKEN_URL));
         }
         return null;
+    }
+
+    public String getToken(String name) {
+        var result =
+                vaultService.get(
+                        format(
+                                "{0}/creds/{1}-{2}",
+                                tokenConfiguration.getVaultPath(), environment, name));
+        return (String) result.get("access_token");
     }
 }

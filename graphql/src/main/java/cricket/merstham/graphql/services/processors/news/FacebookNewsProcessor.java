@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import static cricket.merstham.graphql.helpers.UriHelper.resolveUrl;
 import static java.time.ZoneOffset.UTC;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
@@ -47,7 +48,7 @@ public class FacebookNewsProcessor implements ItemProcessor<News, NewsEntity> {
                                     isBlank(entity.getSocialSummary())
                                             ? entity.getTitle()
                                             : entity.getSocialSummary(),
-                                    baseUrl + entity.getPath().toString(),
+                                    resolveUrl(baseUrl, "news", entity.getPath()),
                                     entity.getPublishDate().atZone(UTC).toLocalDateTime());
                     entity.getAttributes().put(FACEBOOK_ID, id);
                 } else if (!request.isPublishToFacebook() && hasFacebookPost(entity)) {

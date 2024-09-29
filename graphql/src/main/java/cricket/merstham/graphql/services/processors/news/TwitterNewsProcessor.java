@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import static cricket.merstham.graphql.helpers.UriHelper.resolveUrl;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
 @Service("NewsTwitter")
@@ -43,7 +44,7 @@ public class TwitterNewsProcessor implements ItemProcessor<News, NewsEntity> {
                                     isBlank(entity.getSocialSummary())
                                             ? entity.getTitle()
                                             : entity.getSocialSummary(),
-                                    baseUrl + entity.getPath().toString());
+                                    resolveUrl(baseUrl, "news", entity.getPath()));
                     entity.getAttributes().put(TWEET_ID, id);
                 } else if (!request.isPublishToTwitter() && hasTweet(entity)) {
                     tweetService.unTweet(entity.getAttributes().get(TWEET_ID));
