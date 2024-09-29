@@ -50,4 +50,14 @@ public class StringExtensions {
 
         return Jsoup.clean(result, Safelist.basic());
     }
+
+    public static String toSocialAbstract(String in) {
+        Document doc = Jsoup.parse(in);
+        Elements paragraphs = doc.select("p");
+
+        if (paragraphs.size() > 1) {
+            return Jsoup.clean(paragraphs.get(0).text(), Safelist.none());
+        }
+        return null;
+    }
 }

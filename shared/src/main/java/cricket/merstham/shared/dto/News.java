@@ -75,6 +75,10 @@ public class News implements Serializable {
         return body.toAbstract();
     }
 
+    public String getSocialDescription() {
+        return body.toSocialAbstract();
+    }
+
     public String getAuthorInitials() {
         return String.join(
                 "",
