@@ -101,7 +101,7 @@ public class NewsService {
         var result = repository.save(entity);
         processors.forEach(e -> e.postSave(news, result));
 
-        return convertToDto(repository.saveAndFlush(entity));
+        return convertToDto(repository.saveAndFlush(result));
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")

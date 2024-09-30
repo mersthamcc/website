@@ -19,6 +19,7 @@ import java.time.ZoneId;
 @Service
 public class FacebookPageService {
     private static Logger LOG = LoggerFactory.getLogger(FacebookPageService.class);
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     private final APIContext apiContext;
     private final String facebookPageId;
@@ -37,13 +38,15 @@ public class FacebookPageService {
 
     public String createFacebookPost(String message, String link, LocalDateTime publishTime)
             throws APIException {
-        var page = new Page(facebookPageId, getPageTokenContext()).get().execute();
+        var page =
+                new Page(facebookPageId, getPageTokenContext())
+                        .get()
+                        .requestConnectedInstagramAccountField()
+                        .execute();
 
         var scheduledPublishTime =
-                publishTime
-                        .atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneId.of("UTC"))
-                        .toInstant();
+                publishTime.atZone(ZoneId.systemDefault()).withZoneSameInstant(UTC).toInstant();
+
         var postRequest = page.createFeed().setMessage(message);
 
         if (!link.startsWith("http://localhost")) {
@@ -65,10 +68,7 @@ public class FacebookPageService {
         var post = new Post(id, getPageTokenContext()).get().execute();
 
         var scheduledPublishTime =
-                publishTime
-                        .atZone(ZoneId.systemDefault())
-                        .withZoneSameInstant(ZoneId.of("UTC"))
-                        .toInstant();
+                publishTime.atZone(ZoneId.systemDefault()).withZoneSameInstant(UTC).toInstant();
         var postUpdateRequest = post.update().setMessage(message);
 
         if (scheduledPublishTime.isAfter(Instant.now())) {
@@ -93,7 +93,7 @@ public class FacebookPageService {
                 pages.stream()
                         .filter(p -> p.getId().equals(facebookPageId))
                         .findFirst()
-                        .map(p -> p.getFieldAccessToken())
+                        .map(Page::getFieldAccessToken)
                         .orElseThrow();
         return new APIContext(pageToken).enableDebug(debug);
     }

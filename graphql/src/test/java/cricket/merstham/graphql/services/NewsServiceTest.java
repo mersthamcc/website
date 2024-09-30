@@ -102,6 +102,7 @@ class NewsServiceTest {
     @BeforeEach
     void setup() {
         when(repository.saveAndFlush(any(NewsEntity.class))).then(returnsFirstArg());
+        when(repository.save(any(NewsEntity.class))).then(returnsFirstArg());
 
         for (int i = 0; i < Math.ceil(NEWS_STORY_COUNT / 10.0); i++) {
             when(repository.findAll(
