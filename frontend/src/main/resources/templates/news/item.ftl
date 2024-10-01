@@ -3,11 +3,11 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@${config.social.twitter.handle}" />
     <meta name="twitter:title" content="${news.title}" />
-    <meta name="twitter:description" content="${news.socialDescription}" />
+    <meta name="twitter:description" content="${news.getSocialDescription()!""}" />
 
     <meta property="og:type" content="article" />
     <meta property="og:title" content="${news.title}">
-    <meta property="og:description" content="${news.socialDescription}" />
+    <meta property="og:description" content="${news.getSocialDescription()!""}" />
     <meta property="og:locale" content="en_GB" />
     <meta property="og:url" content="${baseUrl}/news${news.path}" />
     <#if news.hasImages()>

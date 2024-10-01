@@ -115,6 +115,7 @@ public class NewsService {
                         .uuid(news.getUuid())
                         .publishToFacebook(news.isPublishToFacebook())
                         .publishToTwitter(news.isPublishToTwitter())
+                        .publishToInstagram(news.isPublishToInstagram())
                         .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result =

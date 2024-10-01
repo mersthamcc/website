@@ -63,6 +63,7 @@
                 <@admin.card title="Social Media">
                     <#if true>
                         <@admin.adminSwitchField name="publishToFacebook" checked=news.publishToFacebook!false localeCategory="news" />
+                        <@admin.adminSwitchField name="publishToInstagram" checked=news.publishToInstagram!false localeCategory="news" />
                         <@admin.adminSwitchField name="publishToTwitter" checked=news.publishToTwitter!false localeCategory="news" />
                         <@admin.adminFormField name="socialSummary" data=news.socialSummary!"" required=false type="text" localeCategory="news" />
                     <#else>

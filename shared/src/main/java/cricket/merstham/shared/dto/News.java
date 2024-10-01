@@ -56,6 +56,8 @@ public class News implements Serializable {
 
     @JsonProperty private boolean publishToFacebook;
 
+    @JsonProperty private boolean publishToInstagram;
+
     @JsonProperty private boolean publishToTwitter;
 
     @JsonProperty private String socialSummary;

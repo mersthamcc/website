@@ -174,7 +174,7 @@ registration:
 bots:
   robots: |
     User-Agent: *
-    Disallow: /
+    Allow: /
 
   sitemap: |
     <?xml version="1.0" encoding="utf-8"?>

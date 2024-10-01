@@ -38,11 +38,7 @@ public class FacebookPageService {
 
     public String createFacebookPost(String message, String link, LocalDateTime publishTime)
             throws APIException {
-        var page =
-                new Page(facebookPageId, getPageTokenContext())
-                        .get()
-                        .requestConnectedInstagramAccountField()
-                        .execute();
+        var page = new Page(facebookPageId, getPageTokenContext()).get().execute();
 
         var scheduledPublishTime =
                 publishTime.atZone(ZoneId.systemDefault()).withZoneSameInstant(UTC).toInstant();

@@ -3767,6 +3767,22 @@
               "deprecationReason": null
             },
             {
+              "name": "publishToInstagram",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "publishToTwitter",
               "description": null,
               "args": [],
@@ -3910,6 +3926,20 @@
             },
             {
               "name": "publishToFacebook",
+              "description": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "publishToInstagram",
               "description": null,
               "type": {
                 "kind": "NON_NULL",

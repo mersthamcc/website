@@ -12,6 +12,7 @@ type News {
     attributes: [KeyValuePair]
 
     publishToFacebook: Boolean!
+    publishToInstagram: Boolean!
     publishToTwitter: Boolean!
 }
 
@@ -29,6 +30,7 @@ input NewsInput {
     attributes: [KeyValuePairInput]
 
     publishToFacebook: Boolean!
+    publishToInstagram: Boolean!
     publishToTwitter: Boolean!
 }
 
