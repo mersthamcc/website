@@ -9,6 +9,7 @@ mutation saveNews ($news: NewsInput!) {
         path
         createdDate
         publishDate
+        featureImageUrl
         socialSummary
         attributes {
             key

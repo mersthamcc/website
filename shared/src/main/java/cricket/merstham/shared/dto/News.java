@@ -10,10 +10,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +37,7 @@ import static lombok.AccessLevel.PRIVATE;
 @EqualsAndHashCode(callSuper = false)
 @ExtensionMethod({StringExtensions.class})
 public class News implements Serializable {
-    private static final long serialVersionUID = 20211024150500L;
+    @Serial private static final long serialVersionUID = 20211024150500L;
 
     @JsonProperty private int id;
 
@@ -62,6 +65,8 @@ public class News implements Serializable {
 
     @JsonProperty private String socialSummary;
 
+    @JsonProperty private String featureImageUrl;
+
     @JsonProperty private List<KeyValuePair> attributes;
 
     @JsonProperty("formattedPublishDate")
@@ -81,6 +86,17 @@ public class News implements Serializable {
         return body.toSocialAbstract();
     }
 
+    public String getSocialImage() {
+        if (Strings.isNotBlank(featureImageUrl)) {
+            return featureImageUrl;
+        }
+        var images = getImages();
+        if (images.isEmpty()) {
+            return null;
+        }
+        return images.get(0).getPath();
+    }
+
     public String getAuthorInitials() {
         return String.join(
                 "",
@@ -90,9 +106,20 @@ public class News implements Serializable {
     }
 
     public List<Image> getImages() {
-        return Jsoup.parse(body).select("img").stream()
-                .map(i -> Image.builder().path(i.attr("src")).caption(i.attr("alt")).build())
-                .toList();
+        var images = new ArrayList<Image>();
+        if (Strings.isNotBlank(featureImageUrl)) {
+            images.add(Image.builder().path(featureImageUrl).caption(title).build());
+        }
+        images.addAll(
+                Jsoup.parse(body).select("img").stream()
+                        .map(
+                                i ->
+                                        Image.builder()
+                                                .path(i.attr("src"))
+                                                .caption(i.attr("alt"))
+                                                .build())
+                        .toList());
+        return images;
     }
 
     public boolean hasImages() {

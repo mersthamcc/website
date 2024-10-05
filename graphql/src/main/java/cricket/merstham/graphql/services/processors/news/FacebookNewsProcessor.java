@@ -48,6 +48,7 @@ public class FacebookNewsProcessor implements ItemProcessor<News, NewsEntity> {
                                     isBlank(entity.getSocialSummary())
                                             ? entity.getTitle()
                                             : entity.getSocialSummary(),
+                                    request.getSocialImage(),
                                     resolveUrl(baseUrl, "news", entity.getPath()),
                                     entity.getPublishDate().atZone(UTC).toLocalDateTime());
                     entity.getAttributes().put(FACEBOOK_ID, id);
@@ -67,7 +68,8 @@ public class FacebookNewsProcessor implements ItemProcessor<News, NewsEntity> {
                 entity.getAttributes().remove(FACEBOOK_ID);
             }
         } catch (APIException ex) {
-            throw new RuntimeException("Error processing Facebook post", ex);
+            throw new RuntimeException(
+                    "Error processing Facebook post: " + ex.getRawResponse(), ex);
         }
     }
 

@@ -41,6 +41,35 @@
             .catch( error => {
                 console.error(error);
             });
+
+        $(document).ready(function (){
+            $("#featureImageUrl-browse").click(function () {
+                CKFinder.modal({
+                    chooseFiles: true,
+                    connectorPath: '/administration/components/ckfinder/connector',
+                    section: 'news',
+                    startupPath: '0-Images:/',
+                    rememberLastFolder: false,
+                    uuid: '${news.uuid}',
+                    pass: 'section,uuid',
+                    onInit: function(finder) {
+                        finder.on('files:choose', function(event) {
+                            let file = event.data.files.first();
+                            $("#item-featureImageUrl").val(file.getUrl());
+                            $("#image-featureImageUrl").attr("src", $("#item-featureImageUrl").val());
+                        });
+                        finder.on('file:choose:resizedImage', function(event) {
+                            $("#item-featureImageUrl").val(event.data.resizedUrl);
+                            $("#image-featureImageUrl").attr("src", $("#item-featureImageUrl").val());
+                        });
+                    }
+                });
+            });
+            if($("#item-featureImageUrl").val() == "") {
+                $("#item-featureImageUrl").val("${resourcePrefix}/front/admin/assets/svg/illustrations/browse.svg");
+            }
+            $("#image-featureImageUrl").attr("src", $("#item-featureImageUrl").val());
+        });
     </script>
 </#macro>
 
@@ -57,6 +86,24 @@
                     <@admin.adminFormDisplayField name="createdDate" data=news.createdDate.format()?datetime.iso?string["dd/MM/yyyy HH:mm"] localeCategory="news" />
                     <@admin.adminFormField name="title" data=news.title!"" required=true type="text" localeCategory="news" />
                     <@admin.adminFormField name="author" data=news.author!"" required=true type="text" localeCategory="news" />
+                    <@admin.adminFormField name="featureImageUrl" data=news.featureImageUrl!"" required=false type="hidden" localeCategory="news">
+                        <div id="attachFilesLabel" class="js-dropzone dropzone-custom custom-file-boxed">
+                            <div class="dz-message custom-file-boxed-label">
+                                <img
+                                        id="image-featureImageUrl"
+                                        class="mb-3 feature-image"
+                                        src="${resourcePrefix}/front/admin/assets/svg/illustrations/browse.svg"
+                                        alt="Browse for images" />
+
+                                <p class="mb-2"></p>
+
+                                <button type="button" class="btn btn-sm btn-white" name="featureImageUrl-browse" id="featureImageUrl-browse">
+                                    <@spring.messageText code="news.browse" text="Browse" />
+                                </button>
+                            </div>
+                        </div>
+                    </@admin.adminFormField>
+
                     <@admin.adminCkEditorField name="body" data=news.body!"" required=true type="text" localeCategory="news" rows=40/>
                     <@admin.adminSwitchField name="draft" checked=news.draft!false localeCategory="news" />
                 </@admin.card>

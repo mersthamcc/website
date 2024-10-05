@@ -110,6 +110,7 @@ graph:
 
 resources:
   base-url: "${RESOURCES_BASE_URL}"
+  bucket-prefix: "${RESOURCES_LOCAL_PREFIX:}"
   base-directory: "${RESOURCES_BASE_DIRECTORY:resources}"
   bucket: "${RESOURCES_BUCKET_NAME:resources}"
   region: "${RESOURCES_BUCKET_REGION:eu-west-2}"

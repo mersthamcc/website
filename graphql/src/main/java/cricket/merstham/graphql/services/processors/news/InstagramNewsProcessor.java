@@ -46,7 +46,7 @@ public class InstagramNewsProcessor implements ItemProcessor<News, NewsEntity> {
                                     isBlank(entity.getSocialSummary())
                                             ? entity.getTitle()
                                             : entity.getSocialSummary(),
-                                    request.getImages().get(0).getPath(),
+                                    request.getSocialImage(),
                                     resolveUrl(baseUrl, "news", entity.getPath()));
                     entity.getAttributes().put(INSTAGRAM_ID, id);
                 } else if (!request.isPublishToInstagram() && hasInstagramPost(entity)) {
@@ -58,7 +58,8 @@ public class InstagramNewsProcessor implements ItemProcessor<News, NewsEntity> {
                 entity.getAttributes().remove(INSTAGRAM_ID);
             }
         } catch (APIException ex) {
-            throw new RuntimeException("Error processing Instagram post", ex);
+            throw new RuntimeException(
+                    "Error processing Instagram post: " + ex.getRawResponse(), ex);
         }
     }
 

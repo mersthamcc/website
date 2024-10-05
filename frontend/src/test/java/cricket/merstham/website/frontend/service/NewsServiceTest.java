@@ -52,6 +52,7 @@ class NewsServiceTest {
                                                 LOREM.getNameFemale(),
                                                 Instant.now(),
                                                 Instant.now(),
+                                                "/image.png",
                                                 LOREM.getHtmlParagraphs(2, 5),
                                                 LOREM.getWords(2, 8),
                                                 "/news/test"))
@@ -106,6 +107,7 @@ class NewsServiceTest {
                                                 LOREM.getHtmlParagraphs(2, 5),
                                                 Instant.now(),
                                                 Instant.now(),
+                                                "/image.png",
                                                 List.of(
                                                         new NewsFeedQuery.Attribute(
                                                                 "Attribute",
@@ -192,6 +194,7 @@ class NewsServiceTest {
                                 news.getPath(),
                                 news.getCreatedDate(),
                                 news.getPublishDate(),
+                                news.getFeatureImageUrl(),
                                 news.getSocialSummary(),
                                 news.getAttributes().stream()
                                         .map(
@@ -294,6 +297,7 @@ class NewsServiceTest {
                                 news.getCreatedDate(),
                                 news.getPublishDate(),
                                 news.getSocialSummary(),
+                                news.getFeatureImageUrl(),
                                 news.getAttributes().stream()
                                         .map(
                                                 a ->

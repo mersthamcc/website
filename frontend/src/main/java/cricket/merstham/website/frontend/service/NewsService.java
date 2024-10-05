@@ -110,6 +110,7 @@ public class NewsService {
                         .socialSummary(news.getSocialSummary())
                         .createdDate(news.getCreatedDate())
                         .publishDate(news.getPublishDate())
+                        .featureImageUrl(news.getFeatureImageUrl())
                         .path(news.getPath().toString())
                         .draft(news.isDraft())
                         .uuid(news.getUuid())

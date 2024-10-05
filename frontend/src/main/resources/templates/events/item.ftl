@@ -2,7 +2,7 @@
 <@layout.mainLayout>
     <div class="container space-1">
         <#if event.banner??>
-            <div class="profile-cover">
+            <div class="profile-cover mb-5">
                 <div class="profile-cover-img-wrapper">
                     <img class="profile-cover-img" src="${event.banner}" alt="Banner Image">
                 </div>

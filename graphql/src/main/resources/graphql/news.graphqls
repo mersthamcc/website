@@ -5,6 +5,7 @@ type News {
     path: String
     createdDate: DateTime!
     publishDate: DateTime
+    featureImageUrl: String
     body: String!
     socialSummary: String
     author: String
@@ -22,6 +23,7 @@ input NewsInput {
     title: String
     createdDate: DateTime
     publishDate: DateTime
+    featureImageUrl: String
     body: String
     author: String
     path: String

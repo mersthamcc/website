@@ -8,6 +8,7 @@ query getNewsItemByPath($path: String!) {
         author
         createdDate
         publishDate
+        featureImageUrl
         body
         socialSummary
         attributes {

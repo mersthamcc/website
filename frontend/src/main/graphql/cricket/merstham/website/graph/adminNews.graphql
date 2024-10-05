@@ -7,6 +7,7 @@ query adminNews($start: Int!, $length: Int!, $search: String) {
         author
         createdDate
         publishDate
+        featureImageUrl
         body
         socialSummary
         path

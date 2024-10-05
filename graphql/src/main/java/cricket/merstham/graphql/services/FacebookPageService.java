@@ -6,6 +6,7 @@ import com.facebook.ads.sdk.APINodeList;
 import com.facebook.ads.sdk.Page;
 import com.facebook.ads.sdk.Post;
 import com.facebook.ads.sdk.User;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class FacebookPageService {
         this.debug = debug;
     }
 
-    public String createFacebookPost(String message, String link, LocalDateTime publishTime)
+    public String createFacebookPost(
+            String message, String imageUrl, String link, LocalDateTime publishTime)
             throws APIException {
         var page = new Page(facebookPageId, getPageTokenContext()).get().execute();
 
@@ -44,6 +46,10 @@ public class FacebookPageService {
                 publishTime.atZone(ZoneId.systemDefault()).withZoneSameInstant(UTC).toInstant();
 
         var postRequest = page.createFeed().setMessage(message);
+
+        if (Strings.isNotBlank(imageUrl)) {
+            postRequest.setPicture(imageUrl);
+        }
 
         if (!link.startsWith("http://localhost")) {
             postRequest.setLink(link);

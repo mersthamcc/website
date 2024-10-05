@@ -10,14 +10,23 @@
     <meta property="og:description" content="${news.getSocialDescription()!""}" />
     <meta property="og:locale" content="en_GB" />
     <meta property="og:url" content="${baseUrl}/news${news.path}" />
-    <#if news.hasImages()>
-        <meta name="twitter:image" content="${news.images[0].path}" />
-        <meta property="og:image" content="${news.images[0].path}">
+    <#if news.getSocialImage()??>
+        <meta name="twitter:image" content="${news.getSocialImage()}" />
+        <meta property="og:image" content="${news.getSocialImage()}">
     </#if>
 </#macro>
 
 <@layout.mainLayout headers=socialheaders>
     <div class="container space-1">
+        <#if news.featureImageUrl??>
+            <div class="mb-5">
+                <img
+                        class="feature-image"
+                        src="${news.featureImageUrl}"
+                        alt="${news.title}">
+            </div>
+        </#if>
+
         <div class="row justify-content-lg-between">
             <div class="w-lg-60 mx-lg-auto">
                 <div class="mb-4">
