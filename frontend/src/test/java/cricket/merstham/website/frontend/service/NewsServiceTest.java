@@ -205,7 +205,8 @@ class NewsServiceTest {
                                                                 a.getValue()))
                                         .toList(),
                                 news.isPublishToFacebook(),
-                                news.isPublishToTwitter()));
+                                news.isPublishToTwitter(),
+                                news.isPublishToInstagram()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 
@@ -307,7 +308,8 @@ class NewsServiceTest {
                                                                 a.getValue()))
                                         .toList(),
                                 news.isPublishToFacebook(),
-                                news.isPublishToTwitter()));
+                                news.isPublishToTwitter(),
+                                news.isPublishToInstagram()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 

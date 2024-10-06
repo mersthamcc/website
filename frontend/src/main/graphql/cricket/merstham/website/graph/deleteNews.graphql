@@ -17,5 +17,6 @@ mutation deleteNews($id: Int!) {
         }
         publishToFacebook
         publishToTwitter
+        publishToInstagram
     }
 }

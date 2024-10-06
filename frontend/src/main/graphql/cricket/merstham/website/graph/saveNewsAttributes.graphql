@@ -17,5 +17,6 @@ mutation saveNewsAttributes ($id: Int!, $attributes: [KeyValuePairInput]!) {
         }
         publishToFacebook
         publishToTwitter
+        publishToInstagram
     }
 }

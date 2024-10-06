@@ -17,5 +17,6 @@ mutation saveNews ($news: NewsInput!) {
         }
         publishToFacebook
         publishToTwitter
+        publishToInstagram
     }
 }

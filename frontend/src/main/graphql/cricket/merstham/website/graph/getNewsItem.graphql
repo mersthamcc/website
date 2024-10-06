@@ -17,5 +17,6 @@ query getNewsItem($id: Int!) {
         }
         publishToFacebook
         publishToTwitter
+        publishToInstagram
     }
 }
