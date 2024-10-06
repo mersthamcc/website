@@ -69,6 +69,12 @@ public class NewsController {
     }
 
     @MutationMapping
+    public News removeNewsAttributes(
+            @Argument("id") int id, @Argument("attributes") List<String> attributes) {
+        return newsService.removeAttributes(id, attributes);
+    }
+
+    @MutationMapping
     public News deleteNews(@Argument("id") int id) {
         return newsService.delete(id);
     }

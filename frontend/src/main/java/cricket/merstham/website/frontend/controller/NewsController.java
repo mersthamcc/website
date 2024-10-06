@@ -12,6 +12,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
@@ -73,7 +74,9 @@ public class NewsController {
         if (news.isDraft() && !isAdmin(principal)) {
             throw new ResourceNotFoundException();
         }
-        return new ModelAndView("news/item", Map.of("news", news));
+        var model = new HashMap<String, Object>();
+        model.put("news", news);
+        return new ModelAndView("news/item", model);
     }
 
     private boolean isAdmin(Principal principal) {

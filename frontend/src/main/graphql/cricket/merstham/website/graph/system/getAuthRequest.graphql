@@ -1,0 +1,6 @@
+query getAuthRequest($name: String!, $redirectUrl: String!) {
+    getAuthRequest(name: $name, redirectUrl: $redirectUrl) {
+        name
+        url
+    }
+}

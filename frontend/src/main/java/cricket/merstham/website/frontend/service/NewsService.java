@@ -27,9 +27,11 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
@@ -108,10 +110,13 @@ public class NewsService {
                         .socialSummary(news.getSocialSummary())
                         .createdDate(news.getCreatedDate())
                         .publishDate(news.getPublishDate())
+                        .featureImageUrl(news.getFeatureImageUrl())
                         .path(news.getPath().toString())
                         .draft(news.isDraft())
                         .uuid(news.getUuid())
-                        .attributes(List.of())
+                        .publishToFacebook(news.isPublishToFacebook())
+                        .publishToTwitter(news.isPublishToTwitter())
+                        .publishToInstagram(news.isPublishToInstagram())
                         .build();
         var saveRequest = SaveNewsMutation.builder().news(input).build();
         Response<SaveNewsMutation.Data> result =
@@ -131,7 +136,7 @@ public class NewsService {
                                                 .key(a.getKey())
                                                 .value(a.getValue())
                                                 .build())
-                        .toList());
+                        .collect(Collectors.toCollection(LinkedList::new)));
 
         processors.forEach(p -> p.postSave(news));
 

@@ -89,7 +89,7 @@ class NewsServiceTest {
     private NewsEntityRepository repository = mock(NewsEntityRepository.class);
 
     private NewsService service =
-            new NewsService(repository, new ModelMapperConfiguration().modelMapper());
+            new NewsService(repository, new ModelMapperConfiguration().modelMapper(), List.of());
 
     public static Stream<Integer> validIds() {
         return IntStream.range(0, NEWS_STORY_COUNT).boxed();
@@ -102,6 +102,7 @@ class NewsServiceTest {
     @BeforeEach
     void setup() {
         when(repository.saveAndFlush(any(NewsEntity.class))).then(returnsFirstArg());
+        when(repository.save(any(NewsEntity.class))).then(returnsFirstArg());
 
         for (int i = 0; i < Math.ceil(NEWS_STORY_COUNT / 10.0); i++) {
             when(repository.findAll(
@@ -357,7 +358,6 @@ class NewsServiceTest {
     @Test
     void shouldCorrectlyUpdateNewsAttributes() {
         var entity = NEWS_ENTITIES.get(10);
-        var originalAttributeOne = entity.getAttributes().get("ATTRIBUTE_ONE");
 
         var result =
                 service.saveAttributes(
@@ -385,7 +385,6 @@ class NewsServiceTest {
                 result.getAttributeMap(),
                 equalTo(
                         Map.of(
-                                "ATTRIBUTE_ONE", originalAttributeOne,
                                 "ATTRIBUTE_TWO", "a new value",
                                 "ATTRIBUTE_THREE", "a new entry")));
         assertThat(result.getId(), equalTo(entity.getId()));

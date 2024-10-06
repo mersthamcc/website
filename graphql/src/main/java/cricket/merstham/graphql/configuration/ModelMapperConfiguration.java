@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public class ModelMapperConfiguration {
                                                         KeyValuePair::getKey,
                                                         KeyValuePair::getValue));
                             }
-                            return Map.of();
+                            return context.getDestination();
                         });
         modelMapper
                 .createTypeMap(Map.class, List.class)
@@ -66,7 +67,7 @@ public class ModelMapperConfiguration {
                                                                 .key(a.getKey())
                                                                 .value(a.getValue())
                                                                 .build())
-                                        .toList();
+                                        .collect(Collectors.toCollection(LinkedList::new));
                             }
                             return List.of();
                         });

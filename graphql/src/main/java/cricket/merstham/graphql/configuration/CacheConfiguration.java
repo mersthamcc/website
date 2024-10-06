@@ -40,4 +40,7 @@ public class CacheConfiguration {
     public static final String VENUE_ITEM_BY_ID_CACHE = "venue_item_by_id";
 
     public static final String MESSAGE_BY_KEY_CACHE = "message_by_key";
+
+    public static final String TOKEN_STATE = "oauth_token_state";
+    public static final String TOKEN_PKCE_VERIFIER = "oauth_pkce_verifier";
 }

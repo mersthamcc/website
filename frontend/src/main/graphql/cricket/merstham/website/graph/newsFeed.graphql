@@ -9,6 +9,7 @@ query newsFeed ($page: Int!){
         body
         createdDate
         publishDate
+        featureImageUrl
         attributes {
             key
             value

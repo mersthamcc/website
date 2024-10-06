@@ -5,11 +5,16 @@ type News {
     path: String
     createdDate: DateTime!
     publishDate: DateTime
+    featureImageUrl: String
     body: String!
     socialSummary: String
     author: String
     draft: Boolean
     attributes: [KeyValuePair]
+
+    publishToFacebook: Boolean!
+    publishToInstagram: Boolean!
+    publishToTwitter: Boolean!
 }
 
 input NewsInput {
@@ -18,12 +23,17 @@ input NewsInput {
     title: String
     createdDate: DateTime
     publishDate: DateTime
+    featureImageUrl: String
     body: String
     author: String
     path: String
     draft: Boolean
     socialSummary: String
     attributes: [KeyValuePairInput]
+
+    publishToFacebook: Boolean!
+    publishToInstagram: Boolean!
+    publishToTwitter: Boolean!
 }
 
 extend type Query {
@@ -38,4 +48,5 @@ extend type Mutation {
     saveNews(news: NewsInput!): News
     deleteNews(id: Int!): News
     saveNewsAttributes(id: Int!, attributes: [KeyValuePairInput]!): News
+    removeNewsAttributes(id: Int!, attributes: [String]!): News
 }

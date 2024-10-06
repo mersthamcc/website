@@ -8,11 +8,15 @@ mutation deleteNews($id: Int!) {
         author
         createdDate
         publishDate
+        featureImageUrl
         body
         socialSummary
         attributes {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
+        publishToInstagram
     }
 }

@@ -1,6 +1,32 @@
 <#import "../base.ftl" as layout>
-<@layout.mainLayout>
+<#macro socialheaders>
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@${config.social.twitter.handle}" />
+    <meta name="twitter:title" content="${news.title}" />
+    <meta name="twitter:description" content="${news.getSocialDescription()!""}" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="${news.title}">
+    <meta property="og:description" content="${news.getSocialDescription()!""}" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:url" content="${baseUrl}/news${news.path}" />
+    <#if news.getSocialImage()??>
+        <meta name="twitter:image" content="${news.getSocialImage()}" />
+        <meta property="og:image" content="${news.getSocialImage()}">
+    </#if>
+</#macro>
+
+<@layout.mainLayout headers=socialheaders>
     <div class="container space-1">
+        <#if news.featureImageUrl?has_content>
+            <div class="mb-5">
+                <img
+                        class="feature-image"
+                        src="${news.featureImageUrl}"
+                        alt="${news.title}">
+            </div>
+        </#if>
+
         <div class="row justify-content-lg-between">
             <div class="w-lg-60 mx-lg-auto">
                 <div class="mb-4">

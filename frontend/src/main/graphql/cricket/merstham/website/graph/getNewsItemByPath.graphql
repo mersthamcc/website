@@ -8,11 +8,15 @@ query getNewsItemByPath($path: String!) {
         author
         createdDate
         publishDate
+        featureImageUrl
         body
         socialSummary
         attributes {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
+        publishToInstagram
     }
 }

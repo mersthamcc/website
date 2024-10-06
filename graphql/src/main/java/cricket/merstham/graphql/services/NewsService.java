@@ -2,6 +2,7 @@ package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.entity.NewsEntity;
 import cricket.merstham.graphql.repository.NewsEntityRepository;
+import cricket.merstham.graphql.services.processors.ItemProcessor;
 import cricket.merstham.shared.dto.KeyValuePair;
 import cricket.merstham.shared.dto.News;
 import cricket.merstham.shared.dto.Totals;
@@ -29,11 +30,16 @@ public class NewsService {
 
     private final NewsEntityRepository repository;
     private final ModelMapper mapper;
+    private final List<ItemProcessor<News, NewsEntity>> processors;
 
     @Autowired
-    public NewsService(NewsEntityRepository repository, ModelMapper mapper) {
+    public NewsService(
+            NewsEntityRepository repository,
+            ModelMapper mapper,
+            List<ItemProcessor<News, NewsEntity>> processors) {
         this.repository = repository;
         this.mapper = mapper;
+        this.processors = processors;
     }
 
     @Cacheable(value = NEWS_SUMMARY_CACHE, key = "#page")
@@ -88,17 +94,32 @@ public class NewsService {
                 @CacheEvict(value = NEWS_TOP_X_CACHE, allEntries = true)
             })
     public News save(News news) {
-        var entity = repository.findById(news.getId()).orElseGet(() -> new NewsEntity());
+        var entity = repository.findById(news.getId()).orElseGet(NewsEntity::new);
         mapper.map(news, entity);
-        return convertToDto(repository.saveAndFlush(entity));
+
+        processors.forEach(p -> p.preSave(news, entity));
+        var result = repository.save(entity);
+        processors.forEach(e -> e.postSave(news, result));
+
+        return convertToDto(repository.saveAndFlush(result));
     }
 
     @PreAuthorize("hasRole('ROLE_NEWS')")
     @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
     public News saveAttributes(int id, List<KeyValuePair> attributes) {
         var news = repository.findById(id).orElseThrow();
+        news.getAttributes().clear();
 
         attributes.forEach(a -> news.getAttributes().put(a.getKey(), a.getValue()));
+        return convertToDto(repository.saveAndFlush(news));
+    }
+
+    @PreAuthorize("hasRole('ROLE_NEWS')")
+    @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#id")
+    public News removeAttributes(int id, List<String> attributes) {
+        var news = repository.findById(id).orElseThrow();
+
+        attributes.forEach(a -> news.getAttributes().remove(a));
         return convertToDto(repository.saveAndFlush(news));
     }
 
@@ -118,6 +139,12 @@ public class NewsService {
     }
 
     private News convertToDto(NewsEntity news) {
-        return mapper.map(news, News.class);
+        var response = mapper.map(news, News.class);
+        return processResponse(response, news);
+    }
+
+    private News processResponse(News news, NewsEntity entity) {
+        processors.forEach(p -> p.postOpen(news, entity));
+        return news;
     }
 }

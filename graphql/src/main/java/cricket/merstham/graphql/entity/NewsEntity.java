@@ -69,6 +69,9 @@ public class NewsEntity implements Serializable {
     @Column(name = "social_summary")
     private String socialSummary;
 
+    @Column(name = "feature_image_url")
+    private String featureImageUrl;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "name")
     @Column(name = "value")

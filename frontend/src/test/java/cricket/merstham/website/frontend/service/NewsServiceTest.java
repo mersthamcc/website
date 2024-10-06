@@ -52,6 +52,7 @@ class NewsServiceTest {
                                                 LOREM.getNameFemale(),
                                                 Instant.now(),
                                                 Instant.now(),
+                                                "/image.png",
                                                 LOREM.getHtmlParagraphs(2, 5),
                                                 LOREM.getWords(2, 8),
                                                 "/news/test"))
@@ -106,6 +107,7 @@ class NewsServiceTest {
                                                 LOREM.getHtmlParagraphs(2, 5),
                                                 Instant.now(),
                                                 Instant.now(),
+                                                "/image.png",
                                                 List.of(
                                                         new NewsFeedQuery.Attribute(
                                                                 "Attribute",
@@ -192,6 +194,7 @@ class NewsServiceTest {
                                 news.getPath(),
                                 news.getCreatedDate(),
                                 news.getPublishDate(),
+                                news.getFeatureImageUrl(),
                                 news.getSocialSummary(),
                                 news.getAttributes().stream()
                                         .map(
@@ -200,7 +203,10 @@ class NewsServiceTest {
                                                                 "Attribute",
                                                                 a.getKey(),
                                                                 a.getValue()))
-                                        .toList()));
+                                        .toList(),
+                                news.isPublishToFacebook(),
+                                news.isPublishToTwitter(),
+                                news.isPublishToInstagram()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 
@@ -219,7 +225,7 @@ class NewsServiceTest {
         assertThat(input.createdDate(), equalTo(news.getCreatedDate()));
         assertThat(input.publishDate(), equalTo(news.getPublishDate()));
         assertThat(input.draft(), equalTo(news.isDraft()));
-        assertThat(input.attributes(), equalTo(List.of()));
+        assertThat(input.attributes(), equalTo(null));
 
         assertThat(newsCaptor.getValue().getId(), equalTo(1));
         assertThat(
@@ -292,6 +298,7 @@ class NewsServiceTest {
                                 news.getCreatedDate(),
                                 news.getPublishDate(),
                                 news.getSocialSummary(),
+                                news.getFeatureImageUrl(),
                                 news.getAttributes().stream()
                                         .map(
                                                 a ->
@@ -299,7 +306,10 @@ class NewsServiceTest {
                                                                 "Attribute",
                                                                 a.getKey(),
                                                                 a.getValue()))
-                                        .toList()));
+                                        .toList(),
+                                news.isPublishToFacebook(),
+                                news.isPublishToTwitter(),
+                                news.isPublishToInstagram()));
         var response = mock(Response.class);
         when(response.getData()).thenReturn(data);
 

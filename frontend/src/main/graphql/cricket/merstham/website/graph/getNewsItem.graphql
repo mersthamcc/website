@@ -9,10 +9,14 @@ query getNewsItem($id: Int!) {
         createdDate
         publishDate
         socialSummary
+        featureImageUrl
         body
         attributes {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
+        publishToInstagram
     }
 }

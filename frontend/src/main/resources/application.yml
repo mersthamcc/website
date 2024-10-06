@@ -110,6 +110,7 @@ graph:
 
 resources:
   base-url: "${RESOURCES_BASE_URL}"
+  bucket-prefix: "${RESOURCES_LOCAL_PREFIX:}"
   base-directory: "${RESOURCES_BASE_DIRECTORY:resources}"
   bucket: "${RESOURCES_BUCKET_NAME:resources}"
   region: "${RESOURCES_BUCKET_REGION:eu-west-2}"
@@ -144,18 +145,6 @@ payments:
     account-number: ${BANK_ACCOUNT_NUMBER:49244507}
     sort-code: ${BANK_ACCOUNT_SORT_CODE:56-00-46}
 
-facebook:
-  application-id: ${FACEBOOK_APP_ID}
-  application-secret: ${FACEBOOK_APP_SECRET}
-  page-id: ${FACEBOOK_PAGE_ID}
-  access-token: ${FACEBOOK_PAGE_ACCESS_TOKEN}
-
-twitter:
-  api-key: ${TWITTER_API_KEY}
-  api-secret: ${TWITTER_API_SECRET}
-  oauth-access-token: ${TWITTER_OAUTH_ACCESS_TOKEN}
-  oauth-access-token-secret: ${TWITTER_OAUTH_ACCESS_TOKEN_SECRET}
-
 contact-methods:
   email:
     enabled: true
@@ -186,7 +175,7 @@ registration:
 bots:
   robots: |
     User-Agent: *
-    Disallow: /
+    Allow: /
 
   sitemap: |
     <?xml version="1.0" encoding="utf-8"?>

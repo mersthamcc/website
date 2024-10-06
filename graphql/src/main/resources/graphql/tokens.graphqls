@@ -1,0 +1,18 @@
+type AuthRequest {
+    name: String!
+    url: String!
+}
+
+type AuthResult {
+    name: String!
+    success: Boolean!
+    message: String
+}
+
+extend type Query {
+    getAuthRequest(name: String!, redirectUrl: String!): AuthRequest
+}
+
+extend type Mutation {
+    putAuthCode(name: String!, code: String!, state: String!, redirectUrl: String!): AuthResult
+}

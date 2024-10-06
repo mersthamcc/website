@@ -1,5 +1,6 @@
 package cricket.merstham.shared.extensions;
 
+import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
@@ -49,5 +50,16 @@ public class StringExtensions {
         }
 
         return Jsoup.clean(result, Safelist.basic());
+    }
+
+    public static String toSocialAbstract(String in) {
+        Document doc = Jsoup.parse(in);
+        Elements paragraphs = doc.select("p");
+
+        return paragraphs.stream()
+                .filter(p -> Strings.isNotBlank(p.text()))
+                .findFirst()
+                .map(p -> p.text())
+                .orElse("");
     }
 }

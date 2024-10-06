@@ -10,9 +10,13 @@ mutation saveNewsAttributes ($id: Int!, $attributes: [KeyValuePairInput]!) {
         createdDate
         publishDate
         socialSummary
+        featureImageUrl
         attributes {
             key
             value
         }
+        publishToFacebook
+        publishToTwitter
+        publishToInstagram
     }
 }

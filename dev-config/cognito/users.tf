@@ -124,3 +124,14 @@ resource "aws_cognito_user_in_group" "developer_in_jupyter_admin" {
   group_name   = aws_cognito_user_group.jupyter_admin.name
   username     = aws_cognito_user.developer.username
 }
+
+resource "aws_cognito_user_group" "system_admin" {
+  name         = "SYSTEM"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_system_admin" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.system_admin.name
+  username     = aws_cognito_user.developer.username
+}
