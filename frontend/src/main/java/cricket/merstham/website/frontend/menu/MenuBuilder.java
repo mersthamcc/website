@@ -301,7 +301,7 @@ public class MenuBuilder {
                                             new Menu(
                                                     "admin-configuration-list",
                                                     null,
-                                                    SCRIPT_LINK,
+                                                    null,
                                                     List.of(),
                                                     null),
                                             new Menu(
