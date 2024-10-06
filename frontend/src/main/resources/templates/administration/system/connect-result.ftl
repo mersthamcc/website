@@ -4,8 +4,8 @@
 <#import "../../admin-components.ftl" as admin>
 
 <@layout.mainLayout>
-    <div class="card-body card-body-centered py-10">
-        <div class="text-center">
+    <div class="row">
+        <div class="col-lg-12">
             <@admin.form action="">
                 <@admin.card title="menu.admin-system-oauth">
                     <@admin.adminFormDisplayField name="name" data=name!"" localeCategory="system" />

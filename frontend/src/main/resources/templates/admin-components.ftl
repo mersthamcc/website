@@ -289,7 +289,7 @@
 <#macro adminFormDisplayField name localeCategory data labelWidth=2>
     <div class="row form-group">
         <label class="col-md-${labelWidth} control-label text-right align-middle">
-            <@spring.message code="${localeCategory}.${name}" />
+            <@spring.messageText code="${localeCategory}.${name}" text=name />
         </label>
         <label class="col-md-${12 - labelWidth} control-label align-middle">
             ${data}

@@ -4,6 +4,10 @@ import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.env.OriginTrackedMapPropertySource;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -14,6 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
@@ -25,11 +30,31 @@ public class SystemController {
 
     private final SystemService service;
     private final String baseUrl;
+    private final Environment environment;
 
     @Autowired
-    public SystemController(SystemService service, @Value("${base-url}") String baseUrl) {
+    public SystemController(
+            SystemService service, @Value("${base-url}") String baseUrl, Environment environment) {
         this.service = service;
         this.baseUrl = baseUrl;
+        this.environment = environment;
+    }
+
+    @GetMapping(value = "/administration/system/config", name = "admin-configuration-list")
+    @PreAuthorize(HAS_SYSTEM_ROLE)
+    public ModelAndView showConfig() {
+        Map<String, Object> config = new HashMap<>();
+        for (PropertySource<?> source : ((AbstractEnvironment) environment).getPropertySources()) {
+            if (source instanceof OriginTrackedMapPropertySource sourceMap) {
+                var keys = sourceMap.getSource().keySet();
+                keys.forEach(s -> config.put(s, environment.getProperty(s)));
+            }
+        }
+        Map<String, Object> model = new HashMap<>();
+        model.put("properties", config);
+        model.put("env", ((AbstractEnvironment) environment).getSystemEnvironment());
+        model.put("profiles", environment.getActiveProfiles());
+        return new ModelAndView("administration/system/config", model);
     }
 
     @GetMapping(value = "/administration/system/oauth/{name}", name = "admin-system-oauth-connect")
