@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static cricket.merstham.graphql.helpers.UriHelper.resolveUrl;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.isNull;
 
 @Service
 public class TweetService {
@@ -37,7 +38,11 @@ public class TweetService {
         template.setInterceptors(List.of(new TwitterAuthenticationInterceptor(tokenService)));
 
         var result = template.postForObject(TWEET_RESOURCE, request, JsonNode.class);
-        return result.at("/data/id").asText();
+        if (!isNull(result)) {
+            LOG.info("Tweet returned: {}", result);
+            return result.at("/data/id").asText();
+        }
+        throw new RuntimeException("Null response received from Twitter API");
     }
 
     public void unTweet(String id) {

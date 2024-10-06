@@ -303,6 +303,12 @@ public class MenuBuilder {
                                                     null,
                                                     SCRIPT_LINK,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-system-oauth-connect",
+                                                    buildParams("name", "twitter"),
+                                                    null,
+                                                    List.of(),
                                                     null)),
                             "tio-tune"));
 

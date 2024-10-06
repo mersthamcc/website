@@ -18,7 +18,7 @@
 
 <@layout.mainLayout headers=socialheaders>
     <div class="container space-1">
-        <#if news.featureImageUrl??>
+        <#if news.featureImageUrl?has_content>
             <div class="mb-5">
                 <img
                         class="feature-image"

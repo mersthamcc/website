@@ -65,10 +65,9 @@
                     }
                 });
             });
-            if($("#item-featureImageUrl").val() == "") {
-                $("#item-featureImageUrl").val("${resourcePrefix}/front/admin/assets/svg/illustrations/browse.svg");
+            if($("#item-featureImageUrl").val() !== "") {
+                $("#image-featureImageUrl").attr("src", $("#item-featureImageUrl").val());
             }
-            $("#image-featureImageUrl").attr("src", $("#item-featureImageUrl").val());
         });
     </script>
 </#macro>
@@ -92,7 +91,7 @@
                                 <img
                                         id="image-featureImageUrl"
                                         class="mb-3 feature-image"
-                                        src="${resourcePrefix}/front/admin/assets/svg/illustrations/browse.svg"
+                                        src="${resourcePrefix}/front/admin/assets/img/400x400/img2.jpg"
                                         alt="Browse for images" />
 
                                 <p class="mb-2"></p>
