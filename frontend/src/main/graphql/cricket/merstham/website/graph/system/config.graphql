@@ -1,0 +1,13 @@
+query Config {
+    config {
+        profiles
+        properties {
+            key
+            value
+        }
+        environment {
+            key
+            value
+        }
+    }
+}

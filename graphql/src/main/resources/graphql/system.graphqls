@@ -1,0 +1,9 @@
+type Configuration {
+    profiles: [String]
+    properties: [KeyValuePair]
+    environment: [KeyValuePair]
+}
+
+extend type Query {
+    config: Configuration
+}
