@@ -38,6 +38,36 @@
                     </#list>
                 </@admin.card>
 
+                <@admin.card title="system.graph-profiles">
+                    <ul class="unstyled">
+                        <#list graphProfiles as profile>
+                            <li><code>${profile}</code></li>
+                        </#list>
+                    </ul>
+                </@admin.card>
+
+                <@admin.card title="system.graph-configuration">
+                    <#list graphProperties?keys?sort as key>
+                        <div class="row form-group">
+                            <code class="col-md-4 control-label text-right">
+                                ${key}
+                            </code>
+                            <pre class="col-md-8" style="white-space: pre-wrap;">${graphProperties[key]?esc}</pre>
+                        </div>
+                    </#list>
+                </@admin.card>
+
+                <@admin.card title="system.graph-environment">
+                    <#list graphEnvironment?keys?sort as key>
+                        <div class="row form-group">
+                            <code class="col-md-4 control-label text-right">
+                                ${key}
+                            </code>
+                            <pre class="col-md-8" style="white-space: pre-wrap;">${graphEnvironment[key]?esc}</pre>
+                        </div>
+                    </#list>
+                </@admin.card>
+
                 <@components.buttonGroup>
                     <a href="/administration" class="btn btn-primary transition-3d-hover">
                         <@spring.message code="system.cancel" />

@@ -155,8 +155,7 @@ contact-methods:
 mail:
   region: eu-west-2
   fromAddress: no-reply@mersthamcc.co.uk
-  confirmation-email-bcc:
-    - treasurer@mersthamcc.co.uk
+  confirmation-email-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}
 
 registration:
   defaults:
