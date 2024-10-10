@@ -19,7 +19,7 @@
 <@layout.mainLayout headers=socialheaders>
     <div class="container space-1">
         <#if news.featureImageUrl?has_content>
-            <div class="mb-5">
+            <div class="mb-5 justify-content-center">
                 <img
                         class="feature-image"
                         src="${news.featureImageUrl}"
@@ -27,7 +27,7 @@
             </div>
         </#if>
 
-        <div class="row justify-content-lg-between">
+        <div class="justify-content-between">
             <div class="w-lg-60 mx-lg-auto">
                 <div class="mb-4">
                     <h1 class="h2">${news.title}</h1>
