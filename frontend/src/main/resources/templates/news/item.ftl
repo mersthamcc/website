@@ -1,6 +1,6 @@
 <#import "../base.ftl" as layout>
 <#macro socialheaders>
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@${config.social.twitter.handle}" />
     <meta name="twitter:title" content="${news.title}" />
     <meta name="twitter:description" content="${news.getSocialDescription()!""}" />
