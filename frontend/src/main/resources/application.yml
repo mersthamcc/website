@@ -158,6 +158,7 @@ mail:
   confirmation-email-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}
 
 registration:
+  enabled: ${REGISTRATION_ENABLED:true}
   defaults:
     - category: junior
       name-field: parent-name-1

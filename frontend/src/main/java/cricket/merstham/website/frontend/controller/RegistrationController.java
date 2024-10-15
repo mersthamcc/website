@@ -16,6 +16,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -63,17 +64,20 @@ public class RegistrationController {
     private final PaymentServiceManager paymentServiceManager;
     private final List<Discount> activeDiscounts;
     private final RegistrationConfiguration registrationConfiguration;
+    private final boolean enabled;
 
     @Autowired
     public RegistrationController(
             MembershipService membershipService,
             PaymentServiceManager paymentServiceManager,
             List<Discount> activeDiscounts,
-            RegistrationConfiguration registrationConfiguration) {
+            RegistrationConfiguration registrationConfiguration,
+            @Value("${registration.enabled}") boolean enabled) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
         this.activeDiscounts = activeDiscounts;
         this.registrationConfiguration = registrationConfiguration;
+        this.enabled = enabled;
     }
 
     @ModelAttribute("basket")
@@ -85,6 +89,9 @@ public class RegistrationController {
     @GetMapping(value = "/register", name = "register")
     public ModelAndView register(
             @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+        if (!enabled) {
+            return new ModelAndView("registration/closed");
+        }
         var model = new HashMap<String, Object>();
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (nonNull(flash) && flash.containsKey(ERRORS)) {
@@ -105,6 +112,9 @@ public class RegistrationController {
                     List<String> declarations,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
+        if (!enabled) {
+            return redirectTo("/register");
+        }
         if (!deleteMember.isBlank()) {
             basket.removeSuscription(UUID.fromString(deleteMember));
         } else if (!editMember.isBlank()) {
@@ -170,6 +180,9 @@ public class RegistrationController {
             @ModelAttribute("code") String code,
             HttpSession session,
             CognitoAuthentication authentication) {
+        if (!enabled) {
+            return new ModelAndView("registration/closed");
+        }
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =
                 membershipCategory.getPriceListItem().stream()
@@ -237,6 +250,9 @@ public class RegistrationController {
             @ModelAttribute("basket") RegistrationBasket basket,
             @RequestBody MultiValueMap<String, Object> body,
             HttpSession session) {
+        if (!enabled) {
+            return redirectTo("/register");
+        }
         var uuid = UUID.fromString((String) body.getFirst("uuid"));
         var subscription = getCurrentSubscription(session).setMember(memberFromPost(body));
         session.removeAttribute(CURRENT_SUBSCRIPTION);
@@ -252,6 +268,9 @@ public class RegistrationController {
             Locale locale,
             HttpSession session,
             SessionStatus status) {
+        if (!enabled) {
+            return new ModelAndView("registration/closed");
+        }
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(
