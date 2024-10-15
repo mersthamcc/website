@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -250,7 +251,11 @@ public class S3Service {
         try {
             var file = getSanitizedFileName(folder, filename);
             client.putObject(
-                    PutObjectRequest.builder().bucket(bucketName).key(file).build(),
+                    PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(file)
+                            .contentType(URLConnection.guessContentTypeFromName(filename))
+                            .build(),
                     RequestBody.fromBytes(bytes));
             return 1;
         } catch (SdkException ex) {
