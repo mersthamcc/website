@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.controller;
 
 import com.apollographql.apollo.api.Error;
 import cricket.merstham.website.frontend.exception.GraphException;
+import io.sentry.Sentry;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -76,6 +77,7 @@ public class FrontEndErrorController
             LOG.atError().setMessage("An unexpected error occurred").setCause(exception).log();
         }
         redirectAttributes.addFlashAttribute(EXCEPTION_FLASH, exception.getLocalizedMessage());
+        Sentry.captureException(exception);
         return redirectTo("/error");
     }
 }

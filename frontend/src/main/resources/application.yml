@@ -1,4 +1,11 @@
 base-url: "${BASE_URL:http://localhost:8080}"
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
+  enabled: ${SENTRY_ENABLED:false}
+  environment: ${SENTRY_ENVIRONMENT:dev}
+
 spring:
   data:
     redis:

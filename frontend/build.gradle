@@ -49,10 +49,11 @@ dependencies {
     implementation "de.brendamour:jpasskit:0.4.2"
     implementation 'com.auth0:java-jwt:4.4.0:'
     implementation 'com.auth0:jwks-rsa:0.22.1'
-    implementation 'com.google.api-client:google-api-client:2.4.0'
-    implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240312-2.0.0'
+    implementation 'com.google.api-client:google-api-client:2.6.0'
+    implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240627-2.0.0'
     implementation "com.rometools:rome:2.1.0"
     implementation "net.sf.biweekly:biweekly:0.6.8"
+    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.16.0'
 
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
     implementation "software.amazon.awssdk:s3-transfer-manager:${dependencyVersions.aws}"
