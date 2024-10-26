@@ -15,6 +15,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cricket.merstham.website.frontend.helpers.LegacyLinkHelper.legacyHelper;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoleHelper.NEWS;
 import static cricket.merstham.website.frontend.helpers.RoleHelper.hasRole;
@@ -50,7 +51,7 @@ public class NewsController {
 
     @GetMapping(value = NEWS_ITEM_LEGACY_ROUTE, name = "news-item-legacy")
     public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-        return redirectTo(newsService.get(id).getPath());
+        return redirectTo(legacyHelper(() -> newsService.get(id).getPath()));
     }
 
     @GetMapping(value = NEWS_ITEM_ROUTE, name = "news")

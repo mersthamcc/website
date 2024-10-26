@@ -42,6 +42,10 @@ public class FrontEndErrorController
             return new ModelAndView("error/404");
         }
 
+        if (nonNull(status) && status.equals(HttpStatus.GONE.value())) {
+            return new ModelAndView("error/410");
+        }
+
         var exception = RequestContextUtils.getInputFlashMap(request);
         Map<String, Object> model =
                 isNull(exception) ? Map.of() : Map.of(EXCEPTION_FLASH, exception);

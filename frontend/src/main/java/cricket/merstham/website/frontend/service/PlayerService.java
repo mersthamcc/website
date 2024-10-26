@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -32,26 +31,17 @@ public class PlayerService {
     public List<Player> getPlayers(
             String type, String term, Integer page, OAuth2AccessToken accessToken) {
         var query = new PlayersQuery();
-        try {
-            Response<PlayersQuery.Data> result = graphService.executeQuery(query, accessToken);
-            return result.getData().getPlayers().stream()
-                    .filter(player -> isNull(term) || player.getName().toLowerCase().contains(term))
-                    .map(player -> modelMapper.map(player, Player.class))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<PlayersQuery.Data> result = graphService.executeQuery(query, accessToken);
+        return result.getData().getPlayers().stream()
+                .filter(player -> isNull(term) || player.getName().toLowerCase().contains(term))
+                .map(player -> modelMapper.map(player, Player.class))
+                .toList();
     }
 
     public PlayerSummary getPlayer(int id, OAuth2AccessToken accessToken) {
         var query = new PlayerSummaryQuery(id);
-        try {
-            Response<PlayerSummaryQuery.Data> result =
-                    graphService.executeQuery(query, accessToken);
-            if (isNull(result.getData().getPlayerSummary())) return null;
-            return modelMapper.map(result.getData().getPlayerSummary(), PlayerSummary.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<PlayerSummaryQuery.Data> result = graphService.executeQuery(query, accessToken);
+        if (isNull(result.getData().getPlayerSummary())) return null;
+        return modelMapper.map(result.getData().getPlayerSummary(), PlayerSummary.class);
     }
 }
