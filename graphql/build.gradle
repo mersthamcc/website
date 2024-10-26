@@ -36,6 +36,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation:${dependencyVersions.spring_boot}"
     implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
     implementation "org.springframework.vault:spring-vault-core:3.1.2"
+    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.16.0'
 
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
     implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"

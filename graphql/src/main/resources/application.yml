@@ -1,6 +1,12 @@
 server:
   port: 8090
 
+sentry:
+  dsn: ${SENTRY_DSN:}
+  tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
+  enabled: ${SENTRY_ENABLED:false}
+  environment: ${SENTRY_ENVIRONMENT:dev}
+
 spring:
   mvc:
     log-request-details: ${DEBUG_LOG_REQUESTS:false}
