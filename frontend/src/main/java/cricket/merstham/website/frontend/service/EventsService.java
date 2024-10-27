@@ -163,7 +163,7 @@ public class EventsService {
         return modelMapper.map(attributeResult.getData().getSaveEventAttributes(), Event.class);
     }
 
-    public Event get(OAuth2AccessToken accessToken, int id) throws IOException {
+    public Event get(OAuth2AccessToken accessToken, int id) {
         var query = new GetEventItemQuery(id);
         Response<GetEventItemQuery.Data> event;
         if (isNull(accessToken)) {
@@ -177,11 +177,11 @@ public class EventsService {
         return result;
     }
 
-    public Event get(int id) throws IOException {
+    public Event get(int id) {
         return get(null, id);
     }
 
-    public Event get(String path) throws IOException {
+    public Event get(String path) {
         var query = new GetEventItemByPathQuery(path);
         Response<GetEventItemByPathQuery.Data> news = graphService.executeQuery(query);
         if (isNull(news.getData().getEventItemByPath())) throw new ResourceNotFoundException();

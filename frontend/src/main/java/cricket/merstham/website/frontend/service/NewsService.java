@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cricket.merstham.website.frontend.helpers.GraphQLResultHelper.requireGraphData;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_NEWS_EDIT_ROUTE;
 import static java.util.Objects.isNull;
@@ -168,7 +169,7 @@ public class NewsService {
         return modelMapper.map(attributeResult.getData().getSaveNewsAttributes(), News.class);
     }
 
-    public News get(OAuth2AccessToken accessToken, int id) throws IOException {
+    public News get(OAuth2AccessToken accessToken, int id) {
         var query = new GetNewsItemQuery(id);
         Response<GetNewsItemQuery.Data> news;
         if (isNull(accessToken)) {
@@ -176,13 +177,15 @@ public class NewsService {
         } else {
             news = graphService.executeQuery(query, accessToken);
         }
-        if (isNull(news.getData().getNewsItem())) throw new ResourceNotFoundException();
-        var result = modelMapper.map(news.getData().getNewsItem(), News.class);
+
+        var result =
+                modelMapper.map(
+                        requireGraphData(news, GetNewsItemQuery.Data::getNewsItem), News.class);
         processors.forEach(p -> p.postOpen(result));
         return result;
     }
 
-    public News get(int id) throws IOException {
+    public News get(int id) {
         return get(null, id);
     }
 

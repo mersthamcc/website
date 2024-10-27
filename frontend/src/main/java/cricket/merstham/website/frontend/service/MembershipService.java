@@ -86,23 +86,18 @@ public class MembershipService {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                                 .doubleValue());
         var order = new Order();
-        try {
-            Response<CreateOrderMutation.Data> orderResult =
-                    graphService.executeMutation(createOrder, accessToken);
-            if (orderResult.hasErrors()) {
-                throw new RuntimeException(
-                        "GraphQL error(s) registering member: "
-                                + String.join(
-                                        "\n",
-                                        orderResult.getErrors().stream()
-                                                .map(error -> error.getMessage())
-                                                .toList()));
-            }
-            order = modelMapper.map(orderResult.getData().getCreateOrder(), Order.class);
-        } catch (IOException e) {
-            LOG.error("Error creating order", e);
-            throw new RuntimeException("Error creating order", e);
+        Response<CreateOrderMutation.Data> orderResult =
+                graphService.executeMutation(createOrder, accessToken);
+        if (orderResult.hasErrors()) {
+            throw new RuntimeException(
+                    "GraphQL error(s) registering member: "
+                            + String.join(
+                                    "\n",
+                                    orderResult.getErrors().stream()
+                                            .map(error -> error.getMessage())
+                                            .toList()));
         }
+        order = modelMapper.map(orderResult.getData().getCreateOrder(), Order.class);
 
         for (var subscription : basket.getSubscriptions().entrySet()) {
             var memberInput =
@@ -131,18 +126,13 @@ public class MembershipService {
                             .build();
 
             var createMemberMutation = new CreateMemberMutation(memberInput);
-            try {
-                var result = graphService.executeMutation(createMemberMutation, accessToken);
-                if (result.hasErrors()) {
-                    throw new RuntimeException(
-                            "GraphQL error(s) registering member: "
-                                    + result.getErrors().stream()
-                                            .map(Error::getMessage)
-                                            .collect(Collectors.joining("\n")));
-                }
-            } catch (IOException e) {
-                LOG.error("Error registering member", e);
-                throw new RuntimeException("Error registering member", e);
+            var result = graphService.executeMutation(createMemberMutation, accessToken);
+            if (result.hasErrors()) {
+                throw new RuntimeException(
+                        "GraphQL error(s) registering member: "
+                                + result.getErrors().stream()
+                                        .map(Error::getMessage)
+                                        .collect(Collectors.joining("\n")));
             }
         }
         return order;
@@ -172,56 +162,40 @@ public class MembershipService {
                                 .reconciled(reconciled)
                                 .status(status)
                                 .build());
-        try {
-            Response<AddPaymentToOrderMutation.Data> result =
-                    graphService.executeMutation(addPaymentToOrderMutation, accessToken);
-            if (result.hasErrors()) {
-                throw new RuntimeException(
-                        "GraphQL error(s) creating payment: "
-                                + result.getErrors().stream()
-                                        .map(Error::getMessage)
-                                        .collect(Collectors.joining("\n")));
-            }
-            return result.getData().getAddPaymentToOrder();
-        } catch (IOException e) {
-            LOG.error("Error registering payment", e);
-            throw new RuntimeException("Error registering payment", e);
+        Response<AddPaymentToOrderMutation.Data> result =
+                graphService.executeMutation(addPaymentToOrderMutation, accessToken);
+        if (result.hasErrors()) {
+            throw new RuntimeException(
+                    "GraphQL error(s) creating payment: "
+                            + result.getErrors().stream()
+                                    .map(Error::getMessage)
+                                    .collect(Collectors.joining("\n")));
         }
+        return result.getData().getAddPaymentToOrder();
     }
 
     public List<MemberCategory> getMembershipCategories() {
         var query = new MembershipCategoriesQuery(StringFilter.builder().build());
-        try {
-            Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            var categories = result.getData().getMembershipCategories();
-            return categories.stream().map(c -> modelMapper.map(c, MemberCategory.class)).toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
+        var categories = result.getData().getMembershipCategories();
+        return categories.stream().map(c -> modelMapper.map(c, MemberCategory.class)).toList();
     }
 
     public MemberCategory getMembershipCategory(String categoryName) {
         var query =
                 new MembershipCategoriesQuery(StringFilter.builder().equals(categoryName).build());
-        try {
-            Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
-            return modelMapper.map(
-                    result.getData().getMembershipCategories().get(0), MemberCategory.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<MembershipCategoriesQuery.Data> result = graphService.executeQuery(query);
+        return modelMapper.map(
+                result.getData().getMembershipCategories().get(0), MemberCategory.class);
     }
 
     public List<MemberSummary> getAllMembers(OAuth2AccessToken accessToken) {
         var query = new MembersQuery();
-        try {
-            Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
-            return result.getData().getMembers().stream()
-                    .map(m -> modelMapper.map(m, MemberSummary.class))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<MembersQuery.Data> result = graphService.executeQuery(query, accessToken);
+        return result.getData().getMembers().stream()
+                .map(m -> modelMapper.map(m, MemberSummary.class))
+                .toList();
     }
 
     public List<MemberSummary> getMembersOwnedBy(
@@ -233,7 +207,7 @@ public class MembershipService {
             return result.getData().getMembersOwnedBy().stream()
                     .map(m -> modelMapper.map(m, MemberSummary.class))
                     .toList();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.atWarn().setCause(e).log("Error getting members owned by {}", ownerSubjectId);
         }
         return List.of();
@@ -247,31 +221,19 @@ public class MembershipService {
     public List<MemberSummary> getFilteredMemberSummary(
             ReportFilter filter, OAuth2AccessToken accessToken) {
         var query = new FilteredMembersQuery(filter.asText());
-        try {
-            Response<FilteredMembersQuery.Data> result =
-                    graphService.executeQuery(query, accessToken);
-            return result.getData().getFilteredMembers().stream()
-                    .map(m -> modelMapper.map(m, MemberSummary.class))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<FilteredMembersQuery.Data> result = graphService.executeQuery(query, accessToken);
+        return result.getData().getFilteredMembers().stream()
+                .map(m -> modelMapper.map(m, MemberSummary.class))
+                .toList();
     }
 
     public Optional<Member> get(int id, OAuth2AccessToken accessToken) {
         var query = new MemberQuery(id);
-        try {
-            Response<MemberQuery.Data> result = graphService.executeQuery(query, accessToken);
-            if (isNull(result.getData().getMember())) {
-                return Optional.empty();
-            }
-            return Optional.of(
-                    modelMapper.map(
-                            result.getData().getMember(),
-                            cricket.merstham.shared.dto.Member.class));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Response<MemberQuery.Data> result = graphService.executeQuery(query, accessToken);
+        if (isNull(result.getData().getMember())) {
+            return Optional.empty();
         }
+        return Optional.of(modelMapper.map(result.getData().getMember(), Member.class));
     }
 
     public Member update(
@@ -295,137 +257,97 @@ public class MembershipService {
                                                                         f.getValue()))
                                                         .build())
                                 .toList());
-        try {
-            Response<UpdateMemberMutation.Data> result =
-                    graphService.executeMutation(request, accessToken);
+        Response<UpdateMemberMutation.Data> result =
+                graphService.executeMutation(request, accessToken);
 
-            if (result.hasErrors()) {
-                throw new GraphException(
-                        result.getErrors().stream()
-                                .map(Error::getMessage)
-                                .reduce((error, error2) -> error.concat("\n").concat(error2))
-                                .orElse("Unknown GraphQL Error"),
-                        result.getErrors());
-            }
-
-            return modelMapper.map(
-                    requireNonNull(result.getData()).getUpdateMember(),
-                    cricket.merstham.shared.dto.Member.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (result.hasErrors()) {
+            throw new GraphException(
+                    result.getErrors().stream()
+                            .map(Error::getMessage)
+                            .reduce((error, error2) -> error.concat("\n").concat(error2))
+                            .orElse("Unknown GraphQL Error"),
+                    result.getErrors());
         }
+
+        return modelMapper.map(requireNonNull(result.getData()).getUpdateMember(), Member.class);
     }
 
     public Map<String, AttributeDefinition> getAttributes() {
         var query = new AttributesQuery();
-        try {
-            Response<AttributesQuery.Data> result = graphService.executeQuery(query);
+        Response<AttributesQuery.Data> result = graphService.executeQuery(query);
 
-            return result.getData().getAttributes().stream()
-                    .collect(
-                            Collectors.toMap(
-                                    a -> a.getKey(),
-                                    a ->
-                                            AttributeDefinition.builder()
-                                                    .key(a.getKey())
-                                                    .choices(a.getChoices())
-                                                    .type(
-                                                            AttributeType.valueOf(
-                                                                    a.getType().rawValue()))
-                                                    .build()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return result.getData().getAttributes().stream()
+                .collect(
+                        Collectors.toMap(
+                                a -> a.getKey(),
+                                a ->
+                                        AttributeDefinition.builder()
+                                                .key(a.getKey())
+                                                .choices(a.getChoices())
+                                                .type(AttributeType.valueOf(a.getType().rawValue()))
+                                                .build()));
     }
 
     public Order getOrder(int id) {
-        try {
-            var query = new OrderQuery(id);
-            Response<OrderQuery.Data> result = graphService.executeQuery(query);
-            return modelMapper.map(result.getData().getOrder(), Order.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        var query = new OrderQuery(id);
+        Response<OrderQuery.Data> result = graphService.executeQuery(query);
+        return modelMapper.map(result.getData().getOrder(), Order.class);
     }
 
     public Member linkToPlayCricketPlayer(
             int id, OAuth2AccessToken accessToken, int playCricketId) {
         var request = new PlayCricketLinkMutation(id, playCricketId);
-        try {
-            Response<PlayCricketLinkMutation.Data> result =
-                    graphService.executeMutation(request, accessToken);
+        Response<PlayCricketLinkMutation.Data> result =
+                graphService.executeMutation(request, accessToken);
 
-            if (result.hasErrors()) {
-                throw new GraphException(
-                        result.getErrors().stream()
-                                .map(Error::getMessage)
-                                .reduce((error, error2) -> error.concat("\n").concat(error2))
-                                .orElse("Unknown GraphQL Error"),
-                        result.getErrors());
-            }
-
-            return modelMapper.map(
-                    requireNonNull(result.getData()).getAssociateMemberToPlayer(),
-                    cricket.merstham.shared.dto.Member.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (result.hasErrors()) {
+            throw new GraphException(
+                    result.getErrors().stream()
+                            .map(Error::getMessage)
+                            .reduce((error, error2) -> error.concat("\n").concat(error2))
+                            .orElse("Unknown GraphQL Error"),
+                    result.getErrors());
         }
+
+        return modelMapper.map(
+                requireNonNull(result.getData()).getAssociateMemberToPlayer(), Member.class);
     }
 
     public Member deletePlayCricketLink(int id, OAuth2AccessToken accessToken) {
         var request = new DeletePlayCricketLinkMutation(id);
-        try {
-            Response<DeletePlayCricketLinkMutation.Data> result =
-                    graphService.executeMutation(request, accessToken);
+        Response<DeletePlayCricketLinkMutation.Data> result =
+                graphService.executeMutation(request, accessToken);
 
-            if (result.hasErrors()) {
-                throw new GraphException(
-                        result.getErrors().stream()
-                                .map(Error::getMessage)
-                                .reduce((error, error2) -> error.concat("\n").concat(error2))
-                                .orElse("Unknown GraphQL Error"),
-                        result.getErrors());
-            }
-
-            return modelMapper.map(
-                    requireNonNull(result.getData()).getDeleteMemberToPlayerLink(),
-                    cricket.merstham.shared.dto.Member.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (result.hasErrors()) {
+            throw new GraphException(
+                    result.getErrors().stream()
+                            .map(Error::getMessage)
+                            .reduce((error, error2) -> error.concat("\n").concat(error2))
+                            .orElse("Unknown GraphQL Error"),
+                    result.getErrors());
         }
+
+        return modelMapper.map(
+                requireNonNull(result.getData()).getDeleteMemberToPlayerLink(), Member.class);
     }
 
     public List<MemberSummary> getMyMembers(OAuth2AccessToken accessToken) {
-        try {
-            Response<MyMembersQuery.Data> result =
-                    graphService.executeQuery(new MyMembersQuery(), accessToken);
-            return result.getData().getMyMembers().stream()
-                    .map(m -> modelMapper.map(m, MemberSummary.class))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Response<MyMembersQuery.Data> result =
+                graphService.executeQuery(new MyMembersQuery(), accessToken);
+        return result.getData().getMyMembers().stream()
+                .map(m -> modelMapper.map(m, MemberSummary.class))
+                .toList();
     }
 
     public void addApplePassSerial(Integer id, String serialNumber, OAuth2AccessToken accessToken) {
-        try {
-            graphService.executeMutation(
-                    new AddMemberIdentifierMutation(id, APPLE_PASS_SERIAL, serialNumber),
-                    accessToken);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        graphService.executeMutation(
+                new AddMemberIdentifierMutation(id, APPLE_PASS_SERIAL, serialNumber), accessToken);
     }
 
     public void addGooglePassSerial(
             Integer id, String serialNumber, OAuth2AccessToken accessToken) {
-        try {
-            graphService.executeMutation(
-                    new AddMemberIdentifierMutation(id, GOOGLE_PASS_SERIAL, serialNumber),
-                    accessToken);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        graphService.executeMutation(
+                new AddMemberIdentifierMutation(id, GOOGLE_PASS_SERIAL, serialNumber), accessToken);
     }
 
     public List<UserPaymentMethod> getUsersPaymentMethods(

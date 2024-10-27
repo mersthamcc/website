@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -57,22 +56,25 @@ public class GraphService {
     }
 
     public <T extends Query, R> R executeQuery(
-            T query, OAuth2AccessToken accessToken, TypeReference<R> clazz) throws IOException {
+            T query, OAuth2AccessToken accessToken, TypeReference<R> clazz) {
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
         byte[] response = getRawResult(query, accessToken.getTokenValue());
-        return objectMapper.readValue(response, clazz);
+        try {
+            return objectMapper.readValue(response, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(
-            T query, OAuth2AccessToken accessToken) throws IOException {
+            T query, OAuth2AccessToken accessToken) {
 
         LOG.info("Sending `{}` GraphQL API request with user token", query.name().name());
         return getResult(query, accessToken.getTokenValue());
     }
 
-    public <T extends Query, R extends Operation.Data> Response<R> executeQuery(T query)
-            throws IOException {
+    public <T extends Query, R extends Operation.Data> Response<R> executeQuery(T query) {
         String accessToken = accessTokenManager.getAccessToken();
         LOG.info(
                 "Sending `{}` GraphQL API request with client credentials token",
@@ -81,24 +83,31 @@ public class GraphService {
     }
 
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
-            T mutation, OAuth2AccessToken accessToken) throws IOException {
+            T mutation, OAuth2AccessToken accessToken) {
 
         return getResult(mutation, accessToken.getTokenValue());
     }
 
     public <T extends Mutation, R> R executeMutation(
-            T mutation, OAuth2AccessToken accessToken, Class<R> clazz) throws IOException {
+            T mutation, OAuth2AccessToken accessToken, Class<R> clazz) {
         byte[] response = getRawResult(mutation, accessToken.getTokenValue());
-        return objectMapper.readValue(response, clazz);
+        try {
+            return objectMapper.readValue(response, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <T extends Operation, R extends Operation.Data> Response<R> getResult(
-            T query, String accessToken) throws IOException {
-        return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
+            T query, String accessToken) {
+        try {
+            return query.parse(ByteString.of(getRawResult(query, accessToken)), adapters);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private <T extends Operation> byte[] getRawResult(T query, String accessToken)
-            throws IOException {
+    private <T extends Operation> byte[] getRawResult(T query, String accessToken) {
         var webTarget = client.target(graphConfiguration.getGraphUri());
 
         var invocation =

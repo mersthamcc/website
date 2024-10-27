@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
+import static cricket.merstham.website.frontend.helpers.LegacyLinkHelper.legacyHelper;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.EVENTS_HOME_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.EVENTS_ITEM_LEGACY_ROUTE;
@@ -46,7 +47,7 @@ public class EventsController {
 
     @GetMapping(value = EVENTS_ITEM_LEGACY_ROUTE, name = "events-item-legacy")
     public RedirectView legacyRedirect(@PathVariable("id") int id) throws IOException {
-        return redirectTo(service.get(id).getPath());
+        return redirectTo(legacyHelper(() -> service.get(id)).getPath());
     }
 
     @GetMapping(value = EVENTS_ITEM_ROUTE, name = "events-item")
