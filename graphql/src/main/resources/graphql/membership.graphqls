@@ -17,10 +17,11 @@ type AttributeDefinition {
 }
 
 type Member {
-    attributes: [MemberAttribute!]!
     id: Int!
     ownerUserId: String!
     registrationDate: DateTime!
+    uuid: String
+    attributes: [MemberAttribute!]!
     subscription: [MemberSubscription!]!
     identifiers: [KeyValuePair]
 }
@@ -189,6 +190,7 @@ extend type Query {
     filteredMembers(filter: String!): [MemberSummary]
     membershipCategories(where: MemberCategoryWhereInput): [MemberCategory]
     myMembers: [MemberSummary]
+    myMemberDetails: [Member]
     myOrders: [Order]
     orders(year: Int!): [Order]
     order(id: Int!): Order
