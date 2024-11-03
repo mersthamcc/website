@@ -15,6 +15,8 @@ public interface MemberEntityRepository
 
     Optional<MemberEntity> findByIdAndOwnerUserId(Integer id, String ownerUserId);
 
+    List<MemberEntity> findAllByOwnerUserId(String ownerUserId);
+
     @Query(
             value =
                     "SELECT *"

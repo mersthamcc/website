@@ -51,6 +51,11 @@ public class MembershipController {
     }
 
     @QueryMapping
+    public List<Member> myMemberDetails(Principal principal) {
+        return membershipService.getMyMemberDetails(principal);
+    }
+
+    @QueryMapping
     public List<MemberSummary> membersOwnedBy(@Argument String owner) {
         return membershipService.getMembersForUser(owner);
     }
