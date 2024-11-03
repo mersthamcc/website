@@ -29,6 +29,7 @@ import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
+import cricket.merstham.website.graph.registration.MyMemberDetailsQuery;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -336,6 +337,14 @@ public class MembershipService {
                 graphService.executeQuery(new MyMembersQuery(), accessToken);
         return result.getData().getMyMembers().stream()
                 .map(m -> modelMapper.map(m, MemberSummary.class))
+                .toList();
+    }
+
+    public List<Member> getMyMemberDetails(OAuth2AccessToken accessToken) {
+        Response<MyMemberDetailsQuery.Data> result =
+                graphService.executeQuery(new MyMemberDetailsQuery(), accessToken);
+        return result.getData().getMyMemberDetails().stream()
+                .map(m -> modelMapper.map(m, Member.class))
                 .toList();
     }
 

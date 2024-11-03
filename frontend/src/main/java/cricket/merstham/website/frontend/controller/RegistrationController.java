@@ -59,6 +59,7 @@ public class RegistrationController {
     public static final String SUBSCRIPTION = "subscription";
     public static final String SUBSCRIPTION_ID = "subscriptionId";
     public static final String MODEL_ERRORS = "errors";
+    public static final String REGISTRATION_CLOSED = "registration/closed";
 
     private final MembershipService membershipService;
     private final PaymentServiceManager paymentServiceManager;
@@ -88,12 +89,17 @@ public class RegistrationController {
 
     @GetMapping(value = "/register", name = "register")
     public ModelAndView register(
-            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+            @ModelAttribute("basket") RegistrationBasket basket,
+            HttpServletRequest request,
+            CognitoAuthentication cognitoAuthentication) {
         if (!enabled) {
-            return new ModelAndView("registration/closed");
+            return new ModelAndView(REGISTRATION_CLOSED);
         }
         var model = new HashMap<String, Object>();
         var flash = RequestContextUtils.getInputFlashMap(request);
+        var members =
+                membershipService.getMyMemberDetails(cognitoAuthentication.getOAuth2AccessToken());
+        basket.addExistingMembers(members);
         if (nonNull(flash) && flash.containsKey(ERRORS)) {
             var errors = flash.get(ERRORS);
             model.put(ERRORS, errors);
@@ -116,7 +122,7 @@ public class RegistrationController {
             return redirectTo("/register");
         }
         if (!deleteMember.isBlank()) {
-            basket.removeSuscription(UUID.fromString(deleteMember));
+            basket.removeSubscription(UUID.fromString(deleteMember));
         } else if (!editMember.isBlank()) {
             var subscription = basket.getSubscriptions().get(UUID.fromString(editMember));
             setCurrentSubscription(session, subscription);
@@ -181,7 +187,7 @@ public class RegistrationController {
             HttpSession session,
             CognitoAuthentication authentication) {
         if (!enabled) {
-            return new ModelAndView("registration/closed");
+            return new ModelAndView(REGISTRATION_CLOSED);
         }
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =
@@ -269,7 +275,7 @@ public class RegistrationController {
             HttpSession session,
             SessionStatus status) {
         if (!enabled) {
-            return new ModelAndView("registration/closed");
+            return new ModelAndView(REGISTRATION_CLOSED);
         }
         return new ModelAndView(
                 "registration/confirmation",
