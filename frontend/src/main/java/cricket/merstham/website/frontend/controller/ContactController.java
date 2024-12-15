@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.website.frontend.exception.ResourceHasGoneException;
 import cricket.merstham.website.frontend.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,10 @@ public class ContactController {
                 items.getData().stream()
                         .filter(contactCategory -> contactCategory.getSlug().equals(categorySlug))
                         .findFirst()
-                        .orElseThrow();
+                        .orElseThrow(
+                                () ->
+                                        new ResourceHasGoneException(
+                                                "Category not found: " + categorySlug));
         return new ModelAndView(
                 "contacts/home", Map.of("categories", items.getData(), "current", category));
     }
