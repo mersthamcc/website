@@ -18,7 +18,7 @@ import cricket.merstham.website.frontend.configuration.ModelMapperConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
-import cricket.merstham.website.graph.CreateMemberMutation;
+import cricket.merstham.website.graph.CreateMemberSubscriptionMutation;
 import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.MemberQuery;
 import cricket.merstham.website.graph.MembersQuery;
@@ -105,9 +105,11 @@ class MembershipServiceTest {
                     .build();
 
     private static final int NUMBER_OF_MEMBERS = 20;
+    public static final int REGISTRATION_YEAR = 2023;
     private final GraphService graphService = mock(GraphService.class);
     private final ModelMapper modelMapper = new ModelMapperConfiguration().modelMapper();
-    private final MembershipService service = new MembershipService(graphService, modelMapper);
+    private final MembershipService service =
+            new MembershipService(graphService, modelMapper, REGISTRATION_YEAR);
 
     @BeforeEach
     void setUp() {}
@@ -145,17 +147,18 @@ class MembershipServiceTest {
                                                 .sum(),
                                         0.00)),
                 mutation ->
-                        new CreateMemberMutation.Data(
-                                new CreateMemberMutation.CreateMember(
+                        new CreateMemberSubscriptionMutation.Data(
+                                new CreateMemberSubscriptionMutation.CreateMemberSubscription(
                                         "CreateMember",
                                         1,
                                         Instant.now(),
                                         member.getAttributes().stream()
                                                 .map(
                                                         a ->
-                                                                new CreateMemberMutation.Attribute(
+                                                                new CreateMemberSubscriptionMutation
+                                                                        .Attribute(
                                                                         "Attribute",
-                                                                        new CreateMemberMutation
+                                                                        new CreateMemberSubscriptionMutation
                                                                                 .Definition(
                                                                                 "Definition",
                                                                                 a.getDefinition()
@@ -165,11 +168,11 @@ class MembershipServiceTest {
                                         member.getSubscription().stream()
                                                 .map(
                                                         s ->
-                                                                new CreateMemberMutation
+                                                                new CreateMemberSubscriptionMutation
                                                                         .Subscription(
                                                                         "Subscription",
                                                                         s.getPrice().doubleValue(),
-                                                                        new CreateMemberMutation
+                                                                        new CreateMemberSubscriptionMutation
                                                                                 .PriceListItem(
                                                                                 "PriceListItem",
                                                                                 s.getPriceListItem()
@@ -209,13 +212,15 @@ class MembershipServiceTest {
 
         verify(graphService, ONCE).executeMutation(any(CreateOrderMutation.class), eq(accessToken));
         verify(graphService, ONCE)
-                .executeMutation(any(CreateMemberMutation.class), eq(accessToken));
+                .executeMutation(any(CreateMemberSubscriptionMutation.class), eq(accessToken));
 
         var orderMutation = (CreateOrderMutation) mutationCaptor.getAllValues().get(0);
         assertThat(orderMutation.variables().uuid(), equalTo(subsId.toString()));
 
         var memberVariable =
-                ((CreateMemberMutation) mutationCaptor.getAllValues().get(1)).variables().member();
+                ((CreateMemberSubscriptionMutation) mutationCaptor.getAllValues().get(1))
+                        .variables()
+                        .member();
         var attributeMap =
                 member.getAttributes().stream()
                         .collect(
@@ -231,7 +236,7 @@ class MembershipServiceTest {
         assertThat(
                 memberVariable.subscription().price().doubleValue(),
                 equalTo(subscriptionInput.getPrice().doubleValue()));
-        assertThat(memberVariable.subscription().year(), equalTo(LocalDate.now().getYear()));
+        assertThat(memberVariable.subscription().year(), equalTo(REGISTRATION_YEAR));
         assertThat(memberVariable.subscription().addedDate(), equalTo(LocalDate.now()));
         assertThat(
                 memberVariable.subscription().priceListItemId(),

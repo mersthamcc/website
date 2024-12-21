@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -85,12 +86,20 @@ public class Member implements Serializable {
     @Transient
     public boolean isPaidThisYear() {
         try {
-            var subscription = thisYearsSubscription();
-            var payments = subscription.getOrder().getPayment();
+            var subs = thisYearsSubscription();
+            var payments = subs.getOrder().getPayment();
             return (!payments.isEmpty()) && payments.stream().allMatch(Payment::getCollected);
         } catch (NoSuchElementException ignored) {
             return false;
         }
+    }
+
+    @Transient
+    public MemberSubscription getMostRecentSubscription() {
+        return subscription.stream()
+                .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())
+                .findFirst()
+                .orElse(null);
     }
 
     private MemberSubscription thisYearsSubscription() {

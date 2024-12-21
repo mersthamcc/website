@@ -12,10 +12,8 @@ import java.util.List;
 @Getter
 @Builder
 public class MemberInput {
-
+    @JsonProperty private Integer memberId;
     @JsonProperty private Instant registrationDate;
-
     @JsonProperty private List<AttributeInput> attributes;
-
     @JsonProperty private MemberSubscriptionInput subscription;
 }

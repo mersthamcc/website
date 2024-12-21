@@ -2,7 +2,9 @@ package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberSubscription;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.website.frontend.model.discounts.Discount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder
@@ -57,19 +61,21 @@ public class RegistrationBasket implements Serializable {
 
     public BigDecimal getItemTotal() {
         return subscriptions.values().stream()
+                .filter(s -> nonNull(s.getPrice()))
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getBasketTotal() {
         return subscriptions.values().stream()
+                .filter(s -> nonNull(s.getPrice()))
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .subtract(
                         getDiscounts().values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    public RegistrationBasket removeSuscription(UUID key) {
+    public RegistrationBasket removeSubscription(UUID key) {
         subscriptions.remove(key);
         return this;
     }
@@ -77,5 +83,25 @@ public class RegistrationBasket implements Serializable {
     public void reset() {
         this.id = UUID.randomUUID().toString();
         this.subscriptions = new HashMap<>();
+    }
+
+    public void addExistingMembers(List<Member> members) {
+        members.forEach(
+                member -> {
+                    var uuid = UUID.randomUUID();
+                    if (!subscriptions.containsKey(uuid))
+                        subscriptions.put(
+                                uuid,
+                                MemberSubscription.builder()
+                                        .action(RegistrationAction.NONE)
+                                        .year(member.getMostRecentSubscription().getYear())
+                                        .category(
+                                                member.getMostRecentSubscription()
+                                                        .getPriceListItem()
+                                                        .getMemberCategory()
+                                                        .getKey())
+                                        .member(member)
+                                        .build());
+                });
     }
 }

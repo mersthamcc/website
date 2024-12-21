@@ -44,6 +44,7 @@ import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,7 @@ import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Component
 public class MembershipService {
@@ -185,15 +187,12 @@ public class MembershipService {
             evict = {
                 @CacheEvict(value = MEMBER_COUNT_CACHE, allEntries = true),
             })
-    public Member createMember(MemberInput data, Principal principal) {
+    public Member createMemberSubscription(MemberInput data, Principal principal) {
+        if (nonNull(data.getMemberId())) {
+            return updateMember(data.getMemberId(), data, principal);
+        }
+
         var now = Instant.now();
-        var currentDate = LocalDate.ofInstant(now, ZoneId.systemDefault());
-        OrderEntity order =
-                orderEntityRepository.findById(data.getSubscription().getOrderId()).orElseThrow();
-        var priceListItem =
-                priceListItemEntityRepository
-                        .findById(data.getSubscription().getPriceListItemId())
-                        .orElseThrow();
         final var member =
                 MemberEntity.builder()
                         .registrationDate(now)
@@ -201,11 +200,34 @@ public class MembershipService {
                         .uuid(UUID.randomUUID().toString())
                         .type("member")
                         .build();
+        return saveMember(member, data, principal);
+    }
 
-        member.setAttributes(
-                data.getAttributes().stream()
-                        .map(
-                                a ->
+    private Member updateMember(int id, MemberInput data, Principal principal) {
+        final var member = memberRepository.findById(id).orElseThrow();
+        return saveMember(member, data, principal);
+    }
+
+    private Member saveMember(MemberEntity member, MemberInput data, Principal principal) {
+        var currentDate = LocalDate.ofInstant(member.getRegistrationDate(), ZoneId.systemDefault());
+        var now = Instant.now();
+        OrderEntity order =
+                orderEntityRepository.findById(data.getSubscription().getOrderId()).orElseThrow();
+        var priceListItem =
+                priceListItemEntityRepository
+                        .findById(data.getSubscription().getPriceListItemId())
+                        .orElseThrow();
+
+        if (isNull(member.getAttributes())) {
+            member.setAttributes(new ArrayList<>());
+        }
+
+        data.getAttributes()
+                .forEach(
+                        a -> {
+                            var attribute = member.getAttributeByName(a.getKey());
+                            if (isNull(attribute)) {
+                                attribute =
                                         MemberAttributeEntity.builder()
                                                 .primaryKey(
                                                         MemberAttributeEntityId.builder()
@@ -216,24 +238,24 @@ public class MembershipService {
                                                                                         a.getKey()))
                                                                 .build())
                                                 .createdDate(now)
-                                                .updatedDate(now)
-                                                .value(a.getValue())
-                                                .build())
-                        .toList());
+                                                .build();
+                            }
+                            attribute.setUpdatedDate(now);
+                            attribute.setValue(a.getValue());
+                        });
 
-        member.setSubscription(
-                List.of(
-                        MemberSubscriptionEntity.builder()
-                                .addedDate(currentDate)
-                                .price(data.getSubscription().getPrice())
-                                .pricelistItem(priceListItem)
-                                .order(order)
-                                .primaryKey(
-                                        MemberSubscriptionEntityId.builder()
-                                                .member(member)
-                                                .year(currentDate.getYear())
-                                                .build())
-                                .build()));
+        member.addSubscription(
+                MemberSubscriptionEntity.builder()
+                        .addedDate(currentDate)
+                        .price(data.getSubscription().getPrice())
+                        .pricelistItem(priceListItem)
+                        .order(order)
+                        .primaryKey(
+                                MemberSubscriptionEntityId.builder()
+                                        .member(member)
+                                        .year(data.getSubscription().getYear())
+                                        .build())
+                        .build());
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 
@@ -337,6 +359,13 @@ public class MembershipService {
     public List<MemberSummary> getMyMembers(Principal principal) {
         var members = summaryRepository.findAllByOwnerUserIdEquals(getSubject(principal));
         return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<Member> getMyMemberDetails(Principal principal) {
+        return memberRepository.findAllByOwnerUserId(getSubject(principal)).stream()
+                .map(m -> modelMapper.map(m, Member.class))
+                .toList();
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
