@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -59,12 +61,14 @@ public class RegistrationBasket implements Serializable {
 
     public BigDecimal getItemTotal() {
         return subscriptions.values().stream()
+                .filter(s -> nonNull(s.getPrice()))
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getBasketTotal() {
         return subscriptions.values().stream()
+                .filter(s -> nonNull(s.getPrice()))
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .subtract(
@@ -84,7 +88,7 @@ public class RegistrationBasket implements Serializable {
     public void addExistingMembers(List<Member> members) {
         members.forEach(
                 member -> {
-                    var uuid = UUID.fromString(member.getUuid());
+                    var uuid = UUID.randomUUID();
                     if (!subscriptions.containsKey(uuid))
                         subscriptions.put(
                                 uuid,

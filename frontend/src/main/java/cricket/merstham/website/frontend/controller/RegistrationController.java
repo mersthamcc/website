@@ -4,6 +4,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSubscription;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.website.frontend.configuration.RegistrationConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.discounts.Discount;
@@ -13,6 +14,7 @@ import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +46,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
+import static cricket.merstham.shared.dto.RegistrationAction.NONE;
+import static cricket.merstham.shared.dto.RegistrationAction.RENEW;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Controller
@@ -66,6 +71,8 @@ public class RegistrationController {
     private final List<Discount> activeDiscounts;
     private final RegistrationConfiguration registrationConfiguration;
     private final boolean enabled;
+    private final ModelMapper modelMapper;
+    private final int registrationYear;
 
     @Autowired
     public RegistrationController(
@@ -73,38 +80,43 @@ public class RegistrationController {
             PaymentServiceManager paymentServiceManager,
             List<Discount> activeDiscounts,
             RegistrationConfiguration registrationConfiguration,
-            @Value("${registration.enabled}") boolean enabled) {
+            @Value("${registration.enabled}") boolean enabled,
+            ModelMapper modelMapper,
+            @Value("${registration.current-year}") int registrationYear) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
         this.activeDiscounts = activeDiscounts;
         this.registrationConfiguration = registrationConfiguration;
         this.enabled = enabled;
+        this.modelMapper = modelMapper;
+        this.registrationYear = registrationYear;
     }
 
     @ModelAttribute("basket")
-    public RegistrationBasket createRegistrationBasket() {
+    public RegistrationBasket createRegistrationBasket(
+            CognitoAuthentication cognitoAuthentication) {
         LOG.info("Creating new registration basket");
-        return new RegistrationBasket(activeDiscounts);
+        var basket = new RegistrationBasket(activeDiscounts);
+        var members =
+                membershipService.getMyMemberDetails(cognitoAuthentication.getOAuth2AccessToken());
+        basket.addExistingMembers(members);
+        return basket;
     }
 
     @GetMapping(value = "/register", name = "register")
     public ModelAndView register(
-            @ModelAttribute("basket") RegistrationBasket basket,
-            HttpServletRequest request,
-            CognitoAuthentication cognitoAuthentication) {
+            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
         if (!enabled) {
             return new ModelAndView(REGISTRATION_CLOSED);
         }
         var model = new HashMap<String, Object>();
         var flash = RequestContextUtils.getInputFlashMap(request);
-        var members =
-                membershipService.getMyMemberDetails(cognitoAuthentication.getOAuth2AccessToken());
-        basket.addExistingMembers(members);
         if (nonNull(flash) && flash.containsKey(ERRORS)) {
             var errors = flash.get(ERRORS);
             model.put(ERRORS, errors);
         }
         model.put("basket", basket);
+        model.put("registrationYear", registrationYear);
         return new ModelAndView("registration/register", model);
     }
 
@@ -260,11 +272,24 @@ public class RegistrationController {
             return redirectTo("/register");
         }
         var uuid = UUID.fromString((String) body.getFirst("uuid"));
-        var subscription = getCurrentSubscription(session).setMember(memberFromPost(body));
+        var subscription = getCurrentSubscription(session);
+        updateMember(subscription, memberFromPost(body));
+        if (getAction(body).equals(NONE)) {
+            subscription.setAction(RENEW);
+        }
         session.removeAttribute(CURRENT_SUBSCRIPTION);
         basket.putSubscription(uuid, subscription);
         saveDefaults(body, subscription, session);
         return redirectTo("/register");
+    }
+
+    private MemberSubscription updateMember(MemberSubscription subscription, Member member) {
+        if (isNull(subscription.getMember())) {
+            subscription.setMember(member);
+        } else {
+            modelMapper.map(member, subscription.getMember());
+        }
+        return subscription;
     }
 
     @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
@@ -391,6 +416,10 @@ public class RegistrationController {
             }
         }
         return attributes;
+    }
+
+    private RegistrationAction getAction(MultiValueMap<String, Object> body) {
+        return RegistrationAction.valueOf((String) body.getFirst("action"));
     }
 
     private Map<String, String> getSessionDefaults(HttpSession session) {

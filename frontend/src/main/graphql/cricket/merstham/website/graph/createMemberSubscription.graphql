@@ -1,5 +1,5 @@
-mutation createMember($member: MemberInput!) {
-  createMember(data: $member) {
+mutation createMemberSubscription($member: MemberInput!) {
+  createMemberSubscription(data: $member) {
     id
     registrationDate
     attributes {

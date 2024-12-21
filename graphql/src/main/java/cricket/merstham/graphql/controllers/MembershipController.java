@@ -92,8 +92,8 @@ public class MembershipController {
     }
 
     @MutationMapping
-    public Member createMember(@Argument MemberInput data, Principal principal) {
-        return membershipService.createMember(data, principal);
+    public Member createMemberSubscription(@Argument MemberInput data, Principal principal) {
+        return membershipService.createMemberSubscription(data, principal);
     }
 
     @MutationMapping

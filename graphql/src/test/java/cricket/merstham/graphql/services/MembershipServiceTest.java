@@ -574,7 +574,7 @@ class MembershipServiceTest {
                                         .build())
                         .build();
 
-        var result = service.createMember(input, principal);
+        var result = service.createMemberSubscription(input, principal);
     }
 
     @Test

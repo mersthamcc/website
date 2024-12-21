@@ -2080,6 +2080,16 @@
           "fields": null,
           "inputFields": [
             {
+              "name": "memberId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "registrationDate",
               "description": null,
               "type": {
@@ -2993,7 +3003,7 @@
               "deprecationReason": null
             },
             {
-              "name": "createMember",
+              "name": "createMemberSubscription",
               "description": null,
               "args": [
                 {

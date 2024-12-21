@@ -86,8 +86,8 @@ public class Member implements Serializable {
     @Transient
     public boolean isPaidThisYear() {
         try {
-            var subscription = thisYearsSubscription();
-            var payments = subscription.getOrder().getPayment();
+            var subs = thisYearsSubscription();
+            var payments = subs.getOrder().getPayment();
             return (!payments.isEmpty()) && payments.stream().allMatch(Payment::getCollected);
         } catch (NoSuchElementException ignored) {
             return false;

@@ -7,6 +7,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.shared.dto.UserPaymentMethod;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
@@ -14,7 +15,7 @@ import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
-import cricket.merstham.website.graph.CreateMemberMutation;
+import cricket.merstham.website.graph.CreateMemberSubscriptionMutation;
 import cricket.merstham.website.graph.CreateOrderMutation;
 import cricket.merstham.website.graph.FilteredMembersQuery;
 import cricket.merstham.website.graph.MemberQuery;
@@ -40,6 +41,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
@@ -70,11 +72,16 @@ public class MembershipService {
 
     private final GraphService graphService;
     private final ModelMapper modelMapper;
+    private final int registrationYear;
 
     @Autowired
-    public MembershipService(GraphService graphService, ModelMapper modelMapper) {
+    public MembershipService(
+            GraphService graphService,
+            ModelMapper modelMapper,
+            @Value("${registration.current-year}") int registrationYear) {
         this.graphService = graphService;
         this.modelMapper = modelMapper;
+        this.registrationYear = registrationYear;
     }
 
     public Order registerMembersFromBasket(
@@ -86,54 +93,61 @@ public class MembershipService {
                         basket.getDiscounts().values().stream()
                                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                                 .doubleValue());
-        var order = new Order();
         Response<CreateOrderMutation.Data> orderResult =
                 graphService.executeMutation(createOrder, accessToken);
-        if (orderResult.hasErrors()) {
-            throw new RuntimeException(
-                    "GraphQL error(s) registering member: "
-                            + String.join(
-                                    "\n",
-                                    orderResult.getErrors().stream()
-                                            .map(error -> error.getMessage())
-                                            .toList()));
-        }
-        order = modelMapper.map(orderResult.getData().getCreateOrder(), Order.class);
+
+        var order =
+                modelMapper.map(
+                        requireGraphData(orderResult, CreateOrderMutation.Data::getCreateOrder),
+                        Order.class);
 
         for (var subscription : basket.getSubscriptions().entrySet()) {
-            var memberInput =
-                    MemberInput.builder()
-                            .attributes(
-                                    subscription.getValue().getMember().getAttributes().stream()
-                                            .map(
-                                                    a ->
-                                                            AttributeInput.builder()
-                                                                    .key(a.getDefinition().getKey())
-                                                                    .value(a.getValue())
-                                                                    .build())
-                                            .toList())
-                            .subscription(
-                                    MemberSubscriptionInput.builder()
-                                            .year(LocalDate.now().getYear())
-                                            .priceListItemId(
-                                                    subscription
-                                                            .getValue()
-                                                            .getPriceListItem()
-                                                            .getId())
-                                            .price(subscription.getValue().getPrice().doubleValue())
-                                            .orderId(order.getId())
-                                            .addedDate(LocalDate.now())
-                                            .build())
-                            .build();
+            if (subscription.getValue().getAction() != RegistrationAction.NONE) {
+                var memberInput =
+                        MemberInput.builder()
+                                .memberId(subscription.getValue().getMember().getId())
+                                .attributes(
+                                        subscription.getValue().getMember().getAttributes().stream()
+                                                .map(
+                                                        a ->
+                                                                AttributeInput.builder()
+                                                                        .key(
+                                                                                a.getDefinition()
+                                                                                        .getKey())
+                                                                        .value(a.getValue())
+                                                                        .build())
+                                                .toList())
+                                .subscription(
+                                        MemberSubscriptionInput.builder()
+                                                .year(registrationYear)
+                                                .priceListItemId(
+                                                        subscription
+                                                                .getValue()
+                                                                .getPriceListItem()
+                                                                .getId())
+                                                .price(
+                                                        subscription
+                                                                .getValue()
+                                                                .getPrice()
+                                                                .doubleValue())
+                                                .orderId(order.getId())
+                                                .addedDate(LocalDate.now())
+                                                .build())
+                                .build();
+                LOG.info(
+                        "Processing membership subscription {}, action = {}",
+                        subscription.getKey(),
+                        subscription.getValue().getAction());
+                var createMemberMutation = new CreateMemberSubscriptionMutation(memberInput);
+                var member =
+                        requireGraphData(
+                                graphService.executeMutation(createMemberMutation, accessToken),
+                                CreateMemberSubscriptionMutation.Data::getCreateMemberSubscription);
 
-            var createMemberMutation = new CreateMemberMutation(memberInput);
-            var result = graphService.executeMutation(createMemberMutation, accessToken);
-            if (result.hasErrors()) {
-                throw new RuntimeException(
-                        "GraphQL error(s) registering member: "
-                                + result.getErrors().stream()
-                                        .map(Error::getMessage)
-                                        .collect(Collectors.joining("\n")));
+                LOG.info(
+                        "Created/updated member {} for subscription {}",
+                        member.getId(),
+                        subscription.getKey());
             }
         }
         return order;

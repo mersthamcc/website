@@ -76,6 +76,7 @@ type MemberFormSectionAttribute {
 }
 
 input MemberInput {
+    memberId: Int
     registrationDate: DateTime
     attributes: [AttributeInput]
     subscription: MemberSubscriptionInput
@@ -198,7 +199,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    createMember(data: MemberInput!): Member
+    createMemberSubscription(data: MemberInput!): Member
     updateMember(id: Int!, data: [AttributeInput]!): Member
     createOrder(uuid: String!, total: Float!, discount: Float!): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment

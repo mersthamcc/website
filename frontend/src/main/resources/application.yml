@@ -166,6 +166,7 @@ mail:
 
 registration:
   enabled: ${REGISTRATION_ENABLED:true}
+  current-year: ${REGISTRATION_YEAR:2025}
   defaults:
     - category: junior
       name-field: parent-name-1
