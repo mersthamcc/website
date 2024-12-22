@@ -4,6 +4,7 @@ plugins {
     id "java"
     id "jacoco"
     id "io.freefair.lombok" version "8.2.2"
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
 }
 
 group = "cricket.merstham.graphql"

@@ -5,6 +5,7 @@ sentry:
   tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
   enabled: ${SENTRY_ENABLED:false}
   environment: ${SENTRY_ENVIRONMENT:dev}
+  use-git-commit-id-as-release: true
 
 spring:
   data:
@@ -166,6 +167,7 @@ mail:
 
 registration:
   enabled: ${REGISTRATION_ENABLED:true}
+  current-year: ${REGISTRATION_YEAR:2025}
   defaults:
     - category: junior
       name-field: parent-name-1

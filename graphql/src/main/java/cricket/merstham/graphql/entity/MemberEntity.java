@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -89,10 +90,27 @@ public class MemberEntity {
     }
 
     @Transient
+    public MemberAttributeEntity getAttributeByName(String name) {
+        return attributes.stream()
+                .filter(a -> a.getDefinition().getKey().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Transient
     public MemberSubscriptionEntity getMostRecentSubscription() {
         return subscription.stream()
                 .sorted(Comparator.comparing(MemberSubscriptionEntity::getAddedDate).reversed())
                 .findFirst()
                 .orElseThrow();
+    }
+
+    @Transient
+    public MemberEntity addSubscription(MemberSubscriptionEntity entity) {
+        if (subscription == null) {
+            subscription = new ArrayList<>();
+        }
+        subscription.add(entity);
+        return this;
     }
 }

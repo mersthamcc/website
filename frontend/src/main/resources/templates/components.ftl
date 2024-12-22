@@ -429,11 +429,12 @@
 
 </#macro>
 
-<#macro section title buttons=noButtons>
+<#macro section title buttons=noButtons rightTitle="">
     <!-- Card -->
     <div class="card mb-3 mb-lg-5">
         <div class="card-header">
             <h5 class="card-title"><@spring.messageText code="${title}" text="${title}" /></h5>
+            <small class="text-muted">${rightTitle}</small>
         </div>
 
         <!-- Body -->

@@ -1,0 +1,28 @@
+query myMemberDetails {
+    myMemberDetails {
+        id
+        ownerUserId
+        registrationDate
+        uuid
+        attributes {
+            definition {
+                key
+                type
+                choices
+            }
+            value
+            createdDate
+            updatedDate
+        }
+        subscription {
+            year
+            addedDate
+            priceListItem {
+                memberCategory {
+                    id
+                    key
+                }
+            }
+        }
+    }
+}
