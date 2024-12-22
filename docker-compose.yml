@@ -1,6 +1,6 @@
 services:
   loki:
-    image: grafana/loki:1.5.0
+    image: grafana/loki:3.3.0
     labels:
       - traefik.enable=true
       - traefik.http.routers.loki.rule=Host(`loki.${DEVDOMAIN}`)
