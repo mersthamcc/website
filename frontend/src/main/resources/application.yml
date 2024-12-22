@@ -5,6 +5,7 @@ sentry:
   tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
   enabled: ${SENTRY_ENABLED:false}
   environment: ${SENTRY_ENVIRONMENT:dev}
+  use-git-commit-id-as-release: true
 
 spring:
   data:
