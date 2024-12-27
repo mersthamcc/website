@@ -87,6 +87,20 @@ jobs:
         run: |
           ./gradlew build -x sonarqube --info
 
+      - name: Generate Release
+        id: generate-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          
+          RELEASE="$(date -u +%Y%m%d.%H.%M)"
+          gh release create \
+            --latest \
+            --title "Release v${RELEASE}" \
+            "v${RELEASE}"
+          
+          echo "release=v${RELEASE}" >> "${GITHUB_OUTPUT}"
+
       - name: Build frontend image
         id: build-frontend
         uses: docker/build-push-action@v5
@@ -96,6 +110,7 @@ jobs:
           tags: |
             mersthamcc/frontend:latest
             ghcr.io/mersthamcc/website-frontend:latest
+            ${{ steps.generate-release.outputs.release }}
           build-args: |
             COMPONENT=frontend
 
@@ -108,6 +123,7 @@ jobs:
           tags: |
             mersthamcc/graphql:latest
             ghcr.io/mersthamcc/website-graphql:latest
+            ${{ steps.generate-release.outputs.release }}
           build-args: |
             COMPONENT=graphql
 
@@ -120,6 +136,7 @@ jobs:
           tags: |
             mersthamcc/flyway:latest
             ghcr.io/mersthamcc/website-flyway:latest
+            ${{ steps.generate-release.outputs.release }}
 
       - name: Dispatch deployment event
         uses: actions/github-script@v7
@@ -127,7 +144,7 @@ jobs:
           GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
           FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
           FLYWAY_DIGEST: ${{ steps.build-flyway.outputs.digest }}
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ steps.generate-release.outputs.release }}
         with:
           github-token: ${{ secrets.DEPLOYMENT_PAT }}
           script: |
