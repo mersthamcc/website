@@ -110,7 +110,9 @@ jobs:
           tags: |
             mersthamcc/frontend:latest
             ghcr.io/mersthamcc/website-frontend:latest
-            ${{ steps.generate-release.outputs.release }}
+            mersthamcc/frontend:${{ steps.generate-release.outputs.release }}
+            ghcr.io/mersthamcc/website-frontend:${{ steps.generate-release.outputs.release }}
+
           build-args: |
             COMPONENT=frontend
 
@@ -123,7 +125,8 @@ jobs:
           tags: |
             mersthamcc/graphql:latest
             ghcr.io/mersthamcc/website-graphql:latest
-            ${{ steps.generate-release.outputs.release }}
+            mersthamcc/graphql:${{ steps.generate-release.outputs.release }}
+            ghcr.io/mersthamcc/website-graphql:${{ steps.generate-release.outputs.release }}
           build-args: |
             COMPONENT=graphql
 
@@ -136,7 +139,8 @@ jobs:
           tags: |
             mersthamcc/flyway:latest
             ghcr.io/mersthamcc/website-flyway:latest
-            ${{ steps.generate-release.outputs.release }}
+            mersthamcc/flyway:${{ steps.generate-release.outputs.release }}
+            ghcr.io/mersthamcc/website-flyway:${{ steps.generate-release.outputs.release }}
 
       - name: Dispatch deployment event
         uses: actions/github-script@v7
