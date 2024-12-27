@@ -90,7 +90,7 @@ jobs:
       - name: Generate Release
         id: generate-release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           
           RELEASE="$(date -u +%Y%m%d.%H.%M)"
