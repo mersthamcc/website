@@ -35,6 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -126,8 +127,6 @@ public class RegistrationController {
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
             @ModelAttribute("edit-member") String editMember,
-            @RequestParam(value = "declarations", required = false, defaultValue = "")
-                    List<String> declarations,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
@@ -176,9 +175,9 @@ public class RegistrationController {
                                     SUBSCRIPTION_ID,
                                     subscriptionId.toString()));
                 case "next":
-                    var errors = validateBasket(basket, declarations);
+                    var errors = validateBasket(basket);
                     if (errors.isEmpty()) {
-                        return redirectTo("/register/confirmation");
+                        return redirectTo("/register/policies");
                     }
                     redirectAttributes.addFlashAttribute(ERRORS, errors);
                     break;
@@ -187,6 +186,36 @@ public class RegistrationController {
             }
         }
         return redirectTo("/register");
+    }
+
+    @GetMapping(value = "/register/policies", name = "policies")
+    public ModelAndView policies(HttpServletRequest request) {
+        if (!enabled) {
+            return new ModelAndView(REGISTRATION_CLOSED);
+        }
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(ERRORS)) {
+            var errors = flash.get(ERRORS);
+            model.put(ERRORS, errors);
+        }
+        return new ModelAndView("registration/policies", model);
+    }
+
+    @PostMapping(value = "/register/policies", name = "accept-policies")
+    public RedirectView acceptPolicies(
+            @RequestParam(value = "declarations", required = false, defaultValue = "")
+                    List<String> declarations,
+            RedirectAttributes redirectAttributes) {
+        if (!enabled) {
+            return redirectTo("/register");
+        }
+        var errors = validatePolicies(declarations);
+        if (errors.isEmpty()) {
+            return redirectTo("/register/confirmation");
+        }
+        redirectAttributes.addFlashAttribute(ERRORS, errors);
+        return redirectTo("/register/policies");
     }
 
     @PostMapping(value = "/register/select-membership", name = "member-details")
@@ -354,11 +383,16 @@ public class RegistrationController {
         session.setAttribute(CURRENT_SUBSCRIPTION, subscription);
     }
 
-    private List<String> validateBasket(RegistrationBasket basket, List<String> declarations) {
+    private List<String> validateBasket(RegistrationBasket basket) {
         var errors = new ArrayList<String>();
         if (basket.getBasketTotal().doubleValue() == 0.00) {
             errors.add("membership.errors.no-members");
         }
+        return errors;
+    }
+
+    private List<String> validatePolicies(List<String> declarations) {
+        var errors = new ArrayList<String>();
         if (!declarations.contains("terms")) {
             errors.add("membership.errors.accept-terms");
         }

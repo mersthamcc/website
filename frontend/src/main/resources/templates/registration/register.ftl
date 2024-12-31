@@ -24,7 +24,7 @@
                                                 </a>
 
                                                 <div class="d-block d-md-none">
-                                                    <#if subscription.member.mostRecentSubscription.year != registrationYear>
+                                                    <#if subscription.member.registeredInYear(registrationYear)>
                                                         <#if subscription.price??>
                                                             <span class="h5 d-block mb-1">
                                                                 ${subscription.price?string.currency}
@@ -45,22 +45,24 @@
                                                     <span><@spring.message code="membership.category" />:</span>
                                                     <span><@spring.message code="membership.${subscription.category!'unknown'}" /></span>
                                                 </div>
-                                                <div class="text-body font-size-1 mb-1">
-                                                    <span><@spring.message code="membership.last-subscription" />:</span>
-                                                    <span>${subscription.year?c}</span>
-                                                    <#if subscription.member.mostRecentSubscription.year != registrationYear>
-                                                        <span class="link-underline ml-2">
-                                                            <@spring.message code="membership.renewal-required" />
-                                                        </span>
-                                                    </#if>
-                                                </div>
+                                                <#if subscription.member.mostRecentSubscription??>
+                                                    <div class="text-body font-size-1 mb-1">
+                                                        <span><@spring.message code="membership.last-subscription" />:</span>
+                                                        <span>${subscription.year?c}</span>
+                                                        <#if subscription.member.registeredInYear(registrationYear)>
+                                                            <span class="link-underline ml-2">
+                                                                <@spring.message code="membership.renewal-required" />
+                                                            </span>
+                                                        </#if>
+                                                    </div>
+                                                </#if>
                                             </div>
 
                                             <div class="col-md-2">
                                                 <div class="row">
                                                     <div class="col-auto">
                                                     </div>
-                                                    <#if subscription.member.mostRecentSubscription.year != registrationYear>
+                                                    <#if !subscription.member.registeredInYear(registrationYear)>
                                                         <div class="col-auto">
                                                             <button type="submit" class="btn btn-pill btn-ghost-primary btn-xs" name="edit-member" value="${id}">
                                                                 <i class="fa fa-edit"></i>
@@ -76,10 +78,10 @@
                                             </div>
 
                                             <div class="col-4 col-md-3 d-none d-md-inline-block text-right">
-                                                <#if subscription.member.mostRecentSubscription.year != registrationYear>
+                                                <#if !subscription.member.registeredInYear(registrationYear)>
                                                     <#if subscription.price??>
                                                         <span class="h5 d-block mb-1">
-                                                                ${subscription.price?string.currency}
+                                                            ${subscription.price?string.currency}
                                                         </span>
                                                     <#else>
                                                         <button type="submit" class="btn btn-pill btn-primary btn-xs" name="edit-member" value="${id}">
@@ -217,66 +219,6 @@
                 </div>
             </div>
 
-            <@components.section title="Policies">
-                <p>
-                    <@spring.message code="membership.declarations-body" />
-                </p>
-                <div class="row form-group">
-                    <label class="col-md-3 control-label">
-                        <@spring.message code="membership.policies" />
-                    </label>
-                    <div class="col-md-9">
-                        <ul class="list-checked">
-                            <li>
-                                <a href="/pages/constitution">Club Constitution</a>
-                            </li>
-                            <li>
-                                <a href="/pages/code-of-conduct">Code of Conduct</a>
-                            </li>
-                            <li>
-                                <a href="/pages/code-of-conduct-juniors">Code of Conduct for Juniors</a>
-                            </li>
-                            <li>
-                                <a href="/pages/safeguarding">Safeguarding Policy</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <label class="col-md-3 control-label">
-                        <@spring.message code="membership.declarations" />
-                    </label>
-                    <div class="col-md-9">
-                        <div class="checkbox">
-                            <label>
-                                <input
-                                        type="checkbox"
-                                        name="declarations"
-                                        id="member-accept-policies"
-                                        value="policies" />
-                                &nbsp;&nbsp;<@spring.message code="membership.accept-policies" />
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label>
-                                <input
-                                        type="checkbox"
-                                        name="declarations"
-                                        id="member-accept-terms"
-                                        value="terms" />
-                                &nbsp;&nbsp;<@spring.message code="membership.accept-terms" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </@components.section>
-
-            <@components.buttonGroup>
-                <button type="submit" class="btn btn-primary transition-3d-hover" name="action" value="next">
-                    <@spring.message code="membership.next" />
-                    <i class="fa fa-arrow-circle-o-right"></i>
-                </button>&nbsp;
-            </@components.buttonGroup>
         </form>
     </@components.panel>
 </@layout.mainLayout>

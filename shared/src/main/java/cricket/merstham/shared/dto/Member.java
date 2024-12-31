@@ -96,10 +96,21 @@ public class Member implements Serializable {
 
     @Transient
     public MemberSubscription getMostRecentSubscription() {
-        return subscription.stream()
-                .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())
-                .findFirst()
-                .orElse(null);
+        if (nonNull(subscription)) {
+            return subscription.stream()
+                    .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    @Transient
+    public boolean registeredInYear(int year) {
+        if (nonNull(subscription)) {
+            return subscription.stream().anyMatch(s -> s.getYear() == year);
+        }
+        return false;
     }
 
     private MemberSubscription thisYearsSubscription() {

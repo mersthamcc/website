@@ -239,6 +239,7 @@ public class MembershipService {
                                                                 .build())
                                                 .createdDate(now)
                                                 .build();
+                                member.getAttributes().add(attribute);
                             }
                             attribute.setUpdatedDate(now);
                             attribute.setValue(a.getValue());
