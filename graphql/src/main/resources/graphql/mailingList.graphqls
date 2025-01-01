@@ -1,0 +1,19 @@
+type MailingListSubscription {
+    emailAddress: String
+    subscribed: Boolean
+    pending: Boolean
+    manualSubscriptionRequired: Boolean
+}
+
+input MailingListSubscriptionInput {
+    emailAddress: String
+    subscribed: Boolean
+}
+
+extend type Query {
+    mailingListSubscriptions(emailAddress: [String!]): [MailingListSubscription]
+}
+
+extend type Mutation {
+    updateMailingListSubscriptions(subscriptions: [MailingListSubscriptionInput!]): [MailingListSubscription]
+}
