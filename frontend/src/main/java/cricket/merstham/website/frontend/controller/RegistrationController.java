@@ -1,14 +1,18 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.shared.dto.MailingListSubscription;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttribute;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.shared.dto.RegistrationAction;
+import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.website.frontend.configuration.RegistrationConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.discounts.Discount;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import cricket.merstham.website.frontend.service.EmailAddressValidator;
+import cricket.merstham.website.frontend.service.MailingListService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -73,6 +78,8 @@ public class RegistrationController {
     private final boolean enabled;
     private final ModelMapper modelMapper;
     private final int registrationYear;
+    private final EmailAddressValidator emailAddressValidator;
+    private final MailingListService mailingListService;
 
     @Autowired
     public RegistrationController(
@@ -82,7 +89,9 @@ public class RegistrationController {
             RegistrationConfiguration registrationConfiguration,
             @Value("${registration.enabled}") boolean enabled,
             ModelMapper modelMapper,
-            @Value("${registration.current-year}") int registrationYear) {
+            @Value("${registration.current-year}") int registrationYear,
+            EmailAddressValidator emailAddressValidator,
+            MailingListService mailingListService) {
         this.membershipService = membershipService;
         this.paymentServiceManager = paymentServiceManager;
         this.activeDiscounts = activeDiscounts;
@@ -90,6 +99,8 @@ public class RegistrationController {
         this.enabled = enabled;
         this.modelMapper = modelMapper;
         this.registrationYear = registrationYear;
+        this.emailAddressValidator = emailAddressValidator;
+        this.mailingListService = mailingListService;
     }
 
     @ModelAttribute("basket")
@@ -126,8 +137,6 @@ public class RegistrationController {
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
             @ModelAttribute("edit-member") String editMember,
-            @RequestParam(value = "declarations", required = false, defaultValue = "")
-                    List<String> declarations,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
@@ -176,9 +185,9 @@ public class RegistrationController {
                                     SUBSCRIPTION_ID,
                                     subscriptionId.toString()));
                 case "next":
-                    var errors = validateBasket(basket, declarations);
+                    var errors = validateBasket(basket);
                     if (errors.isEmpty()) {
-                        return redirectTo("/register/confirmation");
+                        return redirectTo("/register/policies");
                     }
                     redirectAttributes.addFlashAttribute(ERRORS, errors);
                     break;
@@ -187,6 +196,124 @@ public class RegistrationController {
             }
         }
         return redirectTo("/register");
+    }
+
+    @GetMapping(value = "/register/policies", name = "policies")
+    public ModelAndView policies(HttpServletRequest request) {
+        if (!enabled) {
+            return new ModelAndView(REGISTRATION_CLOSED);
+        }
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(ERRORS)) {
+            var errors = flash.get(ERRORS);
+            model.put(ERRORS, errors);
+        }
+        return new ModelAndView("registration/policies", model);
+    }
+
+    @PostMapping(value = "/register/policies", name = "accept-policies")
+    public RedirectView acceptPolicies(
+            @RequestParam(value = "declarations", required = false, defaultValue = "")
+                    List<String> declarations,
+            RedirectAttributes redirectAttributes) {
+        if (!enabled) {
+            return redirectTo("/register");
+        }
+        var errors = validatePolicies(declarations);
+        if (errors.isEmpty()) {
+            return redirectTo("/register/mailing-list");
+        }
+        redirectAttributes.addFlashAttribute(ERRORS, errors);
+        return redirectTo("/register/policies");
+    }
+
+    @GetMapping(value = "/register/mailing-list", name = "register-mailing-list")
+    public ModelAndView mailingList(
+            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+        if (!enabled) {
+            return new ModelAndView(REGISTRATION_CLOSED);
+        }
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(ERRORS)) {
+            var errors = flash.get(ERRORS);
+            model.put(ERRORS, errors);
+        }
+        List<MailingListSubscription> emails =
+                mailingListService.getSubscriptions(detectEmailAddresses(basket));
+        if (emails.isEmpty()) {
+            return new ModelAndView("redirect:/register");
+        }
+        model.put("emails", emails);
+        return new ModelAndView("registration/mailing-list", model);
+    }
+
+    @PostMapping(value = "/register/mailing-list", name = "register-mailing-list-process")
+    public RedirectView mailingListProcess(
+            @RequestParam(value = "emailAddresses", required = false, defaultValue = "")
+                    List<String> emailAddresses,
+            @ModelAttribute("basket") RegistrationBasket basket,
+            RedirectAttributes redirectAttributes) {
+        if (!enabled) {
+            return redirectTo("/register");
+        }
+
+        var subscriptions =
+                detectEmailAddresses(basket).stream()
+                        .map(
+                                emailAddress ->
+                                        MailingListSubscription.builder()
+                                                .emailAddress(emailAddress)
+                                                .subscribed(emailAddresses.contains(emailAddress))
+                                                .build())
+                        .toList();
+
+        List<MailingListSubscription> result =
+                mailingListService.updateSubscriptions(subscriptions);
+
+        var errors = new ArrayList<String>();
+        result.forEach(
+                subscription -> {
+                    if (subscription.isManualSubscriptionRequired()) {
+                        errors.add(
+                                format(
+                                        "Could not add {0} as previously subscribed and record deleted for admin reasons, please re-subscribe using form",
+                                        subscription.getEmailAddress()));
+                    }
+                });
+
+        if (errors.isEmpty()) {
+            return redirectTo("/register/confirmation");
+        }
+        redirectAttributes.addFlashAttribute(ERRORS, errors);
+        return redirectTo("/register/mailing-list");
+    }
+
+    private List<String> detectEmailAddresses(RegistrationBasket basket) {
+        var emails =
+                new ArrayList<String>(
+                        basket.getSubscriptions().values().stream()
+                                .filter(s -> s.getAction() != NONE)
+                                .flatMap(
+                                        subscription ->
+                                                (subscription.getMember().getAttributes().stream()
+                                                        .filter(
+                                                                a ->
+                                                                        a.getDefinition()
+                                                                                .getType()
+                                                                                .equals(
+                                                                                        AttributeType
+                                                                                                .Email))
+                                                        .filter(
+                                                                a ->
+                                                                        emailAddressValidator
+                                                                                .validate(
+                                                                                        a.getValue()
+                                                                                                .asText()))
+                                                        .map(a -> a.getValue().asText())))
+                                .toList());
+        return emails.stream().distinct().toList();
     }
 
     @PostMapping(value = "/register/select-membership", name = "member-details")
@@ -354,11 +481,16 @@ public class RegistrationController {
         session.setAttribute(CURRENT_SUBSCRIPTION, subscription);
     }
 
-    private List<String> validateBasket(RegistrationBasket basket, List<String> declarations) {
+    private List<String> validateBasket(RegistrationBasket basket) {
         var errors = new ArrayList<String>();
         if (basket.getBasketTotal().doubleValue() == 0.00) {
             errors.add("membership.errors.no-members");
         }
+        return errors;
+    }
+
+    private List<String> validatePolicies(List<String> declarations) {
+        var errors = new ArrayList<String>();
         if (!declarations.contains("terms")) {
             errors.add("membership.errors.accept-terms");
         }

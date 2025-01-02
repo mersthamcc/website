@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Payment;
 import cricket.merstham.shared.dto.User;
@@ -316,8 +317,13 @@ public class MembershipController extends SspController<MemberSummary> {
     private Map<String, ?> buildModelData(
             Member member, Locale locale, OAuth2AccessToken accessToken) throws IOException {
         var model = new HashMap<String, Object>();
+        var subscription =
+                member.getSubscription().stream()
+                        .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())
+                        .findFirst()
+                        .orElseThrow();
         model.put("member", member);
-        model.put("subscription", member.getSubscription().get(0));
+        model.put("subscription", subscription);
         model.put(
                 "data",
                 member.getAttributes().stream()
@@ -369,7 +375,7 @@ public class MembershipController extends SspController<MemberSummary> {
                         new DataTableColumn().setKey("membership.order").setSortable(false)));
         model.put(
                 "payments",
-                member.getSubscription().get(0).getOrder().getPayment().stream()
+                subscription.getOrder().getPayment().stream()
                         .sorted(Comparator.comparing(Payment::getDate))
                         .map(
                                 p ->
