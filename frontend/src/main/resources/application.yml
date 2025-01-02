@@ -145,7 +145,7 @@ payments:
     access-token: ${GOCARDLESS_ACCESS_TOKEN:}
     sandbox: ${GOCARDLESS_SANDBOX:true}
     mandate-description: Membership and Match Fees
-    schedule-end-date: 2024-11-30
+    schedule-end-date: 2025-11-30
   bank:
     enabled: true
     disabled-reason: ~
@@ -167,7 +167,7 @@ mail:
 
 registration:
   enabled: ${REGISTRATION_ENABLED:true}
-  current-year: ${REGISTRATION_YEAR:2025}
+  current-year: ${REGISTRATION_YEAR:2026}
   defaults:
     - category: junior
       name-field: parent-name-1

@@ -9,6 +9,7 @@ import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class PaymentsController {
     private final EmailService emailService;
     private final MailConfiguration mailConfiguration;
     private final MessageSource messageSource;
+    private final int registrationYear;
 
     @Autowired
     public PaymentsController(
@@ -41,12 +43,14 @@ public class PaymentsController {
             MembershipService membershipService,
             EmailService emailService,
             MailConfiguration mailConfiguration,
-            MessageSource messageSource) {
+            MessageSource messageSource,
+            @Value("${registration.current-year}") int registrationYear) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
         this.emailService = emailService;
         this.mailConfiguration = mailConfiguration;
         this.messageSource = messageSource;
+        this.registrationYear = registrationYear;
     }
 
     @PostMapping(value = "/payments", name = "payment-start")
@@ -124,7 +128,8 @@ public class PaymentsController {
                                 "order", order,
                                 "paymentType", paymentType,
                                 "discountTranslations", discountTranslations,
-                                "season", Integer.toString(LocalDate.now().getYear()))));
+                                "season", Integer.toString(LocalDate.now().getYear()),
+                                "registrationYear", registrationYear)));
         session.removeAttribute(ORDER);
         basket.reset();
         return paymentService.confirm(request, order, cognitoAuthentication.getOAuth2AccessToken());
