@@ -109,6 +109,7 @@ type Order {
     discount: Float
     memberSubscription: [MemberSubscription!]!
     payment: [Payment!]!
+    confirmed: Boolean
 }
 
 type Payment {
@@ -206,4 +207,5 @@ extend type Mutation {
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
     deleteMemberToPlayerLink(id: Int!): Member
     addMemberIdentifier(id: Int!, name: String!, value: String!): Member!
+    confirmOrder(id: Int!): Order
 }

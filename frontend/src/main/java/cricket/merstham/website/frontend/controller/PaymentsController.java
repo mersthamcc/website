@@ -4,6 +4,7 @@ import cricket.merstham.website.frontend.configuration.MailConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.EmailService;
+import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,12 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Controller
 @SessionAttributes("basket")
 public class PaymentsController {
@@ -36,6 +31,7 @@ public class PaymentsController {
     private final MailConfiguration mailConfiguration;
     private final MessageSource messageSource;
     private final int registrationYear;
+    private final GraphService graphService;
 
     @Autowired
     public PaymentsController(
@@ -44,13 +40,15 @@ public class PaymentsController {
             EmailService emailService,
             MailConfiguration mailConfiguration,
             MessageSource messageSource,
-            @Value("${registration.current-year}") int registrationYear) {
+            @Value("${registration.current-year}") int registrationYear,
+            GraphService graphService) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
         this.emailService = emailService;
         this.mailConfiguration = mailConfiguration;
         this.messageSource = messageSource;
         this.registrationYear = registrationYear;
+        this.graphService = graphService;
     }
 
     @PostMapping(value = "/payments", name = "payment-start")
@@ -104,32 +102,8 @@ public class PaymentsController {
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
         var orderId = (int) session.getAttribute(ORDER);
         var order = membershipService.getOrder(orderId);
-        var discountTranslations =
-                basket.getDiscounts().keySet().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        Function.identity(),
-                                        discount ->
-                                                messageSource.getMessage(
-                                                        discount,
-                                                        null,
-                                                        discount,
-                                                        request.getLocale())));
+        membershipService.confirmOrder(order, cognitoAuthentication.getOAuth2AccessToken());
 
-        emailService.sendEmail(
-                cognitoAuthentication.getOidcUser().getEmail(),
-                List.of(),
-                mailConfiguration.getConfirmationEmailBcc(),
-                "Registration Confirmation",
-                paymentService.getConfirmationEmail(),
-                paymentService.getEmailModel(
-                        Map.of(
-                                "basket", basket,
-                                "order", order,
-                                "paymentType", paymentType,
-                                "discountTranslations", discountTranslations,
-                                "season", Integer.toString(LocalDate.now().getYear()),
-                                "registrationYear", registrationYear)));
         session.removeAttribute(ORDER);
         basket.reset();
         return paymentService.confirm(request, order, cognitoAuthentication.getOAuth2AccessToken());

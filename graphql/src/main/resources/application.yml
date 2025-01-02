@@ -81,6 +81,10 @@ configuration:
     club-name: ${CLUBNAME:My Cricket Club}
     club-url: "${BASE_URL:http://localhost:8080}"
     footer-text: ${CLUB_ADDRESS:}
+  bank-details:
+    account-name: ${BANK_ACCOUNT_NAME:Merstham Cricket Club}
+    account-number: ${BANK_ACCOUNT_NUMBER:49244507}
+    sort-code: ${BANK_ACCOUNT_SORT_CODE:56-00-46}
   cognito:
     user-pool-id: ${COGNITO_USER_POOL_ID:}
   epos-now:

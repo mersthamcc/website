@@ -106,6 +106,11 @@ public class MembershipController {
     }
 
     @MutationMapping
+    public Order confirmOrder(@Argument int id, Principal principal) {
+        return membershipService.confirmOrder(id, principal);
+    }
+
+    @MutationMapping
     public Payment addPaymentToOrder(
             @Argument int orderId, @Argument PaymentInput payment, Principal principal) {
         return membershipService.addPaymentToOrder(orderId, payment, principal);

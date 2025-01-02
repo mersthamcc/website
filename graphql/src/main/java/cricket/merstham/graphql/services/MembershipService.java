@@ -47,12 +47,14 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+import static cricket.merstham.graphql.services.EmailService.MailTemplate.MEMBERSHIP_CONFIRM;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
 import static java.util.Objects.isNull;
@@ -72,6 +74,8 @@ public class MembershipService {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final MemberSummaryRepository memberSummaryRepository;
+    private final EmailService emailService;
+    private final CognitoService cognitoService;
 
     @Autowired
     public MembershipService(
@@ -85,7 +89,9 @@ public class MembershipService {
             PriceListItemEntityRepository priceListItemEntityRepository,
             ModelMapper modelMapper,
             ObjectMapper objectMapper,
-            MemberSummaryRepository memberSummaryRepository) {
+            MemberSummaryRepository memberSummaryRepository,
+            EmailService emailService,
+            CognitoService cognitoService) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -97,6 +103,8 @@ public class MembershipService {
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
         this.memberSummaryRepository = memberSummaryRepository;
+        this.emailService = emailService;
+        this.cognitoService = cognitoService;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -272,6 +280,23 @@ public class MembershipService {
                         .createDate(LocalDate.now())
                         .build();
         order = orderEntityRepository.saveAndFlush(order);
+        return modelMapper.map(order, Order.class);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Order confirmOrder(int id, Principal principal) {
+        var order = orderEntityRepository.findById(id).orElseThrow();
+        var user = cognitoService.getUserDetails(getSubject(principal));
+        if (!order.isConfirmed()) {
+            emailService.sendEmail(
+                    user.getEmail(),
+                    MEMBERSHIP_CONFIRM,
+                    Map.of("order", modelMapper.map(order, Order.class), "user", user));
+
+            order.setConfirmed(true);
+            order = orderEntityRepository.saveAndFlush(order);
+        }
+
         return modelMapper.map(order, Order.class);
     }
 

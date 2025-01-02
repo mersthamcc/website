@@ -15,6 +15,7 @@ import com.paypal.orders.OrdersCreateRequest;
 import com.paypal.orders.OrdersGetRequest;
 import com.paypal.orders.PurchaseUnitRequest;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.website.frontend.configuration.ClubConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.service.MembershipService;
@@ -105,8 +106,8 @@ public class PaypalService implements PaymentService {
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
         List<Item> items = new ArrayList<>();
-        basket.getSubscriptions()
-                .values()
+        basket.getSubscriptions().values().stream()
+                .filter(subscription -> !subscription.getAction().equals(RegistrationAction.NONE))
                 .forEach(
                         subscription ->
                                 items.add(
