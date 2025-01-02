@@ -321,7 +321,7 @@ public class MembershipController extends SspController<MemberSummary> {
                 member.getSubscription().stream()
                         .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())
                         .findFirst()
-                        .get();
+                        .orElseThrow();
         model.put("member", member);
         model.put("subscription", subscription);
         model.put(

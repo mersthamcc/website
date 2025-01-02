@@ -1,0 +1,8 @@
+query mailingListSubscriptions($emailAddress: [String!]){
+    mailingListSubscriptions(emailAddress: $emailAddress) {
+        emailAddress
+        pending
+        subscribed
+        manualSubscriptionRequired
+    }
+}

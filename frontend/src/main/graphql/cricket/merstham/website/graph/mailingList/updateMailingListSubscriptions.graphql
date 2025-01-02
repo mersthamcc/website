@@ -1,0 +1,8 @@
+mutation updateMailingListSubscriptions($subscriptions: [MailingListSubscriptionInput!]){
+    updateMailingListSubscriptions(subscriptions: $subscriptions) {
+        emailAddress
+        subscribed
+        pending
+        manualSubscriptionRequired
+    }
+}

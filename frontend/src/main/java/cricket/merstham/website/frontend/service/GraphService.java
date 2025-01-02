@@ -82,6 +82,15 @@ public class GraphService {
         return getResult(query, accessToken);
     }
 
+    public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(T mutation) {
+        String accessToken = accessTokenManager.getAccessToken();
+        LOG.info(
+                "Sending `{}` GraphQL API mutation with client credentials token",
+                mutation.name().name());
+
+        return getResult(mutation, accessToken);
+    }
+
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
             T mutation, OAuth2AccessToken accessToken) {
 
