@@ -160,11 +160,6 @@ contact-methods:
     enabled: true
     default-region: GB
 
-mail:
-  region: eu-west-2
-  fromAddress: no-reply@mersthamcc.co.uk
-  confirmation-email-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}
-
 registration:
   enabled: ${REGISTRATION_ENABLED:true}
   current-year: ${REGISTRATION_YEAR:2026}

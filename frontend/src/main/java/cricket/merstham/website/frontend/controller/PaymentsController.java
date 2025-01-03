@@ -1,9 +1,7 @@
 package cricket.merstham.website.frontend.controller;
 
-import cricket.merstham.website.frontend.configuration.MailConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
-import cricket.merstham.website.frontend.service.EmailService;
 import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
@@ -27,8 +25,6 @@ public class PaymentsController {
     public static final String ORDER = "current-order";
     private final PaymentServiceManager paymentServiceManager;
     private final MembershipService membershipService;
-    private final EmailService emailService;
-    private final MailConfiguration mailConfiguration;
     private final MessageSource messageSource;
     private final int registrationYear;
     private final GraphService graphService;
@@ -37,15 +33,11 @@ public class PaymentsController {
     public PaymentsController(
             PaymentServiceManager paymentServiceManager,
             MembershipService membershipService,
-            EmailService emailService,
-            MailConfiguration mailConfiguration,
             MessageSource messageSource,
             @Value("${registration.current-year}") int registrationYear,
             GraphService graphService) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
-        this.emailService = emailService;
-        this.mailConfiguration = mailConfiguration;
         this.messageSource = messageSource;
         this.registrationYear = registrationYear;
         this.graphService = graphService;
