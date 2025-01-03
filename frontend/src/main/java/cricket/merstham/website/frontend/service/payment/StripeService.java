@@ -90,7 +90,7 @@ public class StripeService implements PaymentService {
                         .setCancelUrl(format("{0}/payments/{1}/cancel", baseUri, SERVICE_NAME))
                         .setLocale(SessionCreateParams.Locale.EN_GB);
 
-        basket.getSubscriptions().values().stream()
+        basket.getChargeableSubscriptions().stream()
                 .filter(subscription -> !subscription.getAction().equals(RegistrationAction.NONE))
                 .forEach(
                         subscription ->

@@ -145,7 +145,7 @@ payments:
     access-token: ${GOCARDLESS_ACCESS_TOKEN:}
     sandbox: ${GOCARDLESS_SANDBOX:true}
     mandate-description: Membership and Match Fees
-    schedule-end-date: 2025-11-30
+    schedule-end-date: ${GOCARDLESS_SCHEDULE_END_DATE:2025-11-30}
   bank:
     enabled: true
     disabled-reason: ~

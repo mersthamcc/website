@@ -106,7 +106,7 @@ public class PaypalService implements PaymentService {
 
         List<PurchaseUnitRequest> purchaseUnits = new ArrayList<>();
         List<Item> items = new ArrayList<>();
-        basket.getSubscriptions().values().stream()
+        basket.getChargeableSubscriptions().stream()
                 .filter(subscription -> !subscription.getAction().equals(RegistrationAction.NONE))
                 .forEach(
                         subscription ->

@@ -36,6 +36,7 @@ import static java.util.Objects.nonNull;
 public class EmailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmailService.class);
+    public static final String CURRENCY_FORMAT = "'£'##.00";
     private final SesV2Client client;
     private final MailTemplateConfiguration configuration;
     private final MessageSource messageSource;
@@ -199,7 +200,9 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig(),
-                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat("'£'##.00"));
+                        new ColumnConfig()
+                                .alignment(Alignment.RIGHT)
+                                .numberFormat(CURRENCY_FORMAT));
             }
 
             @Override
@@ -207,7 +210,9 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig().alignment(Alignment.RIGHT).bold(),
-                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat("'£'##.00"));
+                        new ColumnConfig()
+                                .alignment(Alignment.RIGHT)
+                                .numberFormat(CURRENCY_FORMAT));
             }
 
             @Override
@@ -271,7 +276,9 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig(),
-                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat("'£'##.00"));
+                        new ColumnConfig()
+                                .alignment(Alignment.RIGHT)
+                                .numberFormat(CURRENCY_FORMAT));
             }
 
             @Override
@@ -279,7 +286,9 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig().alignment(Alignment.RIGHT).bold(),
-                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat("'£'##.00"));
+                        new ColumnConfig()
+                                .alignment(Alignment.RIGHT)
+                                .numberFormat(CURRENCY_FORMAT));
             }
 
             @Override
@@ -328,7 +337,7 @@ public class EmailService {
     }
 
     private String getSubject(MailTemplate template) {
-        return translation(format("email.{0}.subject", template.toString()));
+        return translation(format("email.{0}.subject", template));
     }
 
     private List<String> getBccAddresses(MailTemplate template) {

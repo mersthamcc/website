@@ -2,14 +2,11 @@ package cricket.merstham.website.frontend.controller;
 
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
-import cricket.merstham.website.frontend.service.GraphService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,22 +22,12 @@ public class PaymentsController {
     public static final String ORDER = "current-order";
     private final PaymentServiceManager paymentServiceManager;
     private final MembershipService membershipService;
-    private final MessageSource messageSource;
-    private final int registrationYear;
-    private final GraphService graphService;
 
     @Autowired
     public PaymentsController(
-            PaymentServiceManager paymentServiceManager,
-            MembershipService membershipService,
-            MessageSource messageSource,
-            @Value("${registration.current-year}") int registrationYear,
-            GraphService graphService) {
+            PaymentServiceManager paymentServiceManager, MembershipService membershipService) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
-        this.messageSource = messageSource;
-        this.registrationYear = registrationYear;
-        this.graphService = graphService;
     }
 
     @PostMapping(value = "/payments", name = "payment-start")
@@ -90,7 +77,8 @@ public class PaymentsController {
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
             HttpSession session) {
-        if (basket.getSubscriptions().isEmpty()) return new ModelAndView("redirect:/registration");
+        if (basket.getChargeableSubscriptions().isEmpty())
+            return new ModelAndView("redirect:/registration");
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
         var orderId = (int) session.getAttribute(ORDER);
         var order = membershipService.getOrder(orderId);
