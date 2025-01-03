@@ -20,6 +20,7 @@ input UserPaymentMethodInput {
 
 extend type Query {
     getPaymentMethods(userId: String): [UserPaymentMethod]
+    getMyMethods: [UserPaymentMethod]
 }
 
 extend type Mutation {

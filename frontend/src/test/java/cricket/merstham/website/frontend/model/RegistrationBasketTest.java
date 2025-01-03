@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.model;
 
 import cricket.merstham.shared.dto.MemberSubscription;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.website.frontend.model.discounts.Discount;
 import org.junit.jupiter.api.Test;
 
@@ -93,8 +94,14 @@ class RegistrationBasketTest {
     }
 
     private MemberSubscription createMemberSubscription(String category, double price) {
+        return createMemberSubscription(category, price, RegistrationAction.NEW);
+    }
+
+    private MemberSubscription createMemberSubscription(
+            String category, double price, RegistrationAction action) {
         return MemberSubscription.builder()
                 .category(category)
+                .action(action)
                 .price(BigDecimal.valueOf(price))
                 .build();
     }

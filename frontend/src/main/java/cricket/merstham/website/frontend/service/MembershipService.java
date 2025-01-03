@@ -27,6 +27,7 @@ import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
+import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
@@ -416,5 +417,21 @@ public class MembershipService {
                         AddPaymentMethodMutation.Data::getAddPaymentMethod,
                         () -> "Error adding payment method"),
                 UserPaymentMethod.class);
+    }
+
+    public void confirmOrder(Order order, OAuth2AccessToken accessToken) {
+        var mutation = ConfirmOrderMutation.builder().id(order.getId()).build();
+
+        Response<ConfirmOrderMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+
+        var result =
+                requireGraphData(
+                        response,
+                        ConfirmOrderMutation.Data::getConfirmOrder,
+                        () -> "Error confirming order");
+        if (Boolean.FALSE.equals(result.getConfirmed())) {
+            LOG.warn("Order {} did not confirm", order.getId());
+        }
     }
 }

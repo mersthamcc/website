@@ -12,7 +12,7 @@
 
             <div class="row">
                 <div class="col-lg-8 mb-7 mb-lg-0">
-                    <@components.section title="Registration cart" rightTitle="${basket.subscriptions?size} members">
+                    <@components.section title="Registration cart" rightTitle="${basket.chargeableSubscriptions?size} members">
                         <#list basket.subscriptions as id, subscription>
                             <div class="border-bottom pb-5 mb-5">
                                 <div class="media">
@@ -119,7 +119,7 @@
 
                             <div class="border-bottom pb-4 mb-4">
                                 <div class="media align-items-center mb-3">
-                                    <span class="d-block font-size-1 mr-3">Item subtotal (${basket.subscriptions?size})</span>
+                                    <span class="d-block font-size-1 mr-3">Item subtotal (${basket.chargeableSubscriptions?size})</span>
                                     <div class="media-body text-right">
                                         <span class="text-dark font-weight-bold">
                                             <#if basket.itemTotal??>

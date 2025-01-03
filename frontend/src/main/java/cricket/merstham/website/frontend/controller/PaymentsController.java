@@ -1,15 +1,12 @@
 package cricket.merstham.website.frontend.controller;
 
-import cricket.merstham.website.frontend.configuration.MailConfiguration;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
-import cricket.merstham.website.frontend.service.EmailService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,12 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Controller
 @SessionAttributes("basket")
 public class PaymentsController {
@@ -31,22 +22,12 @@ public class PaymentsController {
     public static final String ORDER = "current-order";
     private final PaymentServiceManager paymentServiceManager;
     private final MembershipService membershipService;
-    private final EmailService emailService;
-    private final MailConfiguration mailConfiguration;
-    private final MessageSource messageSource;
 
     @Autowired
     public PaymentsController(
-            PaymentServiceManager paymentServiceManager,
-            MembershipService membershipService,
-            EmailService emailService,
-            MailConfiguration mailConfiguration,
-            MessageSource messageSource) {
+            PaymentServiceManager paymentServiceManager, MembershipService membershipService) {
         this.paymentServiceManager = paymentServiceManager;
         this.membershipService = membershipService;
-        this.emailService = emailService;
-        this.mailConfiguration = mailConfiguration;
-        this.messageSource = messageSource;
     }
 
     @PostMapping(value = "/payments", name = "payment-start")
@@ -96,35 +77,13 @@ public class PaymentsController {
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
             HttpSession session) {
-        if (basket.getSubscriptions().isEmpty()) return new ModelAndView("redirect:/registration");
+        if (basket.getChargeableSubscriptions().isEmpty())
+            return new ModelAndView("redirect:/registration");
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
         var orderId = (int) session.getAttribute(ORDER);
         var order = membershipService.getOrder(orderId);
-        var discountTranslations =
-                basket.getDiscounts().keySet().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        Function.identity(),
-                                        discount ->
-                                                messageSource.getMessage(
-                                                        discount,
-                                                        null,
-                                                        discount,
-                                                        request.getLocale())));
+        membershipService.confirmOrder(order, cognitoAuthentication.getOAuth2AccessToken());
 
-        emailService.sendEmail(
-                cognitoAuthentication.getOidcUser().getEmail(),
-                List.of(),
-                mailConfiguration.getConfirmationEmailBcc(),
-                "Registration Confirmation",
-                paymentService.getConfirmationEmail(),
-                paymentService.getEmailModel(
-                        Map.of(
-                                "basket", basket,
-                                "order", order,
-                                "paymentType", paymentType,
-                                "discountTranslations", discountTranslations,
-                                "season", Integer.toString(LocalDate.now().getYear()))));
         session.removeAttribute(ORDER);
         basket.reset();
         return paymentService.confirm(request, order, cognitoAuthentication.getOAuth2AccessToken());

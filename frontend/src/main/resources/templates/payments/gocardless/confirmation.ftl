@@ -41,11 +41,11 @@
             </p>
             <p>
                 <b>Mandate cancellation</b>: please note the date of the last payment above, after this date no further payments will
-                be taken and the mandate will automatically cancel shortly afterwards. Please do not cancel the mandate before all payments
-                are taken.
+                be taken but the mandate will remain active so it can be re-used next year. Please do not cancel the mandate before all
+                payments are taken.
             </p>
             <p>
-                If you need to change your bank account details please contact the club treasurer, Chris Clayson,
+                If you need to change your bank account details, or have any other questions, please contact the club treasurer, Chris Clayson,
                 by e-mailing <a href="mailto:treasurer@mersthamcc.co.uk">treasurer@mersthamcc.co.uk</a>.
             </p>
         </@components.section>

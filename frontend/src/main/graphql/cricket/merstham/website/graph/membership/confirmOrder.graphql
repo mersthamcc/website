@@ -1,0 +1,6 @@
+mutation confirmOrder($id: Int!) {
+    confirmOrder(id: $id) {
+        id
+        confirmed
+    }
+}

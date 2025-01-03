@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static cricket.merstham.shared.IdentifierConstants.EPOS_CUSTOMER_ID;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
+import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -111,6 +112,14 @@ public class Member implements Serializable {
             return subscription.stream().anyMatch(s -> s.getYear() == year);
         }
         return false;
+    }
+
+    @Transient
+    public String getFullName() {
+        return format(
+                "{0} {1}",
+                getAttributeMap().get("given-name").asText(),
+                getAttributeMap().get("family-name").asText());
     }
 
     private MemberSubscription thisYearsSubscription() {

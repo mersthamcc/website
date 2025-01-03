@@ -374,7 +374,9 @@ class MembershipServiceTest {
                     priceListItemEntityRepository,
                     new ModelMapperConfiguration().modelMapper(),
                     mock(ObjectMapper.class),
-                    mock(MemberSummaryRepository.class));
+                    mock(MemberSummaryRepository.class),
+                    mock(EmailService.class),
+                    mock(CognitoService.class));
 
     @BeforeEach
     void setup() {
