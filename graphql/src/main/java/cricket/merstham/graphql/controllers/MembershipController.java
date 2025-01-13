@@ -6,6 +6,7 @@ import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.services.MembershipService;
 import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
@@ -91,6 +92,11 @@ public class MembershipController {
         return membershipService.getMemberCount();
     }
 
+    @QueryMapping
+    public List<Coupon> myCoupons(Principal principal) {
+        return membershipService.getMyCoupons(principal);
+    }
+
     @MutationMapping
     public Member createMemberSubscription(@Argument MemberInput data, Principal principal) {
         return membershipService.createMemberSubscription(data, principal);
@@ -101,13 +107,14 @@ public class MembershipController {
             @Argument String uuid,
             @Argument BigDecimal total,
             @Argument BigDecimal discount,
+            @Argument List<String> coupons,
             Principal principal) {
-        return membershipService.createOrder(uuid, total, discount, principal);
+        return membershipService.createOrder(uuid, total, discount, coupons, principal);
     }
 
     @MutationMapping
-    public Order confirmOrder(@Argument int id, Principal principal) {
-        return membershipService.confirmOrder(id, principal);
+    public Order confirmOrder(@Argument int id, @Argument String paymentType, Principal principal) {
+        return membershipService.confirmOrder(id, paymentType, principal);
     }
 
     @MutationMapping
@@ -136,5 +143,10 @@ public class MembershipController {
     public Member addMemberIdentifier(
             @Argument int id, @Argument String name, @Argument String value, Principal principal) {
         return membershipService.addMemberIdentifier(id, name, value, principal);
+    }
+
+    @MutationMapping
+    public Coupon saveCoupon(@Argument Coupon coupon, Principal principal) {
+        return membershipService.saveCoupon(coupon, principal);
     }
 }

@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.shared.dto.Order;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
+
+import static java.util.Objects.isNull;
 
 @Controller
 @SessionAttributes("basket")
@@ -80,9 +83,19 @@ public class PaymentsController {
         if (basket.getChargeableSubscriptions().isEmpty())
             return new ModelAndView("redirect:/registration");
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
-        var orderId = (int) session.getAttribute(ORDER);
-        var order = membershipService.getOrder(orderId);
-        membershipService.confirmOrder(order, cognitoAuthentication.getOAuth2AccessToken());
+        var orderId = (Integer) session.getAttribute(ORDER);
+        Order order;
+        if (isNull(orderId)) {
+            order =
+                    membershipService.registerMembersFromBasket(
+                            basket,
+                            cognitoAuthentication.getOAuth2AccessToken(),
+                            request.getLocale());
+        } else {
+            order = membershipService.getOrder(orderId);
+        }
+        membershipService.confirmOrder(
+                order, paymentType, cognitoAuthentication.getOAuth2AccessToken());
 
         session.removeAttribute(ORDER);
         basket.reset();

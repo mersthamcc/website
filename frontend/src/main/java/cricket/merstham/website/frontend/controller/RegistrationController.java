@@ -41,6 +41,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -116,7 +117,9 @@ public class RegistrationController {
 
     @GetMapping(value = "/register", name = "register")
     public ModelAndView register(
-            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+            @ModelAttribute("basket") RegistrationBasket basket,
+            HttpServletRequest request,
+            CognitoAuthentication authentication) {
         if (!enabled) {
             return new ModelAndView(REGISTRATION_CLOSED);
         }
@@ -126,8 +129,15 @@ public class RegistrationController {
             var errors = flash.get(ERRORS);
             model.put(ERRORS, errors);
         }
+        var coupons =
+                membershipService
+                        .getAvailableCoupons(authentication.getOAuth2AccessToken())
+                        .stream()
+                        .filter(coupon -> !basket.getAppliedCoupons().contains(coupon))
+                        .toList();
         model.put("basket", basket);
         model.put("registrationYear", registrationYear);
+        model.put("coupons", coupons);
         return new ModelAndView("registration/register", model);
     }
 
@@ -137,6 +147,8 @@ public class RegistrationController {
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
             @ModelAttribute("edit-member") String editMember,
+            @ModelAttribute("apply-coupon") String applyCoupon,
+            CognitoAuthentication authentication,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
@@ -160,6 +172,24 @@ public class RegistrationController {
                             subscription,
                             SUBSCRIPTION_ID,
                             editMember));
+        } else if (!applyCoupon.isBlank()) {
+            var coupon =
+                    membershipService
+                            .getAvailableCoupons(authentication.getOAuth2AccessToken())
+                            .stream()
+                            .filter(c -> c.getCode().equals(applyCoupon))
+                            .findFirst();
+            if (coupon.isPresent()) {
+                if (coupon.get().getValue().compareTo(basket.getBasketTotal()) > 0) {
+                    redirectAttributes.addFlashAttribute(
+                            ERRORS,
+                            List.of(
+                                    "Value of coupon is greater that basket total, add members first"));
+                } else {
+                    basket.getAppliedCoupons().add(coupon.get());
+                }
+            }
+            return redirectTo("/register");
         } else {
             switch (action) {
                 case "add-member":
@@ -429,6 +459,9 @@ public class RegistrationController {
         if (!enabled) {
             return new ModelAndView(REGISTRATION_CLOSED);
         }
+        if (basket.getBasketTotal().compareTo(BigDecimal.ZERO) == 0) {
+            return new ModelAndView("registration/no-payment-required", Map.of("basket", basket));
+        }
         return new ModelAndView(
                 "registration/confirmation",
                 Map.of(
@@ -483,7 +516,7 @@ public class RegistrationController {
 
     private List<String> validateBasket(RegistrationBasket basket) {
         var errors = new ArrayList<String>();
-        if (basket.getBasketTotal().doubleValue() == 0.00) {
+        if (basket.getChargeableSubscriptions().isEmpty()) {
             errors.add("membership.errors.no-members");
         }
         return errors;

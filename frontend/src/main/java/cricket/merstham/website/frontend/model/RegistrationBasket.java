@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.shared.dto.RegistrationAction;
@@ -14,6 +15,7 @@ import lombok.experimental.Accessors;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +39,13 @@ public class RegistrationBasket implements Serializable {
 
     @JsonProperty private List<Discount> activeDiscounts;
 
+    @JsonProperty private List<Coupon> appliedCoupons;
+
     public RegistrationBasket(List<Discount> activeDiscounts) {
         this.id = UUID.randomUUID().toString();
         this.subscriptions = new HashMap<>();
         this.activeDiscounts = activeDiscounts;
+        this.appliedCoupons = new ArrayList<>();
     }
 
     public RegistrationBasket putSubscription(UUID key, MemberSubscription subscription) {

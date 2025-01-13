@@ -16,6 +16,11 @@ public interface PaymentService {
 
     boolean isEnabled();
 
+    default boolean isHidden() {
+        return false;
+    }
+    ;
+
     Optional<String> getDisabledReason();
 
     ModelAndView checkout(

@@ -184,6 +184,26 @@ type MemberSummary {
     googlePassSerial: String
 }
 
+type Coupon {
+    id: Int!
+    code: String!
+    ownerUserId: String!
+    description: String!
+    value: Float!
+    redeemDate: DateTime
+    appliedToOrderId: Int
+}
+
+input CouponInput {
+    id: Int
+    code: String!
+    ownerUserId: String!
+    description: String!
+    value: Float!
+    redeemDate: DateTime
+    appliedToOrderId: Int
+}
+
 extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
@@ -197,15 +217,17 @@ extend type Query {
     orders(year: Int!): [Order]
     order(id: Int!): Order
     memberCount: Int!
+    myCoupons: [Coupon]
 }
 
 extend type Mutation {
     createMemberSubscription(data: MemberInput!): Member
     updateMember(id: Int!, data: [AttributeInput]!): Member
-    createOrder(uuid: String!, total: Float!, discount: Float!): Order
+    createOrder(uuid: String!, total: Float!, discount: Float!, coupons: [String]): Order
     addPaymentToOrder(orderId: Int!, payment: PaymentInput!): Payment
     associateMemberToPlayer(id: Int!, playerId: Int!): Member
     deleteMemberToPlayerLink(id: Int!): Member
     addMemberIdentifier(id: Int!, name: String!, value: String!): Member!
-    confirmOrder(id: Int!): Order
+    confirmOrder(id: Int!, paymentType: String!): Order
+    saveCoupon(coupon: CouponInput): Coupon
 }

@@ -1,5 +1,5 @@
-mutation createOrder ($uuid: String!, $total: Float!, $discount: Float!) {
-    createOrder(uuid: $uuid, total: $total, discount: $discount) {
+mutation createOrder ($uuid: String!, $total: Float!, $discount: Float!, $coupons: [String]) {
+    createOrder(uuid: $uuid, total: $total, discount: $discount, coupons: $coupons) {
         id
         uuid
         ownerUserId

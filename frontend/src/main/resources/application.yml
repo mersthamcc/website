@@ -125,6 +125,9 @@ resources:
   api-endpoint: ${RESOURCES_API_ENDPOINT:}
 
 payments:
+  complementary:
+    enabled: true
+    disabled-reason: ~
   pay-later:
     enabled: false
     disabled-reason: ~

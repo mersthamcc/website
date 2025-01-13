@@ -3,8 +3,8 @@
 <#import "../../components.ftl" as components />
 <@layout.mainLayout formName="membership.confirmation">
     <@components.panel>
-        <@components.section title="Pay Later">
-            <@spring.message code="payments.pay-later-confirmation" />
+        <@components.section title="payments.no-payment-required">
+            <@spring.message code="payments.no-payment-required-confirmation" />
         </@components.section>
 
         <@components.buttonGroup>

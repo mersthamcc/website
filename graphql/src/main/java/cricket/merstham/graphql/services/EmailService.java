@@ -91,6 +91,7 @@ public class EmailService {
     private HtmlTextEmail membershipConfirmationEmail(Map<String, Object> model) {
         var user = (User) model.get("user");
         var order = (Order) model.get("order");
+        var paymentType = (String) model.get("paymentType");
         var payments = order.getPayment();
         var builder = configuration.getEmailBuilder();
 
@@ -111,51 +112,55 @@ public class EmailService {
 
         if (!payments.isEmpty()) {
             builder =
-                    builder.text(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-"
-                                                    + order.getPayment().get(0).getType()))
+                    builder.text(translation("email.MEMBERSHIP_CONFIRM.payments-" + paymentType))
                             .and()
                             .table(getPaymentsTable(builder, payments));
 
         } else {
-            builder =
-                    builder.text(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank",
-                                            order.getWebReference()))
-                            .and()
-                            .attribute()
-                            .keyValue(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank-account-name"),
-                                    bankDetails.getAccountName())
-                            .keyValue(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank-account-number"),
-                                    bankDetails.getAccountNumber())
-                            .keyValue(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank-account-sort-code"),
-                                    bankDetails.getSortCode())
-                            .keyValue(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank-account-reference"),
-                                    order.getWebReference())
-                            .keyValue(
-                                    translation(
-                                            "email.MEMBERSHIP_CONFIRM.payments-bank-account-amount"),
-                                    NumberFormat.getCurrencyInstance(Locale.UK)
-                                            .format(order.getTotal()))
-                            .and();
+            switch (paymentType) {
+                case "bank":
+                    builder = addBankDetails(builder, order);
+                    break;
+                case "complementary":
+                    break;
+                default:
+                    LOG.warn(
+                            "Unexpected payment type specified while constructing confirmation e-mail: {}",
+                            paymentType);
+            }
         }
 
-        return builder.text(translation("email.MANDATE_CANCEL.sign-off"))
+        return builder.text(translation("email.MEMBERSHIP_CONFIRM.sign-off"))
                 .and()
                 .text(configuration.getClubName())
                 .bold()
                 .and()
                 .build();
+    }
+
+    private EmailTemplateBuilder.EmailTemplateConfigBuilder addBankDetails(
+            EmailTemplateBuilder.EmailTemplateConfigBuilder builder, Order order) {
+        return builder.text(
+                        translation(
+                                "email.MEMBERSHIP_CONFIRM.payments-bank", order.getWebReference()))
+                .and()
+                .attribute()
+                .keyValue(
+                        translation("email.MEMBERSHIP_CONFIRM.payments-bank-account-name"),
+                        bankDetails.getAccountName())
+                .keyValue(
+                        translation("email.MEMBERSHIP_CONFIRM.payments-bank-account-number"),
+                        bankDetails.getAccountNumber())
+                .keyValue(
+                        translation("email.MEMBERSHIP_CONFIRM.payments-bank-account-sort-code"),
+                        bankDetails.getSortCode())
+                .keyValue(
+                        translation("email.MEMBERSHIP_CONFIRM.payments-bank-account-reference"),
+                        order.getWebReference())
+                .keyValue(
+                        translation("email.MEMBERSHIP_CONFIRM.payments-bank-account-amount"),
+                        NumberFormat.getCurrencyInstance(Locale.UK).format(order.getTotal()))
+                .and();
     }
 
     private HtmlTextEmail mandateCancellationEmail(Map<String, Object> model) {
