@@ -29,7 +29,7 @@ public class PaymentServiceManager {
 
     public List<String> getEnabledServices() {
         return paymentServiceMap.values().stream()
-                .filter(PaymentService::isEnabled)
+                .filter(paymentService -> paymentService.isEnabled() && !paymentService.isHidden())
                 .map(PaymentService::getName)
                 .sorted()
                 .toList();

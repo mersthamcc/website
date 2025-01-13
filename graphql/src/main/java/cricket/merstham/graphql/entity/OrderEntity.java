@@ -57,4 +57,7 @@ public class OrderEntity {
     @OneToMany(mappedBy = "order")
     @OrderBy("addedDate")
     private List<MemberSubscriptionEntity> memberSubscription;
+
+    @Column(name = "confirmed", nullable = false)
+    private boolean confirmed;
 }

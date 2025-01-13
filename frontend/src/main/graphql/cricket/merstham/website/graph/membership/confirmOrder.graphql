@@ -1,0 +1,6 @@
+mutation confirmOrder($id: Int!, $paymentType: String!) {
+    confirmOrder(id: $id, paymentType: $paymentType) {
+        id
+        confirmed
+    }
+}

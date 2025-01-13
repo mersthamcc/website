@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import java.security.Principal;
 import java.util.List;
 
+import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+
 @Controller
 public class PaymentMethodController {
 
@@ -24,6 +26,11 @@ public class PaymentMethodController {
     @QueryMapping
     public List<UserPaymentMethod> getPaymentMethods(@Argument("userId") String userId) {
         return paymentMethodService.getPaymentMethods(userId);
+    }
+
+    @QueryMapping
+    public List<UserPaymentMethod> getMyMethods(Principal principal) {
+        return paymentMethodService.getPaymentMethods(getSubject(principal));
     }
 
     @MutationMapping

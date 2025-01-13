@@ -1,0 +1,10 @@
+query myCoupons {
+    myCoupons {
+        id
+        code
+        ownerUserId
+        description
+        redeemDate
+        value
+    }
+}

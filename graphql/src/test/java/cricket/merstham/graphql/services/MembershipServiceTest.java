@@ -25,6 +25,7 @@ import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.filters.StringFilter;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
+import cricket.merstham.graphql.repository.CouponEntityRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
@@ -374,7 +375,10 @@ class MembershipServiceTest {
                     priceListItemEntityRepository,
                     new ModelMapperConfiguration().modelMapper(),
                     mock(ObjectMapper.class),
-                    mock(MemberSummaryRepository.class));
+                    mock(MemberSummaryRepository.class),
+                    mock(EmailService.class),
+                    mock(CognitoService.class),
+                    mock(CouponEntityRepository.class));
 
     @BeforeEach
     void setup() {
@@ -602,7 +606,7 @@ class MembershipServiceTest {
                                         .discount(discount)
                                         .build());
 
-        var result = service.createOrder(orderUuid, total, discount, principal);
+        var result = service.createOrder(orderUuid, total, discount, List.of(), principal);
 
         assertThat(result.getId(), equalTo(ORDERS.size()));
         assertThat(result.getUuid(), equalTo(orderUuid));

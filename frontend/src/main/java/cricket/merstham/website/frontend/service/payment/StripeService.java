@@ -8,6 +8,7 @@ import com.stripe.net.RequestOptions;
 import com.stripe.param.CouponCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.service.MembershipService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -89,8 +90,8 @@ public class StripeService implements PaymentService {
                         .setCancelUrl(format("{0}/payments/{1}/cancel", baseUri, SERVICE_NAME))
                         .setLocale(SessionCreateParams.Locale.EN_GB);
 
-        basket.getSubscriptions()
-                .values()
+        basket.getChargeableSubscriptions().stream()
+                .filter(subscription -> !subscription.getAction().equals(RegistrationAction.NONE))
                 .forEach(
                         subscription ->
                                 params.addLineItem(

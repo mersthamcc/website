@@ -2,6 +2,7 @@ package cricket.merstham.website.frontend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.shared.dto.RegistrationAction;
@@ -14,13 +15,12 @@ import lombok.experimental.Accessors;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.nonNull;
 
 @Data
 @Builder
@@ -30,6 +30,8 @@ import static java.util.Objects.nonNull;
 public class RegistrationBasket implements Serializable {
 
     @Serial private static final long serialVersionUID = 20210522173000L;
+    private static final List<RegistrationAction> CHARGEABLE_ACTIONS =
+            List.of(RegistrationAction.NEW, RegistrationAction.RENEW);
 
     @JsonProperty private String id;
 
@@ -37,10 +39,13 @@ public class RegistrationBasket implements Serializable {
 
     @JsonProperty private List<Discount> activeDiscounts;
 
+    @JsonProperty private List<Coupon> appliedCoupons;
+
     public RegistrationBasket(List<Discount> activeDiscounts) {
         this.id = UUID.randomUUID().toString();
         this.subscriptions = new HashMap<>();
         this.activeDiscounts = activeDiscounts;
+        this.appliedCoupons = new ArrayList<>();
     }
 
     public RegistrationBasket putSubscription(UUID key, MemberSubscription subscription) {
@@ -59,16 +64,20 @@ public class RegistrationBasket implements Serializable {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public BigDecimal getItemTotal() {
+    public List<MemberSubscription> getChargeableSubscriptions() {
         return subscriptions.values().stream()
-                .filter(s -> nonNull(s.getPrice()))
+                .filter(s -> CHARGEABLE_ACTIONS.contains(s.getAction()))
+                .toList();
+    }
+
+    public BigDecimal getItemTotal() {
+        return getChargeableSubscriptions().stream()
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getBasketTotal() {
-        return subscriptions.values().stream()
-                .filter(s -> nonNull(s.getPrice()))
+        return getChargeableSubscriptions().stream()
                 .map(MemberSubscription::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .subtract(

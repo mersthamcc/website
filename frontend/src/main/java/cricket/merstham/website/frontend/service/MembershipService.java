@@ -1,8 +1,10 @@
 package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Error;
+import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
@@ -27,9 +29,11 @@ import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
+import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
+import cricket.merstham.website.graph.registration.MyCouponsQuery;
 import cricket.merstham.website.graph.registration.MyMemberDetailsQuery;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
@@ -92,7 +96,9 @@ public class MembershipService {
                         basket.getBasketTotal().doubleValue(),
                         basket.getDiscounts().values().stream()
                                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                .doubleValue());
+                                .doubleValue(),
+                        Input.fromNullable(
+                                basket.getAppliedCoupons().stream().map(Coupon::getCode).toList()));
         Response<CreateOrderMutation.Data> orderResult =
                 graphService.executeMutation(createOrder, accessToken);
 
@@ -416,5 +422,31 @@ public class MembershipService {
                         AddPaymentMethodMutation.Data::getAddPaymentMethod,
                         () -> "Error adding payment method"),
                 UserPaymentMethod.class);
+    }
+
+    public void confirmOrder(Order order, String paymentType, OAuth2AccessToken accessToken) {
+        var mutation =
+                ConfirmOrderMutation.builder().id(order.getId()).paymentType(paymentType).build();
+
+        Response<ConfirmOrderMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+
+        var result =
+                requireGraphData(
+                        response,
+                        ConfirmOrderMutation.Data::getConfirmOrder,
+                        () -> "Error confirming order");
+        if (Boolean.FALSE.equals(result.getConfirmed())) {
+            LOG.warn("Order {} did not confirm", order.getId());
+        }
+    }
+
+    public List<Coupon> getAvailableCoupons(OAuth2AccessToken accessToken) {
+        var query = MyCouponsQuery.builder().build();
+        Response<MyCouponsQuery.Data> response = graphService.executeQuery(query, accessToken);
+        return requireGraphData(response, MyCouponsQuery.Data::getMyCoupons).stream()
+                .map(c -> modelMapper.map(c, Coupon.class))
+                .filter(c -> isNull(c.getRedeemDate()))
+                .toList();
     }
 }

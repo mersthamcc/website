@@ -32,6 +32,7 @@ public class Order implements Serializable {
     private List<MemberSubscription> memberSubscription = new ArrayList<>();
     private BigDecimal total;
     private BigDecimal discount;
+    private boolean confirmed;
 
     public String getWebReference() {
         return format("WEB-%1$6s", id).replace(' ', '0');

@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cricket.merstham.graphql.entity.CouponEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
 import cricket.merstham.graphql.entity.MemberCategoryEntity;
@@ -15,6 +16,7 @@ import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
+import cricket.merstham.graphql.repository.CouponEntityRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
@@ -23,6 +25,7 @@ import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.shared.dto.AttributeDefinition;
+import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberFilter;
@@ -47,12 +50,14 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+import static cricket.merstham.graphql.services.EmailService.MailTemplate.MEMBERSHIP_CONFIRM;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
 import static java.util.Objects.isNull;
@@ -72,6 +77,9 @@ public class MembershipService {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final MemberSummaryRepository memberSummaryRepository;
+    private final EmailService emailService;
+    private final CognitoService cognitoService;
+    private final CouponEntityRepository couponEntityRepository;
 
     @Autowired
     public MembershipService(
@@ -85,7 +93,10 @@ public class MembershipService {
             PriceListItemEntityRepository priceListItemEntityRepository,
             ModelMapper modelMapper,
             ObjectMapper objectMapper,
-            MemberSummaryRepository memberSummaryRepository) {
+            MemberSummaryRepository memberSummaryRepository,
+            EmailService emailService,
+            CognitoService cognitoService,
+            CouponEntityRepository couponEntityRepository) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -97,6 +108,9 @@ public class MembershipService {
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
         this.memberSummaryRepository = memberSummaryRepository;
+        this.emailService = emailService;
+        this.cognitoService = cognitoService;
+        this.couponEntityRepository = couponEntityRepository;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -262,7 +276,11 @@ public class MembershipService {
 
     @PreAuthorize("isAuthenticated()")
     public Order createOrder(
-            String uuid, BigDecimal total, BigDecimal discount, Principal principal) {
+            String uuid,
+            BigDecimal total,
+            BigDecimal discount,
+            List<String> coupons,
+            Principal principal) {
         var order =
                 OrderEntity.builder()
                         .ownerUserId(getSubject(principal))
@@ -272,6 +290,38 @@ public class MembershipService {
                         .createDate(LocalDate.now())
                         .build();
         order = orderEntityRepository.saveAndFlush(order);
+        redeemCouponsAgainstOrder(coupons, order);
+
+        return modelMapper.map(order, Order.class);
+    }
+
+    private void redeemCouponsAgainstOrder(List<String> coupons, OrderEntity order) {
+        coupons.forEach(
+                code -> {
+                    var coupon = couponEntityRepository.findFirstByCode(code);
+                    coupon.setRedeemDate(Instant.now());
+                    coupon.setAppliedToOrderId(order.getId());
+                    couponEntityRepository.saveAndFlush(coupon);
+                });
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Order confirmOrder(int id, String paymentType, Principal principal) {
+        var order = orderEntityRepository.findById(id).orElseThrow();
+        var user = cognitoService.getUserDetails(getSubject(principal));
+        if (!order.isConfirmed()) {
+            emailService.sendEmail(
+                    user.getEmail(),
+                    MEMBERSHIP_CONFIRM,
+                    Map.of(
+                            "order", modelMapper.map(order, Order.class),
+                            "user", user,
+                            "paymentType", paymentType));
+
+            order.setConfirmed(true);
+            order = orderEntityRepository.saveAndFlush(order);
+        }
+
         return modelMapper.map(order, Order.class);
     }
 
@@ -381,5 +431,20 @@ public class MembershipService {
                 memberRepository.findByIdAndOwnerUserId(id, getSubject(principal)).orElseThrow();
         member.getIdentifiers().put(name, value);
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
+    }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public Coupon saveCoupon(Coupon coupon, Principal principal) {
+        var entity = couponEntityRepository.findById(coupon.getId()).orElseGet(CouponEntity::new);
+        modelMapper.map(coupon, entity);
+
+        return modelMapper.map(couponEntityRepository.saveAndFlush(entity), Coupon.class);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<Coupon> getMyCoupons(Principal principal) {
+        return couponEntityRepository.findAllByOwnerUserId(getSubject(principal)).stream()
+                .map((element) -> modelMapper.map(element, Coupon.class))
+                .toList();
     }
 }

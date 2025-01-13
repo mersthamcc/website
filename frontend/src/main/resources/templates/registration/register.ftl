@@ -12,7 +12,7 @@
 
             <div class="row">
                 <div class="col-lg-8 mb-7 mb-lg-0">
-                    <@components.section title="Registration cart" rightTitle="${basket.subscriptions?size} members">
+                    <@components.section title="Registration cart" rightTitle="${basket.chargeableSubscriptions?size} members">
                         <#list basket.subscriptions as id, subscription>
                             <div class="border-bottom pb-5 mb-5">
                                 <div class="media">
@@ -119,7 +119,7 @@
 
                             <div class="border-bottom pb-4 mb-4">
                                 <div class="media align-items-center mb-3">
-                                    <span class="d-block font-size-1 mr-3">Item subtotal (${basket.subscriptions?size})</span>
+                                    <span class="d-block font-size-1 mr-3">Item subtotal (${basket.chargeableSubscriptions?size})</span>
                                     <div class="media-body text-right">
                                         <span class="text-dark font-weight-bold">
                                             <#if basket.itemTotal??>
@@ -189,32 +189,32 @@
                         </div>
                         <!-- End Order Summary -->
 
-                        <!-- Accordion -->
-                        <div id="shopCartAccordion" class="accordion card shadow-soft mb-4">
-                            <!-- Card -->
-                            <div class="card">
-                                <div class="card-header card-collapse" id="shopCartHeadingOne">
-                                    <h3 class="mb-0">
-                                        <a class="btn btn-link btn-block card-btn font-weight-bold collapsed" href="javascript:;" role="button" data-toggle="collapse" data-target="#shopCartOne" aria-expanded="false" aria-controls="shopCartOne">
-                                            Promo code?
-                                            <i class="far fa-question-circle text-body ml-1" data-container="body" data-toggle="popover" data-placement="top" data-trigger="hover" title="" data-content="Valid on full priced items only. Some products maybe excluded." data-original-title="Promo code"></i>
-                                        </a>
-                                    </h3>
+                        <#if coupons?has_content>
+                            <div class="card shadow-soft p-4 mb-4">
+                                <div class="border-bottom pb-4 mb-4">
+                                    <h2 class="h3 mb-0">
+                                        <@spring.message code="membership.coupon-title" />
+                                    </h2>
                                 </div>
-                                <div id="shopCartOne" class="collapse" aria-labelledby="shopCartHeadingOne" data-parent="#shopCartAccordion" style="">
+                                <div class="border-bottom pb-4 mb-4">
+                                    <#list coupons as coupon>
+                                        <div class="media align-items-center mb-3">
+                                            <div class="text-body font-size-1 mb-1">
+                                                <div>${coupon.description}</div>
+                                                <div class="ml-2">${coupon.code}</div>
+                                                <div class="ml-2">${coupon.value?string.currency}</div>
+                                            </div>
 
-                                    <div class="input-group input-group-pill mb-3">
-                                        <input type="text" class="form-control" name="name" placeholder="Promo code" aria-label="Promo code">
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-block btn-primary btn-pill">Apply</button>
+                                            <div class="media-body text-right">
+                                                <button type="submit" class="btn btn-pill btn-primary btn-xs" name="apply-coupon" value="${coupon.code}">
+                                                    <@spring.message code="membership.apply-coupon" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-
+                                    </#list>
                                 </div>
                             </div>
-                            <!-- End Card -->
-                        </div>
-                        <!-- End Accordion -->
+                        </#if>
                     </div>
                 </div>
             </div>
