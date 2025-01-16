@@ -70,7 +70,7 @@ public class PricelistItemEntity {
                                         && (today.isBefore(p.getDateTo())
                                                 || today.isEqual(p.getDateTo())))
                 .findFirst()
-                .orElse(PricelistEntity.builder().price(BigDecimal.ZERO).build())
-                .getPrice();
+                .map(PricelistEntity::getPrice)
+                .orElse(null);
     }
 }

@@ -71,6 +71,7 @@ public class RegistrationController {
     public static final String SUBSCRIPTION_ID = "subscriptionId";
     public static final String MODEL_ERRORS = "errors";
     public static final String REGISTRATION_CLOSED = "registration/closed";
+    public static final String REDIRECT_REGISTER = "redirect:/register";
 
     private final MembershipService membershipService;
     private final PaymentServiceManager paymentServiceManager;
@@ -159,19 +160,9 @@ public class RegistrationController {
         } else if (!editMember.isBlank()) {
             var subscription = basket.getSubscriptions().get(UUID.fromString(editMember));
             setCurrentSubscription(session, subscription);
-            return new ModelAndView(
-                    "registration/select-membership",
-                    Map.of(
-                            "categories",
-                            membershipService.getMembershipCategories().stream()
-                                    .sorted(
-                                            Comparator.comparing(MemberCategory::getSortOrder)
-                                                    .thenComparing(MemberCategory::getKey))
-                                    .toList(),
-                            SUBSCRIPTION,
-                            subscription,
-                            SUBSCRIPTION_ID,
-                            editMember));
+            redirectAttributes.addFlashAttribute(SUBSCRIPTION_ID, editMember);
+
+            return redirectTo("/register/renew-membership");
         } else if (!applyCoupon.isBlank()) {
             var coupon =
                     membershipService
@@ -200,20 +191,10 @@ public class RegistrationController {
                                     .build();
                     UUID subscriptionId = UUID.randomUUID();
                     setCurrentSubscription(session, subscription);
-                    return new ModelAndView(
-                            "registration/select-membership",
-                            Map.of(
-                                    "categories",
-                                    membershipService.getMembershipCategories().stream()
-                                            .sorted(
-                                                    Comparator.comparing(
-                                                                    MemberCategory::getSortOrder)
-                                                            .thenComparing(MemberCategory::getKey))
-                                            .toList(),
-                                    SUBSCRIPTION,
-                                    subscription,
-                                    SUBSCRIPTION_ID,
-                                    subscriptionId.toString()));
+                    redirectAttributes.addFlashAttribute(
+                            SUBSCRIPTION_ID, subscriptionId.toString());
+
+                    return redirectTo("/register/select-membership");
                 case "next":
                     var errors = validateBasket(basket);
                     if (errors.isEmpty()) {
@@ -226,6 +207,48 @@ public class RegistrationController {
             }
         }
         return redirectTo("/register");
+    }
+
+    @GetMapping(value = "/register/select-membership", name = "select-membership")
+    public ModelAndView selectMembership(HttpSession session, HttpServletRequest request) {
+        var subscription = getCurrentSubscription(session);
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (isNull(flash) || !flash.containsKey(SUBSCRIPTION_ID)) {
+            return new ModelAndView(REDIRECT_REGISTER);
+        }
+        var subscriptionId = (String) flash.get(SUBSCRIPTION_ID);
+        var model = new HashMap<String, Object>();
+        model.put(SUBSCRIPTION, subscription);
+        model.put(SUBSCRIPTION_ID, subscriptionId);
+
+        model.put(
+                "categories",
+                membershipService.getMembershipCategories().stream()
+                        .sorted(
+                                Comparator.comparing(MemberCategory::getSortOrder)
+                                        .thenComparing(MemberCategory::getKey))
+                        .toList());
+        return new ModelAndView("registration/select-membership", model);
+    }
+
+    @GetMapping(value = "/register/renew-membership", name = "renew-membership")
+    public ModelAndView renewMembership(HttpSession session, HttpServletRequest request) {
+        var subscription = getCurrentSubscription(session);
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (isNull(flash) || !flash.containsKey(SUBSCRIPTION_ID)) {
+            return new ModelAndView(REDIRECT_REGISTER);
+        }
+        var subscriptionId = (String) flash.get(SUBSCRIPTION_ID);
+        var model = new HashMap<String, Object>();
+        model.put(SUBSCRIPTION, subscription);
+        model.put(SUBSCRIPTION_ID, subscriptionId);
+
+        var item =
+                isNull(subscription.getPriceListItem())
+                        ? subscription.getMember().getMostRecentSubscription().getPriceListItem()
+                        : subscription.getPriceListItem();
+        model.put("item", item);
+        return new ModelAndView("registration/renew-membership-level", model);
     }
 
     @GetMapping(value = "/register/policies", name = "policies")
@@ -273,7 +296,7 @@ public class RegistrationController {
         List<MailingListSubscription> emails =
                 mailingListService.getSubscriptions(detectEmailAddresses(basket));
         if (emails.isEmpty()) {
-            return new ModelAndView("redirect:/register");
+            return new ModelAndView(REDIRECT_REGISTER);
         }
         model.put("emails", emails);
         return new ModelAndView("registration/mailing-list", model);
@@ -354,9 +377,14 @@ public class RegistrationController {
             @ModelAttribute("priceListItemId") Integer priceListItemId,
             @ModelAttribute("code") String code,
             HttpSession session,
-            CognitoAuthentication authentication) {
+            CognitoAuthentication authentication,
+            RedirectAttributes redirectAttributes) {
         if (!enabled) {
             return new ModelAndView(REGISTRATION_CLOSED);
+        }
+        if (priceListItemId < 0) {
+            redirectAttributes.addFlashAttribute(SUBSCRIPTION_ID, uuid.toString());
+            return new ModelAndView("redirect:/register/select-membership");
         }
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =

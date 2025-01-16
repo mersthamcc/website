@@ -13,7 +13,10 @@ VALUES ('adult',
         30),
        ('social',
         NULL,
-        40)
+        40),
+       ('honorary',
+        '${honorary_code}',
+        50)
 ON CONFLICT("key") DO UPDATE
     SET registration_code = EXCLUDED.registration_code,
         sort_order        = EXCLUDED.sort_order;
@@ -121,14 +124,6 @@ ON CONFLICT(KEY) DO UPDATE
         choices = EXCLUDED.choices;
 
 INSERT
-INTO member_category(KEY)
-VALUES ('adult'),
-       ('junior'),
-       ('disability'),
-       ('social')
-ON CONFLICT DO NOTHING;
-
-INSERT
 INTO member_form_section(KEY)
 VALUES ('contact'),
        ('parent'),
@@ -136,6 +131,7 @@ VALUES ('contact'),
        ('adult-cricket'),
        ('junior-cricket'),
        ('adult-basics'),
+       ('social-basics'),
        ('disability-basics'),
        ('junior-basics'),
        ('emergency-contact'),
@@ -237,6 +233,14 @@ VALUES ((SELECT id
          FROM attribute_definition
          WHERE KEY = 'family-name'),
         20,
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'adult-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'dob'),
+        25,
         TRUE),
        ((SELECT id
          FROM member_form_section
@@ -421,7 +425,32 @@ VALUES ((SELECT id
          FROM attribute_definition
          WHERE KEY = 'junior-declarations'),
         10,
-        FALSE)
+        FALSE),
+
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'social-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'given-name'),
+        10,
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'social-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'family-name'),
+        20,
+        TRUE),
+       ((SELECT id
+         FROM member_form_section
+         WHERE KEY = 'social-basics'),
+        (SELECT id
+         FROM attribute_definition
+         WHERE KEY = 'gender'),
+        30,
+        TRUE)
 ON CONFLICT(
     member_form_section_id,
     attribute_definition_id
@@ -527,12 +556,28 @@ VALUES ((SELECT id
          WHERE KEY = 'social'),
         (SELECT id
          FROM member_form_section
-         WHERE KEY = 'adult-basics'),
+         WHERE KEY = 'social-basics'),
         10,
         TRUE),
        ((SELECT id
          FROM member_category
          WHERE KEY = 'social'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'contact'),
+        20,
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'honorary'),
+        (SELECT id
+         FROM member_form_section
+         WHERE KEY = 'social-basics'),
+        10,
+        TRUE),
+       ((SELECT id
+         FROM member_category
+         WHERE KEY = 'honorary'),
         (SELECT id
          FROM member_form_section
          WHERE KEY = 'contact'),
@@ -554,6 +599,15 @@ WHERE member_category_id = (SELECT id
                                 FROM member_form_section
                                 WHERE KEY = 'junior-basics');
 
+DELETE
+FROM member_category_form_section
+WHERE member_category_id = (SELECT id
+                            FROM member_category
+                            WHERE KEY = 'social')
+  AND member_form_section_id = (SELECT id
+                                FROM member_form_section
+                                WHERE KEY = 'adult-basics');
+
 INSERT
 INTO pricelist_item(id,
                     category_id,
@@ -574,30 +628,30 @@ VALUES (1,
          FROM member_category
          WHERE KEY = 'junior'),
         8,
-        15,
-        'Juniors (U8 - U15)',
+        18,
+        'Juniors (U8 - U18)',
         NULL),
        (3,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        16,
+        18,
         NULL,
-        'Students (aged 16 and older)',
+        'Students (aged 18 and older)',
         FALSE),
        (4,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        16,
+        18,
         NULL,
         'Students (all inclusive)',
-        FALSE),
+        TRUE),
        (5,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        16,
+        18,
         NULL,
         'Adults',
         FALSE),
@@ -605,7 +659,7 @@ VALUES (1,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        16,
+        18,
         NULL,
         'Adults (all inclusive)',
         TRUE),
@@ -613,9 +667,9 @@ VALUES (1,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        15,
+        18,
         NULL,
-        'Ladies (aged 15 years and older)',
+        'Ladies (aged 18 years and older)',
         NULL),
        (8,
         (SELECT id

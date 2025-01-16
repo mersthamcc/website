@@ -342,85 +342,103 @@
 
 <#macro membershipCategories categories _csrf subscriptionId>
     <#list categories as category>
-        <@section title="membership.${category.key}">
-            <div class="w-lg-80 mx-lg-auto position-relative">
-                <@categoryPricelist category=category _csrf=_csrf subscriptionId=subscriptionId />
-            </div>
-            <p>
-                <sup>*&nbsp;</sup>&nbsp;<@spring.message code="membership.age-footnote" />
-            </p>
-        </@section>
+        <#if category.priceListItem?has_content>
+            <@section title="membership.${category.key}">
+                <div class="w-lg-80 mx-lg-auto position-relative">
+                    <@categoryPricelist category=category _csrf=_csrf subscriptionId=subscriptionId />
+                </div>
+                <p>
+                    <sup>*&nbsp;</sup>&nbsp;<@spring.message code="membership.age-footnote" />
+                </p>
+            </@section>
+        </#if>
     </#list>
 </#macro>
 
 <#macro categoryPricelist category _csrf subscriptionId>
     <div class="row position-relative z-index-2 mx-n2 mb-5">
         <#list category.priceListItem as item>
-            <#if (item.currentPrice > 0)>
-                <div class="col-md-5 col-sm-4">
-                    <div class="px-2 mb-3">
-                        <div class="card h-100">
-                            <div class="card-header text-center">
-                                <span class="d-block h3">
-                                    ${item.description}
-                                </span>
-                                <span class="d-block mb-2">
-                                    <span class="text-dark align-top">&pound;</span>
-                                    <span class="font-size-4 text-dark font-weight-bold mr-n2">
-                                    <span id="pricingCount1">
-                                        ${item.currentPrice}
-                                    </span>
-                                    </span>
-                                    <span class="font-size-1">/ year</span>
-                                </span>
-                            </div>
-                            <!-- End Header -->
-
-                            <!-- Body -->
-                            <div class="card-body">
-                                <div class="media font-size-1 text-body mb-3">
-                                    <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
-                                    <div class="media-body">
-                                        Ages ${item.minAge}
-                                        <#if item.maxAge??>
-                                            to ${item.maxAge}
-                                        <#else>
-                                            and up
-                                        </#if>
-                                        <sup>*</sup>
-                                    </div>
-                                </div>
-                                <#if (item.includesMatchFees)?? && item.includesMatchFees>
-                                <div class="media font-size-1 text-body mb-3">
-                                    <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
-                                    <div class="media-body">
-                                        Includes Match Fees
-                                    </div>
-                                </div>
-                                </#if>
-                            </div>
-                            <!-- End Body -->
-
-                            <div class="card-footer border-0">
-                                <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="category" value="${category.key}" />
-                                    <input type="hidden" name="uuid" value="${subscriptionId}" />
-                                    <button
-                                            type="submit"
-                                            class="btn btn-soft-primary btn-block transition-3d-hover"
-                                            value="${item.id}"
-                                            name="priceListItemId"
-                                            id="priceListItemId-${item.id}">
-                                        <@spring.message code="membership.select" />
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <#if item.currentPrice??>
+                <@pricelistItem item=item category=category _csrf=_csrf subscriptionId=subscriptionId />
             </#if>
         </#list>
+    </div>
+
+</#macro>
+
+<#macro pricelistItem item category _csrf subscriptionId buttonTitle="membership.select" negativeButtonTitle="">
+    <div class="col-md-5 col-sm-4">
+        <div class="px-2 mb-3">
+            <div class="card h-100">
+                <div class="card-header text-center">
+                    <span class="d-block h3">
+                        ${item.description}
+                    </span>
+                    <span class="d-block mb-2">
+                        <span class="text-dark align-top">&pound;</span>
+                        <span class="font-size-4 text-dark font-weight-bold mr-n2">
+                        <span id="pricingCount1">
+                            ${item.currentPrice}
+                        </span>
+                        </span>
+                        <span class="font-size-1">/ year</span>
+                    </span>
+                </div>
+                <!-- End Header -->
+
+                <!-- Body -->
+                <div class="card-body">
+                    <div class="media font-size-1 text-body mb-3">
+                        <i class="fas fa-info-circle text-info mt-1 mr-2"></i>
+                        <div class="media-body">
+                            Ages ${item.minAge}
+                            <#if item.maxAge??>
+                                to ${item.maxAge}
+                            <#else>
+                                and up
+                            </#if>
+                            <sup>*</sup>
+                        </div>
+                    </div>
+                    <#if (item.includesMatchFees)?? && item.includesMatchFees>
+                        <div class="media font-size-1 text-body mb-3">
+                            <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
+                            <div class="media-body">
+                                Includes Match Fees
+                            </div>
+                        </div>
+                    </#if>
+                </div>
+                <!-- End Body -->
+
+                <div class="card-footer border-0">
+                    <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        <input type="hidden" name="category" value="${category.key}" />
+                        <input type="hidden" name="uuid" value="${subscriptionId}" />
+                        <button
+                                type="submit"
+                                class="btn btn-soft-primary btn-block transition-3d-hover"
+                                value="${item.id}"
+                                name="priceListItemId"
+                                id="priceListItemId-${item.id}">
+                            <@spring.message code="${buttonTitle}" />
+                        </button>
+
+                        <#if negativeButtonTitle?has_content>
+                            <button
+                                    type="submit"
+                                    class="btn btn-soft-danger btn-block transition-3d-hover"
+                                    value="-1"
+                                    name="priceListItemId"
+                                    id="priceListItemIdNegative-${item.id}">
+                                <@spring.message code="${negativeButtonTitle}" />
+                            </button>
+                        </#if>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 </#macro>
