@@ -400,6 +400,14 @@
                             <sup>*</sup>
                         </div>
                     </div>
+                    <#if (item.studentsOnly)?? && item.studentsOnly>
+                        <div class="media font-size-1 text-body mb-3">
+                            <i class="fas fa-info-circle text-info mt-1 mr-2"></i>
+                            <div class="media-body">
+                                For full-time students
+                            </div>
+                        </div>
+                    </#if>
                     <#if (item.includesMatchFees)?? && item.includesMatchFees>
                         <div class="media font-size-1 text-body mb-3">
                             <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
@@ -408,6 +416,12 @@
                             </div>
                         </div>
                     </#if>
+                    <div class="media font-size-1 text-body mb-3">
+                        <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
+                        <div class="media-body">
+                            Membership discount at bar <#if (item.parentDiscount)?? && item.parentDiscount>(usable by parent/guardians)</#if>
+                        </div>
+                    </div>
                 </div>
                 <!-- End Body -->
 

@@ -12,6 +12,8 @@ query membershipCategories($key: StringFilter!) {
       minAge
       maxAge
       includesMatchFees
+      studentsOnly
+      parentDiscount
       currentPrice
       memberCategory {
         key

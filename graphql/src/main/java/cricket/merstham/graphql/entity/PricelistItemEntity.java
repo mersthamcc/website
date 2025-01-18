@@ -53,6 +53,12 @@ public class PricelistItemEntity {
     @Column(name = "includes_match_fees")
     private Boolean includesMatchFees;
 
+    @Column(name = "students_only")
+    private Boolean studentsOnly;
+
+    @Column(name = "parent_discount")
+    private Boolean parentDiscount;
+
     @OneToMany(
             fetch = FetchType.EAGER,
             mappedBy = "primaryKey.pricelistItem",

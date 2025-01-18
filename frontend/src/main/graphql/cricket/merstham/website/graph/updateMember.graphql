@@ -37,6 +37,8 @@ mutation updateMember($id: Int!, $data: [AttributeInput]!) {
                 id
                 description
                 includesMatchFees
+                studentsOnly
+                parentDiscount
                 maxAge
                 minAge
                 memberCategory {

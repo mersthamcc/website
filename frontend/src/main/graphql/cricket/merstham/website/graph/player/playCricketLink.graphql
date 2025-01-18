@@ -41,6 +41,8 @@ mutation playCricketLink ($id: Int!, $playCricketId: Int!) {
                 id
                 description
                 includesMatchFees
+                studentsOnly
+                parentDiscount
                 maxAge
                 minAge
                 memberCategory {

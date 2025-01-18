@@ -614,7 +614,9 @@ INTO pricelist_item(id,
                     min_age,
                     max_age,
                     description,
-                    includes_match_fees)
+                    includes_match_fees,
+                    students_only,
+                    parent_discount)
 VALUES (1,
         (SELECT id
          FROM member_category
@@ -622,7 +624,9 @@ VALUES (1,
         5,
         7,
         'Juniors (under 7)',
-        NULL),
+        NULL,
+        FALSE,
+        TRUE),
        (2,
         (SELECT id
          FROM member_category
@@ -630,7 +634,9 @@ VALUES (1,
         8,
         18,
         'Juniors (U8 - U18)',
-        NULL),
+        NULL,
+        FALSE,
+        TRUE),
        (3,
         (SELECT id
          FROM member_category
@@ -638,6 +644,8 @@ VALUES (1,
         18,
         NULL,
         'Students (aged 18 and older)',
+        FALSE,
+        TRUE,
         FALSE),
        (4,
         (SELECT id
@@ -646,7 +654,9 @@ VALUES (1,
         18,
         NULL,
         'Students (all inclusive)',
-        TRUE),
+        TRUE,
+        TRUE,
+        FALSE),
        (5,
         (SELECT id
          FROM member_category
@@ -654,6 +664,8 @@ VALUES (1,
         18,
         NULL,
         'Adults',
+        FALSE,
+        FALSE,
         FALSE),
        (6,
         (SELECT id
@@ -662,7 +674,9 @@ VALUES (1,
         18,
         NULL,
         'Adults (all inclusive)',
-        TRUE),
+        TRUE,
+        FALSE,
+        FALSE),
        (7,
         (SELECT id
          FROM member_category
@@ -670,7 +684,9 @@ VALUES (1,
         18,
         NULL,
         'Ladies (aged 18 years and older)',
-        NULL),
+        NULL,
+        FALSE,
+        FALSE),
        (8,
         (SELECT id
          FROM member_category
@@ -678,7 +694,9 @@ VALUES (1,
         5,
         NULL,
         'Magics Memberships',
-        NULL),
+        NULL,
+        FALSE,
+        FALSE),
        (9,
         (SELECT id
          FROM member_category
@@ -686,7 +704,9 @@ VALUES (1,
         16,
         NULL,
         'Social',
-        NULL),
+        NULL,
+        FALSE,
+        FALSE),
        (10,
         (SELECT id
          FROM member_category
@@ -694,7 +714,9 @@ VALUES (1,
         18,
         NULL,
         'Walking Cricket',
-        NULL),
+        NULL,
+        FALSE,
+        FALSE),
        (11,
         (SELECT id
          FROM member_category
@@ -702,13 +724,17 @@ VALUES (1,
         6,
         10,
         'U10 Girls',
-        NULL)
+        NULL,
+        FALSE,
+        TRUE)
 ON CONFLICT(id) DO UPDATE
     SET category_id         = EXCLUDED.category_id,
         min_age             = EXCLUDED.min_age,
         max_age             = EXCLUDED.max_age,
         description         = EXCLUDED.description,
-        includes_match_fees = EXCLUDED.includes_match_fees;
+        includes_match_fees = EXCLUDED.includes_match_fees,
+        students_only       = EXCLUDED.students_only,
+        parent_discount     = EXCLUDED.parent_discount;
 
 INSERT
 INTO pricelist(pricelist_item_id,

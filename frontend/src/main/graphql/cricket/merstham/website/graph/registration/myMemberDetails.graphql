@@ -22,6 +22,8 @@ query myMemberDetails {
                 id
                 currentPrice
                 includesMatchFees
+                studentsOnly
+                parentDiscount
                 minAge
                 maxAge
                 memberCategory {
