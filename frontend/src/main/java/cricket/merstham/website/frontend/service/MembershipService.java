@@ -56,6 +56,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -365,6 +366,9 @@ public class MembershipService {
                 graphService.executeQuery(new MyMemberDetailsQuery(), accessToken);
         return result.getData().getMyMemberDetails().stream()
                 .map(m -> modelMapper.map(m, Member.class))
+                .sorted(
+                        Comparator.comparing(Member::getFamilyName)
+                                .thenComparing(Member::getGivenName))
                 .toList();
     }
 

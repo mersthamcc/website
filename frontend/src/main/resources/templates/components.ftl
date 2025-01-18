@@ -369,7 +369,7 @@
 <#macro pricelistItem item category _csrf subscriptionId buttonTitle="membership.select" negativeButtonTitle="">
     <div class="col-md-5 col-sm-4">
         <div class="px-2 mb-3">
-            <div class="card h-100">
+            <div class="card min-h-380rem">
                 <div class="card-header text-center">
                     <span class="d-block h3">
                         ${item.description}
@@ -418,7 +418,7 @@
                         <input type="hidden" name="uuid" value="${subscriptionId}" />
                         <button
                                 type="submit"
-                                class="btn btn-soft-primary btn-block transition-3d-hover"
+                                class="btn btn-primary btn-block transition-3d-hover"
                                 value="${item.id}"
                                 name="priceListItemId"
                                 id="priceListItemId-${item.id}">

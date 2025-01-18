@@ -163,7 +163,7 @@
            name="${key}"
            type="date"
            placeholder="<@spring.messageText code="${localeCategory}.${key}-placeholder" text="" />"
-           value="${(data[key]).format('yyyy-MM-dd')!""}"
+           value="<#if data[key]??>${(data[key]).format('yyyy-MM-dd')!""}</#if>"
             ${required}
     />
 </#macro>

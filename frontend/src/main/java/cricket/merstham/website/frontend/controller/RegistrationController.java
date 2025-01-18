@@ -54,14 +54,16 @@ import java.util.UUID;
 import static cricket.merstham.shared.dto.RegistrationAction.NEW;
 import static cricket.merstham.shared.dto.RegistrationAction.NONE;
 import static cricket.merstham.shared.dto.RegistrationAction.RENEW;
+import static cricket.merstham.website.frontend.controller.RegistrationController.BASKET;
 import static cricket.merstham.website.frontend.helpers.AttributeConverter.convert;
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectToPage;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Controller
-@SessionAttributes("basket")
+@SessionAttributes(BASKET)
 @PreAuthorize("isAuthenticated()")
 public class RegistrationController {
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
@@ -71,7 +73,8 @@ public class RegistrationController {
     public static final String SUBSCRIPTION_ID = "subscriptionId";
     public static final String MODEL_ERRORS = "errors";
     public static final String REGISTRATION_CLOSED = "registration/closed";
-    public static final String REDIRECT_REGISTER = "redirect:/register";
+    public static final String REGISTER = "/register";
+    public static final String BASKET = "basket";
 
     private final MembershipService membershipService;
     private final PaymentServiceManager paymentServiceManager;
@@ -105,7 +108,7 @@ public class RegistrationController {
         this.mailingListService = mailingListService;
     }
 
-    @ModelAttribute("basket")
+    @ModelAttribute(BASKET)
     public RegistrationBasket createRegistrationBasket(
             CognitoAuthentication cognitoAuthentication) {
         LOG.info("Creating new registration basket");
@@ -116,9 +119,9 @@ public class RegistrationController {
         return basket;
     }
 
-    @GetMapping(value = "/register", name = "register")
+    @GetMapping(value = REGISTER, name = "register")
     public ModelAndView register(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             HttpServletRequest request,
             CognitoAuthentication authentication) {
         if (!enabled) {
@@ -136,24 +139,25 @@ public class RegistrationController {
                         .stream()
                         .filter(coupon -> !basket.getAppliedCoupons().contains(coupon))
                         .toList();
-        model.put("basket", basket);
+        model.put(BASKET, basket);
         model.put("registrationYear", registrationYear);
         model.put("coupons", coupons);
         return new ModelAndView("registration/register", model);
     }
 
-    @PostMapping(value = "/register", name = "registration-actions")
+    @PostMapping(value = REGISTER, name = "registration-actions")
     public Object actionProcessor(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @ModelAttribute("action") String action,
             @ModelAttribute("delete-member") String deleteMember,
             @ModelAttribute("edit-member") String editMember,
+            @ModelAttribute("reset-member") String resetMember,
             @ModelAttribute("apply-coupon") String applyCoupon,
             CognitoAuthentication authentication,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
-            return redirectTo("/register");
+            return redirectTo(REGISTER);
         }
         if (!deleteMember.isBlank()) {
             basket.removeSubscription(UUID.fromString(deleteMember));
@@ -163,6 +167,12 @@ public class RegistrationController {
             redirectAttributes.addFlashAttribute(SUBSCRIPTION_ID, editMember);
 
             return redirectTo("/register/renew-membership");
+        } else if (!resetMember.isBlank()) {
+            var subscriptionId = UUID.fromString(resetMember);
+            var members =
+                    membershipService.getMyMemberDetails(authentication.getOAuth2AccessToken());
+            basket.resetSubscription(subscriptionId, members);
+            return redirectToPage(REGISTER);
         } else if (!applyCoupon.isBlank()) {
             var coupon =
                     membershipService
@@ -180,7 +190,7 @@ public class RegistrationController {
                     basket.getAppliedCoupons().add(coupon.get());
                 }
             }
-            return redirectTo("/register");
+            return redirectTo(REGISTER);
         } else {
             switch (action) {
                 case "add-member":
@@ -206,7 +216,7 @@ public class RegistrationController {
                     LOG.warn("Unknown action");
             }
         }
-        return redirectTo("/register");
+        return redirectTo(REGISTER);
     }
 
     @GetMapping(value = "/register/select-membership", name = "select-membership")
@@ -214,7 +224,7 @@ public class RegistrationController {
         var subscription = getCurrentSubscription(session);
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || !flash.containsKey(SUBSCRIPTION_ID)) {
-            return new ModelAndView(REDIRECT_REGISTER);
+            return redirectToPage(REGISTER);
         }
         var subscriptionId = (String) flash.get(SUBSCRIPTION_ID);
         var model = new HashMap<String, Object>();
@@ -236,7 +246,7 @@ public class RegistrationController {
         var subscription = getCurrentSubscription(session);
         var flash = RequestContextUtils.getInputFlashMap(request);
         if (isNull(flash) || !flash.containsKey(SUBSCRIPTION_ID)) {
-            return new ModelAndView(REDIRECT_REGISTER);
+            return redirectToPage(REGISTER);
         }
         var subscriptionId = (String) flash.get(SUBSCRIPTION_ID);
         var model = new HashMap<String, Object>();
@@ -271,7 +281,7 @@ public class RegistrationController {
                     List<String> declarations,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
-            return redirectTo("/register");
+            return redirectTo(REGISTER);
         }
         var errors = validatePolicies(declarations);
         if (errors.isEmpty()) {
@@ -283,7 +293,7 @@ public class RegistrationController {
 
     @GetMapping(value = "/register/mailing-list", name = "register-mailing-list")
     public ModelAndView mailingList(
-            @ModelAttribute("basket") RegistrationBasket basket, HttpServletRequest request) {
+            @ModelAttribute(BASKET) RegistrationBasket basket, HttpServletRequest request) {
         if (!enabled) {
             return new ModelAndView(REGISTRATION_CLOSED);
         }
@@ -296,7 +306,7 @@ public class RegistrationController {
         List<MailingListSubscription> emails =
                 mailingListService.getSubscriptions(detectEmailAddresses(basket));
         if (emails.isEmpty()) {
-            return new ModelAndView(REDIRECT_REGISTER);
+            return redirectToPage(REGISTER);
         }
         model.put("emails", emails);
         return new ModelAndView("registration/mailing-list", model);
@@ -306,10 +316,10 @@ public class RegistrationController {
     public RedirectView mailingListProcess(
             @RequestParam(value = "emailAddresses", required = false, defaultValue = "")
                     List<String> emailAddresses,
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             RedirectAttributes redirectAttributes) {
         if (!enabled) {
-            return redirectTo("/register");
+            return redirectTo(REGISTER);
         }
 
         var subscriptions =
@@ -371,7 +381,7 @@ public class RegistrationController {
 
     @PostMapping(value = "/register/select-membership", name = "member-details")
     public ModelAndView membershipForm(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @ModelAttribute("category") String category,
             @ModelAttribute("uuid") UUID uuid,
             @ModelAttribute("priceListItemId") Integer priceListItemId,
@@ -384,7 +394,7 @@ public class RegistrationController {
         }
         if (priceListItemId < 0) {
             redirectAttributes.addFlashAttribute(SUBSCRIPTION_ID, uuid.toString());
-            return new ModelAndView("redirect:/register/select-membership");
+            return redirectToPage("/register/select-membership");
         }
         var membershipCategory = membershipService.getMembershipCategory(category);
         var priceListItem =
@@ -450,11 +460,11 @@ public class RegistrationController {
             name = "member-details",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public View membershipFormProcess(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @RequestBody MultiValueMap<String, Object> body,
             HttpSession session) {
         if (!enabled) {
-            return redirectTo("/register");
+            return redirectTo(REGISTER);
         }
         var uuid = UUID.fromString((String) body.getFirst("uuid"));
         var subscription = getCurrentSubscription(session);
@@ -465,21 +475,21 @@ public class RegistrationController {
         session.removeAttribute(CURRENT_SUBSCRIPTION);
         basket.putSubscription(uuid, subscription);
         saveDefaults(body, subscription, session);
-        return redirectTo("/register");
+        return redirectTo(REGISTER);
     }
 
     private MemberSubscription updateMember(MemberSubscription subscription, Member member) {
         if (isNull(subscription.getMember())) {
             subscription.setMember(member);
         } else {
-            modelMapper.map(member, subscription.getMember());
+            subscription.getMember().updateAttributesFrom(member);
         }
         return subscription;
     }
 
     @GetMapping(value = "/register/confirmation", name = "registration-confirmation")
     public ModelAndView confirmation(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             CognitoAuthentication cognitoAuthentication,
             Locale locale,
             HttpSession session,
@@ -488,15 +498,11 @@ public class RegistrationController {
             return new ModelAndView(REGISTRATION_CLOSED);
         }
         if (basket.getBasketTotal().compareTo(BigDecimal.ZERO) == 0) {
-            return new ModelAndView("registration/no-payment-required", Map.of("basket", basket));
+            return new ModelAndView("registration/no-payment-required", Map.of(BASKET, basket));
         }
         return new ModelAndView(
                 "registration/confirmation",
-                Map.of(
-                        "basket",
-                        basket,
-                        "paymentTypes",
-                        paymentServiceManager.getEnabledServices()));
+                Map.of(BASKET, basket, "paymentTypes", paymentServiceManager.getEnabledServices()));
     }
 
     private Member memberFromPost(MultiValueMap<String, Object> body) {

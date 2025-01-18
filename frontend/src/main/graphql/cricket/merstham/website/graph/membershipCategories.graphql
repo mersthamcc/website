@@ -13,6 +13,9 @@ query membershipCategories($key: StringFilter!) {
       maxAge
       includesMatchFees
       currentPrice
+      memberCategory {
+        key
+      }
     }
     form {
       sortOrder

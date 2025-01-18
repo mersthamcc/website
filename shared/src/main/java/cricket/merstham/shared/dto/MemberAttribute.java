@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
 @Data
 @Builder
@@ -26,4 +27,16 @@ public class MemberAttribute implements Serializable {
     @JsonProperty private Instant createdDate;
     @JsonProperty private Instant updatedDate;
     @JsonProperty private JsonNode value;
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MemberAttribute that)) return false;
+        return Objects.equals(memberId, that.memberId)
+                && Objects.equals(definition, that.definition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(memberId, definition);
+    }
 }
