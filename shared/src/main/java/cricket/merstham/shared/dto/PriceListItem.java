@@ -31,4 +31,6 @@ public class PriceListItem implements Serializable {
     @JsonProperty private Boolean includesMatchFees;
     @JsonProperty private BigDecimal currentPrice;
     @JsonProperty private List<Price> price = new ArrayList<>();
+    @JsonProperty private Boolean studentsOnly;
+    @JsonProperty private Boolean parentDiscount;
 }

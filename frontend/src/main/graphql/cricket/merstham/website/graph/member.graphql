@@ -46,6 +46,8 @@ query member($id: Int!) {
                 id
                 description
                 includesMatchFees
+                studentsOnly
+                parentDiscount
                 maxAge
                 minAge
                 memberCategory {

@@ -350,7 +350,12 @@ class MembershipServiceTest {
                                                                 18,
                                                                 null,
                                                                 false,
-                                                                Double.valueOf(120.00))),
+                                                                false,
+                                                                false,
+                                                                Double.valueOf(120.00),
+                                                                new MembershipCategoriesQuery
+                                                                        .MemberCategory(
+                                                                        "", "adult"))),
                                                 List.of(
                                                         new MembershipCategoriesQuery.Form(
                                                                 "Form",
@@ -453,7 +458,12 @@ class MembershipServiceTest {
                                                                 18,
                                                                 null,
                                                                 false,
-                                                                Double.valueOf(120.00))),
+                                                                false,
+                                                                false,
+                                                                Double.valueOf(120.00),
+                                                                new MembershipCategoriesQuery
+                                                                        .MemberCategory(
+                                                                        "", "adult"))),
                                                 List.of(
                                                         new MembershipCategoriesQuery.Form(
                                                                 "Form",
@@ -654,6 +664,8 @@ class MembershipServiceTest {
                                                                         "Subscription",
                                                                         1,
                                                                         "Adult Membership",
+                                                                        false,
+                                                                        false,
                                                                         false,
                                                                         null,
                                                                         18,

@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static cricket.merstham.shared.IdentifierConstants.EPOS_CUSTOMER_ID;
@@ -122,8 +124,37 @@ public class Member implements Serializable {
                 getAttributeMap().get("family-name").asText());
     }
 
+    @Transient
+    public String getGivenName() {
+        return getAttributeMap().get("given-name").asText();
+    }
+
+    @Transient
+    public String getFamilyName() {
+        return getAttributeMap().get("family-name").asText();
+    }
+
     private MemberSubscription thisYearsSubscription() {
         var now = LocalDate.now().getYear();
         return subscription.stream().filter(s -> s.getYear() == now).findFirst().orElseThrow();
+    }
+
+    public Member updateAttributesFrom(Member member) {
+        var attributeSet =
+                new TreeSet<MemberAttribute>(
+                        (o1, o2) -> {
+                            if (Objects.equals(o1.getMemberId(), o2.getMemberId())) {
+                                if (isNull(o1.getDefinition())) return -1;
+                                if (isNull(o2.getDefinition())) return 1;
+                                return o1.getDefinition()
+                                        .getKey()
+                                        .compareTo(o2.getDefinition().getKey());
+                            }
+                            return o1.getMemberId().compareTo(o2.getMemberId());
+                        });
+        if (nonNull(member.getAttributes())) attributeSet.addAll(member.getAttributes());
+        if (nonNull(this.attributes)) attributeSet.addAll(this.attributes);
+        this.attributes = new ArrayList<>(attributeSet);
+        return this;
     }
 }

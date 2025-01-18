@@ -16,7 +16,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class RegistrationBasket implements Serializable {
 
     public RegistrationBasket(List<Discount> activeDiscounts) {
         this.id = UUID.randomUUID().toString();
-        this.subscriptions = new HashMap<>();
+        this.subscriptions = new LinkedHashMap<>();
         this.activeDiscounts = activeDiscounts;
         this.appliedCoupons = new ArrayList<>();
     }
@@ -91,7 +91,7 @@ public class RegistrationBasket implements Serializable {
 
     public void reset() {
         this.id = UUID.randomUUID().toString();
-        this.subscriptions = new HashMap<>();
+        this.subscriptions = new LinkedHashMap<>();
     }
 
     public void addExistingMembers(List<Member> members) {
@@ -99,18 +99,32 @@ public class RegistrationBasket implements Serializable {
                 member -> {
                     var uuid = UUID.randomUUID();
                     if (!subscriptions.containsKey(uuid))
-                        subscriptions.put(
-                                uuid,
-                                MemberSubscription.builder()
-                                        .action(RegistrationAction.NONE)
-                                        .year(member.getMostRecentSubscription().getYear())
-                                        .category(
-                                                member.getMostRecentSubscription()
-                                                        .getPriceListItem()
-                                                        .getMemberCategory()
-                                                        .getKey())
-                                        .member(member)
-                                        .build());
+                        subscriptions.put(uuid, memberToSubscription(member));
                 });
+    }
+
+    public void resetSubscription(UUID subscriptionId, List<Member> members) {
+        var existingSubscription = subscriptions.get(subscriptionId);
+        var member =
+                members.stream()
+                        .filter(m -> m.getId().equals(existingSubscription.getMember().getId()))
+                        .findFirst();
+
+        if (member.isPresent()) {
+            subscriptions.put(subscriptionId, memberToSubscription(member.get()));
+        }
+    }
+
+    private MemberSubscription memberToSubscription(Member member) {
+        return MemberSubscription.builder()
+                .action(RegistrationAction.NONE)
+                .year(member.getMostRecentSubscription().getYear())
+                .category(
+                        member.getMostRecentSubscription()
+                                .getPriceListItem()
+                                .getMemberCategory()
+                                .getKey())
+                .member(member)
+                .build();
     }
 }

@@ -18,9 +18,18 @@ query myMemberDetails {
             year
             addedDate
             priceListItem {
+                description
+                id
+                currentPrice
+                includesMatchFees
+                studentsOnly
+                parentDiscount
+                minAge
+                maxAge
                 memberCategory {
                     id
                     key
+                    registrationCode
                 }
             }
         }

@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import static cricket.merstham.website.frontend.controller.RegistrationController.BASKET;
 import static java.util.Objects.isNull;
 
 @Controller
-@SessionAttributes("basket")
+@SessionAttributes(BASKET)
 public class PaymentsController {
 
     public static final String ORDER = "current-order";
@@ -35,7 +37,7 @@ public class PaymentsController {
 
     @PostMapping(value = "/payments", name = "payment-start")
     public ModelAndView start(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @ModelAttribute("payment-type") String paymentType,
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
@@ -48,7 +50,7 @@ public class PaymentsController {
 
     @PostMapping(value = "/payments/{payment-type}/authorise", name = "payment-authorise")
     public ModelAndView authorise(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @PathVariable("payment-type") String paymentType,
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request) {
@@ -59,7 +61,7 @@ public class PaymentsController {
 
     @GetMapping(value = "/payments/{payment-type}/execute", name = "payment-execute")
     public ModelAndView execute(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @PathVariable("payment-type") String paymentType,
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
@@ -75,11 +77,12 @@ public class PaymentsController {
 
     @GetMapping(value = "/payments/{payment-type}/confirmation", name = "payment-confirmation")
     public ModelAndView confirmation(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @PathVariable("payment-type") String paymentType,
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request,
-            HttpSession session) {
+            HttpSession session,
+            SessionStatus status) {
         if (basket.getChargeableSubscriptions().isEmpty())
             return new ModelAndView("redirect:/registration");
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
@@ -98,13 +101,14 @@ public class PaymentsController {
                 order, paymentType, cognitoAuthentication.getOAuth2AccessToken());
 
         session.removeAttribute(ORDER);
-        basket.reset();
+        session.removeAttribute(BASKET);
+        status.setComplete();
         return paymentService.confirm(request, order, cognitoAuthentication.getOAuth2AccessToken());
     }
 
     @GetMapping(value = "/payments/{payment-type}/cancel", name = "payment-cancel")
     public ModelAndView cancel(
-            @ModelAttribute("basket") RegistrationBasket basket,
+            @ModelAttribute(BASKET) RegistrationBasket basket,
             @PathVariable("payment-type") String paymentType,
             CognitoAuthentication cognitoAuthentication,
             HttpServletRequest request) {

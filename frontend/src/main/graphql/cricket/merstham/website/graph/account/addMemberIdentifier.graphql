@@ -45,6 +45,8 @@ mutation addMemberIdentifier($id: Int!, $name: String!, $value: String!  ) {
                 id
                 description
                 includesMatchFees
+                studentsOnly
+                parentDiscount
                 maxAge
                 minAge
                 memberCategory {

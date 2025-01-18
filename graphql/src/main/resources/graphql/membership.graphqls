@@ -157,6 +157,8 @@ type PriceListItem {
     minAge: Int!
     maxAge: Int
     includesMatchFees: Boolean
+    studentsOnly: Boolean
+    parentDiscount: Boolean
     memberCategory: MemberCategory!
     priceList: [Price!]!
     currentPrice: Float

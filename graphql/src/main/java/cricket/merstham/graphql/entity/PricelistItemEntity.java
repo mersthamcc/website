@@ -53,6 +53,12 @@ public class PricelistItemEntity {
     @Column(name = "includes_match_fees")
     private Boolean includesMatchFees;
 
+    @Column(name = "students_only")
+    private Boolean studentsOnly;
+
+    @Column(name = "parent_discount")
+    private Boolean parentDiscount;
+
     @OneToMany(
             fetch = FetchType.EAGER,
             mappedBy = "primaryKey.pricelistItem",
@@ -70,7 +76,7 @@ public class PricelistItemEntity {
                                         && (today.isBefore(p.getDateTo())
                                                 || today.isEqual(p.getDateTo())))
                 .findFirst()
-                .orElse(PricelistEntity.builder().price(BigDecimal.ZERO).build())
-                .getPrice();
+                .map(PricelistEntity::getPrice)
+                .orElse(null);
     }
 }
