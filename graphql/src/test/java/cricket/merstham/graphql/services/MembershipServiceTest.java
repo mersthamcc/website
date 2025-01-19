@@ -378,7 +378,8 @@ class MembershipServiceTest {
                     mock(MemberSummaryRepository.class),
                     mock(EmailService.class),
                     mock(CognitoService.class),
-                    mock(CouponEntityRepository.class));
+                    mock(CouponEntityRepository.class),
+                    List.of());
 
     @BeforeEach
     void setup() {

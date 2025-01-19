@@ -24,6 +24,7 @@ import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
+import cricket.merstham.graphql.services.hooks.Hook;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
@@ -80,6 +81,7 @@ public class MembershipService {
     private final EmailService emailService;
     private final CognitoService cognitoService;
     private final CouponEntityRepository couponEntityRepository;
+    private final List<Hook<OrderEntity>> hooks;
 
     @Autowired
     public MembershipService(
@@ -96,7 +98,8 @@ public class MembershipService {
             MemberSummaryRepository memberSummaryRepository,
             EmailService emailService,
             CognitoService cognitoService,
-            CouponEntityRepository couponEntityRepository) {
+            CouponEntityRepository couponEntityRepository,
+            List<Hook<OrderEntity>> hooks) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -111,6 +114,7 @@ public class MembershipService {
         this.emailService = emailService;
         this.cognitoService = cognitoService;
         this.couponEntityRepository = couponEntityRepository;
+        this.hooks = hooks;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -320,9 +324,15 @@ public class MembershipService {
 
             order.setConfirmed(true);
             order = orderEntityRepository.saveAndFlush(order);
+            processOrderConfirmationHooks(order);
+            order = orderEntityRepository.saveAndFlush(order);
         }
 
         return modelMapper.map(order, Order.class);
+    }
+
+    private void processOrderConfirmationHooks(OrderEntity order) {
+        hooks.forEach(hook -> hook.onConfirm(order));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -431,6 +441,12 @@ public class MembershipService {
                 memberRepository.findByIdAndOwnerUserId(id, getSubject(principal)).orElseThrow();
         member.getIdentifiers().put(name, value);
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
+    }
+
+    public void addMemberIdentifier(int id, String name, String value) {
+        var member = memberRepository.findById(id).orElseThrow();
+        member.getIdentifiers().put(name, value);
+        memberRepository.saveAndFlush(member);
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")

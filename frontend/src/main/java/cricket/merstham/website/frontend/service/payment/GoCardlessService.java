@@ -1,10 +1,12 @@
 package cricket.merstham.website.frontend.service.payment;
 
+import com.apollographql.apollo.api.Error;
 import com.gocardless.GoCardlessClient;
 import com.gocardless.resources.CustomerBankAccount;
 import com.gocardless.resources.Mandate;
 import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
@@ -227,8 +229,8 @@ public class GoCardlessService implements PaymentService {
                         .filter(ps -> ps.getNumberOfPayments() == numberOfPayments)
                         .findFirst()
                         .orElseThrow();
-        String mandateId = null;
-        Mandate mandate = null;
+        String mandateId;
+        Mandate mandate;
         if (nonNull(flowId)) {
             var redirectFlow =
                     client.redirectFlows()
@@ -247,8 +249,18 @@ public class GoCardlessService implements PaymentService {
                         mandate.getLinks().getCustomer(),
                         "pending",
                         accessToken);
+            } catch (GraphException e) {
+                LOG.atError()
+                        .setCause(e)
+                        .log(
+                                "Error saving mandate {} - '{}'",
+                                mandate.getId(),
+                                String.join(
+                                        ", ",
+                                        e.getErrors().stream().map(Error::getMessage).toList()),
+                                e);
             } catch (Exception e) {
-                LOG.atWarn()
+                LOG.atError()
                         .setCause(e)
                         .log("Unable to save payment method for mandate {}", mandate.getId());
             }

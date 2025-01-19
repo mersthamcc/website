@@ -162,7 +162,7 @@ public class PassGeneratorService {
                         .barcodes(
                                 List.of(
                                         PKBarcode.builder()
-                                                .format(PKBarcodeFormat.PKBarcodeFormatCode128)
+                                                .format(PKBarcodeFormat.PKBarcodeFormatQR)
                                                 .message(format(barcodePattern, member.getId()))
                                                 .build()))
                         .build();
@@ -250,11 +250,11 @@ public class PassGeneratorService {
                                         .setId(CATEGORY),
                                 new TextModuleData()
                                         .setHeader("Year")
-                                        .setBody(member.getLastSubsYear())
+                                        .setBody(member.getMostRecentSubscription().toString())
                                         .setId(YEAR)))
                 .setBarcode(
                         new Barcode()
-                                .setType("CODE_128")
+                                .setType("QR_CODE")
                                 .setValue(format(barcodePattern, member.getId())))
                 .setCardTitle(
                         new LocalizedString()

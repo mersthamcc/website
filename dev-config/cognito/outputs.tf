@@ -37,3 +37,19 @@ output "cognito_user_pool_id" {
 output "cognito_ui_uri" {
   value = aws_cognito_user_pool_domain.dev_pool_domain.domain
 }
+
+output "transactions_queue_arn" {
+  value = aws_sqs_queue.transactions.arn
+}
+
+output "transaction_responses_queue_arn" {
+  value = aws_sqs_queue.transaction-responses.arn
+}
+
+output "transactions_queue_url" {
+  value = aws_sqs_queue.transactions.id
+}
+
+output "transaction_responses_queue_url" {
+  value = aws_sqs_queue.transaction-responses.id
+}

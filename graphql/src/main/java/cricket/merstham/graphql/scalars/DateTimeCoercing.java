@@ -17,7 +17,7 @@ public class DateTimeCoercing implements Coercing<Instant, String> {
     private DateTimeFormatter formatter =
             new DateTimeFormatterBuilder()
                     .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 9, true)
                     .appendZoneOrOffsetId()
                     .toFormatter();
 
@@ -40,20 +40,22 @@ public class DateTimeCoercing implements Coercing<Instant, String> {
             }
         } catch (DateTimeParseException e) {
             throw new CoercingParseValueException(
-                    String.format("Not a valid date: '%s'.", input), e);
+                    String.format(
+                            "Error coercing string to date: '%s' - %s", input, e.getMessage()),
+                    e);
         }
     }
 
     @Override
     public Instant parseLiteral(final Object input) throws CoercingParseLiteralException {
-        if (input instanceof StringValue) {
+        if (input instanceof StringValue value) {
             try {
-                return Instant.parse(((StringValue) input).getValue());
+                return Instant.parse(value.getValue());
             } catch (DateTimeParseException e) {
                 throw new CoercingParseLiteralException(e);
             }
         } else {
-            throw new CoercingParseLiteralException("Expected a StringValue.");
+            throw new CoercingParseLiteralException("Expected a StringValue");
         }
     }
 }
