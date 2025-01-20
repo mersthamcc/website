@@ -70,6 +70,7 @@ public class PassGeneratorService {
     private final String googleIssuerId;
     private final String googleWalletClass;
     private final GoogleCredentials googleCredentials;
+    private final String apiBaseUrl;
 
     @Autowired
     public PassGeneratorService(
@@ -90,7 +91,8 @@ public class PassGeneratorService {
             Walletobjects walletobjects,
             @Value("${wallet.google.issuer}") String googleIssuerId,
             String googleWalletClass,
-            GoogleCredentials googleCredentials) {
+            GoogleCredentials googleCredentials,
+            @Value("${api.base-uri}") String apiBaseUrl) {
         this.clubName = clubName;
         this.backgroundColourHex = backgroundColourHex;
         this.foregroundColourHex = foregroundColourHex;
@@ -105,6 +107,7 @@ public class PassGeneratorService {
         this.walletobjects = walletobjects;
         this.googleIssuerId = googleIssuerId;
         this.googleCredentials = googleCredentials;
+        this.apiBaseUrl = apiBaseUrl;
         this.signingInformation =
                 new PKSigningInformation(
                         appleSigningCertificate, appleSigningKey, appleIntermediaryCertificate);
@@ -144,7 +147,7 @@ public class PassGeneratorService {
                         .teamIdentifier(appleTeamid)
                         .organizationName(clubName)
                         .description(walletDescription)
-                        .serialNumber(format("{0}-{1}", member.getUuid(), serialNumber))
+                        .serialNumber(format("{0}--{1}", member.getUuid(), serialNumber))
                         .backgroundColor(backgroundColourHex)
                         .foregroundColor(foregroundColourHex)
                         .labelColor(foregroundColourHex)
@@ -165,6 +168,8 @@ public class PassGeneratorService {
                                                 .format(PKBarcodeFormat.PKBarcodeFormatQR)
                                                 .message(format(barcodePattern, member.getId()))
                                                 .build()))
+                        .webServiceURL(new URL(new URL(apiBaseUrl), "/passkit"))
+                        .authenticationToken(member.getUuid())
                         .build();
 
         var template = getTemplate();
@@ -199,7 +204,7 @@ public class PassGeneratorService {
                         PKField.builder()
                                 .label("Year")
                                 .key("year")
-                                .value(member.getLastSubsYear())
+                                .value(member.getMostRecentSubscription())
                                 .build())
                 .build();
     }

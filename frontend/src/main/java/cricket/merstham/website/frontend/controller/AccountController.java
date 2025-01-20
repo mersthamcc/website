@@ -150,12 +150,9 @@ public class AccountController {
                         .filter(m -> m.getUuid().equals(uuid))
                         .findFirst()
                         .orElseThrow();
-        var serialNumber = member.getApplePassSerial();
-        if (isNull(member.getApplePassSerial())) {
-            serialNumber = UUID.randomUUID().toString();
-            membershipService.addApplePassSerial(
-                    member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
-        }
+        var serialNumber = Long.toString(member.getLastSubsDate().toEpochDay());
+        membershipService.addApplePassSerial(
+                member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
         var entity =
                 new ByteArrayResource(
                         passGeneratorService.createAppleWalletPass(member, serialNumber));
