@@ -73,6 +73,8 @@ configuration:
   scheduler-zone: "${SCHEDULER_ZONE:Europe/London}"
   region: ${AWS_REGION:eu-west-2}
   base-url: "${BASE_URL:http://localhost:8080}"
+  transaction-queue-url: ${TRANSACTION_QUEUE_URL:}
+  transaction-response-queue-url: ${TRANSACTION_RESPONSE_QUEUE_URL:}
   mail:
     from-address: ${EMAIL_FROM_ADDRESS:}
     membership-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}

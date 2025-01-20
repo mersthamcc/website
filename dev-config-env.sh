@@ -15,3 +15,6 @@ echo "WEBSITE_CLIENT_CREDENTIALS_SECRET=$(terraform output -json | jq -r '.websi
 
 echo "JUPYTER_CLIENT_ID=$(terraform output -json | jq -r '.jupyter_client_id.value')"
 echo "JUPYTER_CLIENT_SECRET=$(terraform output -json | jq -r '.jupyter_client_secret.value')"
+
+echo "TRANSACTION_QUEUE_URL=$(terraform output -json | jq -r '.transactions_queue_url.value')"
+echo "TRANSACTION_RESPONSE_QUEUE_URL=$(terraform output -json | jq -r '.transaction_responses_queue_url.value')"

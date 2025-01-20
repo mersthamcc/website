@@ -404,8 +404,7 @@ public class MembershipService {
             String methodId,
             String customerId,
             String status,
-            OAuth2AccessToken accessToken)
-            throws IOException {
+            OAuth2AccessToken accessToken) {
         var input =
                 UserPaymentMethodInput.builder()
                         .provider(provider)

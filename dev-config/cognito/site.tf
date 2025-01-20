@@ -6,7 +6,7 @@ terraform {
     }
   }
 
-  required_version = "1.6.6"
+  required_version = "1.9.5"
 }
 
 provider "aws" {
@@ -21,3 +21,5 @@ locals {
     environment = "dev"
   }
 }
+
+data "aws_caller_identity" "current" {}
