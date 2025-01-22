@@ -2,6 +2,7 @@ package cricket.merstham.graphql.controllers;
 
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.PassKitDeviceRegistrationEntityRepository;
+import cricket.merstham.graphql.services.PassGeneratorService;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,12 +16,14 @@ class ApplePassKitControllerTest {
     private MemberEntityRepository memberEntityRepository = mock(MemberEntityRepository.class);
     private PassKitDeviceRegistrationEntityRepository passKitDeviceRegistrationEntityRepository =
             mock(PassKitDeviceRegistrationEntityRepository.class);
+    private PassGeneratorService passGeneratorService = mock(PassGeneratorService.class);
 
     private ApplePassKitController applePassKitController =
             new ApplePassKitController(
                     memberEntityRepository,
                     passKitDeviceRegistrationEntityRepository,
-                    REGISTERED_PASS_TYPE_ID);
+                    REGISTERED_PASS_TYPE_ID,
+                    passGeneratorService);
 
     @Test
     void parseSerialNumber() {

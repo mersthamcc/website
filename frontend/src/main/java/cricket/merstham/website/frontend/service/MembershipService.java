@@ -9,12 +9,14 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
+import cricket.merstham.shared.dto.Pass;
 import cricket.merstham.shared.dto.RegistrationAction;
 import cricket.merstham.shared.dto.UserPaymentMethod;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
 import cricket.merstham.website.graph.CreateMemberSubscriptionMutation;
@@ -28,6 +30,7 @@ import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
+import cricket.merstham.website.graph.account.PassQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
@@ -451,5 +454,14 @@ public class MembershipService {
                 .map(c -> modelMapper.map(c, Coupon.class))
                 .filter(c -> isNull(c.getRedeemDate()))
                 .toList();
+    }
+
+    public Pass getMemberPass(
+            String uuid, String type, CognitoAuthentication cognitoAuthentication) {
+        var query = PassQuery.builder().uuid(uuid).passType(type).build();
+        Response<PassQuery.Data> response =
+                graphService.executeQuery(query, cognitoAuthentication.getOAuth2AccessToken());
+
+        return modelMapper.map(requireGraphData(response, PassQuery.Data::getPass), Pass.class);
     }
 }

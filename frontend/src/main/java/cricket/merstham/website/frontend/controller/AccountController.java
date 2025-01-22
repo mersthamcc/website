@@ -1,11 +1,11 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.shared.dto.Pass;
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.website.frontend.model.ChangePassword;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.MembershipService;
-import cricket.merstham.website.frontend.service.account.PassGeneratorService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static java.text.MessageFormat.format;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Controller
@@ -46,16 +44,11 @@ public class AccountController {
 
     private final CognitoService service;
     private final MembershipService membershipService;
-    private final PassGeneratorService passGeneratorService;
 
     @Autowired
-    public AccountController(
-            CognitoService service,
-            MembershipService membershipService,
-            PassGeneratorService passGeneratorService) {
+    public AccountController(CognitoService service, MembershipService membershipService) {
         this.service = service;
         this.membershipService = membershipService;
-        this.passGeneratorService = passGeneratorService;
     }
 
     @GetMapping(value = "/account", name = "account-home")
@@ -141,21 +134,10 @@ public class AccountController {
 
     @GetMapping(value = "/account/pass/{uuid}/apple", name = "apple-wallet-membership-card")
     public ResponseEntity<Resource> appleWalletMemberShipCard(
-            @PathVariable String uuid, CognitoAuthentication cognitoAuthentication)
-            throws IOException {
-        var member =
-                membershipService
-                        .getMyMembers(cognitoAuthentication.getOAuth2AccessToken())
-                        .stream()
-                        .filter(m -> m.getUuid().equals(uuid))
-                        .findFirst()
-                        .orElseThrow();
-        var serialNumber = Long.toString(member.getLastSubsDate().toEpochDay());
-        membershipService.addApplePassSerial(
-                member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
-        var entity =
-                new ByteArrayResource(
-                        passGeneratorService.createAppleWalletPass(member, serialNumber));
+            @PathVariable String uuid, CognitoAuthentication cognitoAuthentication) {
+        Pass pass = membershipService.getMemberPass(uuid, "apple", cognitoAuthentication);
+        var decoder = Base64.getDecoder();
+        var entity = new ByteArrayResource(decoder.decode(pass.getContent()));
         return ResponseEntity.ok()
                 .contentLength(entity.contentLength())
                 .contentType(MediaType.valueOf("application/vnd.apple.pkpass"))
@@ -165,20 +147,8 @@ public class AccountController {
     @GetMapping(value = "/account/pass/{uuid}/google", name = "google-wallet-membership-card")
     public RedirectView googleWalletMemberShipCard(
             @PathVariable String uuid, CognitoAuthentication cognitoAuthentication) {
-        var member =
-                membershipService
-                        .getMyMembers(cognitoAuthentication.getOAuth2AccessToken())
-                        .stream()
-                        .filter(m -> m.getUuid().equals(uuid))
-                        .findFirst()
-                        .orElseThrow();
-        var serialNumber = member.getGooglePassSerial();
-        if (isNull(member.getGooglePassSerial())) {
-            serialNumber = UUID.randomUUID().toString();
-            membershipService.addGooglePassSerial(
-                    member.getId(), serialNumber, cognitoAuthentication.getOAuth2AccessToken());
-        }
-        return redirectTo(passGeneratorService.createGoogleWalletPass(member, serialNumber));
+        Pass pass = membershipService.getMemberPass(uuid, "google", cognitoAuthentication);
+        return redirectTo(pass.getContent());
     }
 
     private Map<String, Object> baseModel(HttpServletRequest request) {

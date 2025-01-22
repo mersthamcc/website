@@ -21,11 +21,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.text.MessageFormat.format;
 
 @Entity
 @Table(
@@ -100,8 +104,9 @@ public class MemberEntity {
     @Transient
     public MemberSubscriptionEntity getMostRecentSubscription() {
         return subscription.stream()
-                .sorted(Comparator.comparing(MemberSubscriptionEntity::getAddedDate).reversed())
-                .findFirst()
+                .max(
+                        Comparator.comparing(MemberSubscriptionEntity::getYear)
+                                .thenComparing(MemberSubscriptionEntity::getAddedDate))
                 .orElseThrow();
     }
 
@@ -112,5 +117,17 @@ public class MemberEntity {
         }
         subscription.add(entity);
         return this;
+    }
+
+    @Transient
+    public long getSubscriptionEpochSecond() {
+        return getMostRecentSubscription()
+                .getAddedDate()
+                .toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC);
+    }
+
+    public String getFullName() {
+        return format(
+                "{0} {1}", getStringAttribute("given-name"), getStringAttribute("family-name"));
     }
 }

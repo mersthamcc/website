@@ -29,4 +29,6 @@ public interface MemberEntityRepository
     List<MemberEntity> findAllByCancelledIsNull();
 
     Optional<MemberEntity> findFirstByUuid(String uuid);
+
+    Optional<MemberEntity> findByUuidAndOwnerUserId(String uuid, String ownerUserId);
 }

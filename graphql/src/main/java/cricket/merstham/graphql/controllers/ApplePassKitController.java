@@ -4,6 +4,7 @@ import cricket.merstham.graphql.entity.MemberEntity;
 import cricket.merstham.graphql.entity.PasskitDeviceRegistrationEntity;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.PassKitDeviceRegistrationEntityRepository;
+import cricket.merstham.graphql.services.PassGeneratorService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,9 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,16 +48,19 @@ public class ApplePassKitController {
     private final PassKitDeviceRegistrationEntityRepository
             passKitDeviceRegistrationEntityRepository;
     private final String registeredPassTypeIdentifier;
+    private final PassGeneratorService passGeneratorService;
 
     @Autowired
     public ApplePassKitController(
             MemberEntityRepository memberEntityRepository,
             PassKitDeviceRegistrationEntityRepository passKitDeviceRegistrationEntityRepository,
             @Value("${configuration.wallet.apple.pass-identifier}")
-                    String registeredPassTypeIdentifier) {
+                    String registeredPassTypeIdentifier,
+            PassGeneratorService passGeneratorService) {
         this.memberEntityRepository = memberEntityRepository;
         this.passKitDeviceRegistrationEntityRepository = passKitDeviceRegistrationEntityRepository;
         this.registeredPassTypeIdentifier = registeredPassTypeIdentifier;
+        this.passGeneratorService = passGeneratorService;
     }
 
     @PostMapping(
@@ -108,17 +112,10 @@ public class ApplePassKitController {
         return ResponseEntity.status(201).build();
     }
 
-    @PostMapping(path = "/log", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> log(@RequestBody Log body) {
-        LOG.info("Logs received from ApplePassKit");
-        body.getLogs().forEach(log -> LOG.info("PassKit Device Log: {}", log));
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping(
             path = "/devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getUpdatablePasses(
+    public ResponseEntity<Map<String, Object>> getUpdatablePasses(
             @PathVariable String deviceLibraryIdentifier,
             @PathVariable String passTypeIdentifier,
             @RequestParam(required = false) String passesUpdatedSince) {
@@ -154,16 +151,35 @@ public class ApplePassKitController {
     @GetMapping(
             path = "/passes/{passTypeIdentifier}/{serialNumber}",
             produces = "application/vnd.apple.pkpass")
-    public ResponseEntity<Object> getUpdatedPass(
+    public ResponseEntity<ByteArrayResource> getUpdatedPass(
             @RequestHeader("Authorization") String authToken,
             @PathVariable String passTypeIdentifier,
-            @PathVariable String serialNumber) {
+            @PathVariable String serialNumber)
+            throws IOException {
         if (!registeredPassTypeIdentifier.equals(passTypeIdentifier)) {
             return ResponseEntity.notFound().build();
         }
 
         LOG.info("Received request to get updated pass");
-        return null;
+
+        var member = authorise(authToken);
+        if (member.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Optional<ResponseEntity<ByteArrayResource>> serialAuthorisationErrors =
+                validateSerialNumber(member, serialNumber);
+        if (serialAuthorisationErrors.isPresent()) {
+            return serialAuthorisationErrors.get();
+        }
+
+        var pass = passGeneratorService.createAppleWalletPass(member.get(), serialNumber);
+        var entity = new ByteArrayResource(pass);
+        return ResponseEntity.ok()
+                .contentLength(entity.contentLength())
+                .header("Last-Modified", Long.toString(member.get().getSubscriptionEpochSecond()))
+                .contentType(MediaType.valueOf("application/vnd.apple.pkpass"))
+                .body(entity);
     }
 
     @DeleteMapping(
@@ -204,7 +220,14 @@ public class ApplePassKitController {
         return ResponseEntity.ok().build();
     }
 
-    private Optional<ResponseEntity<Object>> validateSerialNumber(
+    @PostMapping(path = "/log", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> log(@RequestBody Log body) {
+        LOG.info("Logs received from ApplePassKit");
+        body.getLogs().forEach(log -> LOG.info("PassKit Device Log: {}", log));
+        return ResponseEntity.ok().build();
+    }
+
+    private <T> Optional<ResponseEntity<T>> validateSerialNumber(
             Optional<MemberEntity> member, String serialNumber) {
         var requestSerial = parseSerialNumber(serialNumber);
         var passSerial = member.map(m -> m.getIdentifiers().get("APPLE_PASS_SERIAL"));
@@ -237,19 +260,13 @@ public class ApplePassKitController {
 
     private Collection<String> detectNewPasses(Set<MemberEntity> members, long since) {
         return members.stream()
-                .filter(member -> getSubscriptionEpochSecond(member) > since)
+                .filter(member -> member.getSubscriptionEpochSecond() > since)
                 .map(
                         member ->
                                 format(
                                         "{0}--{1,number,#########}",
-                                        member.getUuid(), getSubscriptionEpochSecond(member)))
+                                        member.getUuid(), member.getSubscriptionEpochSecond()))
                 .toList();
-    }
-
-    private static long getSubscriptionEpochSecond(MemberEntity member) {
-        return member.getMostRecentSubscription()
-                .getAddedDate()
-                .toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC);
     }
 
     @Data
