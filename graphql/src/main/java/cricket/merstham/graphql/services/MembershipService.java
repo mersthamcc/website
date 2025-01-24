@@ -420,7 +420,9 @@ public class MembershipService {
 
     @PreAuthorize("isAuthenticated()")
     public List<Member> getMyMemberDetails(Principal principal) {
-        return memberRepository.findAllByOwnerUserId(getSubject(principal)).stream()
+        return memberRepository
+                .findAllByOwnerUserIdAndCancelledIsNull(getSubject(principal))
+                .stream()
                 .map(m -> modelMapper.map(m, Member.class))
                 .toList();
     }
