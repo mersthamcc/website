@@ -1,0 +1,9 @@
+type Pass {
+    type: String!
+    serialNumber: String!
+    content: String!
+}
+
+extend type Query {
+    pass(memberUuid: String!, type: String!): Pass!
+}

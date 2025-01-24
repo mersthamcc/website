@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.service.account;
+package cricket.merstham.graphql.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -13,7 +13,10 @@ import com.google.api.services.walletobjects.model.TextModuleData;
 import com.google.api.services.walletobjects.model.TranslatedString;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import cricket.merstham.shared.dto.MemberSummary;
+import cricket.merstham.graphql.configuration.WalletConfiguration;
+import cricket.merstham.graphql.entity.MemberEntity;
+import cricket.merstham.graphql.repository.MemberEntityRepository;
+import cricket.merstham.shared.dto.Pass;
 import de.brendamour.jpasskit.PKBarcode;
 import de.brendamour.jpasskit.PKField;
 import de.brendamour.jpasskit.PKLocation;
@@ -31,21 +34,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import static cricket.merstham.website.frontend.configuration.WalletConfiguration.CATEGORY;
-import static cricket.merstham.website.frontend.configuration.WalletConfiguration.YEAR;
+import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
+import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static java.text.MessageFormat.format;
+import static java.util.Objects.isNull;
 
 @Service
 public class PassGeneratorService {
@@ -70,27 +79,31 @@ public class PassGeneratorService {
     private final String googleIssuerId;
     private final String googleWalletClass;
     private final GoogleCredentials googleCredentials;
+    private final String apiBaseUrl;
+    private final MemberEntityRepository memberEntityRepository;
 
     @Autowired
     public PassGeneratorService(
             @Named("appleSigningCertificate") X509Certificate appleSigningCertificate,
             @Named("appleSigningKey") PrivateKey appleSigningKey,
             @Named("appleIntermediaryCertificate") X509Certificate appleIntermediaryCertificate,
-            @Value("${club.club-name}") String clubName,
-            @Value("${wallet.background-colour}") String backgroundColourHex,
-            @Value("${wallet.foreground-colour}") String foregroundColourHex,
-            @Value("${wallet.wallet-logo}") String logoUrl,
-            @Value("${wallet.apple.pass-identifier}") String applePassIdentifier,
-            @Value("${wallet.barcode-pattern}") String barcodePattern,
-            @Value("${wallet.apple.team-id}") String appleTeamid,
-            @Value("${wallet.location-latitude}") Double locationLatitude,
-            @Value("${wallet.location-longitude}") Double locationLongitude,
-            @Value("${wallet.location-prompt}") String locationPrompt,
-            @Value("${wallet.pass-description}") String walletDescription,
+            @Value("${configuration.wallet.club-name}") String clubName,
+            @Value("${configuration.wallet.background-colour}") String backgroundColourHex,
+            @Value("${configuration.wallet.foreground-colour}") String foregroundColourHex,
+            @Value("${configuration.wallet.wallet-logo}") String logoUrl,
+            @Value("${configuration.wallet.apple.pass-identifier}") String applePassIdentifier,
+            @Value("${configuration.wallet.barcode-pattern}") String barcodePattern,
+            @Value("${configuration.wallet.apple.team-id}") String appleTeamid,
+            @Value("${configuration.wallet.location-latitude}") Double locationLatitude,
+            @Value("${configuration.wallet.location-longitude}") Double locationLongitude,
+            @Value("${configuration.wallet.location-prompt}") String locationPrompt,
+            @Value("${configuration.wallet.pass-description}") String walletDescription,
             Walletobjects walletobjects,
-            @Value("${wallet.google.issuer}") String googleIssuerId,
+            @Value("${configuration.wallet.google.issuer}") String googleIssuerId,
             String googleWalletClass,
-            GoogleCredentials googleCredentials) {
+            GoogleCredentials googleCredentials,
+            @Value("${configuration.api-url}") String apiBaseUrl,
+            MemberEntityRepository memberEntityRepository) {
         this.clubName = clubName;
         this.backgroundColourHex = backgroundColourHex;
         this.foregroundColourHex = foregroundColourHex;
@@ -105,6 +118,8 @@ public class PassGeneratorService {
         this.walletobjects = walletobjects;
         this.googleIssuerId = googleIssuerId;
         this.googleCredentials = googleCredentials;
+        this.apiBaseUrl = apiBaseUrl;
+        this.memberEntityRepository = memberEntityRepository;
         this.signingInformation =
                 new PKSigningInformation(
                         appleSigningCertificate, appleSigningKey, appleIntermediaryCertificate);
@@ -112,8 +127,40 @@ public class PassGeneratorService {
         this.googleWalletClass = googleWalletClass;
     }
 
-    public String createGoogleWalletPass(MemberSummary member, String serialNumber) {
-        var passObject = getGooglePassObject(member, serialNumber);
+    @PreAuthorize("isAuthenticated()")
+    public Pass getPassData(String memberUuid, String type, Principal principal)
+            throws IOException {
+        var member =
+                memberEntityRepository
+                        .findByUuidAndOwnerUserId(memberUuid, getSubject(principal))
+                        .orElseThrow();
+        String serialNumber;
+        String content;
+        switch (type) {
+            case "apple":
+                serialNumber = Long.toString(member.getSubscriptionEpochSecond());
+                content =
+                        Base64.getEncoder()
+                                .encodeToString(createAppleWalletPass(member, serialNumber));
+                member.getIdentifiers().put(APPLE_PASS_SERIAL, serialNumber);
+                break;
+            case "google":
+                serialNumber = member.getIdentifiers().get(GOOGLE_PASS_SERIAL);
+                if (isNull(serialNumber)) {
+                    serialNumber = UUID.randomUUID().toString();
+                }
+                content = createGoogleWalletPass(member, serialNumber);
+                member.getIdentifiers().put(GOOGLE_PASS_SERIAL, serialNumber);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
+        memberEntityRepository.saveAndFlush(member);
+        return Pass.builder().serialNumber(serialNumber).content(content).type(type).build();
+    }
+
+    public String createGoogleWalletPass(MemberEntity member, String serialNumber) {
+        var passObject = createOrUpdateGooglePassObject(member, serialNumber);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("iss", ((ServiceAccountCredentials) googleCredentials).getClientEmail());
@@ -136,7 +183,7 @@ public class PassGeneratorService {
         return format("https://pay.google.com/gp/v/save/{0}", token);
     }
 
-    public byte[] createAppleWalletPass(MemberSummary member, String serialNumber)
+    public byte[] createAppleWalletPass(MemberEntity member, String serialNumber)
             throws IOException {
         var pass =
                 PKPass.builder()
@@ -144,7 +191,10 @@ public class PassGeneratorService {
                         .teamIdentifier(appleTeamid)
                         .organizationName(clubName)
                         .description(walletDescription)
-                        .serialNumber(format("{0}-{1}", member.getUuid(), serialNumber))
+                        .serialNumber(
+                                serialNumber.startsWith(member.getUuid() + "--")
+                                        ? serialNumber
+                                        : format("{0}--{1}", member.getUuid(), serialNumber))
                         .backgroundColor(backgroundColourHex)
                         .foregroundColor(foregroundColourHex)
                         .labelColor(foregroundColourHex)
@@ -165,6 +215,8 @@ public class PassGeneratorService {
                                                 .format(PKBarcodeFormat.PKBarcodeFormatQR)
                                                 .message(format(barcodePattern, member.getId()))
                                                 .build()))
+                        .webServiceURL(new URL(new URL(apiBaseUrl), "/passkit"))
+                        .authenticationToken(member.getUuid())
                         .build();
 
         var template = getTemplate();
@@ -177,29 +229,31 @@ public class PassGeneratorService {
         }
     }
 
-    private static PKGenericPass buildGenericPass(MemberSummary member) {
+    private static PKGenericPass buildGenericPass(MemberEntity member) {
         return PKGenericPass.builder()
                 .passType(PKPassType.PKGenericPass)
                 .primaryField(
                         PKField.builder()
                                 .label("Name")
                                 .key("name")
-                                .value(
-                                        format(
-                                                "{0} {1}",
-                                                member.getGivenName(), member.getFamilyName()))
+                                .value(member.getFullName())
                                 .build())
                 .auxiliaryField(
                         PKField.builder()
                                 .label("Category")
                                 .key("category")
-                                .value(member.getDescription())
+                                .value(
+                                        member.getMostRecentSubscription()
+                                                .getPricelistItem()
+                                                .getDescription())
                                 .build())
                 .auxiliaryField(
                         PKField.builder()
                                 .label("Year")
                                 .key("year")
-                                .value(member.getLastSubsYear())
+                                .value(
+                                        Integer.toString(
+                                                member.getMostRecentSubscription().getYear()))
                                 .build())
                 .build();
     }
@@ -214,7 +268,7 @@ public class PassGeneratorService {
         return template;
     }
 
-    private GenericObject getGooglePassObject(MemberSummary member, String serialNumber) {
+    public GenericObject createOrUpdateGooglePassObject(MemberEntity member, String serialNumber) {
         try {
             var cardId = format("{0}.{1}-{2}", googleIssuerId, member.getUuid(), serialNumber);
             try {
@@ -237,7 +291,7 @@ public class PassGeneratorService {
         }
     }
 
-    private GenericObject buildGooglePass(MemberSummary member, String cardId) {
+    private GenericObject buildGooglePass(MemberEntity member, String cardId) {
         return new GenericObject()
                 .setId(cardId)
                 .setClassId(googleWalletClass)
@@ -246,12 +300,18 @@ public class PassGeneratorService {
                         List.of(
                                 new TextModuleData()
                                         .setHeader("Category")
-                                        .setBody(member.getDescription())
-                                        .setId(CATEGORY),
+                                        .setBody(
+                                                member.getMostRecentSubscription()
+                                                        .getPricelistItem()
+                                                        .getDescription())
+                                        .setId(WalletConfiguration.CATEGORY),
                                 new TextModuleData()
                                         .setHeader("Year")
-                                        .setBody(member.getMostRecentSubscription().toString())
-                                        .setId(YEAR)))
+                                        .setBody(
+                                                Integer.toString(
+                                                        member.getMostRecentSubscription()
+                                                                .getYear()))
+                                        .setId(WalletConfiguration.YEAR)))
                 .setBarcode(
                         new Barcode()
                                 .setType("QR_CODE")
@@ -267,11 +327,7 @@ public class PassGeneratorService {
                                 .setDefaultValue(
                                         new TranslatedString()
                                                 .setLanguage(LANGUAGE)
-                                                .setValue(
-                                                        format(
-                                                                "{0} {1}",
-                                                                member.getGivenName(),
-                                                                member.getFamilyName()))))
+                                                .setValue(member.getFullName())))
                 .setSubheader(
                         new LocalizedString()
                                 .setDefaultValue(

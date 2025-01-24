@@ -14,6 +14,8 @@ import java.beans.Transient;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -132,6 +134,13 @@ public class Member implements Serializable {
     @Transient
     public String getFamilyName() {
         return getAttributeMap().get("family-name").asText();
+    }
+
+    @Transient
+    public long getSubscriptionEpochSecond() {
+        return getMostRecentSubscription()
+                .getAddedDate()
+                .toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC);
     }
 
     private MemberSubscription thisYearsSubscription() {

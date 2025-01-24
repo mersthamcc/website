@@ -42,6 +42,8 @@ public class SecurityConfiguration {
                         requests ->
                                 requests.requestMatchers("/webhooks/**")
                                         .permitAll()
+                                        .requestMatchers("/passkit/**")
+                                        .permitAll()
                                         .requestMatchers("/graphql")
                                         .permitAll()
                                         .requestMatchers("/actuator/**")

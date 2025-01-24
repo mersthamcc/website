@@ -1,7 +1,6 @@
 package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
@@ -374,7 +373,6 @@ class MembershipServiceTest {
                     memberFilterEntityRepository,
                     priceListItemEntityRepository,
                     new ModelMapperConfiguration().modelMapper(),
-                    mock(ObjectMapper.class),
                     mock(MemberSummaryRepository.class),
                     mock(EmailService.class),
                     mock(CognitoService.class),

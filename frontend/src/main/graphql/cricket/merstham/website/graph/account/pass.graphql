@@ -1,0 +1,7 @@
+query pass($uuid: String!, $passType: String!) {
+    pass(memberUuid: $uuid, type: $passType) {
+        type
+        serialNumber
+        content
+    }
+}

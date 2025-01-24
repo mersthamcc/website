@@ -113,8 +113,9 @@ club:
   kit-store-url: ${KIT_STORE_URL:}
   rss:
     feed-description: ${RSS_FEED_DESCRIPTION:Club News}
-graph:
-  graph-uri: ${GRAPH_URI:http://localhost:8090/graphql}
+api:
+  base-uri: ${API_BASE_URI:http://localhost:8090}
+  graph-uri: ${API_BASE_URI:http://localhost:8090}/graphql
 
 resources:
   base-url: "${RESOURCES_BASE_URL}"

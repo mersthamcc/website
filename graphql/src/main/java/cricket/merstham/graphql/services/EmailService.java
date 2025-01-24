@@ -13,6 +13,7 @@ import io.rocketbase.mail.table.ColumnConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sesv2.SesV2Client;
@@ -20,6 +21,8 @@ import software.amazon.awssdk.services.sesv2.model.EmailContent;
 import software.amazon.awssdk.services.sesv2.model.SendEmailRequest;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -41,17 +44,20 @@ public class EmailService {
     private final MailTemplateConfiguration configuration;
     private final MessageSource messageSource;
     private final BankDetails bankDetails;
+    private final String baseUrl;
 
     @Autowired
     public EmailService(
             SesV2Client client,
             MailTemplateConfiguration configuration,
             MessageSource messageSource,
-            BankDetails bankDetails) {
+            BankDetails bankDetails,
+            @Value("${configuration.base-url}") String baseUrl) {
         this.client = client;
         this.configuration = configuration;
         this.messageSource = messageSource;
         this.bankDetails = bankDetails;
+        this.baseUrl = baseUrl;
     }
 
     public void sendEmail(String to, MailTemplate template, Map<String, Object> model) {
@@ -130,6 +136,43 @@ public class EmailService {
             }
         }
 
+        try {
+            builder.text(translation("email.MEMBERSHIP_CONFIRM.spond-title"))
+                    .h2()
+                    .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph1"))
+                    .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph2"))
+                    .and()
+                    .image(
+                            "https://resources.mersthamcc.co.uk/mcc/img/apps/apple-store-download.png")
+                    .linkUrl("https://apps.apple.com/gb/app/spond/id755596884")
+                    .alt("Download on the App Store")
+                    .width(120)
+                    .margin("15px")
+                    .and()
+                    .image(
+                            "https://resources.mersthamcc.co.uk/mcc/img/apps/google-play-download.png")
+                    .linkUrl(
+                            "https://play.google.com/store/apps/details?id=com.spond.spond&amp;hl=en_GB&amp;gl=US&amp;pli=1")
+                    .alt("Get it on Google Play")
+                    .width(120)
+                    .margin("15px")
+                    .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-title"))
+                    .h2()
+                    .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph1"))
+                    .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph2"))
+                    .and()
+                    .button(
+                            translation("email.MEMBERSHIP_CONFIRM.pass-download"),
+                            new URL(new URL(baseUrl), "/account/members").toString())
+                    .and();
+        } catch (MalformedURLException ex) {
+            LOG.error("Error while constructing confirmation e-mail", ex);
+        }
         return builder.text(translation("email.MEMBERSHIP_CONFIRM.sign-off"))
                 .and()
                 .text(configuration.getClubName())

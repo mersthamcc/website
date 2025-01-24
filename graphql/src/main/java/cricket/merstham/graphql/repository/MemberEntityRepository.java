@@ -27,4 +27,8 @@ public interface MemberEntityRepository
     List<MemberEntity> findAllWhereIdentifiersDoesNotContainKey(@Param("key") String key);
 
     List<MemberEntity> findAllByCancelledIsNull();
+
+    Optional<MemberEntity> findFirstByUuid(String uuid);
+
+    Optional<MemberEntity> findByUuidAndOwnerUserId(String uuid, String ownerUserId);
 }

@@ -68,6 +68,7 @@ management:
 debug: ${DEBUG:false}
 
 configuration:
+  api-url: ${API_BASE_URI:http://localhost:8090}
   environment: ${ENVIRONMENT:dev}
   database-secret: ${DATABASE_SECRET:}
   scheduler-zone: "${SCHEDULER_ZONE:Europe/London}"
@@ -147,3 +148,24 @@ configuration:
     list-id: ${MAILCHIMP_LIST_ID:}
     newsletter-interest-id: ${MAILCHIMP_NEWSLETTER_INTEREST_ID:}
   trusted-client-scope: "${WEBSITE_CLIENT_TRUSTED_SCOPE:graphql/trusted-client}"
+  wallet:
+    background-colour: "${WALLET_PASS_BACKGROUND_COLOUR:}"
+    foreground-colour: "${WALLET_PASS_FOREGROUND_COLOUR:}"
+    wallet-logo: "${WALLET_LOGO_URL:}"
+    barcode-pattern: "${WALLET_PASS_BARCODE_PATTERN:}"
+    location-prompt: "${WALLET_PASS_LOCATION_PROMPT:}"
+    location-longitude: "${WALLET_PASS_LOCATION_LONGITUDE:}"
+    location-latitude: "${WALLET_PASS_LOCATION_LATITUDE:}"
+    pass-description: "Membership card"
+    club-name: ${CLUBNAME:My Cricket Club}
+    apple:
+      pass-identifier: "${APPLE_PASS_IDENTIFIER:}"
+      team-id: "${APPLE_DEVELOPER_TEAM_ID:}"
+      signing-certificate: "${APPLE_WALLET_SIGNING_CERTIFICATE:}"
+      signing-key: "${APPLE_WALLET_SIGNING_KEY:}"
+      apple-intermediary-ca-cert: "${APPLE_CA_CERTIFICATE:}"
+    google:
+      credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
+      application-name: ${GOOGLE_APPLICATION_NAME:}
+      issuer: ${GOOGLE_ISSUER_ID:}
+      class-name: ${GOOGLE_CLASS_NAME:}

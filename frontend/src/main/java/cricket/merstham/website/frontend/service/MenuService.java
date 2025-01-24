@@ -1,7 +1,6 @@
 package cricket.merstham.website.frontend.service;
 
 import com.apollographql.apollo.api.Response;
-import com.google.common.collect.Lists;
 import cricket.merstham.shared.dto.ContactCategory;
 import cricket.merstham.shared.dto.Message;
 import cricket.merstham.shared.dto.StaticPage;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +36,10 @@ public class MenuService {
     public DynamicMenu getDynamicMenuItems() {
         try {
             Response<MenusQuery.Data> result = graphService.executeQuery(new MenusQuery());
-            var seasons = Lists.reverse(result.getData().getFixtureArchiveSeasons());
+            var seasons =
+                    result.getData().getFixtureArchiveSeasons().stream()
+                            .sorted(Comparator.reverseOrder())
+                            .toList();
             if (!seasons.isEmpty()) seasons = seasons.subList(1, min(20, seasons.size()));
             return DynamicMenu.builder()
                     .venues(venues(result.getData()))

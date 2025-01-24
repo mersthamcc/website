@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.configuration;
+package cricket.merstham.graphql.configuration;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -16,12 +16,11 @@ import com.google.api.services.walletobjects.model.TemplateItem;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.inject.Singleton;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,7 +52,7 @@ public class WalletConfiguration {
     @Singleton
     @Named("appleSigningCertificate")
     public X509Certificate getAppleSigningCertificate(
-            @Value("${wallet.apple.signing-certificate}") String certificateFilename)
+            @Value("${configuration.wallet.apple.signing-certificate}") String certificateFilename)
             throws CertificateException, FileNotFoundException {
         return loadCertificateFromFile(certificateFilename);
     }
@@ -61,7 +60,8 @@ public class WalletConfiguration {
     @Bean
     @Singleton
     @Named("appleSigningKey")
-    public PrivateKey getAppleSigningKey(@Value("${wallet.apple.signing-key}") String keyFilename)
+    public PrivateKey getAppleSigningKey(
+            @Value("${configuration.wallet.apple.signing-key}") String keyFilename)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         return loadPrivateKeyFromFile(keyFilename);
     }
@@ -70,7 +70,8 @@ public class WalletConfiguration {
     @Singleton
     @Named("appleIntermediaryCertificate")
     public X509Certificate getAppleIntermediaryCertificate(
-            @Value("${wallet.apple.apple-intermediary-ca-cert}") String certificateFilename)
+            @Value("${configuration.wallet.apple.apple-intermediary-ca-cert}")
+                    String certificateFilename)
             throws CertificateException, FileNotFoundException {
         return loadCertificateFromFile(certificateFilename);
     }
@@ -85,7 +86,7 @@ public class WalletConfiguration {
     @Bean
     public Walletobjects getWalletObjects(
             GoogleCredentials credentials,
-            @Value("${wallet.google.application-name}") String googleApplicationName)
+            @Value("${configuration.wallet.google.application-name}") String googleApplicationName)
             throws GeneralSecurityException, IOException {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
@@ -101,8 +102,8 @@ public class WalletConfiguration {
     @Named("googleWalletClass")
     public String googleWalletClass(
             Walletobjects walletobjects,
-            @Value("${wallet.google.issuer}") String issuerId,
-            @Value("${wallet.google.class-name}") String className)
+            @Value("${configuration.wallet.google.issuer}") String issuerId,
+            @Value("${configuration.wallet.google.class-name}") String className)
             throws IOException {
 
         var qualifiedClassName = format(CLASS_NAME_PATTERN, issuerId, className);
