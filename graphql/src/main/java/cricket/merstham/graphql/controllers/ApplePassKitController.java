@@ -177,7 +177,7 @@ public class ApplePassKitController {
         var entity = new ByteArrayResource(pass);
         return ResponseEntity.ok()
                 .contentLength(entity.contentLength())
-                .header("Last-Modified", Long.toString(member.get().getSubscriptionEpochSecond()))
+                .lastModified(member.get().getSubscriptionEpochSecond())
                 .contentType(MediaType.valueOf("application/vnd.apple.pkpass"))
                 .body(entity);
     }
