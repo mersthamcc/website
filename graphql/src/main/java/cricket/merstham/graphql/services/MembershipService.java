@@ -1,6 +1,5 @@
 package cricket.merstham.graphql.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.graphql.entity.CouponEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
@@ -75,9 +74,8 @@ public class MembershipService {
     private final PaymentEntityRepository paymentEntityRepository;
     private final MemberFilterEntityRepository filterEntityRepository;
     private final PriceListItemEntityRepository priceListItemEntityRepository;
-    private final ModelMapper modelMapper;
-    private final ObjectMapper objectMapper;
     private final MemberSummaryRepository memberSummaryRepository;
+    private final ModelMapper modelMapper;
     private final EmailService emailService;
     private final CognitoService cognitoService;
     private final CouponEntityRepository couponEntityRepository;
@@ -94,7 +92,6 @@ public class MembershipService {
             MemberFilterEntityRepository filterEntityRepository,
             PriceListItemEntityRepository priceListItemEntityRepository,
             ModelMapper modelMapper,
-            ObjectMapper objectMapper,
             MemberSummaryRepository memberSummaryRepository,
             EmailService emailService,
             CognitoService cognitoService,
@@ -109,7 +106,6 @@ public class MembershipService {
         this.filterEntityRepository = filterEntityRepository;
         this.priceListItemEntityRepository = priceListItemEntityRepository;
         this.modelMapper = modelMapper;
-        this.objectMapper = objectMapper;
         this.memberSummaryRepository = memberSummaryRepository;
         this.emailService = emailService;
         this.cognitoService = cognitoService;

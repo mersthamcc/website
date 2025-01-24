@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderHook implements Hook<OrderEntity> {
+public class EposNowHook implements Hook<OrderEntity> {
 
     private final EposNowService eposNowService;
 
     @Autowired
-    public OrderHook(EposNowService eposNowService) {
+    public EposNowHook(EposNowService eposNowService) {
         this.eposNowService = eposNowService;
     }
 
