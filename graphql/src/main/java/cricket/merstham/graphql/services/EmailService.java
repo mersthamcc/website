@@ -166,6 +166,9 @@ public class EmailService {
                     .and()
                     .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph2"))
                     .and()
+                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-ios-update"))
+                    .bold()
+                    .and()
                     .button(
                             translation("email.MEMBERSHIP_CONFIRM.pass-download"),
                             new URL(new URL(baseUrl), "/account/members").toString())
