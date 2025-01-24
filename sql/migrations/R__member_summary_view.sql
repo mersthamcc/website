@@ -9,8 +9,7 @@ SELECT m.id,
            dob.value::JSONB ->> 0
            )::DATE                            AS dob,
        CASE
-           WHEN dob.value IS NULL THEN NULL
-           ELSE EXTRACT(
+           WHEN cat.key = 'junior' THEN EXTRACT(
                    YEAR
                    FROM
                    AGE(
@@ -31,8 +30,7 @@ SELECT m.id,
                 )
            END                                AS age,
        CASE
-           WHEN dob.value IS NULL THEN NULL
-           ELSE 'U' || EXTRACT(
+           WHEN cat.key = 'junior' THEN 'U' || EXTRACT(
                    YEAR
                    FROM
                    AGE(
@@ -49,8 +47,8 @@ SELECT m.id,
                            (
                                dob.value::JSONB ->> 0
                                )::DATE
+                           )
                    )
-                       )
            END                                AS agegroup,
        gender.value::JSONB ->> 0              AS gender,
        subs.year                              AS most_recent_subscription,

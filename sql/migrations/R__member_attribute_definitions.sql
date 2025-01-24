@@ -632,8 +632,8 @@ VALUES (1,
          FROM member_category
          WHERE KEY = 'junior'),
         8,
-        18,
-        'Juniors (U8 - U18)',
+        17,
+        'Juniors (U8 - U17)',
         NULL,
         FALSE,
         TRUE),
@@ -716,17 +716,7 @@ VALUES (1,
         'Walking Cricket',
         NULL,
         FALSE,
-        FALSE),
-       (11,
-        (SELECT id
-         FROM member_category
-         WHERE KEY = 'junior'),
-        6,
-        10,
-        'U10 Girls',
-        NULL,
-        FALSE,
-        TRUE)
+        FALSE)
 ON CONFLICT(id) DO UPDATE
     SET category_id         = EXCLUDED.category_id,
         min_age             = EXCLUDED.min_age,
@@ -832,10 +822,6 @@ VALUES (1,
        (10,
         '2025-01-01',
         '2025-12-31',
-        50.00),
-       (11,
-        '2025-01-01',
-        '2025-12-31',
         50.00)
 ON CONFLICT(
     pricelist_item_id,
@@ -843,3 +829,5 @@ ON CONFLICT(
     date_to
     ) DO UPDATE
     SET price = EXCLUDED.price;
+
+DELETE FROM pricelist WHERE pricelist_item_id = 11;
