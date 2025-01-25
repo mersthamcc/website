@@ -223,7 +223,6 @@ public class MembershipService {
     }
 
     private Member saveMember(MemberEntity member, MemberInput data, Principal principal) {
-        var currentDate = LocalDate.ofInstant(member.getRegistrationDate(), ZoneId.systemDefault());
         var now = Instant.now();
         OrderEntity order =
                 orderEntityRepository.findById(data.getSubscription().getOrderId()).orElseThrow();
@@ -261,7 +260,7 @@ public class MembershipService {
 
         member.addSubscription(
                 MemberSubscriptionEntity.builder()
-                        .addedDate(currentDate)
+                        .addedDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
                         .price(data.getSubscription().getPrice())
                         .pricelistItem(priceListItem)
                         .order(order)
