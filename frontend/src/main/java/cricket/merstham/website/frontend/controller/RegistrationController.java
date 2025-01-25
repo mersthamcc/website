@@ -166,6 +166,17 @@ public class RegistrationController {
             setCurrentSubscription(session, subscription);
             redirectAttributes.addFlashAttribute(SUBSCRIPTION_ID, editMember);
 
+            var item =
+                    isNull(subscription.getPriceListItem())
+                            ? subscription
+                                    .getMember()
+                                    .getMostRecentSubscription()
+                                    .getPriceListItem()
+                            : subscription.getPriceListItem();
+
+            if (isNull(item.getCurrentPrice())) {
+                return redirectToPage("/register/select-membership");
+            }
             return redirectTo("/register/renew-membership");
         } else if (!resetMember.isBlank()) {
             var subscriptionId = UUID.fromString(resetMember);
@@ -257,6 +268,7 @@ public class RegistrationController {
                 isNull(subscription.getPriceListItem())
                         ? subscription.getMember().getMostRecentSubscription().getPriceListItem()
                         : subscription.getPriceListItem();
+
         model.put("item", item);
         return new ModelAndView("registration/renew-membership-level", model);
     }
