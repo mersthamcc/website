@@ -5,7 +5,8 @@ public enum ReportFilter {
     UNPAID("UNPAID"),
     OPENAGE("OPENAGE"),
     NO_PHOTOS_COACHING("NO_PHOTOS_COACHING"),
-    NO_PHOTOS_MEDIA("NO_PHOTOS_MEDIA");
+    NO_PHOTOS_MEDIA("NO_PHOTOS_MEDIA"),
+    NOT_THIS_YEAR("NOT_THIS_YEAR");
 
     private final String value;
 

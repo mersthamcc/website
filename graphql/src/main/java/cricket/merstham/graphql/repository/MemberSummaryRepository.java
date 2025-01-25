@@ -122,6 +122,11 @@ public interface MemberSummaryRepository
                                             "declarations",
                                             "PHOTOS-COACHING")));
                 }
+                case NOT_THIS_YEAR -> {
+                    predicates.add(
+                            criteriaBuilder.lessThan(
+                                    root.get("mostRecentSubscription"), LocalDate.now().getYear()));
+                }
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

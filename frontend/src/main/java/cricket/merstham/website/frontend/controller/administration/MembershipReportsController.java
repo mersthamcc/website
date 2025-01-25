@@ -139,6 +139,7 @@ public class MembershipReportsController {
             case "openage-junior-report" -> ReportFilter.OPENAGE;
             case "no-photos-coaching" -> ReportFilter.NO_PHOTOS_COACHING;
             case "no-photos-media" -> ReportFilter.NO_PHOTOS_MEDIA;
+            case "not-this-year" -> ReportFilter.NOT_THIS_YEAR;
             default -> throw new IllegalStateException("Unexpected value: " + report);
         };
     }
