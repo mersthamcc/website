@@ -17,6 +17,7 @@ import cricket.merstham.graphql.configuration.WalletConfiguration;
 import cricket.merstham.graphql.entity.MemberEntity;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.shared.dto.Pass;
+import cricket.merstham.shared.extensions.StringExtensions;
 import de.brendamour.jpasskit.PKBarcode;
 import de.brendamour.jpasskit.PKField;
 import de.brendamour.jpasskit.PKLocation;
@@ -29,6 +30,7 @@ import de.brendamour.jpasskit.signing.PKPassTemplateInMemory;
 import de.brendamour.jpasskit.signing.PKSigningException;
 import de.brendamour.jpasskit.signing.PKSigningInformation;
 import jakarta.inject.Named;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,7 @@ import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 
 @Service
+@ExtensionMethod({StringExtensions.class})
 public class PassGeneratorService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PassGeneratorService.class);
@@ -138,7 +141,10 @@ public class PassGeneratorService {
         String content;
         switch (type) {
             case "apple":
-                serialNumber = Long.toString(member.getSubscriptionEpochSecond());
+                serialNumber = member.getIdentifiers().get(APPLE_PASS_SERIAL);
+                if (isNull(serialNumber) || !serialNumber.isNumeric()) {
+                    serialNumber = Long.toString(member.getPassUpdateEpochSecond());
+                }
                 content =
                         Base64.getEncoder()
                                 .encodeToString(createAppleWalletPass(member, serialNumber));

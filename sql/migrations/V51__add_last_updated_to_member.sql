@@ -1,0 +1,2 @@
+ALTER TABLE member
+  ADD COLUMN last_updated TIMESTAMP NULL;

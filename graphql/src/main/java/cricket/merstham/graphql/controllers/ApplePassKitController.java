@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
 
@@ -177,7 +178,7 @@ public class ApplePassKitController {
         var entity = new ByteArrayResource(pass);
         return ResponseEntity.ok()
                 .contentLength(entity.contentLength())
-                .lastModified(member.get().getSubscriptionEpochSecond())
+                .lastModified(member.get().getPassUpdateEpochSecond())
                 .contentType(MediaType.valueOf("application/vnd.apple.pkpass"))
                 .body(entity);
     }
@@ -260,12 +261,13 @@ public class ApplePassKitController {
 
     private Collection<String> detectNewPasses(Set<MemberEntity> members, long since) {
         return members.stream()
-                .filter(member -> member.getSubscriptionEpochSecond() > since)
+                .filter(member -> member.getPassUpdateEpochSecond() > since)
                 .map(
                         member ->
                                 format(
-                                        "{0}--{1,number,#########}",
-                                        member.getUuid(), member.getSubscriptionEpochSecond()))
+                                        "{0}--{1}",
+                                        member.getUuid(),
+                                        member.getIdentifiers().get(APPLE_PASS_SERIAL)))
                 .toList();
     }
 
