@@ -67,6 +67,8 @@ dependencies {
     implementation 'com.auth0:jwks-rsa:0.22.1'
     implementation 'com.google.api-client:google-api-client:2.6.0'
     implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240627-2.0.0'
+    implementation "com.eatthepath:pushy:0.15.4"
+    implementation "com.eatthepath:pushy-micrometer-metrics-listener:0.15.4"
 
     implementation project(":shared")
 
