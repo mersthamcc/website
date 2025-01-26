@@ -1,7 +1,5 @@
 package cricket.merstham.shared.helpers;
 
-import org.apache.tomcat.util.codec.binary.Base64;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,6 +14,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 
 public class KeyHelper {
 
@@ -30,7 +29,7 @@ public class KeyHelper {
                         .replaceAll(System.lineSeparator(), "")
                         .replace("-----END PRIVATE KEY-----", "");
 
-        byte[] encoded = Base64.decodeBase64(stripped);
+        byte[] encoded = Base64.getDecoder().decode(stripped);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
