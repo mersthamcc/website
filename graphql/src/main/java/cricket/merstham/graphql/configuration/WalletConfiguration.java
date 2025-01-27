@@ -1,5 +1,8 @@
 package cricket.merstham.graphql.configuration;
 
+import com.eatthepath.pushy.apns.ApnsClient;
+import com.eatthepath.pushy.apns.ApnsClientBuilder;
+import com.eatthepath.pushy.apns.metrics.micrometer.MicrometerApnsClientMetricsListener;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -15,30 +18,27 @@ import com.google.api.services.walletobjects.model.GenericClass;
 import com.google.api.services.walletobjects.model.TemplateItem;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileInputStream;
+import javax.net.ssl.SSLException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.List;
 
+import static cricket.merstham.shared.helpers.KeyHelper.loadCertificateFromFile;
+import static cricket.merstham.shared.helpers.KeyHelper.loadPrivateKeyFromFile;
 import static java.text.MessageFormat.format;
 
 @Configuration
@@ -74,13 +74,6 @@ public class WalletConfiguration {
                     String certificateFilename)
             throws CertificateException, FileNotFoundException {
         return loadCertificateFromFile(certificateFilename);
-    }
-
-    private X509Certificate loadCertificateFromFile(String certificateFilename)
-            throws CertificateException, FileNotFoundException {
-        CertificateFactory fact = CertificateFactory.getInstance("X.509");
-        FileInputStream is = new FileInputStream(certificateFilename);
-        return (X509Certificate) fact.generateCertificate(is);
     }
 
     @Bean
@@ -124,6 +117,20 @@ public class WalletConfiguration {
         return response.getId();
     }
 
+    @Bean
+    @Named("WalletUpdateApnsClient")
+    public ApnsClient getApnsClient(
+            @Named("appleSigningCertificate") X509Certificate appleSigningCertificate,
+            @Named("appleSigningKey") PrivateKey appleSigningKey,
+            MeterRegistry meterRegistry)
+            throws SSLException {
+        return new ApnsClientBuilder()
+                .setClientCredentials(appleSigningCertificate, appleSigningKey, null)
+                .setApnsServer(ApnsClientBuilder.PRODUCTION_APNS_HOST)
+                .setMetricsListener(new MicrometerApnsClientMetricsListener(meterRegistry))
+                .build();
+    }
+
     private GenericClass createGoogleWalletClass(String qualifiedClassName) {
         return new GenericClass()
                 .setId(qualifiedClassName)
@@ -157,21 +164,5 @@ public class WalletConfiguration {
                                                                                                                                                 new FieldReference()
                                                                                                                                                         .setFieldPath(
                                                                                                                                                                 "object.textModulesData['YEAR']"))))))))));
-    }
-
-    private PrivateKey loadPrivateKeyFromFile(String keyFilename)
-            throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String key = new String(Files.readAllBytes(Path.of(keyFilename)), Charset.defaultCharset());
-
-        String stripped =
-                key.replace("-----BEGIN PRIVATE KEY-----", "") // pragma: allowlist secret
-                        .replaceAll(System.lineSeparator(), "")
-                        .replace("-----END PRIVATE KEY-----", "");
-
-        byte[] encoded = Base64.decodeBase64(stripped);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-        return keyFactory.generatePrivate(keySpec);
     }
 }
