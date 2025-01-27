@@ -386,7 +386,13 @@ public class RegistrationController {
                                                                                 .validate(
                                                                                         a.getValue()
                                                                                                 .asText()))
-                                                        .map(a -> a.getValue().asText())))
+                                                        .map(
+                                                                a ->
+                                                                        a.getValue()
+                                                                                .asText()
+                                                                                .toLowerCase(
+                                                                                        Locale
+                                                                                                .ROOT))))
                                 .toList());
         return emails.stream().distinct().toList();
     }

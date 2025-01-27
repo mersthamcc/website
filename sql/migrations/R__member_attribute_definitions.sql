@@ -683,7 +683,7 @@ VALUES (1,
          WHERE KEY = 'adult'),
         18,
         NULL,
-        'Ladies (aged 18 years and older)',
+        'Women (aged 18 years and older)',
         NULL,
         FALSE,
         FALSE),
@@ -716,7 +716,17 @@ VALUES (1,
         'Walking Cricket',
         NULL,
         FALSE,
-        FALSE)
+        FALSE),
+       (11,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'junior'),
+        8,
+        17,
+        'U8 - U17 Girls',
+        NULL,
+        FALSE,
+        TRUE)
 ON CONFLICT(id) DO UPDATE
     SET category_id         = EXCLUDED.category_id,
         min_age             = EXCLUDED.min_age,
@@ -822,12 +832,14 @@ VALUES (1,
        (10,
         '2025-01-01',
         '2025-12-31',
-        50.00)
+        50.00),
+       (11,
+        '2025-01-01',
+        '2025-12-31',
+        75.00)
 ON CONFLICT(
     pricelist_item_id,
     date_from,
     date_to
     ) DO UPDATE
     SET price = EXCLUDED.price;
-
-DELETE FROM pricelist WHERE pricelist_item_id = 11;
