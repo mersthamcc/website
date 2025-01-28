@@ -3,6 +3,8 @@ package cricket.merstham.website.frontend.configuration;
 import cricket.merstham.website.frontend.formatters.InstantFormatFactory;
 import cricket.merstham.website.frontend.formatters.LocalDateTimeDateOnlyFormatFactory;
 import cricket.merstham.website.frontend.formatters.LocalDateTimeFormatFactory;
+import cricket.merstham.website.frontend.interceptors.PageViewInterceptor;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,15 +28,18 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     private final ViewConfiguration viewConfiguration;
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientRepository authorizedClientRepository;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
     public WebMvcConfiguration(
             ViewConfiguration viewConfiguration,
             ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+            OAuth2AuthorizedClientRepository authorizedClientRepository,
+            MeterRegistry meterRegistry) {
         this.viewConfiguration = viewConfiguration;
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.authorizedClientRepository = authorizedClientRepository;
+        this.meterRegistry = meterRegistry;
     }
 
     @Bean
@@ -62,6 +67,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(viewConfiguration);
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(new PageViewInterceptor(meterRegistry));
     }
 
     @Override
