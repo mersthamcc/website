@@ -21,13 +21,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.text.MessageFormat.format;
 
@@ -62,6 +61,9 @@ public class MemberEntity {
 
     @Column(name = "uuid", unique = true)
     private String uuid;
+
+    @Column(name = "last_updated")
+    private Instant lastUpdated;
 
     @OneToMany(
             fetch = FetchType.LAZY,
@@ -120,14 +122,23 @@ public class MemberEntity {
     }
 
     @Transient
-    public long getSubscriptionEpochSecond() {
-        return getMostRecentSubscription()
-                .getAddedDate()
-                .toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC);
+    public long getPassUpdateEpochSecond() {
+        return getLastUpdated().getEpochSecond();
     }
 
     public String getFullName() {
         return format(
                 "{0} {1}", getStringAttribute("given-name"), getStringAttribute("family-name"));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MemberEntity that)) return false;
+        return Objects.equals(id, that.id) && Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, uuid);
     }
 }

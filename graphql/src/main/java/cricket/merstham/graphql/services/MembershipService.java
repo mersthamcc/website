@@ -270,6 +270,7 @@ public class MembershipService {
                                         .year(data.getSubscription().getYear())
                                         .build())
                         .build());
+        member.setLastUpdated(now);
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 
@@ -387,7 +388,7 @@ public class MembershipService {
                                                             .build();
                                             member.getAttributes().add(a);
                                         }));
-
+        member.setLastUpdated(Instant.now());
         return modelMapper.map(memberRepository.saveAndFlush(member), Member.class);
     }
 
