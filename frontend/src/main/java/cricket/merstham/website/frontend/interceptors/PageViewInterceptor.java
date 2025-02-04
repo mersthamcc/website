@@ -33,10 +33,12 @@ public class PageViewInterceptor implements HandlerInterceptor {
                 .increment();
         var session = request.getSession(false);
         var sessionId = "anonymous";
-        try {
-            sessionId = session.getId();
-        } catch (IllegalStateException ignored) {
-            // session is invalid, use default value
+        if (nonNull(session)) {
+            try {
+                sessionId = session.getId();
+            } catch (NullPointerException | IllegalStateException ignored) {
+                // session is invalid, use default value
+            }
         }
 
         var remoteAddress = request.getHeader("X-Forwarded-For");
