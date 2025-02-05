@@ -230,13 +230,17 @@ public class ApplePassKitController {
 
     private <T> Optional<ResponseEntity<T>> validateSerialNumber(
             Optional<MemberEntity> member, String serialNumber) {
-        var requestSerial = parseSerialNumber(serialNumber);
-        var passSerial = member.map(m -> m.getIdentifiers().get("APPLE_PASS_SERIAL"));
-        if (passSerial.isEmpty() || !passSerial.get().equals(requestSerial)) {
+        try {
+            var requestSerial = parseSerialNumber(serialNumber);
+            var passSerial = member.map(m -> m.getIdentifiers().get("APPLE_PASS_SERIAL"));
+            if (passSerial.isEmpty() || !passSerial.get().equals(requestSerial)) {
+                return Optional.of(ResponseEntity.status(401).build());
+            }
+            LOG.info("Matched Serial: {}", requestSerial);
+            return Optional.empty();
+        } catch (ArrayIndexOutOfBoundsException e) {
             return Optional.of(ResponseEntity.status(401).build());
         }
-        LOG.info("Matched Serial: {}", requestSerial);
-        return Optional.empty();
     }
 
     private Optional<MemberEntity> authorise(String authToken) {
