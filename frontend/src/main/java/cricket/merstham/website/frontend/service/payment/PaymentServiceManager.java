@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.service.payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,8 +31,10 @@ public class PaymentServiceManager {
     public List<String> getEnabledServices() {
         return paymentServiceMap.values().stream()
                 .filter(paymentService -> paymentService.isEnabled() && !paymentService.isHidden())
+                .sorted(
+                        Comparator.comparing(PaymentService::displayOrder)
+                                .thenComparing(PaymentService::getName))
                 .map(PaymentService::getName)
-                .sorted()
                 .toList();
     }
 }

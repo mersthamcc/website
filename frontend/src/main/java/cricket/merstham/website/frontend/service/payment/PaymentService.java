@@ -19,7 +19,10 @@ public interface PaymentService {
     default boolean isHidden() {
         return false;
     }
-    ;
+
+    default int displayOrder() {
+        return 10;
+    }
 
     Optional<String> getDisabledReason();
 

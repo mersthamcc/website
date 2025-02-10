@@ -101,4 +101,9 @@ public class BankTransferService implements PaymentService {
                         "bankAccountSortCode", bankAccountSortCode));
         return model;
     }
+
+    @Override
+    public int displayOrder() {
+        return 100;
+    }
 }
