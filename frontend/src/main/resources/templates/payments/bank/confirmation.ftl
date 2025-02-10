@@ -9,20 +9,38 @@
 
         <@components.section title="Bank Details">
             <@spring.message code="payments.bank-arrange-transfer" />
-            <table>
-                <tr>
-                    <th>Account Name</th>
-                    <td>${bankAccountName}</td>
-                </tr>
-                <tr>
-                    <th>Account Number</th>
-                    <td>${bankAccountNumber}</td>
-                </tr>
-                <tr>
-                    <th>Sort Code</th>
-                    <td>${bankAccountSortCode}</td>
-                </tr>
-            </table>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Account Name</b>
+                </div>
+                <div class="col-md-8">
+                    ${bankAccountName}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Account Number</b>
+                </div>
+                <div class="col-md-8">
+                    ${bankAccountNumber}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Sort Code</b>
+                </div>
+                <div class="col-md-8">
+                    ${bankAccountSortCode}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <b>Payment Reference</b>
+                </div>
+                <div class="col-md-8">
+                    ${orderReference}
+                </div>
+            </div>
         </@components.section>
 
         <@components.buttonGroup>
