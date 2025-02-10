@@ -81,7 +81,8 @@ public class BankTransferService implements PaymentService {
                 Map.of(
                         "bankAccountName", bankAccountName,
                         "bankAccountNumber", bankAccountNumber,
-                        "bankAccountSortCode", bankAccountSortCode));
+                        "bankAccountSortCode", bankAccountSortCode,
+                        "orderReference", order.getWebReference()));
     }
 
     @Override
