@@ -148,6 +148,9 @@ configuration:
     list-id: ${MAILCHIMP_LIST_ID:}
     newsletter-interest-id: ${MAILCHIMP_NEWSLETTER_INTEREST_ID:}
   trusted-client-scope: "${WEBSITE_CLIENT_TRUSTED_SCOPE:graphql/trusted-client}"
+  google:
+    credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
+    application-name: ${GOOGLE_APPLICATION_NAME:}
   wallet:
     background-colour: "${WALLET_PASS_BACKGROUND_COLOUR:}"
     foreground-colour: "${WALLET_PASS_FOREGROUND_COLOUR:}"
@@ -165,7 +168,5 @@ configuration:
       signing-key: "${APPLE_WALLET_SIGNING_KEY:}"
       apple-intermediary-ca-cert: "${APPLE_CA_CERTIFICATE:}"
     google:
-      credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
-      application-name: ${GOOGLE_APPLICATION_NAME:}
       issuer: ${GOOGLE_ISSUER_ID:}
       class-name: ${GOOGLE_CLASS_NAME:}

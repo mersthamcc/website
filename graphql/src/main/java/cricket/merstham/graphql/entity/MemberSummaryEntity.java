@@ -2,10 +2,15 @@ package cricket.merstham.graphql.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import cricket.merstham.graphql.jpa.JpaJsonbConverter;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,6 +25,8 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Mapping for DB view */
 @Getter
@@ -99,4 +106,12 @@ public class MemberSummaryEntity {
 
     @Column(name = "google_pass_serial_number", unique = true)
     private String googlePassSerial;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "key")
+    @Column(name = "value")
+    @CollectionTable(
+            name = "member_summary_attribute",
+            joinColumns = @JoinColumn(name = "member_id"))
+    private Map<String, String> attributes = new HashMap<>();
 }

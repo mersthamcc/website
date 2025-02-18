@@ -78,8 +78,8 @@ public class WalletConfiguration {
 
     @Bean
     public Walletobjects getWalletObjects(
-            GoogleCredentials credentials,
-            @Value("${configuration.wallet.google.application-name}") String googleApplicationName)
+            @Named("WalletCredentials") GoogleCredentials credentials,
+            @Value("${configuration.google.application-name}") String googleApplicationName)
             throws GeneralSecurityException, IOException {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
