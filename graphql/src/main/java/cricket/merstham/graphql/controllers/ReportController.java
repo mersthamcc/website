@@ -8,8 +8,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.Principal;
 
 @Controller
@@ -25,8 +23,7 @@ public class ReportController {
     }
 
     @QueryMapping
-    public ReportExport exportFilteredMembers(Principal principal, @Argument ReportFilter filter)
-            throws GeneralSecurityException, IOException {
+    public ReportExport exportFilteredMembers(Principal principal, @Argument ReportFilter filter) {
         var members = membershipService.getMembers(principal, filter);
 
         return googleSheetsService.exportMemberSummary(principal, members, filter);

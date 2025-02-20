@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.MemberSummary;
+import cricket.merstham.shared.dto.ReportExport;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
@@ -85,6 +86,17 @@ public class MembershipReportsController {
                                         .setSortable(false))));
     }
 
+    @GetMapping(
+            value = "/administration/membership-report/{report}/export",
+            produces = "application/json",
+            name = "admin-membership-report-export")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public @ResponseBody ReportExport reportExport(
+            @PathVariable String report, CognitoAuthentication cognitoAuthentication) {
+        return service.exportReport(
+                reportFilter(report), cognitoAuthentication.getOAuth2AccessToken());
+    }
+
     @PostMapping(
             consumes = "application/json",
             produces = "application/json",
@@ -135,6 +147,7 @@ public class MembershipReportsController {
 
     private ReportFilter reportFilter(String report) {
         return switch (report) {
+            case "all" -> ReportFilter.ALL;
             case "unpaid-members-report" -> ReportFilter.UNPAID;
             case "openage-junior-report" -> ReportFilter.OPENAGE;
             case "no-photos-coaching" -> ReportFilter.NO_PHOTOS_COACHING;

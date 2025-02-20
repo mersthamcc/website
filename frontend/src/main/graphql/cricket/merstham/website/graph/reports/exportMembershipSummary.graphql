@@ -1,0 +1,6 @@
+query exportMembershipSummary($filter: String!) {
+    exportFilteredMembers(filter: $filter) {
+        type
+        location
+    }
+}

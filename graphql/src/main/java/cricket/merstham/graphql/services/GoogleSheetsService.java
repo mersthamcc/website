@@ -60,7 +60,10 @@ public class GoogleSheetsService {
     public ReportExport exportMemberSummary(
             Principal principal, List<MemberSummary> members, ReportFilter filter) {
         try {
-            var emailAddress = cognitoService.getUserDetails(getSubject(principal)).getEmail();
+            var subject = getSubject(principal);
+            LOG.info("Getting user info for subject {}", subject);
+            var emailAddress = cognitoService.getUserDetails(subject).getEmail();
+            LOG.info("Creating delegated credentials for user {}", emailAddress);
             var credentials = googleCredentials.createDelegated(emailAddress);
             credentials.refresh();
             LOG.info("Initiating export of {} members for {}", filter.asText(), emailAddress);

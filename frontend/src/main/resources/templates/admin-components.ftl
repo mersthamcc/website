@@ -534,7 +534,7 @@
     });
 </#macro>
 
-<#macro adminSspTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" columns=[] defaultPageLength=50 pageLengths=[10, 50, 100]>
+<#macro adminSspTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" columns=[] defaultPageLength=50 pageLengths=[10, 50, 100] buttons="">
     <div class="card ${cardClass}">
         <!-- Header -->
         <div class="card-header">
@@ -579,6 +579,11 @@
                         </form>
                     </div>
                     <div class="col-auto">
+                        <#if buttons?is_directive>
+                            <@buttons />
+                        <#else>
+                            ${buttons}
+                        </#if>
                     </div>
                 </div>
             </#if>

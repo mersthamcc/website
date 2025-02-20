@@ -11,6 +11,7 @@ import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Pass;
 import cricket.merstham.shared.dto.RegistrationAction;
+import cricket.merstham.shared.dto.ReportExport;
 import cricket.merstham.shared.dto.UserPaymentMethod;
 import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
@@ -38,6 +39,7 @@ import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.registration.MyCouponsQuery;
 import cricket.merstham.website.graph.registration.MyMemberDetailsQuery;
+import cricket.merstham.website.graph.reports.ExportMembershipSummaryQuery;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -463,5 +465,15 @@ public class MembershipService {
                 graphService.executeQuery(query, cognitoAuthentication.getOAuth2AccessToken());
 
         return modelMapper.map(requireGraphData(response, PassQuery.Data::getPass), Pass.class);
+    }
+
+    public ReportExport exportReport(ReportFilter filter, OAuth2AccessToken accessToken) {
+        var query = ExportMembershipSummaryQuery.builder().filter(filter.asText()).build();
+        Response<ExportMembershipSummaryQuery.Data> response =
+                graphService.executeQuery(query, accessToken);
+        return modelMapper.map(
+                requireGraphData(
+                        response, ExportMembershipSummaryQuery.Data::getExportFilteredMembers),
+                ReportExport.class);
     }
 }
