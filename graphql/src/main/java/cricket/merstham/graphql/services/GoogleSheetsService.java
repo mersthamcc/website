@@ -62,7 +62,7 @@ public class GoogleSheetsService {
         try {
             var subject = getSubject(principal);
             LOG.info("Getting user info for subject {}", subject);
-            var emailAddress = cognitoService.getUserDetails(subject).getEmail();
+            var emailAddress = cognitoService.getUserBySubjectId(subject).getEmail();
             LOG.info("Creating delegated credentials for user {}", emailAddress);
             var credentials = googleCredentials.createDelegated(emailAddress);
             credentials.refresh();
