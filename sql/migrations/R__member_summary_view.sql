@@ -131,4 +131,17 @@ FROM "member" m
 
 WHERE m.cancelled IS NULL
 ORDER BY familyname,
-         givenname
+         givenname;
+
+DROP VIEW IF EXISTS member_summary_attribute;
+CREATE OR REPLACE VIEW member_summary_attribute AS
+SELECT
+    a.member_id,
+    d."key",
+    CASE
+        WHEN d."type" IN ('String', 'Option', 'Email', 'Date', 'Time', 'Timestamp') THEN a."value"::JSONB ->> 0
+        WHEN d."type" IN ('Boolean') THEN (a."value"::JSONB ->> 0)::TEXT
+        ELSE a."value"
+    END AS value
+FROM member_attribute a
+         INNER JOIN attribute_definition d ON a.attribute_id = d.id;

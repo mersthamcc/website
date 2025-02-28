@@ -104,7 +104,7 @@ public class PassGeneratorService {
             Walletobjects walletobjects,
             @Value("${configuration.wallet.google.issuer}") String googleIssuerId,
             String googleWalletClass,
-            GoogleCredentials googleCredentials,
+            @Named("WalletCredentials") GoogleCredentials googleCredentials,
             @Value("${configuration.api-url}") String apiBaseUrl,
             MemberEntityRepository memberEntityRepository) {
         this.clubName = clubName;

@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -41,10 +42,11 @@ public class MemberSummary implements Serializable {
     @JsonProperty private String googlePassSerial;
     @JsonProperty private List<String> declarations;
     @JsonProperty private List<String> identifiers;
+    @JsonProperty private Map<String, String> attributes;
 
     @JsonProperty
     @Transient
     public String getLastSubsYear() {
-        return Integer.toString(lastSubsDate.getYear());
+        return Integer.toString(mostRecentSubscription);
     }
 }

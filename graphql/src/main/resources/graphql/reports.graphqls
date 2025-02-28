@@ -1,0 +1,8 @@
+type ReportExport {
+    type: String!
+    location: String!
+}
+
+extend type Query {
+    exportFilteredMembers(filter: String!): ReportExport
+}

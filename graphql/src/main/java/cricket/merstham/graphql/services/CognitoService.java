@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
 
 import java.util.List;
+
+import static java.text.MessageFormat.format;
 
 @Service
 public class CognitoService {
@@ -22,6 +25,7 @@ public class CognitoService {
     private static final String EMAIL_CLAIM = "email";
     public static final String PHONE_NUMBER_CLAIM = "phone_number";
     private static final String EMAIL_VERIFIED_CLAIM = "email_verified";
+    private static final String SUBJECT_CLAIM = "sub";
 
     private final CognitoIdentityProviderClient client;
     private final String userPoolId;
@@ -54,6 +58,32 @@ public class CognitoService {
                                 getUserAttribute(user.userAttributes(), EMAIL_VERIFIED_CLAIM)))
                 .enabled(user.enabled())
                 .build();
+    }
+
+    public User getUserBySubjectId(String subjectId) {
+        var response =
+                client.listUsers(
+                        ListUsersRequest.builder()
+                                .userPoolId(userPoolId)
+                                .filter(format("\"sub\" = \"{0}\"", subjectId))
+                                .build());
+
+        if (response.hasUsers() && !response.users().isEmpty()) {
+            var user = response.users().get(0);
+            return User.builder()
+                    .username(user.username())
+                    .subjectId(getUserAttribute(user.attributes(), SUBJECT_CLAIM))
+                    .givenName(getUserAttribute(user.attributes(), GIVEN_NAME_CLAIM))
+                    .familyName(getUserAttribute(user.attributes(), FAMILY_NAME_CLAIM))
+                    .email(getUserAttribute(user.attributes(), EMAIL_CLAIM))
+                    .phoneNumber(getUserAttribute(user.attributes(), PHONE_NUMBER_CLAIM))
+                    .verified(
+                            Boolean.parseBoolean(
+                                    getUserAttribute(user.attributes(), EMAIL_VERIFIED_CLAIM)))
+                    .enabled(user.enabled())
+                    .build();
+        }
+        throw new RuntimeException("User not found");
     }
 
     private String getUserAttribute(List<AttributeType> attributes, String name) {

@@ -1,7 +1,9 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.MemberSummary;
+import cricket.merstham.shared.dto.ReportExport;
 import cricket.merstham.shared.types.ReportFilter;
+import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
@@ -11,6 +13,7 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,6 +88,25 @@ public class MembershipReportsController {
                                         .setSortable(false))));
     }
 
+    @GetMapping(
+            value = "/administration/membership-report/{report}/export",
+            produces = "application/json",
+            name = "admin-membership-report-export")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public ResponseEntity<ReportExport> reportExport(
+            @PathVariable String report, CognitoAuthentication cognitoAuthentication) {
+        try {
+            var result =
+                    service.exportReport(
+                            reportFilter(report), cognitoAuthentication.getOAuth2AccessToken());
+
+            return ResponseEntity.ok(result);
+        } catch (GraphException e) {
+            return ResponseEntity.internalServerError()
+                    .body(ReportExport.builder().error(e.getErrors().get(0).getMessage()).build());
+        }
+    }
+
     @PostMapping(
             consumes = "application/json",
             produces = "application/json",
@@ -135,6 +157,7 @@ public class MembershipReportsController {
 
     private ReportFilter reportFilter(String report) {
         return switch (report) {
+            case "all" -> ReportFilter.ALL;
             case "unpaid-members-report" -> ReportFilter.UNPAID;
             case "openage-junior-report" -> ReportFilter.OPENAGE;
             case "no-photos-coaching" -> ReportFilter.NO_PHOTOS_COACHING;
