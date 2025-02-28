@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.controller.administration;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.ReportExport;
 import cricket.merstham.shared.types.ReportFilter;
+import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
@@ -12,6 +13,7 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,10 +93,18 @@ public class MembershipReportsController {
             produces = "application/json",
             name = "admin-membership-report-export")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
-    public @ResponseBody ReportExport reportExport(
+    public ResponseEntity<ReportExport> reportExport(
             @PathVariable String report, CognitoAuthentication cognitoAuthentication) {
-        return service.exportReport(
-                reportFilter(report), cognitoAuthentication.getOAuth2AccessToken());
+        try {
+            var result =
+                    service.exportReport(
+                            reportFilter(report), cognitoAuthentication.getOAuth2AccessToken());
+
+            return ResponseEntity.ok(result);
+        } catch (GraphException e) {
+            return ResponseEntity.internalServerError()
+                    .body(ReportExport.builder().error(e.getErrors().get(0).getMessage()).build());
+        }
     }
 
     @PostMapping(

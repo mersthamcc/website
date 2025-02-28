@@ -53,6 +53,9 @@
                     beforeSend: function (request) {
                         request.setRequestHeader(header, token);
                     }
+                }).error(function(jqXHR, textStatus, errorMessage) {
+                    $('#export-status')
+                        .html("<p><b>Export error!</b></p><p>An error occured performing export.</p><p>Please contact administrator</p>");
                 }).done(function (data) {
                     $('#export-status')
                         .html("<p><b>Export complete!</b></p><p>Saved to your private Google Drive folder, to share move the sheet to appropriate shared drive.</p><p>Click below to open.</p>");

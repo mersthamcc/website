@@ -18,4 +18,5 @@ import lombok.experimental.Accessors;
 public class ReportExport {
     private String type;
     private String location;
+    private String error;
 }
