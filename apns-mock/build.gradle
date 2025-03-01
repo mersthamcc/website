@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id "com.gradleup.shadow" version "8.3.0"
+}
+
+group = 'cricket.merstham.mock-apns'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation "com.eatthepath:pushy:0.15.4"
+    implementation "org.apache.logging.log4j:log4j-api:2.22.1"
+    implementation "org.apache.logging.log4j:log4j-core:2.22.1"
+    implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1"
+    implementation "org.postgresql:postgresql:42.7.4"
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "cricket.merstham.Main"
+    }
+}
