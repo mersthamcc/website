@@ -32,6 +32,7 @@ public class PasskitUpdateService {
     }
 
     public boolean sendNotification(PasskitDeviceRegistrationEntity registration) {
+        if (!registration.isValid()) return false;
         return sendNotification(
                 registration.getDeviceLibraryIdentifier(), registration.getPushToken());
     }

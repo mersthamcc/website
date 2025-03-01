@@ -1,6 +1,7 @@
 package cricket.merstham.graphql.services.hooks.pass;
 
 import cricket.merstham.graphql.entity.OrderEntity;
+import cricket.merstham.graphql.entity.PasskitDeviceRegistrationEntity;
 import cricket.merstham.graphql.repository.PassKitDeviceRegistrationEntityRepository;
 import cricket.merstham.graphql.services.PasskitUpdateService;
 import cricket.merstham.graphql.services.hooks.Hook;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 @Service
@@ -36,6 +38,8 @@ public class ApplePassHook implements Hook<OrderEntity> {
                                 var member = subscription.getMember();
                                 var registrations =
                                         repository.findAllByMembersContains(Set.of(member));
+                                var devicesToRemove =
+                                        new ArrayList<PasskitDeviceRegistrationEntity>();
                                 registrations.forEach(
                                         registration -> {
                                             LOG.info(
@@ -48,12 +52,10 @@ public class ApplePassHook implements Hook<OrderEntity> {
                                                         "Removing failed device {} from member {}",
                                                         registration.getDeviceLibraryIdentifier(),
                                                         member.getId());
-                                                registration.getMembers().remove(member);
+                                                devicesToRemove.add(registration);
                                             }
                                         });
-                                repository.saveAllAndFlush(registrations).stream()
-                                        .filter(r -> r.getMembers().isEmpty())
-                                        .forEach(repository::delete);
+                                repository.deleteAll(devicesToRemove);
                                 repository.flush();
                             } catch (Exception e) {
                                 LOG.error(

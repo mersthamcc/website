@@ -167,6 +167,7 @@ configuration:
       signing-certificate: "${APPLE_WALLET_SIGNING_CERTIFICATE:}"
       signing-key: "${APPLE_WALLET_SIGNING_KEY:}"
       apple-intermediary-ca-cert: "${APPLE_CA_CERTIFICATE:}"
+      use-mock-server: "${APNS_MOCK_SERVER:false}"
     google:
       issuer: ${GOOGLE_ISSUER_ID:}
       class-name: ${GOOGLE_CLASS_NAME:}
