@@ -6,6 +6,8 @@ sentry:
   enabled: ${SENTRY_ENABLED:false}
   environment: ${SENTRY_ENVIRONMENT:dev}
   use-git-commit-id-as-release: true
+  ignored-exceptions-for-type:
+    - org.springframework.security.authorization.AuthorizationDeniedException
 
 spring:
   data:
