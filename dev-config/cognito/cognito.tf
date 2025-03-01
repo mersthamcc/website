@@ -1,5 +1,6 @@
 resource "aws_cognito_user_pool" "dev_pool" {
-  name = var.developer_name
+  name           = var.developer_name
+  user_pool_tier = "ESSENTIALS"
 
   username_configuration {
     case_sensitive = false
