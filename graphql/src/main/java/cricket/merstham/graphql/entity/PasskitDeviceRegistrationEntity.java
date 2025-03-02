@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.entity;
 
+import com.google.common.base.Strings;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -53,4 +55,10 @@ public class PasskitDeviceRegistrationEntity {
             joinColumns = @JoinColumn(name = "device_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id"))
     private Set<MemberEntity> members = new LinkedHashSet<>();
+
+    @Transient
+    public boolean isValid() {
+        return !(Strings.isNullOrEmpty(deviceLibraryIdentifier)
+                || Strings.isNullOrEmpty(pushToken));
+    }
 }

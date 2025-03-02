@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.net.ssl.SSLException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -122,8 +123,18 @@ public class WalletConfiguration {
     public ApnsClient getApnsClient(
             @Named("appleSigningCertificate") X509Certificate appleSigningCertificate,
             @Named("appleSigningKey") PrivateKey appleSigningKey,
+            @Value("${configuration.wallet.apple.use-mock-server}") boolean useMock,
             MeterRegistry meterRegistry)
             throws SSLException {
+        if (useMock) {
+            return new ApnsClientBuilder()
+                    .setClientCredentials(appleSigningCertificate, appleSigningKey, null)
+                    .setApnsServer("localhost", 8888)
+                    .setTrustedServerCertificateChain(
+                            new File(System.getenv("MOCK_APNS_SERVER_CERTIFICATE")))
+                    .setMetricsListener(new MicrometerApnsClientMetricsListener(meterRegistry))
+                    .build();
+        }
         return new ApnsClientBuilder()
                 .setClientCredentials(appleSigningCertificate, appleSigningKey, null)
                 .setApnsServer(ApnsClientBuilder.PRODUCTION_APNS_HOST)
