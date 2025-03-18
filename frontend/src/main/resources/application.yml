@@ -2,12 +2,14 @@ base-url: "${BASE_URL:http://localhost:8080}"
 
 sentry:
   dsn: ${SENTRY_DSN:}
-  tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
+  traces-sample-rate: ${SENTRY_SAMPLE_RATE:1.0}
   enabled: ${SENTRY_ENABLED:false}
   environment: ${SENTRY_ENVIRONMENT:dev}
   use-git-commit-id-as-release: true
   ignored-exceptions-for-type:
     - org.springframework.security.authorization.AuthorizationDeniedException
+  send-default-pii: true
+  enable-metrics: true
 
 spring:
   data:
@@ -69,9 +71,9 @@ server:
   forward-headers-strategy: framework
   servlet:
     session:
-      timeout: 24h
+      timeout: 21600s
       cookie:
-        max-age: 24h
+        max-age: 21600s
 
 management:
   server:
