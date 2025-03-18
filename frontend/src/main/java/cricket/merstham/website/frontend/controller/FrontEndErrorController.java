@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectToPage;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -58,7 +58,7 @@ public class FrontEndErrorController
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public RedirectView handleError(
+    public ModelAndView handleError(
             HttpServletRequest request,
             RuntimeException exception,
             RedirectAttributes redirectAttributes) {
@@ -77,11 +77,18 @@ public class FrontEndErrorController
                                             .collect(Collectors.joining(", ")))
                     .setCause(graphException)
                     .log();
+        } else if (exception instanceof MethodArgumentTypeMismatchException e) {
+            LOG.atWarn()
+                    .setMessage("Invalid path requested: {}")
+                    .addArgument(() -> request.getServletPath())
+                    .setCause(e)
+                    .log();
+            return new ModelAndView("error/404", HttpStatus.NOT_FOUND);
         } else {
             LOG.atError().setMessage("An unexpected error occurred").setCause(exception).log();
         }
         redirectAttributes.addFlashAttribute(EXCEPTION_FLASH, exception.getLocalizedMessage());
         Sentry.captureException(exception);
-        return redirectTo("/error");
+        return redirectToPage("/error");
     }
 }

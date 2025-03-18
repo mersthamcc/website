@@ -3,11 +3,12 @@ server:
 
 sentry:
   dsn: ${SENTRY_DSN:}
-  tracesSampleRate: ${SENTRY_SAMPLE_RATE:1.0}
   enabled: ${SENTRY_ENABLED:false}
   environment: ${SENTRY_ENVIRONMENT:dev}
   use-git-commit-id-as-release: true
-
+  traces-sample-rate: ${SENTRY_SAMPLE_RATE:1.0}
+  send-default-pii: true
+  enable-metrics: true
 spring:
   mvc:
     log-request-details: ${DEBUG_LOG_REQUESTS:false}
