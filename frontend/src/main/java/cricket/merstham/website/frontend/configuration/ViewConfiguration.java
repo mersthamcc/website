@@ -44,6 +44,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
     private final ClubConfiguration clubConfiguration;
     private final String resourcePrefix;
     private final String baseUrl;
+    private final String scripts;
 
     private final boolean debug;
 
@@ -53,12 +54,14 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
             ClubConfiguration clubConfiguration,
             @Value("${resources.base-url}") String resourcePrefix,
             @Value("${base-url}") String baseUrl,
-            @Value("${debug}") boolean debug) {
+            @Value("${debug}") boolean debug,
+            @Value("${scripts}") String scripts) {
         this.menuBuilderProvider = menuBuilderProvider;
         this.clubConfiguration = clubConfiguration;
         this.resourcePrefix = resourcePrefix;
         this.baseUrl = baseUrl;
         this.debug = debug;
+        this.scripts = scripts;
     }
 
     @Override
@@ -79,6 +82,7 @@ public class ViewConfiguration implements HandlerInterceptor, BeanPostProcessor 
                 }
             }
             model.put("debug", debug);
+            model.put("scripts", scripts);
             model.put("config", clubConfiguration);
             model.put("topMenu", menuBuilderProvider.getTopMenu());
             model.put("userMenu", menuBuilderProvider.getUserMenu());

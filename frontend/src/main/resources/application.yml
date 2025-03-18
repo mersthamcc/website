@@ -187,3 +187,5 @@ registration:
 bots:
   robots: "${ROBOTS:}"
   sitemap: "${SITEMAP:}"
+
+scripts: "${GLOBAL_SCRIPT_WIDGETS:}"

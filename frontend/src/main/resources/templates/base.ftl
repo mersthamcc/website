@@ -490,6 +490,10 @@
                     src="//mersthamcricketclub.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/sb53l8/b/24/bc54840da492f9ca037209037ef0522a/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=e8e9adb2">
             </script>
 
+            <#if scripts?? && scripts?has_content>
+                ${scripts}
+            </#if>
+
             <script type="text/javascript">
                 function startMail(user,domain) {
                     let locationstring = "mailto:" + user + "@" + domain;
