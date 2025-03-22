@@ -74,6 +74,10 @@ server:
       timeout: 21600s
       cookie:
         max-age: 21600s
+  tomcat:
+    max-http-response-header-size: 32KB
+
+  max-http-request-header-size: 32KB
 
 management:
   server:
