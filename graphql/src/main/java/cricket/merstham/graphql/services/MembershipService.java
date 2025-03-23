@@ -308,7 +308,7 @@ public class MembershipService {
     @PreAuthorize("isAuthenticated()")
     public Order confirmOrder(int id, String paymentType, Principal principal) {
         var order = orderEntityRepository.findById(id).orElseThrow();
-        var user = cognitoService.getUserDetails(getSubject(principal));
+        var user = cognitoService.getUserBySubjectId(getSubject(principal));
         if (!order.isConfirmed()) {
             emailService.sendEmail(
                     user.getEmail(),
@@ -414,14 +414,19 @@ public class MembershipService {
 
     @PreAuthorize("isAuthenticated()")
     public List<MemberSummary> getMyMembers(Principal principal) {
-        var members = summaryRepository.findAllByOwnerUserIdEquals(getSubject(principal));
+        var user = cognitoService.getUserBySubjectId(getSubject(principal));
+        var members =
+                summaryRepository.findAllByOwnerUserIdEqualsOrOwnerEmailAddressesContains(
+                        getSubject(principal), user.getEmail());
         return members.stream().map(m -> modelMapper.map(m, MemberSummary.class)).toList();
     }
 
     @PreAuthorize("isAuthenticated()")
     public List<Member> getMyMemberDetails(Principal principal) {
+        var user = cognitoService.getUserBySubjectId(getSubject(principal));
         return memberRepository
-                .findAllByOwnerUserIdAndCancelledIsNull(getSubject(principal))
+                .findAllByOwnerUserIdOrOwnerEmailAddressesContainsAndCancelledIsNull(
+                        user.getSubjectId(), user.getEmail())
                 .stream()
                 .map(m -> modelMapper.map(m, Member.class))
                 .toList();

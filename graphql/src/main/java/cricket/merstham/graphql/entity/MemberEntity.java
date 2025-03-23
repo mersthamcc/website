@@ -85,6 +85,11 @@ public class MemberEntity {
     @CollectionTable(name = "member_identifier", joinColumns = @JoinColumn(name = "member_id"))
     private Map<String, String> identifiers = new HashMap<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "owner_email_address")
+    @CollectionTable(name = "member_summary_owner", joinColumns = @JoinColumn(name = "member_id"))
+    private List<String> ownerEmailAddresses = new ArrayList<>();
+
     @Transient
     public String getStringAttribute(String key) {
         return attributes.stream()
