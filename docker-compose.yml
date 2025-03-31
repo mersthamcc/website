@@ -59,6 +59,8 @@ services:
       "--log.level=DEBUG",
       "--accesslog=true",
       "--accesslog.filepath=/dev/stderr",
+      "--experimental.plugins.traefik-modsecurity-plugin.modulename=github.com/acouvreur/traefik-modsecurity-plugin",
+      "--experimental.plugins.traefik-modsecurity-plugin.version=v1.3.0"
     ]
     labels:
       - traefik.http.middlewares.forcehttps.redirectscheme.scheme=https
@@ -75,6 +77,8 @@ services:
       - traefik.http.routers.traefik-tls.tls.domains[0].main=*.${DEVDOMAIN}
       - com_docker_swarm_service_name=traefik
       - tls-cert-host-check=traefik.${DEVDOMAIN}
+      - traefik.http.middlewares.waf.plugin.traefik-modsecurity-plugin.modSecurityUrl=http://waf:8080
+      - traefik.http.middlewares.waf.plugin.traefik-modsecurity-plugin.maxBodySize=10485760
     environment:
       AWS_ACCESS_KEY_ID: ${DNS_AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${DNS_AWS_SECRET_ACCESS_KEY}
@@ -102,6 +106,32 @@ services:
       options:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
+  waf:
+    image: owasp/modsecurity-crs:4.2.0-apache-202405220605
+    environment:
+      - PARANOIA=1
+      - ANOMALY_INBOUND=10
+      - ANOMALY_OUTBOUND=5
+      - BACKEND=http://dummy
+    networks:
+      - dmz
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+  dummy:
+    image: traefik/whoami
+    networks:
+      - dmz
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
   postgres:
     image: postgres:15-alpine
     ports:
@@ -121,6 +151,28 @@ services:
       test: pg_isready -U ${DATABASE_ROOT_USER}
       interval: 5s
       retries: 30
+    depends_on:
+      - loki
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+  local-data-api:
+    image: koxudaxi/local-data-api
+    restart: unless-stopped
+    networks:
+      - backendnetwork
+    environment:
+      ENGINE: PostgreSQLJDBC
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      RESOURCE_ARN: 'arn:aws:rds:eu-west-2:123456789012:cluster:dummy'
+      SECRET_ARN: 'arn:aws:secretsmanager:eu-west-2:123456789012:secret:dummy' #pragma: allowlist secret
+    ports:
+      - "8180:80"
     depends_on:
       - loki
     logging:
@@ -385,7 +437,7 @@ services:
         loki-url: "http://localhost:3100/loki/api/v1/push"
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.1
     labels:
       - traefik.enable=true
       - traefik.http.routers.postgres.rule=Host(`postgres.${DEVDOMAIN}`)
@@ -681,6 +733,7 @@ services:
 #      driver: loki
 #      options:
 #        loki-url: "http://localhost:3100/loki/api/v1/push"
+
 volumes:
   pg-data:
   redis-config:

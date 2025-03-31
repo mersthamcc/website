@@ -145,3 +145,12 @@ SELECT
     END AS value
 FROM member_attribute a
          INNER JOIN attribute_definition d ON a.attribute_id = d.id;
+
+DROP VIEW IF EXISTS member_summary_owner;
+CREATE OR REPLACE VIEW member_summary_owner AS
+SELECT
+    a.member_id,
+    a."value"::JSONB ->> 0 AS owner_email_address
+FROM member_attribute a
+         INNER JOIN attribute_definition d ON a.attribute_id = d.id
+WHERE d.key IN ('email', 'parent-email-1', 'parent-email-2');

@@ -22,6 +22,9 @@ public interface MemberSummaryRepository
 
     List<MemberSummaryEntity> findAllByOwnerUserIdEquals(String ownerUserId);
 
+    List<MemberSummaryEntity> findAllByOwnerUserIdEqualsOrOwnerEmailAddressesContains(
+            String ownerUserId, String ownerEmailAddress);
+
     default Specification<MemberSummaryEntity> getMemberSpecification(MemberFilter filter) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

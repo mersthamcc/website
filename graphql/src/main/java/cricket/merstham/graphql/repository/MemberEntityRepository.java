@@ -33,4 +33,7 @@ public interface MemberEntityRepository
     Optional<MemberEntity> findByUuidAndOwnerUserId(String uuid, String ownerUserId);
 
     List<MemberEntity> findAllByOwnerUserIdAndCancelledIsNull(String subject);
+
+    List<MemberEntity> findAllByOwnerUserIdOrOwnerEmailAddressesContainsAndCancelledIsNull(
+            String subject, String ownerEmailAddress);
 }

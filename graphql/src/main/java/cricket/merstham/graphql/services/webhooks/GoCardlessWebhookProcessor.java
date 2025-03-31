@@ -227,7 +227,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
 
             orders.forEach(
                     order -> {
-                        var user = cognitoService.getUserDetails(order.getOwnerUserId());
+                        var user = cognitoService.getUserBySubjectId(order.getOwnerUserId());
                         emailService.sendEmail(
                                 user.getEmail(),
                                 MANDATE_CANCEL,

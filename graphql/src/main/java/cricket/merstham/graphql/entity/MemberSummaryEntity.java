@@ -25,7 +25,9 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Mapping for DB view */
@@ -114,4 +116,9 @@ public class MemberSummaryEntity {
             name = "member_summary_attribute",
             joinColumns = @JoinColumn(name = "member_id"))
     private Map<String, String> attributes = new HashMap<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "owner_email_address")
+    @CollectionTable(name = "member_summary_owner", joinColumns = @JoinColumn(name = "member_id"))
+    private List<String> ownerEmailAddresses = new ArrayList<>();
 }
