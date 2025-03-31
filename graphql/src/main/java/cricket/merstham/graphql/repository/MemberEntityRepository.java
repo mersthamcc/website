@@ -34,6 +34,7 @@ public interface MemberEntityRepository
 
     List<MemberEntity> findAllByOwnerUserIdAndCancelledIsNull(String subject);
 
-    List<MemberEntity> findAllByOwnerUserIdOrOwnerEmailAddressesContainsAndCancelledIsNull(
-            String subject, String ownerEmailAddress);
+    List<MemberEntity>
+            findAllByOwnerUserIdAndCancelledIsNullOrOwnerEmailAddressesContainsAndCancelledIsNull(
+                    String subject, String ownerEmailAddress);
 }

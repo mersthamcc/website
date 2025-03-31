@@ -7,8 +7,12 @@ import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.payment.PaymentServiceManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +22,15 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import static cricket.merstham.website.frontend.controller.RegistrationController.BASKET;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectToPage;
 import static java.util.Objects.isNull;
 
 @Controller
 @SessionAttributes(BASKET)
+@PreAuthorize("isAuthenticated()")
 public class PaymentsController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PaymentsController.class);
 
     public static final String ORDER = "current-order";
     private final PaymentServiceManager paymentServiceManager;
@@ -114,5 +122,11 @@ public class PaymentsController {
             HttpServletRequest request) {
         var paymentService = paymentServiceManager.getServiceByName(paymentType);
         return paymentService.cancel(request, basket, cognitoAuthentication.getOAuth2AccessToken());
+    }
+
+    @ExceptionHandler(value = IllegalStateException.class)
+    public ModelAndView handleException(IllegalStateException ex) {
+        LOG.warn("Encountered invalid session error, redirecting to /register", ex);
+        return redirectToPage("/register");
     }
 }
