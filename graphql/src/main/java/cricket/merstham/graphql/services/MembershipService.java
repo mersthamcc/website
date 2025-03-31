@@ -425,7 +425,7 @@ public class MembershipService {
     public List<Member> getMyMemberDetails(Principal principal) {
         var user = cognitoService.getUserBySubjectId(getSubject(principal));
         return memberRepository
-                .findAllByOwnerUserIdOrOwnerEmailAddressesContainsAndCancelledIsNull(
+                .findAllByOwnerUserIdAndCancelledIsNullOrOwnerEmailAddressesContainsAndCancelledIsNull(
                         user.getSubjectId(), user.getEmail())
                 .stream()
                 .map(m -> modelMapper.map(m, Member.class))
