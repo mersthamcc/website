@@ -28,8 +28,11 @@
         }
 
         function unpaid(row, type, set, meta) {
-            if (row.data.mostRecentSubscription < CURRENT_YEAR || !row.data.received) {
+            if (!row.data.received) {
                 return `<span class="badge badge-danger"><@spring.message code="membership.unpaid" /></span>`
+            }
+            if (row.data.mostRecentSubscription < CURRENT_YEAR) {
+                return `<span class="badge badge-soft-warning"><@spring.message code="membership.not-renewed" /></span>`
             }
             return "";
         }
