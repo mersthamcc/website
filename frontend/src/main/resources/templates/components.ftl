@@ -291,14 +291,14 @@
                                                     <#else>
                                                         <#assign classes></#assign>
                                                     </#if>
-                                                    <a class="dropdown-item ${classes}" href="${leafItem.destinationUrl}">
+                                                    <a class="dropdown-item ${classes}" href="${leafItem.destinationUrl}" <#if (leafItem.externalLink)>target="_blank" rel="noopener"</#if>>
                                                         <@spring.messageArgsText code="menu.${leafItem.name}" args=leafItem.argumentValues text=leafItem.displayName />
                                                     </a>
                                                 </#list>
                                             </div>
                                         </div>
                                     <#else>
-                                        <a class="dropdown-item ${classes}" href="${subitem.destinationUrl}">
+                                        <a class="dropdown-item ${classes}" href="${subitem.destinationUrl}" <#if (subitem.externalLink)>target="_blank" rel="noopener"</#if>>
                                             <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />
                                         </a>
                                     </#if>
@@ -310,6 +310,7 @@
                             <a id="menu-${item.name}"
                                class="hs-mega-menu-invoker nav-link ${classes}"
                                href="${item.destinationUrl}"
+                               <#if (item.externalLink)>target="_blank" rel="noopener"</#if>
                                aria-haspopup="true"
                                aria-expanded="false"
                                >

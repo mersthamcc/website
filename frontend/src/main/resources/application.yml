@@ -119,6 +119,11 @@ club:
           - "_utma"
           - "gid"
   kit-store-url: ${KIT_STORE_URL:}
+  supporter-kit-store-url: ${SUPPORTER_STORE_URL:}
+  mailing-list:
+    post-url: ${MAILCHIMP_FORM_POST_URL:}
+    tags: ${MAILCHIMP_FORM_TAGS:}
+    hidden-field-name: ${MAILCHIMP_FORM_HIDDEN_NAME:}
   rss:
     feed-description: ${RSS_FEED_DESCRIPTION:Club News}
 api:

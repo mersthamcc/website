@@ -21,6 +21,7 @@ public class Menu {
     private final Provider<List<Menu>> children;
     private final String icons;
     private final String displayName;
+    private final boolean externalLink;
 
     public Menu(
             String name,
@@ -29,7 +30,8 @@ public class Menu {
             List<String> roles,
             Provider<List<Menu>> children,
             String icons,
-            String displayName) {
+            String displayName,
+            boolean externalLink) {
         this.name = name;
         this.arguments = arguments;
         this.destinationUrl = destinationUrl;
@@ -37,6 +39,7 @@ public class Menu {
         this.children = children;
         this.icons = icons;
         this.displayName = displayName;
+        this.externalLink = externalLink;
     }
 
     public Menu(
@@ -46,7 +49,7 @@ public class Menu {
             List<String> roles,
             Provider<List<Menu>> children,
             String icons) {
-        this(name, arguments, destinationUrl, roles, children, icons, null);
+        this(name, arguments, destinationUrl, roles, children, icons, null, false);
     }
 
     public Menu(
@@ -56,6 +59,16 @@ public class Menu {
             List<String> roles,
             Provider<List<Menu>> children) {
         this(name, arguments, destinationUrl, roles, children, null);
+    }
+
+    public Menu(
+            String name,
+            Map<String, String> arguments,
+            URI destinationUrl,
+            List<String> roles,
+            Provider<List<Menu>> children,
+            boolean externalLink) {
+        this(name, arguments, destinationUrl, roles, children, null, null, externalLink);
     }
 
     public String getName() {
@@ -140,5 +153,9 @@ public class Menu {
     public String getDisplayName() {
         if (nonNull(displayName)) return displayName;
         return name;
+    }
+
+    public boolean isExternalLink() {
+        return externalLink;
     }
 }
