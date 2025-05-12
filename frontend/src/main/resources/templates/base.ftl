@@ -258,7 +258,16 @@
                                     <li class="nav-item"><a class="nav-link" href="/pages/about"><@spring.messageText code="footer.about" text="About" /></a></li>
                                     <li class="nav-item"><a class="nav-link" href="/pages/subs"><@spring.messageText code="footer.membership" text="Membership" /></a></li>
                                     <li class="nav-item"><a class="nav-link" href="/contacts"><@spring.messageText code="footer.contact" text="Contacts" /></a></li>
-                                    <li class="nav-item"><a class="nav-link" href="${config.kitStoreUrl}"><@spring.messageText code="footer.kit-store" text="Kit" /></a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="${config.kitStoreUrl}" target="_blank" rel="noopener">
+                                            <@spring.messageText code="footer.kit-store" text="Playing Kit" />
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="${config.supporterKitStoreUrl}" target="_blank" rel="noopener">
+                                            <@spring.messageText code="footer.supporter-store" text="Supporter Clothing" />
+                                        </a>
+                                    </li>
 <#--                                    <li class="nav-item"><a class="nav-link" href=""><@spring.messageText code="footer.policies" text="Policies" /></a></li>-->
                                 </ul>
                                 <!-- End Nav Link -->
@@ -287,6 +296,16 @@
                                               <span class="media-body"><@spring.messageText code="footer.account" text="Account" /></span>
                                             </span>
                                         </a>
+
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/mailing-list">
+                                            <span class="media align-items-center">
+                                              <i class="fa fa-mail-bulk mr-2"></i>
+                                              <span class="media-body"><@spring.messageText code="footer.mailing-list" text="Mailing List" /></span>
+                                            </span>
+                                        </a>
+
                                     </li>
                                 </ul>
                                 <!-- End Nav Link -->

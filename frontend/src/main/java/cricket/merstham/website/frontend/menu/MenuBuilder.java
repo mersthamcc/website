@@ -3,6 +3,7 @@ package cricket.merstham.website.frontend.menu;
 import cricket.merstham.shared.dto.ContactCategory;
 import cricket.merstham.shared.dto.Message;
 import cricket.merstham.shared.dto.StaticPage;
+import cricket.merstham.website.frontend.configuration.ClubConfiguration;
 import cricket.merstham.website.frontend.configuration.ViewConfiguration;
 import cricket.merstham.website.frontend.service.MenuService;
 import cricket.merstham.website.frontend.service.PageService;
@@ -94,7 +95,13 @@ public class MenuBuilder {
                             null,
                             URI.create("#"),
                             List.of(),
-                            () -> buildMenuFor("venue", getVenueList())));
+                            () -> buildMenuFor("venue", getVenueList())),
+                    new Menu(
+                            "kit",
+                            null,
+                            URI.create("#"),
+                            List.of(),
+                            () -> buildMenuFor("kit", getKitMenu())));
 
     private List<Menu> buildMenuFor(String name, List<Menu> items) {
         var menu = new ArrayList<Menu>();
@@ -111,7 +118,8 @@ public class MenuBuilder {
                                                 List.of(),
                                                 null,
                                                 null,
-                                                p.getTitle()))
+                                                p.getTitle(),
+                                                false))
                         .toList());
         return menu;
     }
@@ -364,11 +372,14 @@ public class MenuBuilder {
     //                                                    "fa-credit-card"))));
     private final MenuService menuService;
     private final PageService pageService;
+    private final ClubConfiguration clubConfiguration;
 
     @Autowired
-    public MenuBuilder(MenuService menuService, PageService pageService) {
+    public MenuBuilder(
+            MenuService menuService, PageService pageService, ClubConfiguration clubConfiguration) {
         this.menuService = menuService;
         this.pageService = pageService;
+        this.clubConfiguration = clubConfiguration;
     }
 
     private List<Menu> getVenueList() {
@@ -382,7 +393,8 @@ public class MenuBuilder {
                                         List.of(),
                                         null,
                                         null,
-                                        v.getName()))
+                                        v.getName(),
+                                        false))
                 .toList();
     }
 
@@ -411,8 +423,27 @@ public class MenuBuilder {
                                         List.of(),
                                         null,
                                         null,
-                                        s.getTitle()))
+                                        s.getTitle(),
+                                        false))
                 .toList();
+    }
+
+    private List<Menu> getKitMenu() {
+        return List.of(
+                new Menu(
+                        "kit-store",
+                        null,
+                        URI.create(clubConfiguration.getKitStoreUrl()),
+                        List.of(),
+                        null,
+                        true),
+                new Menu(
+                        "supporter-store",
+                        null,
+                        URI.create(clubConfiguration.getSupporterKitStoreUrl()),
+                        List.of(),
+                        null,
+                        true));
     }
 
     public List<Menu> getTopMenu() {
