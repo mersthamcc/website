@@ -26,6 +26,8 @@ public interface FixtureRepository
 
     List<FixtureEntity> findAllByDateInAndTeamIncludedInSelectionIsTrue(List<LocalDate> dates);
 
+    List<FixtureEntity> findAllByDateAfterAndHomeAwayEquals(LocalDate date, String homeAway);
+
     @Query(
             value =
                     "SELECT DISTINCT detail->>'competition_id' "

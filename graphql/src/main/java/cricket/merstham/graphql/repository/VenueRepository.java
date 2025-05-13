@@ -26,4 +26,6 @@ public interface VenueRepository
                             + "WHERE venue.show_on_menu = TRUE "
                             + "ORDER BY sort_order ASC, name ASC")
     List<VenueEntity> venuesForMenu();
+
+    VenueEntity findByPlayCricketId(long playCricketId);
 }

@@ -69,6 +69,8 @@ dependencies {
     implementation 'com.google.apis:google-api-services-walletobjects:v1-rev20240627-2.0.0'
     implementation 'com.google.apis:google-api-services-sheets:v4-rev20241001-2.0.0'
     implementation 'com.google.apis:google-api-services-drive:v3-rev20240914-2.0.0'
+    implementation 'com.google.apis:google-api-services-calendar:v3-rev20240927-2.0.0'
+
     implementation "com.eatthepath:pushy:0.15.4"
     implementation "com.eatthepath:pushy-micrometer-metrics-listener:0.15.4"
 

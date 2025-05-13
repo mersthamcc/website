@@ -63,6 +63,9 @@ public class Fixture implements Serializable {
 
     private int focusTeam;
 
+    @JsonProperty("calendar_id")
+    private String calendarId;
+
     @JsonIgnore
     @Transient
     public String getVenue() {

@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.configuration;
 
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.walletobjects.WalletobjectsScopes;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -35,6 +36,18 @@ public class GoogleConfiguration {
         var credentials =
                 GoogleCredentials.fromStream(new StringInputStream(credentialJson))
                         .createScoped(List.of(SheetsScopes.SPREADSHEETS, SheetsScopes.DRIVE));
+        credentials.refresh();
+        return credentials;
+    }
+
+    @Bean
+    @Named("CalendarCredentials")
+    public GoogleCredentials getGoogleCalendarCredentials(
+            @Value("${configuration.google.credentials}") String credentialJson)
+            throws IOException {
+        var credentials =
+                GoogleCredentials.fromStream(new StringInputStream(credentialJson))
+                        .createScoped(List.of(CalendarScopes.CALENDAR_EVENTS));
         credentials.refresh();
         return credentials;
     }
