@@ -152,6 +152,8 @@ configuration:
   google:
     credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
     application-name: ${GOOGLE_APPLICATION_NAME:}
+    club-calendar-id: ${GOOGLE_CLUB_CALENDAR_ID:}
+    google-calendar-sync-cron: ${GOOGLE_CALENDAR_SYNC_CRON:-}
   wallet:
     background-colour: "${WALLET_PASS_BACKGROUND_COLOUR:}"
     foreground-colour: "${WALLET_PASS_FOREGROUND_COLOUR:}"

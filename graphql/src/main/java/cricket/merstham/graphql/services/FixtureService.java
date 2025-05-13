@@ -10,6 +10,7 @@ import cricket.merstham.graphql.entity.LastUpdateEntity;
 import cricket.merstham.graphql.entity.LeagueEntity;
 import cricket.merstham.graphql.entity.PlayerEntity;
 import cricket.merstham.graphql.entity.TeamEntity;
+import cricket.merstham.graphql.entity.VenueEntity;
 import cricket.merstham.graphql.repository.FantasyPlayerStatisticRepository;
 import cricket.merstham.graphql.repository.FixturePlayerSummaryEntityRepository;
 import cricket.merstham.graphql.repository.FixtureRepository;
@@ -17,6 +18,7 @@ import cricket.merstham.graphql.repository.LastUpdateRepository;
 import cricket.merstham.graphql.repository.LeagueRepository;
 import cricket.merstham.graphql.repository.PlayerRepository;
 import cricket.merstham.graphql.repository.TeamRepository;
+import cricket.merstham.graphql.repository.VenueRepository;
 import cricket.merstham.shared.dto.FantasyPlayerStatistic;
 import cricket.merstham.shared.dto.Fixture;
 import cricket.merstham.shared.dto.FixturePlayer;
@@ -38,7 +40,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.GeneralSecurityException;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -56,6 +60,7 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_CAC
 import static cricket.merstham.graphql.configuration.CacheConfiguration.TEAM_FIXTURE_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.UPCOMING_FIXTURE_CACHE;
 import static cricket.merstham.graphql.helpers.SelectionHelper.getThisWeekendsDates;
+import static cricket.merstham.graphql.services.PlayCricketService.HOME;
 import static cricket.merstham.graphql.services.PlayCricketService.PLAYER_ID;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -79,6 +84,8 @@ public class FixtureService {
     private final PlayerRepository playerRepository;
     private final FixturePlayerSummaryEntityRepository playerSummaryRepository;
     private final FantasyPlayerStatisticRepository fantasyPlayerStatisticRepository;
+    private final GoogleCalendarService googleCalendarService;
+    private final VenueRepository venueRepository;
 
     @Autowired
     public FixtureService(
@@ -90,7 +97,9 @@ public class FixtureService {
             LeagueRepository leagueRepository,
             PlayerRepository playerRepository,
             FixturePlayerSummaryEntityRepository playerSummaryRepository,
-            FantasyPlayerStatisticRepository fantasyPlayerStatisticRepository) {
+            FantasyPlayerStatisticRepository fantasyPlayerStatisticRepository,
+            GoogleCalendarService googleCalendarService,
+            VenueRepository venueRepository) {
         this.playCricketService = playCricketService;
         this.modelMapper = modelMapper;
         this.teamRepository = teamRepository;
@@ -100,6 +109,8 @@ public class FixtureService {
         this.playerRepository = playerRepository;
         this.playerSummaryRepository = playerSummaryRepository;
         this.fantasyPlayerStatisticRepository = fantasyPlayerStatisticRepository;
+        this.googleCalendarService = googleCalendarService;
+        this.venueRepository = venueRepository;
     }
 
     @Cacheable(value = ACTIVE_TEAM_CACHE)
@@ -291,11 +302,28 @@ public class FixtureService {
 
             saveFixtures(fixtures.stream().filter(f -> f.getStatus().equals("New")).toList());
 
+            var deletedFixtures =
+                    fixtures.stream().filter(f -> f.getStatus().equals("Deleted")).toList();
+
+            deletedFixtures.forEach(
+                    f -> {
+                        var entity = fixtureRepository.findById(f.getId());
+                        if (entity.isPresent() && nonNull(entity.get().getCalendarId())) {
+                            try {
+                                googleCalendarService.deleteFixtureEvent(entity.get());
+                            } catch (GeneralSecurityException | IOException e) {
+                                LOG.error(
+                                        () ->
+                                                format(
+                                                        "Error deleting fixture {0} from Google Calendar~",
+                                                        f.getId()),
+                                        e);
+                            }
+                        }
+                    });
+
             fixtureRepository.deleteAllByIdInBatch(
-                    fixtures.stream()
-                            .filter(f -> f.getStatus().equals("Deleted"))
-                            .map(PlayCricketMatch::getId)
-                            .toList());
+                    deletedFixtures.stream().map(PlayCricketMatch::getId).toList());
 
             lastUpdateRepository.saveAndFlush(
                     lastUpdateEntity
@@ -330,6 +358,39 @@ public class FixtureService {
             LOG.error("Error in PlayCricket fixture refresh", ex);
         }
         LOG.info("Finished PlayCricket fixture refresh!");
+    }
+
+    @Timed(
+            value = "google.fixtures.refresh",
+            description = "Time taken to sync fixtures with Google Calendar")
+    @Scheduled(
+            cron = "${configuration.google.google-calendar-sync-cron}",
+            zone = "${configuration.scheduler-zone}")
+    public void syncFixturesWithCalendar() {
+        LOG.info("Starting Google Calendar fixture refresh... ");
+        try {
+            var fixtures =
+                    fixtureRepository.findAllByDateAfterAndHomeAwayEquals(
+                            LocalDate.of(LocalDate.now().getYear(), 1, 1), HOME);
+
+            fixtures.forEach(
+                    f -> {
+                        try {
+                            VenueEntity venue = null;
+                            if (nonNull(f.getGroundId())) {
+                                venue = venueRepository.findByPlayCricketId(f.getGroundId());
+                            }
+                            f.setCalendarId(googleCalendarService.syncFixtureEvent(f, venue));
+                        } catch (GeneralSecurityException | IOException e) {
+                            LOG.error("Error in Google Calendar fixture refresh", e);
+                        }
+                    });
+
+            fixtureRepository.saveAll(fixtures);
+        } catch (Exception ex) {
+            LOG.error("Error in Google Calendar fixture refresh", ex);
+        }
+        LOG.info("Finished Google Calendar fixture refresh!");
     }
 
     public FantasyPlayerStatistic getPlayerStatistics(FixturePlayer player, int season) {
@@ -401,6 +462,18 @@ public class FixtureService {
                                             .setOppositionTeamId(additionalTeamId);
 
                             playerSummaryRepository.saveAllAndFlush(processPlayerStats(entity));
+                            try {
+                                VenueEntity venue = null;
+                                if (nonNull(entity.getGroundId())) {
+                                    venue =
+                                            venueRepository.findByPlayCricketId(
+                                                    entity.getGroundId());
+                                }
+                                entity.setCalendarId(
+                                        googleCalendarService.syncFixtureEvent(entity, venue));
+                            } catch (Exception ex) {
+                                LOG.error("Error in Google Calendar fixture sync", ex);
+                            }
                             updates.add(fixtureRepository.save(entity));
                         }
                     } catch (Exception ex) {

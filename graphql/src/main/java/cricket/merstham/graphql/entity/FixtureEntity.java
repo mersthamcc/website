@@ -80,6 +80,9 @@ public class FixtureEntity {
     @Column(name = "include_in_fantasy")
     private Boolean includeInFantasy;
 
+    @Column(name = "calendar_id")
+    private String calendarId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
