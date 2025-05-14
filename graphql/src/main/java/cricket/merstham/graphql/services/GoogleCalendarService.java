@@ -36,15 +36,18 @@ public class GoogleCalendarService {
     private final GoogleCredentials googleCredentials;
     private final String applicationName;
     private final String calendarId;
+    private final String zoneId;
 
     @Autowired
     public GoogleCalendarService(
             @Named("CalendarCredentials") GoogleCredentials googleCredentials,
             @Value("${configuration.google.application-name}") String applicationName,
-            @Value("${configuration.google.club-calendar-id}") String calendarId) {
+            @Value("${configuration.google.club-calendar-id}") String calendarId,
+            @Value("${configuration.scheduler-zone}") String zoneId) {
         this.googleCredentials = googleCredentials;
         this.applicationName = applicationName;
         this.calendarId = calendarId;
+        this.zoneId = zoneId;
     }
 
     public String syncFixtureEvent(FixtureEntity fixture, VenueEntity venue)
@@ -115,13 +118,13 @@ public class GoogleCalendarService {
 
     private DateTime constructStartDateTime(FixtureEntity fixture) {
         ZonedDateTime start =
-                ZonedDateTime.of(fixture.getDate(), fixture.getStart(), ZoneId.systemDefault());
+                ZonedDateTime.of(fixture.getDate(), fixture.getStart(), ZoneId.of(zoneId));
         return DateTime.parseRfc3339(start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     }
 
     private DateTime constructEndDateTime(FixtureEntity fixture) {
         ZonedDateTime start =
-                ZonedDateTime.of(fixture.getDate(), fixture.getStart(), ZoneId.systemDefault());
+                ZonedDateTime.of(fixture.getDate(), fixture.getStart(), ZoneId.of(zoneId));
         ZonedDateTime end = start.plus(fixtureLength(fixture), ChronoUnit.HOURS);
         return DateTime.parseRfc3339(end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     }
