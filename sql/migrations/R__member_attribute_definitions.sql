@@ -608,6 +608,14 @@ WHERE member_category_id = (SELECT id
                                 FROM member_form_section
                                 WHERE KEY = 'adult-basics');
 
+DELETE
+FROM member_category_form_section
+WHERE member_category_id = (SELECT id
+                            FROM member_category
+                            WHERE KEY = 'honorary')
+  AND member_form_section_id = (SELECT id
+                                FROM member_form_section
+                                WHERE KEY = 'adult-basics');
 INSERT
 INTO pricelist_item(id,
                     category_id,
@@ -726,7 +734,17 @@ VALUES (1,
         'U8 - U17 Girls',
         NULL,
         FALSE,
-        TRUE)
+        TRUE),
+       (12,
+        (SELECT id
+         FROM member_category
+         WHERE KEY = 'honorary'),
+        18,
+        NULL,
+        'Honorary/Life Membership',
+        NULL,
+        FALSE,
+        FALSE)
 ON CONFLICT(id) DO UPDATE
     SET category_id         = EXCLUDED.category_id,
         min_age             = EXCLUDED.min_age,
@@ -836,7 +854,11 @@ VALUES (1,
        (11,
         '2025-01-01',
         '2025-12-31',
-        75.00)
+        75.00),
+       (12,
+        '2025-01-01',
+        '9999-12-31',
+        0.00)
 ON CONFLICT(
     pricelist_item_id,
     date_from,
