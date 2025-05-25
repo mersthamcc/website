@@ -86,8 +86,8 @@ public class VenueController extends SspController<Venue> {
     public ModelAndView edit(
             CognitoAuthentication cognitoAuthentication, @PathVariable("slug") String slug)
             throws IOException {
-        var contact = service.get(cognitoAuthentication.getOAuth2AccessToken(), slug);
-        return new ModelAndView(ADMINISTRATION_VENUE_EDIT, Map.of(VENUE, contact));
+        var venue = service.get(cognitoAuthentication.getOAuth2AccessToken(), slug);
+        return new ModelAndView(ADMINISTRATION_VENUE_EDIT, Map.of(VENUE, venue));
     }
 
     @GetMapping(value = ADMIN_VENUE_DELETE_ROUTE, name = "admin-venue-delete")
@@ -137,7 +137,7 @@ public class VenueController extends SspController<Venue> {
                     .recordsTotal(data.getRecordsTotal())
                     .build();
         } catch (IOException e) {
-            LOG.error("Error getting contact items from graph service", e);
+            LOG.error("Error getting venue items from graph service", e);
             return SspResponse.<SspResponseDataWrapper<Venue>>builder()
                     .error(Optional.of(List.of(e.getMessage())))
                     .build();

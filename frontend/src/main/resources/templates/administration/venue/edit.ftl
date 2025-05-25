@@ -11,7 +11,18 @@
                     'heading', '|',
                     'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
                     'undo', 'redo', '|',
-                    'sourceEditing']
+                    'ckfinder', 'mediaEmbed', '|',
+                    'sourceEditing'],
+                ckfinder: {
+                    uploadUrl: '/administration/components/ckfinder/connector?command=QuickUpload&type=Files&responseType=json',
+                    options: {
+                        connectorPath: '/administration/components/ckfinder/connector',
+                        section: 'venues',
+                        startupPath: '0-Images:/',
+                        rememberLastFolder: false,
+                        pass: 'section'
+                    }
+                }
             })
             .then(editor => {
                 CKEditorInspector.attach(editor);
@@ -25,7 +36,18 @@
                     'heading', '|',
                     'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
                     'undo', 'redo', '|',
-                    'sourceEditing']
+                    'ckfinder', 'mediaEmbed', '|',
+                    'sourceEditing'],
+                ckfinder: {
+                    uploadUrl: '/administration/components/ckfinder/connector?command=QuickUpload&type=Files&responseType=json',
+                    options: {
+                        connectorPath: '/administration/components/ckfinder/connector',
+                        section: 'venues',
+                        startupPath: '0-Images:/',
+                        rememberLastFolder: false,
+                        pass: 'section'
+                    }
+                }
             })
             .then(editor => {
                 CKEditorInspector.attach(editor);
