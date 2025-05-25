@@ -84,6 +84,7 @@ public class PassGeneratorService {
     private final GoogleCredentials googleCredentials;
     private final String apiBaseUrl;
     private final MemberEntityRepository memberEntityRepository;
+    private final CognitoService cognitoService;
 
     @Autowired
     public PassGeneratorService(
@@ -106,7 +107,8 @@ public class PassGeneratorService {
             String googleWalletClass,
             @Named("WalletCredentials") GoogleCredentials googleCredentials,
             @Value("${configuration.api-url}") String apiBaseUrl,
-            MemberEntityRepository memberEntityRepository) {
+            MemberEntityRepository memberEntityRepository,
+            CognitoService cognitoService) {
         this.clubName = clubName;
         this.backgroundColourHex = backgroundColourHex;
         this.foregroundColourHex = foregroundColourHex;
@@ -128,14 +130,17 @@ public class PassGeneratorService {
                         appleSigningCertificate, appleSigningKey, appleIntermediaryCertificate);
         signingUtil = new PKInMemorySigningUtil();
         this.googleWalletClass = googleWalletClass;
+        this.cognitoService = cognitoService;
     }
 
     @PreAuthorize("isAuthenticated()")
     public Pass getPassData(String memberUuid, String type, Principal principal)
             throws IOException {
+        var user = cognitoService.getUserBySubjectId(getSubject(principal));
         var member =
                 memberEntityRepository
-                        .findByUuidAndOwnerUserId(memberUuid, getSubject(principal))
+                        .findByUuidAndOwnerUserIdOrUuidAndOwnerEmailAddressesContains(
+                                memberUuid, user.getSubjectId(), memberUuid, user.getEmail())
                         .orElseThrow();
         String serialNumber;
         String content;
