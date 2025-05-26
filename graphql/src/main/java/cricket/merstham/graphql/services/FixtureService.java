@@ -19,6 +19,7 @@ import cricket.merstham.graphql.repository.LeagueRepository;
 import cricket.merstham.graphql.repository.PlayerRepository;
 import cricket.merstham.graphql.repository.TeamRepository;
 import cricket.merstham.graphql.repository.VenueRepository;
+import cricket.merstham.shared.dto.CalendarSyncResult;
 import cricket.merstham.shared.dto.FantasyPlayerStatistic;
 import cricket.merstham.shared.dto.Fixture;
 import cricket.merstham.shared.dto.FixturePlayer;
@@ -366,12 +367,15 @@ public class FixtureService {
     @Scheduled(
             cron = "${configuration.google.google-calendar-sync-cron}",
             zone = "${configuration.scheduler-zone}")
-    public void syncFixturesWithCalendar() {
+    public List<CalendarSyncResult> syncFixturesWithCalendar() {
+        return syncFixturesWithCalendar(LocalDate.of(LocalDate.now().getYear(), 1, 1));
+    }
+
+    public List<CalendarSyncResult> syncFixturesWithCalendar(LocalDate start) {
+        var results = new ArrayList<CalendarSyncResult>();
         LOG.info("Starting Google Calendar fixture refresh... ");
         try {
-            var fixtures =
-                    fixtureRepository.findAllByDateAfterAndHomeAwayEquals(
-                            LocalDate.of(LocalDate.now().getYear(), 1, 1), HOME);
+            var fixtures = fixtureRepository.findAllByDateAfterAndHomeAwayEquals(start, HOME);
 
             fixtures.forEach(
                     f -> {
@@ -380,7 +384,13 @@ public class FixtureService {
                             if (nonNull(f.getGroundId())) {
                                 venue = venueRepository.findByPlayCricketId(f.getGroundId());
                             }
-                            f.setCalendarId(googleCalendarService.syncFixtureEvent(f, venue));
+                            var calendarId = googleCalendarService.syncFixtureEvent(f, venue);
+                            f.setCalendarId(calendarId);
+                            results.add(
+                                    CalendarSyncResult.builder()
+                                            .fixtureId(f.getId())
+                                            .calendarId(calendarId)
+                                            .build());
                         } catch (GeneralSecurityException | IOException e) {
                             LOG.error("Error in Google Calendar fixture refresh", e);
                         }
@@ -391,6 +401,7 @@ public class FixtureService {
             LOG.error("Error in Google Calendar fixture refresh", ex);
         }
         LOG.info("Finished Google Calendar fixture refresh!");
+        return results;
     }
 
     public FantasyPlayerStatistic getPlayerStatistics(FixturePlayer player, int season) {

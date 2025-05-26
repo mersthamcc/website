@@ -1,0 +1,8 @@
+type CalendarSyncResult {
+    fixtureId: Int!
+    calendarId: String!
+}
+
+extend type Mutation {
+    calendarSync(start: Date!): [CalendarSyncResult!]!
+}

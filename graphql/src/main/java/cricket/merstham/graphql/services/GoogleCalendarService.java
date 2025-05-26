@@ -12,8 +12,8 @@ import com.google.common.base.Strings;
 import cricket.merstham.graphql.entity.FixtureEntity;
 import cricket.merstham.graphql.entity.VenueEntity;
 import jakarta.inject.Named;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ import static java.util.Objects.isNull;
 
 @Service
 public class GoogleCalendarService {
-    private static final Logger LOG = LoggerFactory.getLogger(GoogleCalendarService.class);
+    private static final Logger LOG = LogManager.getLogger(GoogleCalendarService.class);
 
     private final GoogleCredentials googleCredentials;
     private final String applicationName;
