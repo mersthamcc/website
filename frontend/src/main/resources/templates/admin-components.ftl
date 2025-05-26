@@ -34,8 +34,8 @@
     </form>
 </#macro>
 
-<#macro form action>
-    <form class="form-horizontal" method="post" name="action" action="${action}">
+<#macro form action id="main-form">
+    <form id="${id}" class="form-horizontal" method="post" name="action" action="${action}">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <#nested />
     </form>

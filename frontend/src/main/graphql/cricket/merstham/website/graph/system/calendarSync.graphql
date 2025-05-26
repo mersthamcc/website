@@ -1,0 +1,6 @@
+mutation calendarSync($start: Date!){
+    calendarSync(start: $start) {
+        fixtureId
+        calendarId
+    }
+}

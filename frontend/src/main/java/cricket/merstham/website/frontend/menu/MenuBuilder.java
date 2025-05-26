@@ -324,7 +324,21 @@ public class MenuBuilder {
                                                     null,
                                                     List.of(),
                                                     null)),
-                            "tio-tune"));
+                            "tio-tune"),
+                    new Menu(
+                            "admin-sync-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of("ROLE_SYSTEM"),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "admin-sync-calendar",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null)),
+                            "tio-sync"));
 
     private final List<Menu> accountMenu =
             List.of(
