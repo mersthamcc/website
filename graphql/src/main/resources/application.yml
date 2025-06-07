@@ -53,6 +53,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${COGNITO_ISSUER_URI:}
+    api-key:
+      header-name: "${API_KEY_HEADER:X-API-KEY}" #pragma: allowlist secret
+      keys: ${API_KEYS:[]}
   data:
     redis:
       host: ${REDIS_HOST:localhost}

@@ -54,7 +54,7 @@ public class MailingListService {
         restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("anystring", apiKey));
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_TRUSTED')")
+    @PreAuthorize("hasAuthority('TRUSTED_CLIENT')")
     public List<MailingListSubscription> getSubscriptionStatus(List<String> emailAddresses) {
         var result = new ArrayList<MailingListSubscription>();
 
@@ -94,7 +94,7 @@ public class MailingListService {
         return result;
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_TRUSTED')")
+    @PreAuthorize("hasAuthority('TRUSTED_CLIENT')")
     public List<MailingListSubscription> updateSubscriptionStatus(
             List<MailingListSubscription> subscriptions) {
         var result = new ArrayList<MailingListSubscription>();
