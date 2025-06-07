@@ -2,6 +2,7 @@ package cricket.merstham.graphql.security;
 
 import cricket.merstham.graphql.configuration.ApiKey;
 import cricket.merstham.graphql.configuration.ApiKeyConfig;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,12 @@ public class ApiKeyAuthenticator {
     private static final Logger LOG = LoggerFactory.getLogger(ApiKeyAuthenticator.class);
 
     private final ApiKeyConfig apiKeyConfig;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
-    public ApiKeyAuthenticator(ApiKeyConfig apiKeyConfig) {
+    public ApiKeyAuthenticator(ApiKeyConfig apiKeyConfig, MeterRegistry meterRegistry) {
         this.apiKeyConfig = apiKeyConfig;
+        this.meterRegistry = meterRegistry;
     }
 
     public Authentication authenticate(HttpServletRequest request) {
@@ -37,11 +40,16 @@ public class ApiKeyAuthenticator {
                     if (apiKey.isTrusted()) {
                         authorities = List.of(new SimpleGrantedAuthority("TRUSTED_CLIENT"));
                     }
-                    LOG.info(
-                            "Authenticated api key client '{}' from {}, trusted = {}",
-                            apiKey.getName(),
-                            request.getRemoteAddr(),
-                            apiKey.isTrusted());
+                    meterRegistry
+                            .counter(
+                                    "cricket.merstham.security.api-key.authenticated",
+                                    "client_name",
+                                    apiKey.getName(),
+                                    "ipaddress",
+                                    request.getRemoteAddr(),
+                                    "trusted",
+                                    Boolean.toString(apiKey.isTrusted()))
+                            .increment();
                     return ApiKeyAuthentication.builder()
                             .name(apiKey.getName())
                             .apiKey(apiKey.getKey())
@@ -49,6 +57,12 @@ public class ApiKeyAuthenticator {
                             .build();
                 }
             } catch (BadCredentialsException ex) {
+                meterRegistry
+                        .counter(
+                                "cricket.merstham.security.api-key.error",
+                                "ipaddress",
+                                request.getRemoteAddr())
+                        .increment();
                 LOG.warn(
                         "Api key authentication rejected '{}' from {}",
                         apiKeyInHeader,

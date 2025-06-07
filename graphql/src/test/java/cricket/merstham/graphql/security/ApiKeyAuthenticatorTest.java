@@ -2,6 +2,8 @@ package cricket.merstham.graphql.security;
 
 import cricket.merstham.graphql.configuration.ApiKey;
 import cricket.merstham.graphql.configuration.ApiKeyConfig;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,7 +34,8 @@ class ApiKeyAuthenticatorTest {
                                             .build()))
                     .build();
 
-    private final ApiKeyAuthenticator auth = new ApiKeyAuthenticator(CONFIG);
+    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
+    private final ApiKeyAuthenticator auth = new ApiKeyAuthenticator(CONFIG, meterRegistry);
 
     @Test
     void shouldReturnNullWhenNoApiKeyProvided() {
