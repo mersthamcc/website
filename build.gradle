@@ -1,7 +1,7 @@
 plugins {
     id "com.avast.gradle.docker-compose" version "0.14.3"
     id "com.diffplug.spotless" version "6.20.0"
-    id "org.sonarqube" version "4.2.1.3168"
+    id "org.sonarqube" version "6.2.0.5505"
     id "jacoco"
     id "java"
 }

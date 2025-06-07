@@ -10,9 +10,6 @@ echo "COGNITO_UI_URI=https://$(terraform output -json | jq -r '.cognito_ui_uri.v
 echo "COGNITO_CLIENT_ID=$(terraform output -json | jq -r '.website_client_id.value')"
 echo "COGNITO_CLIENT_SECRET=$(terraform output -json | jq -r '.website_client_secret.value')"
 
-echo "WEBSITE_CLIENT_CREDENTIALS_ID=$(terraform output -json | jq -r '.website_credentials_client_id.value')"
-echo "WEBSITE_CLIENT_CREDENTIALS_SECRET=$(terraform output -json | jq -r '.website_credentials_client_secret.value')"
-
 echo "JUPYTER_CLIENT_ID=$(terraform output -json | jq -r '.jupyter_client_id.value')"
 echo "JUPYTER_CLIENT_SECRET=$(terraform output -json | jq -r '.jupyter_client_secret.value')"
 

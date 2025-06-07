@@ -1,4 +1,4 @@
-package cricket.merstham.website.frontend.configuration;
+package cricket.merstham.graphql.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,16 +7,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.URI;
+import java.util.List;
 
 @Configuration
-@ConfigurationProperties(prefix = "api")
+@ConfigurationProperties(prefix = "spring.security.api-key")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class GraphConfiguration {
-    private URI graphUri;
-    private String apiKey;
-    private String apiKeyHeader;
+@NoArgsConstructor
+public class ApiKeyConfig {
+    private String headerName;
+    private List<ApiKey> keys;
 }

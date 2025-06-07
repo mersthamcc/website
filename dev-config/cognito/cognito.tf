@@ -41,11 +41,6 @@ resource "aws_cognito_resource_server" "graphql" {
 
   identifier   = "graphql"
   user_pool_id = aws_cognito_user_pool.dev_pool.id
-
-  scope {
-    scope_description = "GraphQL Trusted Client (website only)"
-    scope_name        = "trusted-client"
-  }
 }
 
 resource "aws_cognito_identity_provider" "saml_provider" {

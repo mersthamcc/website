@@ -34,26 +34,6 @@ resource "aws_cognito_user_pool_client" "website" {
   prevent_user_existence_errors = "LEGACY"
 }
 
-resource "aws_cognito_user_pool_client" "website_credentials" {
-  name         = "website-client"
-  user_pool_id = aws_cognito_user_pool.dev_pool.id
-
-  allowed_oauth_flows = [
-    "client_credentials",
-  ]
-  allowed_oauth_flows_user_pool_client = true
-
-  allowed_oauth_scopes = aws_cognito_resource_server.graphql.scope_identifiers
-
-  supported_identity_providers = [
-    "COGNITO",
-  ]
-
-  generate_secret = true
-
-  prevent_user_existence_errors = "LEGACY"
-}
-
 resource "aws_cognito_user_pool_client" "jupyterhub" {
   name         = "jupyter"
   user_pool_id = aws_cognito_user_pool.dev_pool.id
