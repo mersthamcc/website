@@ -90,60 +90,60 @@ jobs:
         run: |
           ./gradlew build -x sonarqube --info
 
-#      - name: Build frontend image
-#        id: build-frontend
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          push: true
-#          tags: |
-#            mersthamcc/frontend:test
-#            ghcr.io/mersthamcc/website-frontend:test
-#          build-args: |
-#            COMPONENT=frontend
-#
-#      - name: Build GraphQL image
-#        id: build-graphql
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          push: true
-#          tags: |
-#            mersthamcc/graphql:test
-#            ghcr.io/mersthamcc/website-graphql:test
-#          build-args: |
-#            COMPONENT=graphql
-#
-#      - name: Build Flyway image
-#        id: build-flyway
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: sql/
-#          push: true
-#          tags: |
-#            mersthamcc/flyway:test
-#            ghcr.io/mersthamcc/website-flyway:test
-#
-#      - name: Dispatch deployment event
-#        uses: actions/github-script@v7
-#        env:
-#          GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
-#          FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
-#          FLYWAY_DIGEST: ${{ steps.build-flyway.outputs.digest }}
-#          IMAGE_TAG: test
-#        with:
-#          github-token: ${{ secrets.DEPLOYMENT_PAT }}
-#          script: |
-#            const { GRAPHQL_DIGEST, FRONTEND_DIGEST, FLYWAY_DIGEST, IMAGE_TAG } = process.env
-#
-#            const result = await github.rest.repos.createDispatchEvent({
-#              owner: 'mersthamcc',
-#              repo: 'infrastructure',
-#              event_type: 'test-app-deploy',
-#              client_payload: {
-#                "graphql_digest": GRAPHQL_DIGEST,
-#                "frontend_digest": FRONTEND_DIGEST,
-#                "flyway_digest": FLYWAY_DIGEST,
-#                "image_tag": IMAGE_TAG
-#              }
-#            });
+      - name: Build frontend image
+        id: build-frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            mersthamcc/frontend:test
+            ghcr.io/mersthamcc/website-frontend:test
+          build-args: |
+            COMPONENT=frontend
+
+      - name: Build GraphQL image
+        id: build-graphql
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            mersthamcc/graphql:test
+            ghcr.io/mersthamcc/website-graphql:test
+          build-args: |
+            COMPONENT=graphql
+
+      - name: Build Flyway image
+        id: build-flyway
+        uses: docker/build-push-action@v5
+        with:
+          context: sql/
+          push: true
+          tags: |
+            mersthamcc/flyway:test
+            ghcr.io/mersthamcc/website-flyway:test
+
+      - name: Dispatch deployment event
+        uses: actions/github-script@v7
+        env:
+          GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
+          FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
+          FLYWAY_DIGEST: ${{ steps.build-flyway.outputs.digest }}
+          IMAGE_TAG: test
+        with:
+          github-token: ${{ secrets.DEPLOYMENT_PAT }}
+          script: |
+            const { GRAPHQL_DIGEST, FRONTEND_DIGEST, FLYWAY_DIGEST, IMAGE_TAG } = process.env
+
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'mersthamcc',
+              repo: 'infrastructure',
+              event_type: 'test-app-deploy',
+              client_payload: {
+                "graphql_digest": GRAPHQL_DIGEST,
+                "frontend_digest": FRONTEND_DIGEST,
+                "flyway_digest": FLYWAY_DIGEST,
+                "image_tag": IMAGE_TAG
+              }
+            });
