@@ -151,7 +151,6 @@ configuration:
     dc: ${MAILCHIMP_DC:}
     list-id: ${MAILCHIMP_LIST_ID:}
     newsletter-interest-id: ${MAILCHIMP_NEWSLETTER_INTEREST_ID:}
-  trusted-client-scope: "${WEBSITE_CLIENT_TRUSTED_SCOPE:graphql/trusted-client}"
   google:
     credentials: ${GOOGLE_APPLICATION_CREDENTIALS:}
     application-name: ${GOOGLE_APPLICATION_NAME:}
