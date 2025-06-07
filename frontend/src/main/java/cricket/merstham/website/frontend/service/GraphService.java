@@ -15,6 +15,7 @@ import cricket.merstham.website.frontend.mappers.LocalDateCustomTypeAdapter;
 import jakarta.inject.Named;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +28,13 @@ import java.util.Map;
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.Response.Status.Family.SUCCESSFUL;
+import static java.util.Objects.nonNull;
 
 @Service
 public class GraphService {
     private static final Logger LOG = LoggerFactory.getLogger(GraphService.class);
 
     private final GraphConfiguration graphConfiguration;
-    private final AccessTokenManager accessTokenManager;
     private final ObjectMapper objectMapper;
     private final Client client;
     private final ScalarTypeAdapters adapters =
@@ -46,11 +47,9 @@ public class GraphService {
     @Autowired
     public GraphService(
             GraphConfiguration graphConfiguration,
-            AccessTokenManager accessTokenManager,
             ObjectMapper objectMapper,
             @Named("graphqlClient") Client client) {
         this.graphConfiguration = graphConfiguration;
-        this.accessTokenManager = accessTokenManager;
         this.objectMapper = objectMapper;
         this.client = client;
     }
@@ -75,20 +74,18 @@ public class GraphService {
     }
 
     public <T extends Query, R extends Operation.Data> Response<R> executeQuery(T query) {
-        String accessToken = accessTokenManager.getAccessToken();
         LOG.info(
                 "Sending `{}` GraphQL API request with client credentials token",
                 query.name().name());
-        return getResult(query, accessToken);
+        return getResult(query, null);
     }
 
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(T mutation) {
-        String accessToken = accessTokenManager.getAccessToken();
         LOG.info(
                 "Sending `{}` GraphQL API mutation with client credentials token",
                 mutation.name().name());
 
-        return getResult(mutation, accessToken);
+        return getResult(mutation, null);
     }
 
     public <T extends Mutation, R extends Operation.Data> Response<R> executeMutation(
@@ -118,12 +115,17 @@ public class GraphService {
 
     private <T extends Operation> byte[] getRawResult(T query, String accessToken) {
         var webTarget = client.target(graphConfiguration.getGraphUri());
+        var headers = new MultivaluedHashMap<String, Object>();
+        headers.add(graphConfiguration.getApiKeyHeader(), graphConfiguration.getApiKey());
+        if (nonNull(accessToken)) {
+            headers.add(AUTHORIZATION, "Bearer " + accessToken);
+        }
 
         var invocation =
                 webTarget
                         .request(APPLICATION_JSON_TYPE)
                         .accept(APPLICATION_JSON_TYPE)
-                        .header(AUTHORIZATION, "Bearer " + accessToken)
+                        .headers(headers)
                         .buildPost(Entity.json(query.composeRequestBody(adapters).utf8()));
         var response = invocation.invoke();
         LOG.info(

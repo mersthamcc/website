@@ -17,4 +17,6 @@ import java.net.URI;
 @AllArgsConstructor
 public class GraphConfiguration {
     private URI graphUri;
+    private String apiKey;
+    private String apiKeyHeader;
 }
