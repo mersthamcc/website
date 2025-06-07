@@ -1,7 +1,6 @@
 package cricket.merstham.graphql.configuration;
 
 import cricket.merstham.graphql.security.ApiKeyAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -50,7 +49,7 @@ public class SecurityConfiguration {
                                         .requestMatchers("/passkit/**")
                                         .permitAll()
                                         .requestMatchers("/graphql")
-                                        .permitAll()
+                                        .authenticated()
                                         .requestMatchers("/actuator/**")
                                         .permitAll()
                                         .requestMatchers("/graphiql**")
@@ -59,24 +58,17 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor(
-            @Value("${configuration.trusted-client-scope}") String trustedScope) {
+    public Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-                new GrantedAuthoritiesExtractor(trustedScope));
+                new GrantedAuthoritiesExtractor());
 
         return jwtAuthenticationConverter;
     }
 
     static class GrantedAuthoritiesExtractor
             implements Converter<Jwt, Collection<GrantedAuthority>> {
-
-        private final String trustedScope;
-
-        GrantedAuthoritiesExtractor(String trustedScope) {
-            this.trustedScope = trustedScope;
-        }
 
         public Collection<GrantedAuthority> convert(Jwt jwt) {
             List<GrantedAuthority> result = new ArrayList<>();
@@ -94,12 +86,6 @@ public class SecurityConfiguration {
                                                                         + s.toUpperCase(
                                                                                 Locale.ROOT)))
                                 .toList());
-            }
-
-            Collection<String> scopes = jwt.getClaimAsStringList("scope");
-
-            if (scopes != null && scopes.contains(trustedScope)) {
-                result.add(new SimpleGrantedAuthority("SCOPE_TRUSTED"));
             }
             return result;
         }
