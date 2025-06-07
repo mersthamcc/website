@@ -35,7 +35,7 @@ class ApiKeysConvertorTest {
     @Test
     void shouldConvertEmptyArray() {
         var result = convertor.convert("[]");
-        assertThat(result).hasSize(0);
+        assertThat(result).isEmpty();
     }
 
     @Test

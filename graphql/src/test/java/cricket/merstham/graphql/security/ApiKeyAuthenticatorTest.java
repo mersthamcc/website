@@ -60,8 +60,7 @@ class ApiKeyAuthenticatorTest {
 
         var result = auth.authenticate(request);
 
-        assertThat(result).isNotNull();
-        assertThat(result).isInstanceOf(ApiKeyAuthentication.class);
+        assertThat(result).isNotNull().isInstanceOf(ApiKeyAuthentication.class);
         assertThat(result.getName()).isEqualTo("api-client");
         assertThat(result.getAuthorities()).isEmpty();
     }

@@ -37,7 +37,7 @@ public class ApiKeyAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return name;
+        return getName();
     }
 
     @Override
