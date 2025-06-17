@@ -1,10 +1,10 @@
 <#import "../base.ftl" as layout>
 <@layout.mainLayout>
     <div class="container space-1">
-        <#if event.banner??>
+        <#if event.banner?has_content>
             <div class="profile-cover mb-5">
                 <div class="profile-cover-img-wrapper">
-                    <img class="profile-cover-img" src="${event.banner}" alt="Banner Image">
+                    <img class="profile-cover-img" src="${event.banner}">
                 </div>
             </div>
         </#if>
@@ -20,7 +20,7 @@
 
 
             <div class="col-lg-3">
-                <#if event.callToActionLink??>
+                <#if event.callToActionLink?has_content>
                     <a class="btn btn-primary" href="${event.callToActionLink}">${event.callToActionDescription}</a>
                 </#if>
             </div>
