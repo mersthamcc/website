@@ -33,7 +33,7 @@
                                     <a href="/events${n.path}#readmore">Read more...</a>
                                 </div>
                             </div>
-                            <#if n.callToActionLink??>
+                            <#if n.callToActionLink?has_content>
                                 <div class="card-footer">
                                     <a class="btn btn-primary" href="${n.callToActionLink}">${n.callToActionDescription}</a>
                                 </div>
