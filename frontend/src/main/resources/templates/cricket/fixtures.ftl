@@ -19,11 +19,13 @@
 
             <div class="col-md-9">
                 <div class="container">
-                    <div class="profile-cover">
-                        <div class="profile-cover-img-wrapper">
-                            <img class="profile-cover-img" src="${resourcePrefix}/front/assets/img/1920x400/img1.jpg" alt="Image Description">
+                    <#if false>
+                        <div class="profile-cover">
+                            <div class="profile-cover-img-wrapper">
+                                <img class="profile-cover-img" src="${resourcePrefix}/front/assets/img/1920x400/img1.jpg" alt="Image Description">
+                            </div>
                         </div>
-                    </div>
+                    </#if>
 
                     <div class="d-sm-flex align-items-lg-center pt-1 px-3 pb-3">
                         <#if false>
