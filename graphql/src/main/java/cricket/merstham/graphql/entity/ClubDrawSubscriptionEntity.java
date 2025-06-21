@@ -49,7 +49,4 @@ public class ClubDrawSubscriptionEntity {
 
     @OneToMany(mappedBy = "clubDrawSubscription")
     private Set<ClubDrawPaymentEntity> clubDrawPayments = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "clubDrawPayment")
-    private Set<ClubDrawWinnerEntity> clubDrawWinners = new LinkedHashSet<>();
 }
