@@ -1,0 +1,54 @@
+type ClubDraw {
+    id: Int!
+    drawDate: Date!
+    priceFund: Float
+    clubDrawPayments: [ClubDrawPayment]
+    clubDrawWinners: [ClubDrawWinner]
+}
+
+type ClubDrawSubscription {
+    id: Int!
+    ownerUserId: String!
+    subscriptionId: String!
+    createDate: Date!
+    lastUpdated: Date!
+    active: Boolean!
+    clubDrawWinners: [ClubDrawWinner]
+    clubDrawPayments: [ClubDrawPayment]
+}
+
+type ClubDrawPayment {
+    id: Int!
+    date: Date
+    paymentReference: String!
+    amount: Float!
+    feesAmount: Float!
+    accountingId: String
+    feesAccountingId: String
+    status: String!
+    reconciled: Boolean
+    clubDrawSubscription: ClubDrawSubscription
+}
+
+type ClubDrawWinner {
+    id: Int!
+    prizePercent: Float!
+    prizeAmount: Float!
+    payoutDate: Date
+    clubDrawPayment: ClubDrawPayment!
+}
+
+input ClubDrawSubscriptionInput {
+    subscriptionId: String!
+    active: Boolean!
+}
+
+extend type Query {
+    myClubDrawSubscriptions: [ClubDrawSubscription]
+    clubDrawWinners: [ClubDrawWinner]
+}
+
+extend type Mutation {
+    addClubDrawSubscription(subscription: ClubDrawSubscriptionInput!): ClubDrawSubscription!
+    disableTicket(id: Int!): ClubDrawSubscription!
+}
