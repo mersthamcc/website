@@ -28,6 +28,7 @@ import cricket.merstham.shared.dto.Team;
 import cricket.merstham.shared.extensions.StringExtensions;
 import io.micrometer.core.annotation.Timed;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
 import lombok.experimental.ExtensionMethod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.ACTIVE_TEAM_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.FIXTURES_WON_COUNT_CACHE;
@@ -66,6 +68,7 @@ import static cricket.merstham.graphql.services.PlayCricketService.PLAYER_ID;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static software.amazon.awssdk.http.HttpStatusCode.NOT_FOUND;
 
 @Service
 @ExtensionMethod({StringExtensions.class})
@@ -602,14 +605,52 @@ public class FixtureService {
     public List<Fixture> getThisWeeksSelection() {
         var dates = getThisWeekendsDates(LocalDate.now());
         var fixtures = fixtureRepository.findAllByDateInAndTeamIncludedInSelectionIsTrue(dates);
+        var fixturesToDelete = new ArrayList<FixtureEntity>();
 
         fixtures.stream()
                 .forEach(
-                        fixture ->
+                        fixture -> {
+                            try {
                                 fixture.setDetail(
-                                        playCricketService.getMatchDetails(fixture.getId())));
+                                        playCricketService.getMatchDetails(fixture.getId()));
+                            } catch (WebApplicationException e) {
+                                if (e.getResponse().getStatus() == NOT_FOUND) {
+                                    LOG.atWarn()
+                                            .withThrowable(e)
+                                            .log(
+                                                    "PlayCricket returned 404 for fixture {}, removing from local database.",
+                                                    fixture.getId());
 
+                                    if (fixture.getCalendarId() != null) {
+                                        try {
+                                            googleCalendarService.deleteFixtureEvent(fixture);
+                                        } catch (GeneralSecurityException | IOException ex) {
+                                            LOG.atError()
+                                                    .withThrowable(ex)
+                                                    .log(
+                                                            "Error removing fixture from Google calendar {}",
+                                                            fixture.getId());
+                                        }
+                                    }
+                                    fixturesToDelete.add(fixture);
+                                } else {
+                                    LOG.atError()
+                                            .withThrowable(e)
+                                            .log(
+                                                    "Error while getting match details for fixture {}",
+                                                    fixture.getId());
+                                }
+                            }
+                        });
+
+        fixtures.removeAll(fixturesToDelete);
         fixtureRepository.saveAllAndFlush(fixtures);
+        if (!fixturesToDelete.isEmpty()) {
+            fixtureRepository.deleteAllByIdInBatch(
+                    fixturesToDelete.stream()
+                            .map(FixtureEntity::getId)
+                            .collect(Collectors.toList()));
+        }
 
         return fixtures.stream()
                 .map(f -> modelMapper.map(f, Fixture.class))
