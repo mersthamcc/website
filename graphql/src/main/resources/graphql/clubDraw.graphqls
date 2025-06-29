@@ -13,6 +13,7 @@ type ClubDrawSubscription {
     createDate: Date!
     lastUpdated: Date!
     active: Boolean!
+    noOfTickets: Int!
     clubDrawWinners: [ClubDrawWinner]
     clubDrawPayments: [ClubDrawPayment]
 }
@@ -41,6 +42,7 @@ type ClubDrawWinner {
 input ClubDrawSubscriptionInput {
     subscriptionId: String!
     active: Boolean!
+    noOfTickets: Int!
 }
 
 extend type Query {
@@ -49,6 +51,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addClubDrawSubscription(subscription: ClubDrawSubscriptionInput!): ClubDrawSubscription!
+    addClubDrawSubscription(mandateId: String!, noOfTickets: Int!): ClubDrawSubscription!
+    saveClubDrawSubscription(subscription: ClubDrawSubscriptionInput!): ClubDrawSubscription!
     disableTicket(id: Int!): ClubDrawSubscription!
 }

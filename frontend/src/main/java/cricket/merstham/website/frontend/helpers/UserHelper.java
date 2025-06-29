@@ -1,13 +1,18 @@
 package cricket.merstham.website.frontend.helpers;
 
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.security.Principal;
 
 public class UserHelper {
-    public static String getUserFullName(Principal principal) {
-        OidcUser user = (OidcUser) ((OAuth2AuthenticationToken) principal).getPrincipal();
-        return user.getFullName();
+
+    private UserHelper() {}
+
+    public static OAuth2AccessToken getAccessToken(Principal principal) {
+        if (principal instanceof CognitoAuthentication cognitoAuthentication) {
+            return cognitoAuthentication.getOAuth2AccessToken();
+        }
+        throw new IllegalArgumentException("Unsupported principal type: " + principal.getClass());
     }
 }

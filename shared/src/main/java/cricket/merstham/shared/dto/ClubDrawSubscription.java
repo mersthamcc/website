@@ -30,6 +30,7 @@ public class ClubDrawSubscription implements Serializable {
     @JsonProperty private Instant createDate;
     @JsonProperty private Instant lastUpdated;
     @JsonProperty private Boolean active;
+    @JsonProperty private Integer noOfTickets;
     @JsonProperty private Set<ClubDrawPayment> clubDrawPayments = new LinkedHashSet<>();
     @JsonProperty private Set<ClubDrawWinner> clubDrawWinners = new LinkedHashSet<>();
 }

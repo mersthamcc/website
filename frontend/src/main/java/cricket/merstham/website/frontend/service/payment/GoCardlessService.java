@@ -1,19 +1,13 @@
 package cricket.merstham.website.frontend.service.payment;
 
-import com.apollographql.apollo.api.Error;
 import com.gocardless.GoCardlessClient;
-import com.gocardless.resources.CustomerBankAccount;
 import com.gocardless.resources.Mandate;
-import com.gocardless.services.RedirectFlowService;
 import cricket.merstham.shared.dto.Order;
-import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
 import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
-import cricket.merstham.website.frontend.security.CognitoAuthentication;
+import cricket.merstham.website.frontend.service.MandateService;
 import cricket.merstham.website.frontend.service.MembershipService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Builder;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +15,8 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,8 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.gocardless.GoCardlessClient.Environment.LIVE;
-import static com.gocardless.GoCardlessClient.Environment.SANDBOX;
 import static com.gocardless.services.PaymentService.PaymentCreateRequest.Currency.GBP;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -60,28 +50,24 @@ public class GoCardlessService implements PaymentService {
     private final boolean enabled;
     private final String disabledReason;
     private final MembershipService membershipService;
-    private final String mandateDescription;
     private final LocalDate endDate;
 
     private final GoCardlessClient client;
+    private final MandateService mandateService;
 
     public GoCardlessService(
             @Value("${payments.gocardless.enabled}") boolean enabled,
             @Value("${payments.gocardless.disabled-reason}") String disabledReason,
-            @Value("${payments.gocardless.access-token}") String accessToken,
-            @Value("${payments.gocardless.sandbox}") boolean sandbox,
-            @Value("${payments.gocardless.mandate-description}") String mandateDescription,
             @Value("${payments.gocardless.schedule-end-date}") LocalDate endDate,
-            MembershipService membershipService) {
+            MembershipService membershipService,
+            GoCardlessClient client,
+            MandateService mandateService) {
         this.enabled = enabled;
         this.disabledReason = disabledReason;
         this.membershipService = membershipService;
-        this.mandateDescription = mandateDescription;
         this.endDate = endDate;
-        this.client =
-                GoCardlessClient.newBuilder(accessToken)
-                        .withEnvironment(sandbox ? SANDBOX : LIVE)
-                        .build();
+        this.client = client;
+        this.mandateService = mandateService;
     }
 
     @Override
@@ -121,50 +107,8 @@ public class GoCardlessService implements PaymentService {
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);
         model.put("schedules", schedules);
         model.put("endDate", endDate);
-        try {
-            var paymentMethods =
-                    membershipService.getUsersPaymentMethods(
-                            ((CognitoAuthentication) request.getUserPrincipal())
-                                    .getOidcUser()
-                                    .getSubject(),
-                            accessToken);
-
-            var existingMandates =
-                    paymentMethods.stream()
-                            .filter(
-                                    p ->
-                                            p.getType().equals(MANDATE)
-                                                    && p.getStatus().equals("active")
-                                                    && p.getProvider().equals(SERVICE_NAME))
-                            .map(
-                                    p ->
-                                            MandatePresentation.builder()
-                                                    .mandate(
-                                                            client.mandates()
-                                                                    .get(p.getMethodIdentifier())
-                                                                    .execute()))
-                            .filter(
-                                    mandate ->
-                                            mandate.mandate
-                                                    .getStatus()
-                                                    .name()
-                                                    .equals(Mandate.Status.ACTIVE.name()))
-                            .map(
-                                    m ->
-                                            m.customerBankAccount(
-                                                            client.customerBankAccounts()
-                                                                    .get(
-                                                                            m.mandate
-                                                                                    .getLinks()
-                                                                                    .getCustomerBankAccount())
-                                                                    .execute())
-                                                    .build())
-                            .toList();
-
-            model.put("existingMandates", existingMandates);
-        } catch (IOException e) {
-            throw new RuntimeException("Error fetching active mandates", e);
-        }
+        var existingMandates = mandateService.getUserMandates(request.getUserPrincipal());
+        model.put("existingMandates", existingMandates);
 
         return new ModelAndView("payments/gocardless/checkout", model);
     }
@@ -183,25 +127,9 @@ public class GoCardlessService implements PaymentService {
 
         var mandate = request.getParameter(MANDATE);
         if (isNull(mandate) || mandate.equals(NEW)) {
-            var requestUri = URI.create(request.getRequestURL().toString());
-            String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-
-            var principal = ((CognitoAuthentication) request.getUserPrincipal()).getOidcUser();
-
             var redirectFlow =
-                    client.redirectFlows()
-                            .create()
-                            .withDescription(mandateDescription)
-                            .withIdempotencyKey(UUID.randomUUID().toString())
-                            .withSessionToken(basket.getId())
-                            .withSuccessRedirectUrl(
-                                    format("{0}/payments/{1}/execute", baseUri, SERVICE_NAME))
-                            .withPrefilledCustomerEmail(request.getUserPrincipal().getName())
-                            .withPrefilledCustomerGivenName(principal.getGivenName())
-                            .withPrefilledCustomerFamilyName(principal.getFamilyName())
-                            .withScheme(RedirectFlowService.RedirectFlowCreateRequest.Scheme.BACS)
-                            .execute();
-
+                    mandateService.createNewMandate(
+                            request, format("/payments/{0}/execute", SERVICE_NAME), basket.getId());
             request.getSession().setAttribute(SESSION_FLOW_ID, redirectFlow.getId());
 
             return new ModelAndView(format(REDIRECT_FORMAT, redirectFlow.getRedirectUrl()));
@@ -220,7 +148,6 @@ public class GoCardlessService implements PaymentService {
             OAuth2AccessToken accessToken) {
         int dayOfMonth = (int) request.getSession().getAttribute(SESSION_DAY_OF_MONTH);
         int numberOfPayments = (int) request.getSession().getAttribute(SESSION_NUMBER_OF_PAYMENTS);
-        String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
         List<PaymentSchedule> schedules =
                 (List<PaymentSchedule>) request.getSession().getAttribute(SESSION_SCHEDULES);
 
@@ -229,43 +156,13 @@ public class GoCardlessService implements PaymentService {
                         .filter(ps -> ps.getNumberOfPayments() == numberOfPayments)
                         .findFirst()
                         .orElseThrow();
-        String mandateId;
-        Mandate mandate;
-        if (nonNull(flowId)) {
-            var redirectFlow =
-                    client.redirectFlows()
-                            .complete(flowId)
-                            .withSessionToken(basket.getId())
-                            .execute();
 
-            mandateId = redirectFlow.getLinks().getMandate();
-            mandate = client.mandates().get(mandateId).execute();
-            LOG.info("Saving mandate {}", mandate.getId());
-            try {
-                membershipService.createUserPaymentMethod(
-                        SERVICE_NAME,
-                        MANDATE,
-                        mandate.getId(),
-                        mandate.getLinks().getCustomer(),
-                        "pending",
-                        accessToken);
-            } catch (GraphException e) {
-                LOG.atError()
-                        .setCause(e)
-                        .log(
-                                "Error saving mandate {} - '{}'",
-                                mandate.getId(),
-                                String.join(
-                                        ", ",
-                                        e.getErrors().stream().map(Error::getMessage).toList()),
-                                e);
-            } catch (Exception e) {
-                LOG.atError()
-                        .setCause(e)
-                        .log("Unable to save payment method for mandate {}", mandate.getId());
-            }
+        Mandate mandate;
+        String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
+        if (nonNull(flowId)) {
+            mandate = mandateService.completeRedirectFlow(flowId, basket.getId(), accessToken);
         } else {
-            mandateId = (String) request.getSession().getAttribute(SESSION_MANDATE);
+            var mandateId = (String) request.getSession().getAttribute(SESSION_MANDATE);
             mandate = client.mandates().get(mandateId).execute();
         }
 
@@ -342,12 +239,5 @@ public class GoCardlessService implements PaymentService {
             startDate = startDate.plusMonths(1);
         }
         return chargeDates;
-    }
-
-    @Builder
-    @Data
-    public static class MandatePresentation {
-        private Mandate mandate;
-        private CustomerBankAccount customerBankAccount;
     }
 }

@@ -1,0 +1,10 @@
+query myClubDrawSubscriptions {
+    myClubDrawSubscriptions {
+        id
+        active
+        createDate
+        lastUpdated
+        ownerUserId
+        subscriptionId
+    }
+}

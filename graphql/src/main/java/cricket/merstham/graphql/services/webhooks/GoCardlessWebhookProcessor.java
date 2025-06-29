@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.gocardless.GoCardlessClient.Environment.LIVE;
-import static com.gocardless.GoCardlessClient.Environment.SANDBOX;
 import static com.gocardless.resources.Event.ResourceType.MANDATES;
 import static com.gocardless.resources.Event.ResourceType.PAYMENTS;
 import static com.gocardless.resources.Event.ResourceType.PAYOUTS;
@@ -58,8 +56,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
 
     public GoCardlessWebhookProcessor(
             @Value("${configuration.webhooks.gocardless.secret}") String secret,
-            @Value("${configuration.webhooks.gocardless.access-token}") String accessToken,
-            @Value("${configuration.webhooks.gocardless.sandbox}") boolean sandbox,
+            GoCardlessClient client,
             PaymentEntityRepository paymentEntityRepository,
             UserPaymentMethodRepository userPaymentMethodRepository,
             EmailService emailService,
@@ -68,10 +65,7 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
         this.secret = secret;
         this.emailService = emailService;
         this.cognitoService = cognitoService;
-        this.client =
-                GoCardlessClient.newBuilder(accessToken)
-                        .withEnvironment(sandbox ? SANDBOX : LIVE)
-                        .build();
+        this.client = client;
         this.paymentEntityRepository = paymentEntityRepository;
         this.userPaymentMethodRepository = userPaymentMethodRepository;
         this.modelMapper = modelMapper;

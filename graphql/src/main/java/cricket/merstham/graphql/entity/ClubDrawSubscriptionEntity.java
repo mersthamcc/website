@@ -47,6 +47,9 @@ public class ClubDrawSubscriptionEntity {
     @Column(name = "active")
     private Boolean active;
 
+    @Column(name = "no_of_tickets", nullable = false)
+    private Integer noOfTickets;
+
     @OneToMany(mappedBy = "clubDrawSubscription")
     private Set<ClubDrawPaymentEntity> clubDrawPayments = new LinkedHashSet<>();
 }

@@ -194,3 +194,6 @@ bots:
   sitemap: "${SITEMAP:}"
 
 scripts: "${GLOBAL_SCRIPT_WIDGETS:}"
+
+features:
+  club-draw: true
