@@ -11,6 +11,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.LegacyLinkHelper.legacyHelper;
@@ -68,6 +69,8 @@ public class EventsController {
                                                 "day", day,
                                                 "slug", slug))
                                 .toString());
-        return new ModelAndView("events/item", Map.of("event", event));
+        var model = new HashMap<String, Object>();
+        model.put("event", event);
+        return new ModelAndView("events/item", model);
     }
 }
