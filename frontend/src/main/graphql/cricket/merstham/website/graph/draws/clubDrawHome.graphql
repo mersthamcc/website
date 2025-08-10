@@ -1,0 +1,6 @@
+query clubDrawHome {
+    homePage: page(slug: "100-club") {
+        title
+        content
+    }
+}

@@ -34,8 +34,8 @@ public class ClubDrawController {
 
     @MutationMapping("addClubDrawSubscription")
     public ClubDrawSubscription addLotteryTicket(
-            @Argument("subscription") ClubDrawSubscription subscription) {
-        return null;
+            @Argument("mandateId") String mandateId, @Argument("noOfTickets") int noOfTickets) {
+        return service.createSubscription(mandateId, noOfTickets);
     }
 
     @MutationMapping("disableTicket")
