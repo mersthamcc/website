@@ -16,6 +16,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      ssl:
+        enabled: ${REDIS_TLS:false}
   session:
     dynamodb:
       table-name: ${DYNAMO_SESSION_TABLE:sessions}
