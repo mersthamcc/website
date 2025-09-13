@@ -29,6 +29,15 @@ public class VaultService {
         return requireNonNull(result).getData();
     }
 
+    public String getEnvironmentSecret(String key) {
+        var template =
+                new VaultTemplate(
+                        configuration.vaultEndpoint(), configuration.clientAuthentication());
+        var result = template.read(configuration.getEnvironmentSecretsPath());
+
+        return ((Map<String, String>) requireNonNull(result).getData().get("data")).get(key);
+    }
+
     public Map<String, Object> write(String path, Map<String, Object> data) {
         var template =
                 new VaultTemplate(

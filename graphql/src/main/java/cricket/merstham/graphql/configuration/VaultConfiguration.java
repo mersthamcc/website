@@ -23,6 +23,7 @@ public class VaultConfiguration extends AbstractVaultConfiguration {
     private String authType;
     private String token;
     private String role;
+    private String environmentSecretsPath;
 
     @NotNull
     @Override

@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -98,6 +99,7 @@ public class AccountingService {
             value = "accounting.sales-order.sync",
             description = "Time taken to sync sales orders with accounts")
     @Transactional(propagation = Propagation.REQUIRED)
+    @Lazy
     public void accountingSalesOrderSync() {
         LOG.info("Starting accounting sync...");
         try {

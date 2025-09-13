@@ -18,6 +18,7 @@ import com.google.api.services.walletobjects.model.GenericClass;
 import com.google.api.services.walletobjects.model.TemplateItem;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
+import cricket.merstham.graphql.services.VaultService;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -28,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 import javax.net.ssl.SSLException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
@@ -38,8 +38,8 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-import static cricket.merstham.shared.helpers.KeyHelper.loadCertificateFromFile;
-import static cricket.merstham.shared.helpers.KeyHelper.loadPrivateKeyFromFile;
+import static cricket.merstham.shared.helpers.KeyHelper.loadCertificateFromString;
+import static cricket.merstham.shared.helpers.KeyHelper.loadPrivateKeyFromString;
 import static java.text.MessageFormat.format;
 
 @Configuration
@@ -52,29 +52,28 @@ public class WalletConfiguration {
     @Bean
     @Singleton
     @Named("appleSigningCertificate")
-    public X509Certificate getAppleSigningCertificate(
-            @Value("${configuration.wallet.apple.signing-certificate}") String certificateFilename)
-            throws CertificateException, FileNotFoundException {
-        return loadCertificateFromFile(certificateFilename);
+    public X509Certificate getAppleSigningCertificate(VaultService vaultService)
+            throws CertificateException {
+        var secret = vaultService.getEnvironmentSecret("apple_signing_cert");
+        return loadCertificateFromString(secret);
     }
 
     @Bean
     @Singleton
     @Named("appleSigningKey")
-    public PrivateKey getAppleSigningKey(
-            @Value("${configuration.wallet.apple.signing-key}") String keyFilename)
+    public PrivateKey getAppleSigningKey(VaultService vaultService)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        return loadPrivateKeyFromFile(keyFilename);
+        var secret = vaultService.getEnvironmentSecret("apple_signing_key");
+        return loadPrivateKeyFromString(secret);
     }
 
     @Bean
     @Singleton
     @Named("appleIntermediaryCertificate")
-    public X509Certificate getAppleIntermediaryCertificate(
-            @Value("${configuration.wallet.apple.apple-intermediary-ca-cert}")
-                    String certificateFilename)
-            throws CertificateException, FileNotFoundException {
-        return loadCertificateFromFile(certificateFilename);
+    public X509Certificate getAppleIntermediaryCertificate(VaultService vaultService)
+            throws CertificateException {
+        var secret = vaultService.getEnvironmentSecret("apple_intermediates");
+        return loadCertificateFromString(secret);
     }
 
     @Bean

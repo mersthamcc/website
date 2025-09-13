@@ -11,6 +11,7 @@ sentry:
   send-default-pii: true
   enable-metrics: true
 
+
 spring:
   data:
     redis:
@@ -18,6 +19,12 @@ spring:
       port: ${REDIS_PORT:6379}
       ssl:
         enabled: ${REDIS_TLS:false}
+      client-type: lettuce
+      repositories:
+        enabled: false
+      lettuce:
+        pool:
+          enabled: true
   session:
     dynamodb:
       table-name: ${DYNAMO_SESSION_TABLE:sessions}
@@ -65,14 +72,20 @@ spring:
 debug: ${DEBUG:false}
 server:
   port: 8080
-  forward-headers-strategy: framework
+  forward-headers-strategy: native
   servlet:
     session:
       timeout: 21600s
       cookie:
         max-age: 21600s
+
   tomcat:
     max-http-response-header-size: 32KB
+    use-relative-redirects: true
+    redirect-context-root: false
+    remoteip:
+      host-header: X-Forwarded-Host
+      internal-proxies: .*
 
   max-http-request-header-size: 32KB
 
@@ -83,6 +96,7 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+      base-path: /actuator
 
 club:
   club-name: ${CLUBNAME:My Cricket Club}
@@ -190,9 +204,3 @@ registration:
         - parent-email-1
         - parent-email-2
         - family-name
-
-bots:
-  robots: "${ROBOTS:}"
-  sitemap: "${SITEMAP:}"
-
-scripts: "${GLOBAL_SCRIPT_WIDGETS:}"

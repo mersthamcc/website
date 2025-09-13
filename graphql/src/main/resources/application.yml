@@ -28,6 +28,11 @@ spring:
     url: "jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:}"
     username: ${DATABASE_USER:}
     password: ${DATABASE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 5
+      max-lifetime: 600000
+      minimum-idle: 2
+      idle-timeout: 300000
 
   graphql:
     graphiql:
@@ -62,7 +67,12 @@ spring:
       port: ${REDIS_PORT:6379}
       ssl:
         enabled: ${REDIS_TLS:false}
-
+      client-type: lettuce
+      repositories:
+        enabled: false
+      lettuce:
+        pool:
+          enabled: true
 management:
   server:
     port: 8091
@@ -70,6 +80,7 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+      base-path: /actuator
 
 debug: ${DEBUG:false}
 
@@ -140,6 +151,7 @@ configuration:
     auth-type: ${VAULT_AUTH:TOKEN}
     token: ${VAULT_TOKEN:}
     role: ${VAULT_ROLE:}
+    environment-secrets-path: ${VAULT_ENVIRONMENT_PATH:/secrets/data/test}
   token-service:
     vault-path: ${VAULT_OAUTH_PATH:/oauthapp}
     credentials-path: ${VAULT_SECRETS_PATH:/secrets/data}
