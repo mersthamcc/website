@@ -72,21 +72,15 @@ spring:
 debug: ${DEBUG:false}
 server:
   port: 8080
-  forward-headers-strategy: native
+  forward-headers-strategy: framework
   servlet:
     session:
       timeout: 21600s
       cookie:
         max-age: 21600s
-
   tomcat:
     max-http-response-header-size: 32KB
     use-relative-redirects: true
-    redirect-context-root: false
-    remoteip:
-      host-header: X-Forwarded-Host
-      internal-proxies: .*
-
   max-http-request-header-size: 32KB
 
 management:
