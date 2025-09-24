@@ -118,7 +118,12 @@ public class SecurityConfiguration {
                                                         cors.policy(
                                                                 CrossOriginOpenerPolicyHeaderWriter
                                                                         .CrossOriginOpenerPolicy
-                                                                        .SAME_ORIGIN)))
+                                                                        .SAME_ORIGIN))
+                                        .httpStrictTransportSecurity(
+                                                hsts ->
+                                                        hsts.includeSubDomains(true)
+                                                                .preload(true)
+                                                                .maxAgeInSeconds(31536000)))
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(
                         exceptionHandling ->
