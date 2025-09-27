@@ -107,11 +107,12 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/arm64
           tags: |
             mersthamcc/frontend:latest
-            ghcr.io/mersthamcc/website-frontend:latest
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_FRONTEND_URL }}:latest
             mersthamcc/frontend:${{ steps.generate-release.outputs.release }}
-            ghcr.io/mersthamcc/website-frontend:${{ steps.generate-release.outputs.release }}
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_FRONTEND_URL }}:${{ steps.generate-release.outputs.release }}
 
           build-args: |
             COMPONENT=frontend
@@ -122,11 +123,13 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/arm64
           tags: |
             mersthamcc/graphql:latest
-            ghcr.io/mersthamcc/website-graphql:latest
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_BACKEND_URL }}:latest
             mersthamcc/graphql:${{ steps.generate-release.outputs.release }}
-            ghcr.io/mersthamcc/website-graphql:${{ steps.generate-release.outputs.release }}
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_BACKEND_URL }}:${{ steps.generate-release.outputs.release }}
+
           build-args: |
             COMPONENT=graphql
 
