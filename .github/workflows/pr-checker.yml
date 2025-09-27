@@ -79,6 +79,16 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.WEBSITE_ACCOUNT_PR_DEPLOYER_ARN }}
+          aws-region: eu-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Prepare
         shell: bash
         run: |
@@ -98,9 +108,11 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/arm64
           tags: |
             mersthamcc/frontend:test
             ghcr.io/mersthamcc/website-frontend:test
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_FRONTEND_URL }}:test
           build-args: |
             COMPONENT=frontend
 
@@ -109,10 +121,12 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/arm64
           push: true
           tags: |
             mersthamcc/graphql:test
             ghcr.io/mersthamcc/website-graphql:test
+            ${{ secrets.WEBSITE_ACCOUNT_ECR_BACKEND_URL }}:test
           build-args: |
             COMPONENT=graphql
 

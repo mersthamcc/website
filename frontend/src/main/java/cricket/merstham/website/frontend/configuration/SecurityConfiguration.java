@@ -46,6 +46,7 @@ import java.util.Set;
 import static cricket.merstham.website.frontend.controller.LoginController.LOGIN_PROCESSING_URL;
 import static cricket.merstham.website.frontend.controller.LoginController.LOGIN_URL;
 import static cricket.merstham.website.frontend.controller.administration.CkFinderController.CONNECTOR_PATH;
+import static cricket.merstham.website.frontend.helpers.UriHelper.resolveUrl;
 import static java.util.Objects.nonNull;
 
 @Configuration
@@ -98,7 +99,8 @@ public class SecurityConfiguration {
             CognitoChallengeResponseFilter cognitoChallengeProcessingFilter,
             CognitoAuthenticationFailureHandler failureHandler,
             CognitoExceptionTranslationFilter cognitoExceptionTranslationFilter,
-            CognitoRefreshFilter cognitoRefreshFilter)
+            CognitoRefreshFilter cognitoRefreshFilter,
+            @Value("${base-url}") String baseUrl)
             throws Exception {
         http.csrf(
                         csrf ->
@@ -116,7 +118,12 @@ public class SecurityConfiguration {
                                                         cors.policy(
                                                                 CrossOriginOpenerPolicyHeaderWriter
                                                                         .CrossOriginOpenerPolicy
-                                                                        .SAME_ORIGIN)))
+                                                                        .SAME_ORIGIN))
+                                        .httpStrictTransportSecurity(
+                                                hsts ->
+                                                        hsts.includeSubDomains(true)
+                                                                .preload(true)
+                                                                .maxAgeInSeconds(31536000)))
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(
                         exceptionHandling ->
@@ -129,7 +136,7 @@ public class SecurityConfiguration {
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
                 .formLogin(
                         form ->
-                                form.loginPage(LOGIN_URL)
+                                form.loginPage(resolveUrl(baseUrl, LOGIN_URL))
                                         .loginProcessingUrl(LOGIN_PROCESSING_URL)
                                         .usernameParameter("email")
                                         .passwordParameter("password")

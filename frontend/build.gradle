@@ -34,6 +34,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
     implementation "org.springframework.session:spring-session-data-redis:${dependencyVersions.spring_sessions}"
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
+    implementation "org.apache.commons:commons-pool2:2.12.1"
     implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
     implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
     implementation 'com.stripe:stripe-java:21.14.0'

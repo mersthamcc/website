@@ -510,6 +510,9 @@ services:
   vault:
     build:
       context: infrastructure/Dockerfiles/vault
+    command:
+      - "server"
+      - "-dev"
     labels:
       - traefik.enable=true
       - traefik.http.routers.vault.rule=Host(`vault.${DEVDOMAIN}`)
@@ -563,6 +566,8 @@ services:
     volumes:
       - ./dev-config/vault:/src
       - ./infrastructure/Dockerfiles/vault/plugins:/vault/plugins
+      - ~/.config/dev-keys/:/keys
+      - ./infrastructure/keys:/certs
     working_dir: /src
     entrypoint: sh
     command: -c "terraform init -input=false && terraform apply -auto-approve"

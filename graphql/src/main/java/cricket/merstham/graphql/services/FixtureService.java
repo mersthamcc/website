@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -239,6 +240,7 @@ public class FixtureService {
                 @CacheEvict(value = TEAM_CACHE, allEntries = true),
                 @CacheEvict(value = ACTIVE_TEAM_CACHE, allEntries = true),
             })
+    @Lazy
     public void refreshTeams() {
         LOG.info("Starting PlayCricket team refresh...");
         try {
@@ -296,6 +298,7 @@ public class FixtureService {
                 @CacheEvict(value = FIXTURES_WON_COUNT_CACHE, allEntries = true),
                 @CacheEvict(value = UPCOMING_FIXTURE_CACHE, allEntries = true),
             })
+    @Lazy
     public void refreshFixtures() {
         LOG.info("Starting PlayCricket fixture refresh... ");
         try {
@@ -370,6 +373,7 @@ public class FixtureService {
     @Scheduled(
             cron = "${configuration.google.google-calendar-sync-cron}",
             zone = "${configuration.scheduler-zone}")
+    @Lazy
     public List<CalendarSyncResult> syncFixturesWithCalendar() {
         return syncFixturesWithCalendar(LocalDate.of(LocalDate.now().getYear(), 1, 1));
     }
