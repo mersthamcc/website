@@ -149,6 +149,7 @@ jobs:
         with:
           context: sql/
           push: true
+          platforms: linux/arm64
           tags: |
             mersthamcc/flyway:latest
             ghcr.io/mersthamcc/website-flyway:latest
