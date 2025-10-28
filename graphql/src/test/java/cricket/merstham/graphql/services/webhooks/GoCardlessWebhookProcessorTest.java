@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.services.webhooks;
 
+import com.gocardless.GoCardlessClient;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
 import cricket.merstham.graphql.repository.UserPaymentMethodRepository;
 import cricket.merstham.graphql.services.CognitoService;
@@ -15,11 +16,11 @@ import static org.mockito.Mockito.mock;
 class GoCardlessWebhookProcessorTest {
 
     private final PaymentEntityRepository repository = mock(PaymentEntityRepository.class);
+    private final GoCardlessClient goCardlessClient = mock(GoCardlessClient.class);
     private final GoCardlessWebhookProcessor processor =
             new GoCardlessWebhookProcessor(
                     null,
-                    null,
-                    false,
+                    goCardlessClient,
                     repository,
                     mock(UserPaymentMethodRepository.class),
                     mock(EmailService.class),

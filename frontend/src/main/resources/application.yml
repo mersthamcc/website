@@ -198,3 +198,5 @@ registration:
         - parent-email-1
         - parent-email-2
         - family-name
+features:
+  club-draw: ${FEATURE_CLUB_DRAW:false}
