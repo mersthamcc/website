@@ -29,7 +29,6 @@ services:
       COOKIE_CONTROL_KEY: ${COOKIE_CONTROL_KEY}
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_COMMON_SECRET}
       KEYCLOAK_CLIENT_ID: website
-      GRAPH_URI: https://graph.${DEVDOMAIN}/graphql
       REDIS_HOST: redis
     ports:
       - 8081:8081
