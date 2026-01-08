@@ -162,6 +162,9 @@ type PriceListItem {
     memberCategory: MemberCategory!
     priceList: [Price!]!
     currentPrice: Float
+    inclusiveKit: Boolean!
+    sortOrder: Int!
+    specificGender: String
 }
 
 type MemberSummary {

@@ -15,6 +15,9 @@ query membershipCategories($key: StringFilter!) {
       studentsOnly
       parentDiscount
       currentPrice
+      inclusiveKit
+      sortOrder
+      specificGender
       memberCategory {
         key
       }
