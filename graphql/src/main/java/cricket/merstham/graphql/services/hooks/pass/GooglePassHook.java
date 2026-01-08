@@ -3,6 +3,7 @@ package cricket.merstham.graphql.services.hooks.pass;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.services.PassGeneratorService;
 import cricket.merstham.graphql.services.hooks.Hook;
+import cricket.merstham.shared.dto.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class GooglePassHook implements Hook<OrderEntity> {
     }
 
     @Override
-    public void onConfirm(OrderEntity order) {
+    public void onConfirm(OrderEntity order, String paymentType, User user) {
         try {
             order.getMemberSubscription()
                     .forEach(
