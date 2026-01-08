@@ -358,13 +358,12 @@
 
 <#macro categoryPricelist category _csrf subscriptionId>
     <div class="row position-relative z-index-2 mx-n2 mb-5">
-        <#list category.priceListItem as item>
+        <#list category.sortedPriceListItem as item>
             <#if item.currentPrice??>
                 <@pricelistItem item=item category=category _csrf=_csrf subscriptionId=subscriptionId />
             </#if>
         </#list>
     </div>
-
 </#macro>
 
 <#macro pricelistItem item category _csrf subscriptionId buttonTitle="membership.select" negativeButtonTitle="">
@@ -401,6 +400,27 @@
                             <sup>*</sup>
                         </div>
                     </div>
+                    <#if item.minAge < 16>
+                        <div class="media font-size-1 text-body mb-3">
+                            <i class="fas fa-school text-info mt-1 mr-2"></i>
+                            <div class="media-body">
+                                School years <#if item.minAge - 5 == 0>Reception<#else>${item.minAge - 5}</#if>
+                                <#if item.maxAge??>
+                                    to ${item.maxAge - 5}
+                                <#else>
+                                    and up
+                                </#if>
+                            </div>
+                        </div>
+                    </#if>
+                    <#if item.inclusiveKit>
+                        <div class="media font-size-1 text-body mb-3">
+                            <i class="fas fa-tshirt text-info mt-1 mr-2"></i>
+                            <div class="media-body">
+                                Includes match day shirt
+                            </div>
+                        </div>
+                    </#if>
                     <#if (item.studentsOnly)?? && item.studentsOnly>
                         <div class="media font-size-1 text-body mb-3">
                             <i class="fas fa-info-circle text-info mt-1 mr-2"></i>
@@ -455,7 +475,6 @@
             </div>
         </div>
     </div>
-
 </#macro>
 
 <#macro noButtons>
