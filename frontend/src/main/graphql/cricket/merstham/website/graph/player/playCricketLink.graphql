@@ -45,6 +45,9 @@ mutation playCricketLink ($id: Int!, $playCricketId: Int!) {
                 parentDiscount
                 maxAge
                 minAge
+                inclusiveKit
+                sortOrder
+                specificGender
                 memberCategory {
                     key
                     form {

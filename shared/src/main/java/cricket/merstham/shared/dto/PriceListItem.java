@@ -33,4 +33,7 @@ public class PriceListItem implements Serializable {
     @JsonProperty private List<Price> price = new ArrayList<>();
     @JsonProperty private Boolean studentsOnly;
     @JsonProperty private Boolean parentDiscount;
+    @JsonProperty private Boolean inclusiveKit;
+    @JsonProperty private Integer sortOrder;
+    @JsonProperty private String specificGender;
 }

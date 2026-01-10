@@ -50,6 +50,9 @@ query member($id: Int!) {
                 parentDiscount
                 maxAge
                 minAge
+                inclusiveKit
+                sortOrder
+                specificGender
                 memberCategory {
                     key
                     form {

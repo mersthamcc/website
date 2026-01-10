@@ -26,6 +26,9 @@ query myMemberDetails {
                 parentDiscount
                 minAge
                 maxAge
+                sortOrder
+                inclusiveKit
+                specificGender
                 memberCategory {
                     id
                     key

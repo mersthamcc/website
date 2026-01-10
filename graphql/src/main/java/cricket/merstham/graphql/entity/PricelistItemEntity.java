@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -58,6 +60,18 @@ public class PricelistItemEntity {
 
     @Column(name = "parent_discount")
     private Boolean parentDiscount;
+
+    @NotNull
+    @Column(name = "inclusive_kit", nullable = false)
+    private Boolean inclusiveKit;
+
+    @NotNull
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder;
+
+    @Size(max = 6)
+    @Column(name = "specific_gender", length = 6)
+    private String specificGender;
 
     @OneToMany(
             fetch = FetchType.EAGER,

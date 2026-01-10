@@ -2,6 +2,7 @@ package cricket.merstham.graphql.services;
 
 import cricket.merstham.graphql.configuration.BankDetails;
 import cricket.merstham.graphql.configuration.MailTemplateConfiguration;
+import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
 import cricket.merstham.shared.dto.User;
@@ -40,6 +41,8 @@ public class EmailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmailService.class);
     public static final String CURRENCY_FORMAT = "'£'##.00";
+    public static final String ORDER = "order";
+    public static final String USER = "user";
     private final SesV2Client client;
     private final MailTemplateConfiguration configuration;
     private final MessageSource messageSource;
@@ -91,12 +94,46 @@ public class EmailService {
         return switch (template) {
             case MANDATE_CANCEL -> mandateCancellationEmail(model);
             case MEMBERSHIP_CONFIRM -> membershipConfirmationEmail(model);
+            case INCLUSIVE_KIT_ORDER -> inclusiveKitConfirmationEmail(model);
         };
     }
 
+    private HtmlTextEmail inclusiveKitConfirmationEmail(Map<String, Object> model) {
+        var user = (User) model.get(USER);
+        var subscriptions = (List<MemberSubscriptionEntity>) model.get("subscriptions");
+        var members = subscriptions.stream().map(m -> m.getMember().getFullName()).toList();
+        var builder = configuration.getEmailBuilder();
+
+        return builder.text(translation("email.INCLUSIVE_KIT_ORDER.title"))
+                .h2()
+                .and()
+                .text(translation("email.salutation", user.getGivenName()))
+                .and()
+                .text(translation("email.INCLUSIVE_KIT_ORDER.paragraph1"))
+                .and()
+                .table(buildKitEligibleMemberTable(builder, members))
+                .text(
+                        translation(
+                                "email.INCLUSIVE_KIT_ORDER.paragraph2",
+                                configuration.getInclusiveKitPartner()))
+                .and()
+                .button(
+                        translation("email.INCLUSIVE_KIT_ORDER.button"),
+                        configuration.getInclusiveKitUrl())
+                .and()
+                .text(translation("email.INCLUSIVE_KIT_ORDER.paragraph3"))
+                .and()
+                .text(translation("email.INCLUSIVE_KIT_ORDER.sign-off"))
+                .and()
+                .text(configuration.getClubName())
+                .bold()
+                .and()
+                .build();
+    }
+
     private HtmlTextEmail membershipConfirmationEmail(Map<String, Object> model) {
-        var user = (User) model.get("user");
-        var order = (Order) model.get("order");
+        var user = (User) model.get(USER);
+        var order = (Order) model.get(ORDER);
         var paymentType = (String) model.get("paymentType");
         var payments = order.getPayment();
         var builder = configuration.getEmailBuilder();
@@ -210,8 +247,8 @@ public class EmailService {
     }
 
     private HtmlTextEmail mandateCancellationEmail(Map<String, Object> model) {
-        var user = (User) model.get("user");
-        var order = (Order) model.get("order");
+        var user = (User) model.get(USER);
+        var order = (Order) model.get(ORDER);
         var payments = order.getPayment().stream().filter(p -> !p.getCollected()).toList();
         var builder = configuration.getEmailBuilder();
         return builder.text(translation("email.MANDATE_CANCEL.title"))
@@ -236,6 +273,51 @@ public class EmailService {
 
     private String translation(String code, Object... args) {
         return messageSource.getMessage(code, args, Locale.getDefault());
+    }
+
+    private TableLine buildKitEligibleMemberTable(
+            EmailTemplateBuilder.EmailTemplateConfigBuilder builder, List<String> members) {
+        return new TableLine() {
+            @Override
+            public List<ColumnConfig> getHeader() {
+                return List.of();
+            }
+
+            @Override
+            public List<ColumnConfig> getItem() {
+                return List.of(new ColumnConfig());
+            }
+
+            @Override
+            public List<ColumnConfig> getFooter() {
+                return List.of();
+            }
+
+            @Override
+            public List<List<Object>> getHeaderRows() {
+                return List.of();
+            }
+
+            @Override
+            public List<List<Object>> getItemRows() {
+                return members.stream().map(List::<Object>of).toList();
+            }
+
+            @Override
+            public List<List<Object>> getFooterRows() {
+                return List.of();
+            }
+
+            @Override
+            public EmailTemplateBuilder.EmailTemplateConfigBuilder and() {
+                return builder;
+            }
+
+            @Override
+            public HtmlTextEmail build() {
+                return builder.build();
+            }
+        };
     }
 
     private TableLine buildSubscriptionsTable(
@@ -393,20 +475,20 @@ public class EmailService {
 
     private List<String> getBccAddresses(MailTemplate template) {
         return switch (template) {
-            case MANDATE_CANCEL -> configuration.getMembershipBcc();
-            case MEMBERSHIP_CONFIRM -> configuration.getMembershipBcc();
+            case MANDATE_CANCEL, MEMBERSHIP_CONFIRM -> configuration.getMembershipBcc();
+            case INCLUSIVE_KIT_ORDER -> List.of();
         };
     }
 
     private List<String> getCCAddresses(MailTemplate template) {
         return switch (template) {
-            case MANDATE_CANCEL -> List.of();
-            case MEMBERSHIP_CONFIRM -> List.of();
+            default -> List.of();
         };
     }
 
     public enum MailTemplate {
         MEMBERSHIP_CONFIRM,
-        MANDATE_CANCEL
+        MANDATE_CANCEL,
+        INCLUSIVE_KIT_ORDER
     }
 }

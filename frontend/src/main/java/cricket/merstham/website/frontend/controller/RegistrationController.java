@@ -248,6 +248,7 @@ public class RegistrationController {
                         .sorted(
                                 Comparator.comparing(MemberCategory::getSortOrder)
                                         .thenComparing(MemberCategory::getKey))
+                        .filter(memberCategory -> !memberCategory.isEmpty())
                         .toList());
         return new ModelAndView("registration/select-membership", model);
     }

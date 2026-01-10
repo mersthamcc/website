@@ -23,6 +23,8 @@ public class MailTemplateConfiguration {
     private String footerText;
     private String fromAddress;
     private List<String> membershipBcc;
+    private String inclusiveKitUrl;
+    private String inclusiveKitPartner;
 
     public MailTemplateConfiguration() {
         this.configuration = TbConfiguration.newInstance();

@@ -5,6 +5,7 @@ import cricket.merstham.graphql.entity.PasskitDeviceRegistrationEntity;
 import cricket.merstham.graphql.repository.PassKitDeviceRegistrationEntityRepository;
 import cricket.merstham.graphql.services.PasskitUpdateService;
 import cricket.merstham.graphql.services.hooks.Hook;
+import cricket.merstham.shared.dto.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class ApplePassHook implements Hook<OrderEntity> {
     }
 
     @Override
-    public void onConfirm(OrderEntity data) {
+    public void onConfirm(OrderEntity data, String paymentType, User user) {
         LOG.info("Begin ApplePassHook onConfirm hook for order {}", data.getId());
         data.getMemberSubscription()
                 .forEach(

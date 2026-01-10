@@ -3,6 +3,7 @@ package cricket.merstham.graphql.services.hooks.order;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.services.EposNowService;
 import cricket.merstham.graphql.services.hooks.Hook;
+import cricket.merstham.shared.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class EposNowHook implements Hook<OrderEntity> {
     }
 
     @Override
-    public void onConfirm(OrderEntity data) {
+    public void onConfirm(OrderEntity data, String paymentType, User user) {
         data.getMemberSubscription()
                 .forEach(member -> eposNowService.sendToQueue(member.getMember()));
     }

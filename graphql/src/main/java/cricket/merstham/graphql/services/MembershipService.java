@@ -32,6 +32,7 @@ import cricket.merstham.shared.dto.MemberFilter;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
+import cricket.merstham.shared.dto.User;
 import cricket.merstham.shared.types.ReportFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +51,12 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
-import static cricket.merstham.graphql.services.EmailService.MailTemplate.MEMBERSHIP_CONFIRM;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
 import static java.util.Objects.isNull;
@@ -310,25 +309,17 @@ public class MembershipService {
         var order = orderEntityRepository.findById(id).orElseThrow();
         var user = cognitoService.getUserBySubjectId(getSubject(principal));
         if (!order.isConfirmed()) {
-            emailService.sendEmail(
-                    user.getEmail(),
-                    MEMBERSHIP_CONFIRM,
-                    Map.of(
-                            "order", modelMapper.map(order, Order.class),
-                            "user", user,
-                            "paymentType", paymentType));
-
             order.setConfirmed(true);
             order = orderEntityRepository.saveAndFlush(order);
-            processOrderConfirmationHooks(order);
+            processOrderConfirmationHooks(order, paymentType, user);
             order = orderEntityRepository.saveAndFlush(order);
         }
 
         return modelMapper.map(order, Order.class);
     }
 
-    private void processOrderConfirmationHooks(OrderEntity order) {
-        hooks.forEach(hook -> hook.onConfirm(order));
+    private void processOrderConfirmationHooks(OrderEntity order, String paymentType, User user) {
+        hooks.forEach(hook -> hook.onConfirm(order, paymentType, user));
     }
 
     @PreAuthorize("isAuthenticated()")
