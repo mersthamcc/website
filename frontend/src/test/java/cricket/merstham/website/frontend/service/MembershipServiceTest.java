@@ -675,6 +675,9 @@ class MembershipServiceTest {
                                                                         false,
                                                                         null,
                                                                         18,
+                                                                        false,
+                                                                        1,
+                                                                        null,
                                                                         new MemberQuery
                                                                                 .MemberCategory(
                                                                                 "MemberCategory",
