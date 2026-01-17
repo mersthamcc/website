@@ -352,7 +352,10 @@ class MembershipServiceTest {
                                                                 false,
                                                                 false,
                                                                 false,
-                                                                Double.valueOf(120.00),
+                                                                120.00,
+                                                                false,
+                                                                1,
+                                                                null,
                                                                 new MembershipCategoriesQuery
                                                                         .MemberCategory(
                                                                         "", "adult"))),
@@ -460,7 +463,10 @@ class MembershipServiceTest {
                                                                 false,
                                                                 false,
                                                                 false,
-                                                                Double.valueOf(120.00),
+                                                                120.00,
+                                                                false,
+                                                                1,
+                                                                null,
                                                                 new MembershipCategoriesQuery
                                                                         .MemberCategory(
                                                                         "", "adult"))),
@@ -669,6 +675,9 @@ class MembershipServiceTest {
                                                                         false,
                                                                         null,
                                                                         18,
+                                                                        false,
+                                                                        1,
+                                                                        null,
                                                                         new MemberQuery
                                                                                 .MemberCategory(
                                                                                 "MemberCategory",

@@ -41,6 +41,9 @@ mutation updateMember($id: Int!, $data: [AttributeInput]!) {
                 parentDiscount
                 maxAge
                 minAge
+                inclusiveKit
+                sortOrder
+                specificGender
                 memberCategory {
                     key
                     form {

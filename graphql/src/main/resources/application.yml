@@ -101,6 +101,8 @@ configuration:
     club-name: ${CLUBNAME:My Cricket Club}
     club-url: "${BASE_URL:http://localhost:8080}"
     footer-text: ${CLUB_ADDRESS:}
+    inclusive-kit-url: ${INCLUSIVE_KIT_ORDER_URL:}
+    inclusive-kit-partner: ${INCLUSIVE_KIT_PARTNER:}
   bank-details:
     account-name: ${BANK_ACCOUNT_NAME:Merstham Cricket Club}
     account-number: ${BANK_ACCOUNT_NUMBER:49244507}
