@@ -11,6 +11,7 @@ import io.rocketbase.mail.TableLine;
 import io.rocketbase.mail.model.HtmlTextEmail;
 import io.rocketbase.mail.styling.Alignment;
 import io.rocketbase.mail.table.ColumnConfig;
+import io.rocketbase.mail.table.TableCellImageSimple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class EmailService {
     private final MessageSource messageSource;
     private final BankDetails bankDetails;
     private final String baseUrl;
+    private String resourcePrefix;
 
     @Autowired
     public EmailService(
@@ -55,12 +57,14 @@ public class EmailService {
             MailTemplateConfiguration configuration,
             MessageSource messageSource,
             BankDetails bankDetails,
-            @Value("${configuration.base-url}") String baseUrl) {
+            @Value("${configuration.base-url}") String baseUrl,
+            @Value("${configuration.resources-base-url}") String resourcePrefix) {
         this.client = client;
         this.configuration = configuration;
         this.messageSource = messageSource;
         this.bankDetails = bankDetails;
         this.baseUrl = baseUrl;
+        this.resourcePrefix = resourcePrefix;
     }
 
     public void sendEmail(String to, MailTemplate template, Map<String, Object> model) {
@@ -151,11 +155,30 @@ public class EmailService {
                         .and()
                         .text(translation("email.MEMBERSHIP_CONFIRM.paragraph2"))
                         .and()
-                        .table(buildSubscriptionsTable(builder, order));
+                        .table(buildSubscriptionsTable(builder, order))
+                        .hr()
+                        .and()
+                        .text(translation("email.MEMBERSHIP_CONFIRM.pass-title"))
+                        .h2()
+                        .and()
+                        .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph1"))
+                        .and()
+                        .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph2"))
+                        .and()
+                        .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph3"))
+                        .and()
+                        .text(translation("email.MEMBERSHIP_CONFIRM.pass-ios-update"))
+                        .bold()
+                        .and()
+                        .hr()
+                        .and();
 
         if (!payments.isEmpty()) {
             builder =
-                    builder.text(translation("email.MEMBERSHIP_CONFIRM.payments-" + paymentType))
+                    builder.text(translation("email.MEMBERSHIP_CONFIRM.payments-header"))
+                            .h2()
+                            .and()
+                            .text(translation("email.MEMBERSHIP_CONFIRM.payments-" + paymentType))
                             .and()
                             .table(getPaymentsTable(builder, payments));
 
@@ -173,46 +196,29 @@ public class EmailService {
             }
         }
 
-        try {
-            builder.text(translation("email.MEMBERSHIP_CONFIRM.spond-title"))
-                    .h2()
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph1"))
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph2"))
-                    .and()
-                    .image(
-                            "https://resources.mersthamcc.co.uk/mcc/img/apps/apple-store-download.png")
-                    .linkUrl("https://apps.apple.com/gb/app/spond/id755596884")
-                    .alt("Download on the App Store")
-                    .width(120)
-                    .margin("15px")
-                    .and()
-                    .image(
-                            "https://resources.mersthamcc.co.uk/mcc/img/apps/google-play-download.png")
-                    .linkUrl(
-                            "https://play.google.com/store/apps/details?id=com.spond.spond&amp;hl=en_GB&amp;gl=US&amp;pli=1")
-                    .alt("Get it on Google Play")
-                    .width(120)
-                    .margin("15px")
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-title"))
-                    .h2()
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph1"))
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-paragraph2"))
-                    .and()
-                    .text(translation("email.MEMBERSHIP_CONFIRM.pass-ios-update"))
-                    .bold()
-                    .and()
-                    .button(
-                            translation("email.MEMBERSHIP_CONFIRM.pass-download"),
-                            new URL(new URL(baseUrl), "/account/members").toString())
-                    .and();
-        } catch (MalformedURLException ex) {
-            LOG.error("Error while constructing confirmation e-mail", ex);
-        }
+        builder.hr()
+                .and()
+                .text(translation("email.MEMBERSHIP_CONFIRM.spond-title"))
+                .h2()
+                .and()
+                .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph1"))
+                .and()
+                .text(translation("email.MEMBERSHIP_CONFIRM.spond-paragraph2"))
+                .and()
+                .image("https://resources.mersthamcc.co.uk/mcc/img/apps/apple-store-download.png")
+                .linkUrl("https://apps.apple.com/gb/app/spond/id755596884")
+                .alt("Download on the App Store")
+                .width(120)
+                .margin("15px")
+                .and()
+                .image("https://resources.mersthamcc.co.uk/mcc/img/apps/google-play-download.png")
+                .linkUrl(
+                        "https://play.google.com/store/apps/details?id=com.spond.spond&amp;hl=en_GB&amp;gl=US&amp;pli=1")
+                .alt("Get it on Google Play")
+                .width(120)
+                .margin("15px")
+                .and();
+
         return builder.text(translation("email.MEMBERSHIP_CONFIRM.sign-off"))
                 .and()
                 .text(configuration.getClubName())
@@ -325,7 +331,11 @@ public class EmailService {
         return new TableLine() {
             @Override
             public List<ColumnConfig> getHeader() {
-                return List.of();
+                return List.of(
+                        new ColumnConfig(),
+                        new ColumnConfig(),
+                        new ColumnConfig().alignment(Alignment.RIGHT),
+                        new ColumnConfig().alignment(Alignment.CENTER).colspan(2));
             }
 
             @Override
@@ -333,9 +343,9 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig(),
-                        new ColumnConfig()
-                                .alignment(Alignment.RIGHT)
-                                .numberFormat(CURRENCY_FORMAT));
+                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat(CURRENCY_FORMAT),
+                        new ColumnConfig().alignment(Alignment.CENTER),
+                        new ColumnConfig().alignment(Alignment.CENTER));
             }
 
             @Override
@@ -343,25 +353,77 @@ public class EmailService {
                 return List.of(
                         new ColumnConfig(),
                         new ColumnConfig().alignment(Alignment.RIGHT).bold(),
-                        new ColumnConfig()
-                                .alignment(Alignment.RIGHT)
-                                .numberFormat(CURRENCY_FORMAT));
+                        new ColumnConfig().alignment(Alignment.RIGHT).numberFormat(CURRENCY_FORMAT),
+                        new ColumnConfig(),
+                        new ColumnConfig());
             }
 
             @Override
             public List<List<Object>> getHeaderRows() {
-                return List.of(List.of("Name", "Category", "Price"));
+                return List.of(List.of("Name", "Category", "Price", "Digital Membership Card", ""));
             }
 
             @Override
             public List<List<Object>> getItemRows() {
                 return order.getMemberSubscription().stream()
                         .map(
-                                subscription ->
-                                        List.<Object>of(
+                                subscription -> {
+                                    try {
+                                        var appleCardLink =
+                                                new TableCellImageSimple(
+                                                        new URL(
+                                                                        new URL(resourcePrefix),
+                                                                        "/mcc/img/pass/apple-wallet.svg")
+                                                                .toString());
+                                        appleCardLink.width(130);
+                                        appleCardLink.alt(
+                                                translation(
+                                                        "email.MEMBERSHIP_CONFIRM.pass-download-apple"));
+                                        appleCardLink.title(
+                                                translation(
+                                                        "email.MEMBERSHIP_CONFIRM.pass-download-apple"));
+                                        appleCardLink.linkUrl(
+                                                new URL(
+                                                                new URL(baseUrl),
+                                                                format(
+                                                                        "/account/pass/{0}/apple",
+                                                                        subscription
+                                                                                .getMember()
+                                                                                .getUuid()))
+                                                        .toString());
+                                        var googlePassLink =
+                                                new TableCellImageSimple(
+                                                        new URL(
+                                                                        new URL(resourcePrefix),
+                                                                        "/mcc/img/pass/google-add-wallet-badge.svg")
+                                                                .toString());
+                                        googlePassLink.width(140);
+                                        googlePassLink.alt(
+                                                translation(
+                                                        "email.MEMBERSHIP_CONFIRM.pass-download-google"));
+                                        googlePassLink.title(
+                                                translation(
+                                                        "email.MEMBERSHIP_CONFIRM.pass-download-google"));
+                                        googlePassLink.linkUrl(
+                                                new URL(
+                                                                new URL(baseUrl),
+                                                                format(
+                                                                        "/account/pass/{0}/google",
+                                                                        subscription
+                                                                                .getMember()
+                                                                                .getUuid()))
+                                                        .toString());
+
+                                        return List.<Object>of(
                                                 subscription.getMember().getFullName(),
                                                 subscription.getPriceListItem().getDescription(),
-                                                subscription.getPrice().doubleValue()))
+                                                subscription.getPrice().doubleValue(),
+                                                appleCardLink,
+                                                googlePassLink);
+                                    } catch (MalformedURLException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
                         .toList();
             }
 
@@ -374,13 +436,17 @@ public class EmailService {
                             List.of(
                                     "",
                                     translation("email.MEMBERSHIP_CONFIRM.discount"),
-                                    order.getDiscount().doubleValue()));
+                                    order.getDiscount().doubleValue(),
+                                    "",
+                                    ""));
                 }
                 result.add(
                         List.of(
                                 "",
                                 translation("email.MEMBERSHIP_CONFIRM.total"),
-                                order.getTotal().doubleValue()));
+                                order.getTotal().doubleValue(),
+                                "",
+                                ""));
                 return result;
             }
 
