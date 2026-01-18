@@ -193,3 +193,5 @@ configuration:
     google:
       issuer: ${GOOGLE_ISSUER_ID:}
       class-name: ${GOOGLE_CLASS_NAME:}
+  safeguarding:
+    hook-queue-url: ${SAFEGUARDING_QUEUE_URL:}
