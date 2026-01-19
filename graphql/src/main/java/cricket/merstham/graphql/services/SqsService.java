@@ -27,13 +27,16 @@ public class SqsService {
 
     private final SqsClient client;
     private final String queueUrl;
+    private final String safeGuardingQueueUrl;
     private final ObjectMapper objectMapper;
 
     @Autowired
     public SqsService(
             @Value("${configuration.transaction-queue-url}") String queueUrl,
+            @Value("${configuration.safeguarding.hook-queue-url}") String safeGuardingQueueUrl,
             ObjectMapper objectMapper) {
         this.queueUrl = queueUrl;
+        this.safeGuardingQueueUrl = safeGuardingQueueUrl;
         this.objectMapper = objectMapper;
         this.client =
                 SqsClient.builder()
@@ -61,6 +64,20 @@ public class SqsService {
                                             MESSAGE_ID_ATTRIBUTE, messageIdAttribute))
                             .messageDeduplicationId(messageId)
                             .messageGroupId(CUSTOMER_SYNC_TRANSACTION)
+                            .messageBody(objectMapper.writeValueAsString(data))
+                            .build();
+            client.sendMessage(request);
+        } catch (Exception ex) {
+            LOG.error("Error sending to queue", ex);
+            throw new RuntimeException("Error sending to queue", ex);
+        }
+    }
+
+    public void sendSafeguardingSubject(Object data) {
+        try {
+            SendMessageRequest request =
+                    SendMessageRequest.builder()
+                            .queueUrl(safeGuardingQueueUrl)
                             .messageBody(objectMapper.writeValueAsString(data))
                             .build();
             client.sendMessage(request);

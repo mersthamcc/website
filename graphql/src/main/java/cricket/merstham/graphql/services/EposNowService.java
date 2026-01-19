@@ -50,7 +50,7 @@ public class EposNowService {
                         member.getMostRecentSubscription().getOrder().getUuid()));
         var email = determineEmail(member);
         if (nonNull(email)) {
-            result.put("emailAddress", determineEmail(member));
+            result.put("emailAddress", email);
         }
         if (nonNull(member.getIdentifiers().get(EPOS_CUSTOMER_ID))) {
             result.put("eposCustomerId", member.getIdentifiers().get(EPOS_CUSTOMER_ID));
