@@ -447,30 +447,36 @@
                 <!-- End Body -->
 
                 <div class="card-footer border-0">
-                    <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                        <input type="hidden" name="category" value="${category.key}" />
-                        <input type="hidden" name="uuid" value="${subscriptionId}" />
-                        <button
-                                type="submit"
-                                class="btn btn-primary btn-block transition-3d-hover"
-                                value="${item.id}"
-                                name="priceListItemId"
-                                id="priceListItemId-${item.id}">
-                            <@spring.message code="${buttonTitle}" />
-                        </button>
-
-                        <#if negativeButtonTitle?has_content>
+                    <#if subscriptionId?has_content>
+                        <form class="form-horizontal" method="post" name="subscription" action="/register/select-membership">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <input type="hidden" name="category" value="${category.key}" />
+                            <input type="hidden" name="uuid" value="${subscriptionId}" />
                             <button
                                     type="submit"
-                                    class="btn btn-soft-danger btn-block transition-3d-hover"
-                                    value="-1"
+                                    class="btn btn-primary btn-block transition-3d-hover"
+                                    value="${item.id}"
                                     name="priceListItemId"
-                                    id="priceListItemIdNegative-${item.id}">
-                                <@spring.message code="${negativeButtonTitle}" />
+                                    id="priceListItemId-${item.id}">
+                                <@spring.message code="${buttonTitle}" />
                             </button>
-                        </#if>
-                    </form>
+
+                            <#if negativeButtonTitle?has_content>
+                                <button
+                                        type="submit"
+                                        class="btn btn-soft-danger btn-block transition-3d-hover"
+                                        value="-1"
+                                        name="priceListItemId"
+                                        id="priceListItemIdNegative-${item.id}">
+                                    <@spring.message code="${negativeButtonTitle}" />
+                                </button>
+                            </#if>
+                        </form>
+                    <#else>
+<#--                        <a class="btn btn-sm btn-ghost-primary transition-3d-hover" href="/register">-->
+<#--                            <@spring.message code="menu.register" />-->
+<#--                        </a>-->
+                    </#if>
                 </div>
             </div>
         </div>

@@ -8,10 +8,10 @@ resource "random_password" "developer_password" {
 }
 
 resource "aws_cognito_user" "developer" {
-  user_pool_id       = aws_cognito_user_pool.dev_pool.id
-  username           = var.developer_email
-  password           = random_password.developer_password.result
-  enabled            = true
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  username     = var.developer_email
+  password     = random_password.developer_password.result
+  enabled      = true
 
   desired_delivery_mediums = ["EMAIL"]
 

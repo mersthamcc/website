@@ -44,3 +44,7 @@ output "transactions_queue_url" {
 output "transaction_responses_queue_url" {
   value = aws_sqs_queue.transaction-responses.id
 }
+
+output "safeguarding_queue_url" {
+  value = aws_sqs_queue.safeguarding.id
+}

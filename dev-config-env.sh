@@ -15,3 +15,5 @@ echo "JUPYTER_CLIENT_SECRET=$(terraform output -json | jq -r '.jupyter_client_se
 
 echo "TRANSACTION_QUEUE_URL=$(terraform output -json | jq -r '.transactions_queue_url.value')"
 echo "TRANSACTION_RESPONSE_QUEUE_URL=$(terraform output -json | jq -r '.transaction_responses_queue_url.value')"
+
+echo "SAFEGUARDING_QUEUE_URL=$(terraform output -json | jq -r '.safeguarding_queue_url.value')"
