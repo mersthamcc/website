@@ -12,6 +12,7 @@ import cricket.merstham.website.frontend.model.datatables.SspGraphResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.service.processors.ItemProcessor;
 import cricket.merstham.website.graph.AboutQuery;
+import cricket.merstham.website.graph.FeesQuery;
 import cricket.merstham.website.graph.HomeQuery;
 import cricket.merstham.website.graph.pages.AdminPagesQuery;
 import cricket.merstham.website.graph.pages.DeletePageMutation;
@@ -196,6 +197,17 @@ public class PageService {
                 .fixtures(requireGraphData(response, AboutQuery.Data::getFixtureCount))
                 .wins(requireGraphData(response, AboutQuery.Data::getFixtureWinCount))
                 .build();
+    }
+
+    public StaticPage fees() throws IOException {
+        try {
+            var query = new FeesQuery();
+            Response<FeesQuery.Data> response = graphService.executeQuery(query);
+            return modelMapper.map(
+                    requireGraphData(response, FeesQuery.Data::getPage), StaticPage.class);
+        } catch (Exception e) {
+            return StaticPage.builder().build();
+        }
     }
 
     @Builder

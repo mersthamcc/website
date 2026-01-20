@@ -1,0 +1,6 @@
+query fees {
+    page: page(slug: "fees")  {
+        title
+        content
+    }
+}

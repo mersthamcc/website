@@ -89,7 +89,9 @@ public class MenuBuilder {
                                                             null,
                                                             URI.create("#"),
                                                             List.of(),
-                                                            this::getContactCategories)))),
+                                                            this::getContactCategories),
+                                                    new Menu(
+                                                            "fees", null, null, List.of(), null)))),
                     new Menu(
                             "venue",
                             null,
