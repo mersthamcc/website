@@ -433,7 +433,7 @@ public class RegistrationController {
         setCurrentSubscription(session, subscription);
 
         if (!(Strings.isBlank(membershipCategory.getRegistrationCode()))) {
-            if (!(membershipCategory.getRegistrationCode().equals(code)
+            if (!(membershipCategory.getRegistrationCode().equalsIgnoreCase(code)
                     || codePreviouslyEntered(
                             session, category, membershipCategory.getRegistrationCode()))) {
                 List<String> errors = List.of();
@@ -452,7 +452,7 @@ public class RegistrationController {
                                 "priceListItemId",
                                 priceListItemId));
             }
-            storeCode(session, category, code);
+            storeCode(session, category, membershipCategory.getRegistrationCode());
         }
 
         return new ModelAndView(
