@@ -256,7 +256,7 @@
                                 <!-- Nav Link -->
                                 <ul class="nav nav-sm nav-x-0 nav-white flex-column">
                                     <li class="nav-item"><a class="nav-link" href="/about"><@spring.messageText code="footer.about" text="About" /></a></li>
-                                    <li class="nav-item"><a class="nav-link" href="/pages/subs"><@spring.messageText code="footer.membership" text="Membership" /></a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/about/fees"><@spring.messageText code="footer.membership" text="Membership" /></a></li>
                                     <li class="nav-item"><a class="nav-link" href="/contacts"><@spring.messageText code="footer.contact" text="Contacts" /></a></li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="${config.kitStoreUrl}" target="_blank" rel="noopener">
