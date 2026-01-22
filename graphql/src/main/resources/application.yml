@@ -97,8 +97,8 @@ configuration:
   mail:
     from-address: ${EMAIL_FROM_ADDRESS:}
     membership-bcc: ${EMAIL_MEMBERSHIP_BCC_ADDRESS:}
-    logo: "https://resources.mersthamcc.co.uk/mcc/img/logos/mcc-logo.svg"
-    logo-dark: "https://resources.mersthamcc.co.uk/mcc/img/logos/mcc-logo-inverse.svg"
+    logo: "https://resources.mersthamcc.co.uk/mcc/img/logos/mcc-logo.png"
+    logo-dark: "https://resources.mersthamcc.co.uk/mcc/img/logos/mcc-logo-inverse.png"
     club-name: ${CLUBNAME:My Cricket Club}
     club-url: "${BASE_URL:http://localhost:8080}"
     footer-text: ${CLUB_ADDRESS:}

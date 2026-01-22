@@ -373,7 +373,7 @@ public class EmailService {
                                                 new TableCellImageSimple(
                                                         new URL(
                                                                         new URL(resourcePrefix),
-                                                                        "/mcc/img/pass/apple-wallet.svg")
+                                                                        "/mcc/img/pass/apple-wallet.png")
                                                                 .toString());
                                         appleCardLink.width(130);
                                         appleCardLink.alt(
@@ -395,7 +395,7 @@ public class EmailService {
                                                 new TableCellImageSimple(
                                                         new URL(
                                                                         new URL(resourcePrefix),
-                                                                        "/mcc/img/pass/google-add-wallet-badge.svg")
+                                                                        "/mcc/img/pass/google-add-wallet-badge.png")
                                                                 .toString());
                                         googlePassLink.width(140);
                                         googlePassLink.alt(
