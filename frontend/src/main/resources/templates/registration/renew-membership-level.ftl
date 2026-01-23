@@ -18,7 +18,7 @@
                     _csrf=_csrf
                     subscriptionId=subscriptionId
                     buttonTitle="membership.yes"
-                    negativeButtonTitle="membership.no"
+                    negativeButtonTitle="membership.change-type"
                 />
             </div>
             <p>
