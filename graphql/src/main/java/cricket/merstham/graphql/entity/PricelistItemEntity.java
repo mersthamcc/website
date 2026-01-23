@@ -80,6 +80,9 @@ public class PricelistItemEntity {
             cascade = CascadeType.ALL)
     private List<PricelistEntity> priceList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "pricelistItem")
+    private List<PricelistItemInfoEntity> pricelistItemInfos = new ArrayList<>();
+
     @Transient
     public BigDecimal getCurrentPrice() {
         LocalDate today = LocalDate.now();

@@ -36,4 +36,5 @@ public class PriceListItem implements Serializable {
     @JsonProperty private Boolean inclusiveKit;
     @JsonProperty private Integer sortOrder;
     @JsonProperty private String specificGender;
+    @JsonProperty private List<PricelistItemInfo> pricelistItemInfos = new ArrayList<>();
 }
