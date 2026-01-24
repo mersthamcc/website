@@ -21,6 +21,11 @@ query membershipCategories($key: StringFilter!) {
       memberCategory {
         key
       }
+      pricelistItemInfos {
+        key
+        icon
+        description
+      }
     }
     form {
       sortOrder

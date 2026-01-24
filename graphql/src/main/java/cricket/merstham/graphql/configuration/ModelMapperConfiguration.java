@@ -1,7 +1,9 @@
 package cricket.merstham.graphql.configuration;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import cricket.merstham.graphql.entity.PricelistItemInfoEntity;
 import cricket.merstham.shared.dto.KeyValuePair;
+import cricket.merstham.shared.dto.PricelistItemInfo;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.jackson.JsonNodeValueReader;
 import org.springframework.context.annotation.Bean;
@@ -70,6 +72,21 @@ public class ModelMapperConfiguration {
                                         .collect(Collectors.toCollection(LinkedList::new));
                             }
                             return List.of();
+                        });
+        modelMapper
+                .createTypeMap(PricelistItemInfoEntity.class, PricelistItemInfo.class)
+                .setConverter(
+                        context -> {
+                            if (nonNull(context.getSource())) {
+                                PricelistItemInfoEntity source = context.getSource();
+                                return PricelistItemInfo.builder()
+                                        .pricelistItemId(source.getId().getPricelistItemId())
+                                        .key(source.getId().getKey())
+                                        .icon(source.getIcon())
+                                        .description(source.getDescription())
+                                        .build();
+                            }
+                            return null;
                         });
         return modelMapper;
     }

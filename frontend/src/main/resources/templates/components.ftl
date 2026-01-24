@@ -433,7 +433,7 @@
                         <div class="media font-size-1 text-body mb-3">
                             <i class="fas fa-check-circle text-success mt-1 mr-2"></i>
                             <div class="media-body">
-                                Includes Match Fees
+                                Includes ALL Match Fees
                             </div>
                         </div>
                     </#if>
@@ -443,6 +443,14 @@
                             Membership discount at bar <#if (item.parentDiscount)?? && item.parentDiscount>(usable by parent/guardians)</#if>
                         </div>
                     </div>
+                    <#list item.pricelistItemInfos as info>
+                        <div class="media font-size-1 text-body mb-3">
+                            <i class="fas fa-envelope-open ${info.icon} text-success mt-1 mr-2"></i>
+                            <div class="media-body">
+                                ${info.description}
+                            </div>
+                        </div>
+                    </#list>
                 </div>
                 <!-- End Body -->
 

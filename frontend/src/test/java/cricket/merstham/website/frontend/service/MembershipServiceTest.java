@@ -358,7 +358,8 @@ class MembershipServiceTest {
                                                                 null,
                                                                 new MembershipCategoriesQuery
                                                                         .MemberCategory(
-                                                                        "", "adult"))),
+                                                                        "", "adult"),
+                                                                List.of())),
                                                 List.of(
                                                         new MembershipCategoriesQuery.Form(
                                                                 "Form",
@@ -469,7 +470,8 @@ class MembershipServiceTest {
                                                                 null,
                                                                 new MembershipCategoriesQuery
                                                                         .MemberCategory(
-                                                                        "", "adult"))),
+                                                                        "", "adult"),
+                                                                List.of())),
                                                 List.of(
                                                         new MembershipCategoriesQuery.Form(
                                                                 "Form",
@@ -682,7 +684,8 @@ class MembershipServiceTest {
                                                                                 .MemberCategory(
                                                                                 "MemberCategory",
                                                                                 "adult",
-                                                                                List.of())),
+                                                                                List.of()),
+                                                                        List.of()),
                                                                 2022))))
                         .toList();
 

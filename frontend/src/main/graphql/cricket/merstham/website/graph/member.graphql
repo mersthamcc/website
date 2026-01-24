@@ -71,6 +71,11 @@ query member($id: Int!) {
                         }
                     }
                 }
+                pricelistItemInfos {
+                    key
+                    icon
+                    description
+                }
             }
             year
         }

@@ -66,6 +66,11 @@ mutation deletePlayCricketLink ($id: Int!) {
                         }
                     }
                 }
+                pricelistItemInfos {
+                    key
+                    icon
+                    description
+                }
             }
             year
         }

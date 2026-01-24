@@ -165,6 +165,14 @@ type PriceListItem {
     inclusiveKit: Boolean!
     sortOrder: Int!
     specificGender: String
+    pricelistItemInfos: [PriceListItemInfo]
+}
+
+type PriceListItemInfo {
+    pricelistItemId: Int!
+    key: String!
+    icon: String
+    description: String
 }
 
 type MemberSummary {

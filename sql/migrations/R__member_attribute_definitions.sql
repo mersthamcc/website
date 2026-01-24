@@ -797,6 +797,34 @@ ON CONFLICT(id) DO UPDATE
         sort_order          = EXCLUDED.sort_order,
         specific_gender     = EXCLUDED.specific_gender;
 
+DELETE FROM pricelist_item_info;
+
+INSERT INTO pricelist_item_info (pricelist_item_id, key, icon, description)
+VALUES (
+            3,
+            'payg',
+            'fa-money-bill-wave',
+        'Match fee due for each match played'
+       ),
+       (
+           5,
+           'payg',
+           'fa-money-bill-wave',
+           'Match fee due for each match played'
+       ),
+       (
+           7,
+           'payg',
+           'fa-money-bill-wave',
+           'Match fee due for each match played'
+       ),
+       (
+           12,
+           'invite-only',
+           'fa-envelope-open',
+           'For invited members only'
+       );
+
 INSERT
 INTO pricelist(pricelist_item_id,
                date_from,
