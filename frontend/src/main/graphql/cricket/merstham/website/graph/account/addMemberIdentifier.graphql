@@ -52,6 +52,11 @@ mutation addMemberIdentifier($id: Int!, $name: String!, $value: String!  ) {
                 inclusiveKit
                 sortOrder
                 specificGender
+                pricelistItemInfos {
+                    key
+                    icon
+                    description
+                }
                 memberCategory {
                     key
                     form {
