@@ -659,9 +659,9 @@ VALUES (1,
         (SELECT id
          FROM member_category
          WHERE KEY = 'adult'),
-        18,
+        19,
         NULL,
-        'Students (aged 18 upwards in full time education)',
+        'Students (aged 19+)',
         FALSE,
         TRUE,
         FALSE,
