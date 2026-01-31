@@ -407,6 +407,9 @@
                                 School years <#if item.minAge - 5 == 0>Reception<#else>${item.minAge - 5}</#if>
                                 <#if item.maxAge??>
                                     to ${item.maxAge - 5}
+                                    <#if item.maxAge == 18>
+                                        (upper sixth)
+                                    </#if>
                                 <#else>
                                     and up
                                 </#if>
