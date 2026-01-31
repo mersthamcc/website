@@ -687,7 +687,7 @@ VALUES (1,
          WHERE KEY = 'adult'),
         18,
         NULL,
-        'Adults (aged 18 and older)',
+        'Adults (over 18)',
         FALSE,
         FALSE,
         FALSE,
@@ -713,7 +713,7 @@ VALUES (1,
          WHERE KEY = 'adult'),
         18,
         NULL,
-        'Women (aged 18 years and older)',
+        'Women (over 18)',
         NULL,
         FALSE,
         FALSE,
@@ -737,7 +737,7 @@ VALUES (1,
         (SELECT id
          FROM member_category
          WHERE KEY = 'social'),
-        16,
+        18,
         NULL,
         'Social',
         NULL,
@@ -839,11 +839,11 @@ VALUES
         '2026-01-01',
         '2026-12-31',
         130.00),
-       (3,      -- Students (aged 18 and older)
+       (3,      -- Students (over 18)
         '2026-01-01',
         '2026-12-31',
         115.00),
-       (4,      -- Students (aged 18 and older) - All Inclusive
+       (4,      -- Students (over 18) - All Inclusive
         '2026-01-01',
         '2026-12-31',
         315.00),
@@ -855,7 +855,7 @@ VALUES
         '2026-01-01',
         '2026-12-31',
         460.00),
-       (7,      -- Women (aged 18 years and older)
+       (7,      -- Women (over 18)
         '2026-01-01',
         '2026-12-31',
         100.00),
