@@ -40,14 +40,16 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:${dependencyVersions.spring_boot}"
     implementation "org.springframework.vault:spring-vault-core:3.1.2"
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.16.0'
-    implementation "software.amazon.awssdk:sqs:2.29.7"
 
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
-    implementation "software.amazon.awssdk:cognitoidentityprovider:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:dynamodb-enhanced:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:dynamodb:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:lambda:${dependencyVersions.aws}"
-    implementation "software.amazon.awssdk:sesv2:${dependencyVersions.aws}"
+    implementation "software.amazon.awssdk:cognitoidentityprovider"
+    implementation "software.amazon.awssdk:dynamodb-enhanced"
+    implementation "software.amazon.awssdk:dynamodb"
+    implementation "software.amazon.awssdk:lambda"
+    implementation "software.amazon.awssdk:sesv2"
+    implementation "software.amazon.awssdk:sqs"
+    implementation "software.amazon.awssdk:auth"
+    implementation "software.amazon.awssdk:http-auth-aws:2.26.27"
 
     implementation "com.facebook.business.sdk:facebook-java-business-sdk:20.0.4"
     implementation "com.gocardless:gocardless-pro:5.8.0"
