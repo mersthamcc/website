@@ -25,6 +25,8 @@ public interface MemberSummaryRepository
     List<MemberSummaryEntity> findAllByOwnerUserIdEqualsOrOwnerEmailAddressesContains(
             String ownerUserId, String ownerEmailAddress);
 
+    List<MemberSummaryEntity> findAllByMostRecentSubscriptionGreaterThanEqual(int year);
+
     default Specification<MemberSummaryEntity> getMemberSpecification(MemberFilter filter) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

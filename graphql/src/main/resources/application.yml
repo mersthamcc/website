@@ -193,3 +193,6 @@ configuration:
     google:
       issuer: ${GOOGLE_ISSUER_ID:}
       class-name: ${GOOGLE_CLASS_NAME:}
+  safeguarding:
+    export-url: ${SAFEGUARDING_EXPORT_URL:}
+    export-cron: ${SAFEGUARDING_EXPORT_CRON:-}
