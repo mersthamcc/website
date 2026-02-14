@@ -142,7 +142,7 @@ jobs:
             ghcr.io/mersthamcc/website-flyway:test
 
       - name: Dispatch deployment event
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           GRAPHQL_DIGEST: ${{ steps.build-graphql.outputs.digest }}
           FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
