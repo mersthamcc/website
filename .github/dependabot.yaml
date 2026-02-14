@@ -1,0 +1,45 @@
+# See also: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    registries: "*"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 5
+    pull-request-branch-name:
+      separator: '-'
+    groups:
+      test-dependencies:
+        patterns:
+          - org.testcontainers*
+          - io.cucumber*
+          - org.junit.jupiter*
+          - org.mockito*
+      aws-dependencies:
+        patterns:
+          - com.amazonaws*
+          - software.amazon.*
+      spring-dependencies:
+        patterns:
+          - org.springframework.boot*
+      other-dependencies:
+        exclude-patterns:
+          - org.springframework.boot*
+          - com.amazonaws*
+          - software.amazon.*
+          - org.testcontainers*
+          - io.cucumber*
+          - org.junit.jupiter*
+          - org.mockito*
+  - package-ecosystem: "github-actions"
+    # Workflow files stored in the default location of `.github/workflows`
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    pull-request-branch-name:
+      separator: '-'
