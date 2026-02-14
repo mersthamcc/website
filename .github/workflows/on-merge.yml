@@ -3,6 +3,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - build.gradle
+      - frontend/**
+      - gradle/**
+      - .java-version
+      - graphql/**
+      - shared/**
+      - sql/**
+      - settings.gradle
 
 jobs:
   analyse:
