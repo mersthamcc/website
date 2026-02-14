@@ -113,7 +113,7 @@ jobs:
 
       - name: Build frontend image
         id: build-frontend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -129,7 +129,7 @@ jobs:
 
       - name: Build GraphQL image
         id: build-graphql
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -145,7 +145,7 @@ jobs:
 
       - name: Build Flyway image
         id: build-flyway
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: sql/
           push: true
