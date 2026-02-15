@@ -24,11 +24,13 @@ updates:
           - com.amazonaws*
           - software.amazon.*
       spring-dependencies:
+        ignore:
+          - update-types: [ "version-update:semver-major" ]
         patterns:
-          - org.springframework.boot*
+          - org.springframework*
       other-dependencies:
         exclude-patterns:
-          - org.springframework.boot*
+          - org.springframework*
           - com.amazonaws*
           - software.amazon.*
           - org.testcontainers*
