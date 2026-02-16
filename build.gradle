@@ -1,7 +1,7 @@
 plugins {
-    id "com.avast.gradle.docker-compose" version "0.14.3"
-    id "com.diffplug.spotless" version "6.20.0"
-    id "org.sonarqube" version "6.2.0.5505"
+    id "com.avast.gradle.docker-compose" version "0.17.21"
+    id "com.diffplug.spotless" version "8.2.1"
+    id "org.sonarqube" version "7.2.2.6593"
     id "jacoco"
     id "java"
 }
@@ -14,14 +14,14 @@ group 'cricket.merstham'
 
 ext {
     dependencyVersions = [
-            apollo         : "2.5.14",
+            apollo         : "4.4.1",
             aws            : "2.41.29",
-            jackson        : "2.13.4.1",
+            jackson        : "2.21.0",
             lombok         : "1.18.24",
-            model_mapper   : "3.2.0",
-            prometheus     : "1.10.4",
+            model_mapper   : "3.2.6",
+            prometheus     : "1.16.3",
             spring_boot    : "3.5.5",
-            spring_sessions: "3.5.1",
+            spring_sessions: "4.0.1",
             testcontainers : "1.16.2",
     ]
 }
