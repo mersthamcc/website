@@ -11,6 +11,7 @@ public class CacheConfiguration implements CacheManagerCustomizer<ConcurrentMapC
 
     public static final String MEMBER_SUMMARY_CACHE = "member_summary";
     public static final String NEWS_SUMMARY_CACHE = "news_summary";
+    public static final String STATIC_DATA_CACHE = "statics";
 
     @Override
     public void customize(ConcurrentMapCacheManager cacheManager) {
