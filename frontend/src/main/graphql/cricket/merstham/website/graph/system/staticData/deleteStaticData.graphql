@@ -1,0 +1,9 @@
+mutation deleteStaticData($id: Int!) {
+    deleteStaticData(id: $id) {
+        id
+        path
+        statusCode
+        contentType
+        content
+    }
+}

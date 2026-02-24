@@ -1,0 +1,27 @@
+type StaticData {
+    id: Int
+    path: String!
+    contentType: String!
+    content: String!
+    statusCode: Int!
+}
+
+input StaticDataInput {
+    id: Int
+    path: String!
+    contentType: String!
+    content: String!
+    statusCode: Int!
+}
+
+extend type Query {
+    staticDataById(id: Int!): StaticData
+    staticDataByPath(path: String!): StaticData
+    staticData(start: Int!, length: Int!, searchString: String): [StaticData]
+    staticDataTotals(searchString: String): Totals
+}
+
+extend type Mutation {
+    saveStaticData(data: StaticDataInput!): StaticData
+    deleteStaticData(id: Int!): StaticData
+}

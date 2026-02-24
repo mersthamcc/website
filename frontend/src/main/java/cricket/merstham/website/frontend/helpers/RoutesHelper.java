@@ -42,6 +42,14 @@ public class RoutesHelper {
     public static final String ADMIN_PAGE_DELETE_ROUTE = ADMIN_PAGE_BASE + "/delete/{slug}";
     public static final String ADMIN_PAGE_AJAX_ROUTE = ADMIN_PAGE_BASE + "/get-data";
 
+    public static final String ADMIN_STATIC_DATA_BASE = "/administration/system/static-data";
+    public static final String ADMIN_STATIC_DATA_SAVE_ROUTE = ADMIN_STATIC_DATA_BASE + "/save";
+    public static final String ADMIN_STATIC_DATA_NEW_ROUTE = ADMIN_STATIC_DATA_BASE + "/new";
+    public static final String ADMIN_STATIC_DATA_EDIT_ROUTE = ADMIN_STATIC_DATA_BASE + "/edit/{id}";
+    public static final String ADMIN_STATIC_DATA_DELETE_ROUTE =
+            ADMIN_STATIC_DATA_BASE + "/delete/{id}";
+    public static final String ADMIN_STATIC_DATA_AJAX_ROUTE = ADMIN_STATIC_DATA_BASE + "/get-data";
+
     public static final String ADMIN_VENUE_BASE = "/administration/venue";
     public static final String ADMIN_VENUE_SAVE_ROUTE = ADMIN_VENUE_BASE + "/save";
     public static final String ADMIN_VENUE_NEW_ROUTE = ADMIN_VENUE_BASE + "/new";

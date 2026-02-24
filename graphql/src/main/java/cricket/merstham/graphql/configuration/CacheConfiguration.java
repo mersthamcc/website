@@ -31,7 +31,9 @@ public class CacheConfiguration {
     public static final String MEMBER_COUNT_CACHE = "member_count";
     public static final String TEAM_FIXTURE_CACHE = "fixture_by_team";
     public static final String PAGE_SUMMARY_TOTAL_CACHE = "page_feed_totals";
+    public static final String STATIC_DATA_SUMMARY_TOTAL_CACHE = "static_data_feed_totals";
     public static final String PAGE_ITEM_BY_ID_CACHE = "page_item_by_id";
+    public static final String STATIC_DATA_ITEM_BY_PATH_CACHE = "static_data_item_by_path";
     public static final String PAGE_MENU_CACHE = "pages_for_menus";
     public static final String SELECTION_CACHE = "selection";
 

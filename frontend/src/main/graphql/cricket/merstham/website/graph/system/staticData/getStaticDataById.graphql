@@ -1,0 +1,9 @@
+query staticDataById($id: Int!) {
+    staticDataById(id: $id) {
+        id
+        path
+        statusCode
+        contentType
+        content
+    }
+}

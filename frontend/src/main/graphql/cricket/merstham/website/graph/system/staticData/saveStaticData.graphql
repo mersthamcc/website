@@ -1,0 +1,9 @@
+mutation saveStaticData ($data: StaticDataInput!) {
+    saveStaticData(data: $data) {
+        id
+        path
+        statusCode
+        contentType
+        content
+    }
+}
