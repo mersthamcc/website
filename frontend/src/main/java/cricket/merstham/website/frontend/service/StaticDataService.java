@@ -18,6 +18,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import static cricket.merstham.website.frontend.configuration.CacheConfiguration.STATIC_DATA_CACHE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_STATIC_DATA_DELETE_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_STATIC_DATA_EDIT_ROUTE;
 import static java.util.Objects.isNull;
@@ -70,6 +73,7 @@ public class StaticDataService {
                 .build();
     }
 
+    @CacheEvict(cacheNames = STATIC_DATA_CACHE, allEntries = true)
     public StaticData saveItem(OAuth2AccessToken accessToken, StaticData data) throws IOException {
         var input =
                 StaticDataInput.builder()
@@ -118,10 +122,12 @@ public class StaticDataService {
         return result;
     }
 
+    @Cacheable(cacheNames = STATIC_DATA_CACHE, key = "#path")
     public StaticData get(String path) throws IOException {
         return get(null, path);
     }
 
+    @CacheEvict(cacheNames = STATIC_DATA_CACHE, allEntries = true)
     public boolean delete(OAuth2AccessToken accessToken, int id) throws IOException {
         var query = DeleteStaticDataMutation.builder().id(id).build();
         Response<DeletePageMutation.Data> result = graphService.executeMutation(query, accessToken);
