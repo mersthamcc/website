@@ -331,9 +331,7 @@
             <@spring.message code="${localeCategory}.${name}" />
         </label>
         <div class="col-md-10">
-            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>
-                ${data}
-            </textarea>
+            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>${data}</textarea>
         </div>
     </div>
 </#macro>

@@ -1,0 +1,9 @@
+query staticDataByPath($path: String!) {
+    staticDataByPath(path: $path) {
+        id
+        path
+        statusCode
+        contentType
+        content
+    }
+}

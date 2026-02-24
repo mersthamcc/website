@@ -1,0 +1,15 @@
+query adminStaticData($start: Int!, $length: Int!, $search: String) {
+
+    staticData(start: $start, length: $length, searchString: $search) {
+        id
+        path
+        statusCode
+        contentType
+        content
+    }
+
+    staticDataTotals (searchString: $search){
+        totalRecords
+        totalMatching
+    }
+}
