@@ -79,9 +79,9 @@ public class StaticDataService {
                 StaticDataInput.builder()
                         .id(data.getId())
                         .statusCode(data.getStatusCode())
-                        .contentType(data.getContentType())
-                        .path(data.getPath())
-                        .content(data.getContent())
+                        .contentType(data.getContentType().trim())
+                        .path(data.getPath().trim())
+                        .content(data.getContent().trim())
                         .build();
         var saveRequest = SaveStaticDataMutation.builder().data(input).build();
         Response<SaveStaticDataMutation.Data> result =
