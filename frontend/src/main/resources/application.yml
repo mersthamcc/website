@@ -12,6 +12,9 @@ sentry:
   enable-metrics: true
 
 spring:
+  application:
+    name: frontend
+    version: "${IMAGE_TAG:unknown}"
   data:
     redis:
       host: ${REDIS_HOST:localhost}

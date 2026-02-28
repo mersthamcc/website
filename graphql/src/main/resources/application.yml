@@ -10,6 +10,9 @@ sentry:
   send-default-pii: true
   enable-metrics: true
 spring:
+  application:
+    name: graphql
+    version: "${IMAGE_TAG:unknown}"
   mvc:
     log-request-details: ${DEBUG_LOG_REQUESTS:false}
   devtools:
