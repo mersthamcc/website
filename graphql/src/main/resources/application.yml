@@ -73,6 +73,19 @@ spring:
       lettuce:
         pool:
           enabled: true
+
+logging:
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        environment: "${ENVIRONMENT:unknown}"
+        node-name: "${AWS_EXECUTION_ENV:unknown}"
+    json:
+      add:
+        xray-trace-id: "${_X_AMZN_TRACE_ID:none}"
+
 management:
   server:
     port: 8091

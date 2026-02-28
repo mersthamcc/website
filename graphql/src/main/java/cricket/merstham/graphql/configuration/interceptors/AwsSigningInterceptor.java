@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.configuration.interceptors;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
@@ -16,6 +17,7 @@ import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 public class AwsSigningInterceptor implements ClientHttpRequestInterceptor {
 
@@ -64,17 +66,22 @@ public class AwsSigningInterceptor implements ClientHttpRequestInterceptor {
     private HttpRequest convertToHttpRequest(SdkHttpRequest request) {
         return new HttpRequest() {
             @Override
-            public HttpMethod getMethod() {
+            public @NonNull HttpMethod getMethod() {
                 return HttpMethod.valueOf(request.method().name());
             }
 
             @Override
-            public URI getURI() {
+            public @NonNull URI getURI() {
                 return request.getUri();
             }
 
             @Override
-            public HttpHeaders getHeaders() {
+            public @NonNull Map<String, Object> getAttributes() {
+                return Map.of();
+            }
+
+            @Override
+            public @NonNull HttpHeaders getHeaders() {
                 var headers = new HttpHeaders();
                 request.headers().forEach(headers::addAll);
                 return headers;
