@@ -22,7 +22,7 @@ ext {
             prometheus     : "1.10.4",
             spring_boot    : "3.5.7",
             spring_sessions: "3.5.1",
-            testcontainers : "1.16.2",
+            testcontainers : "2.0.3",
     ]
 }
 
