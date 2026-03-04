@@ -2,10 +2,10 @@ plugins {
     id "org.springframework.boot" version "3.5.7"
     id "io.spring.dependency-management" version "1.1.7"
     id "java"
-    id "com.apollographql.apollo" version "2.5.14"
+    id "com.apollographql.apollo" version "4.4.1"
     id "jacoco"
-    id "io.freefair.lombok" version "8.2.2"
-    id "com.gorylenko.gradle-git-properties" version "2.4.1"
+    id "io.freefair.lombok" version "9.2.0"
+    id "com.gorylenko.gradle-git-properties" version "2.5.7"
 }
 
 group = "cricket.merstham.website"
@@ -34,24 +34,24 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis:${dependencyVersions.spring_boot}"
     implementation "org.springframework.session:spring-session-data-redis:${dependencyVersions.spring_sessions}"
     implementation "org.springframework.boot:spring-boot-starter-actuator:${dependencyVersions.spring_boot}"
-    implementation "org.apache.commons:commons-pool2:2.12.1"
+    implementation "org.apache.commons:commons-pool2:2.13.1"
     implementation "com.apollographql.apollo:apollo-api:${dependencyVersions.apollo}"
     implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
-    implementation 'com.stripe:stripe-java:21.14.0'
-    implementation 'com.gocardless:gocardless-pro:5.8.0'
+    implementation 'com.stripe:stripe-java:31.4.0'
+    implementation 'com.gocardless:gocardless-pro:7.6.0'
     implementation "com.cksource:ckfinder3:3.5.2"
-    implementation 'no.api.freemarker:freemarker-java8:2.1.0'
+    implementation 'no.api.freemarker:freemarker-java8:3.0.3'
     implementation "org.modelmapper:modelmapper:${dependencyVersions.model_mapper}"
     implementation "org.modelmapper.extensions:modelmapper-jackson:${dependencyVersions.model_mapper}"
     implementation "org.modelmapper.extensions:modelmapper-spring:${dependencyVersions.model_mapper}"
-    implementation 'org.passay:passay:1.6.2'
-    implementation 'com.google.zxing:core:3.5.1'
-    implementation 'com.google.zxing:javase:3.5.1'
-    implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.12'
-    implementation 'com.google.guava:guava:32.0.1-jre'
+    implementation 'org.passay:passay:1.6.6'
+    implementation 'com.google.zxing:core:3.5.4'
+    implementation 'com.google.zxing:javase:3.5.4'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:9.0.25'
+    implementation 'com.google.guava:guava:33.5.0-jre'
     implementation "com.rometools:rome:2.1.0"
     implementation "net.sf.biweekly:biweekly:0.6.8"
-    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.16.0'
+    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:8.33.0'
 
     implementation platform("software.amazon.awssdk:bom:${dependencyVersions.aws}")
     implementation "software.amazon.awssdk:s3-transfer-manager:${dependencyVersions.aws}"
@@ -66,10 +66,10 @@ dependencies {
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
-    testImplementation 'org.springframework.security:spring-security-test:5.7.3'
-    testImplementation 'org.assertj:assertj-core:3.23.1'
+    testImplementation 'org.springframework.security:spring-security-test:7.0.3'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'com.c4-soft.springaddons:spring-security-oauth2-test-addons:4.5.1'
-    testImplementation 'com.thedeanda:lorem:2.1'
+    testImplementation 'com.thedeanda:lorem:2.2'
 }
 
 apollo {
