@@ -81,7 +81,7 @@ dependencies {
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${dependencyVersions.prometheus}"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
     testImplementation 'com.thedeanda:lorem:2.1'
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
     testImplementation "org.testcontainers:junit-jupiter"
