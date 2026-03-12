@@ -17,7 +17,7 @@
                     <@admin.adminFormField name="path" data=data.path!"" required=true type="text" localeCategory="static-data" />
                     <@admin.adminFormField name="statusCode" data=data.statusCode!200?c required=true type="number" localeCategory="static-data" />
                     <@admin.adminFormField name="contentType" data=data.contentType!"" required=true type="text" localeCategory="static-data" />
-                    <@admin.adminCkEditorField name="content" data=data.content!"" required=true type="text" localeCategory="static-data" rows=60/>
+                    <@admin.adminTextAreaEditorField name="content" data=data.content!"" required=true type="text" localeCategory="static-data" rows=60/>
                 </@admin.card>
 
                 <@components.buttonGroup>

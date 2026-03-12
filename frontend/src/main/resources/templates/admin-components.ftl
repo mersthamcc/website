@@ -331,10 +331,29 @@
             <@spring.message code="${localeCategory}.${name}" />
         </label>
         <div class="col-md-10">
-            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>${data}</textarea>
+            <textarea name="${name}" id="${name}-editor" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>
+                ${data}
+            </textarea>
         </div>
     </div>
 </#macro>
+
+<#macro adminTextAreaEditorField name localeCategory data required=false type="text" rows=25>
+    <#if required>
+        <#assign requiredAttribute>required="required"</#assign>
+    <#else>
+        <#assign requiredAttribute></#assign>
+    </#if>
+    <div class="row form-group">
+        <label class="col-md-2 control-label text-right">
+            <@spring.message code="${localeCategory}.${name}" />
+        </label>
+        <div class="col-md-10">
+            <textarea name="${name}" id="${name}" class="form-control c-square c-theme" size="${rows}" ${requiredAttribute}>${data}</textarea>
+        </div>
+    </div>
+</#macro>
+
 
 <#macro adminTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" data=[] columns=[] defaultPageLength=50 pageLengths=[10, 50, 100] rightHeader="">
     <div class="card ${cardClass}">
