@@ -39,7 +39,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class News implements Serializable {
     @Serial private static final long serialVersionUID = 20211024150500L;
 
-    @JsonProperty private int id;
+    @JsonProperty private Integer id;
 
     @JsonProperty private String title;
 

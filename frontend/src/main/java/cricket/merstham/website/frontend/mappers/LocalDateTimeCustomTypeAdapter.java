@@ -20,6 +20,7 @@ public class LocalDateTimeCustomTypeAdapter implements CustomTypeAdapter<LocalDa
                     .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
                     .appendZoneOrOffsetId()
                     .toFormatter();
+
     // DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
 
     @Override

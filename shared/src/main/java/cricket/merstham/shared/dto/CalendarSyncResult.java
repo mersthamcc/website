@@ -22,6 +22,6 @@ import java.io.Serializable;
 public class CalendarSyncResult implements Serializable {
     @Serial private static final long serialVersionUID = 6973875824194729397L;
 
-    @JsonProperty private int fixtureId;
+    @JsonProperty private Integer fixtureId;
     @JsonProperty private String calendarId;
 }

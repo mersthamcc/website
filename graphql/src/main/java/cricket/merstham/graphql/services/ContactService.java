@@ -118,9 +118,9 @@ public class ContactService {
             })
     public Contact save(Contact contact) {
         var entity =
-                contact.getId() == 0
+                isNull(contact.getId())
                         ? new ContactEntity()
-                        : repository.findById(contact.getId()).orElseGet(ContactEntity::new);
+                        : repository.findById(contact.getId()).orElseThrow();
         if (isNull(entity.getCategory())
                 || !contact.getCategory().getId().equals(entity.getCategory().getId())) {
             var category = categoryRepository.getReferenceById(contact.getCategory().getId());

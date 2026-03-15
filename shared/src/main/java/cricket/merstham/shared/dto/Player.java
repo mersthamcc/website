@@ -23,7 +23,7 @@ public class Player implements Serializable {
     @Serial private static final long serialVersionUID = 5497279570370861431L;
 
     @JsonProperty("id")
-    private int id;
+    private Integer id;
 
     @JsonProperty("name")
     private String name;

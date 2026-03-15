@@ -46,9 +46,14 @@ public abstract class JpaEncryptedBaseConverter {
     }
 
     protected byte[] decrypt(EncryptionEnvelope envelope)
-            throws DecoderException, NoSuchPaddingException, NoSuchAlgorithmException,
-                    InvalidAlgorithmParameterException, InvalidKeyException,
-                    IllegalBlockSizeException, BadPaddingException, IOException {
+            throws DecoderException,
+                    NoSuchPaddingException,
+                    NoSuchAlgorithmException,
+                    InvalidAlgorithmParameterException,
+                    InvalidKeyException,
+                    IllegalBlockSizeException,
+                    BadPaddingException,
+                    IOException {
         byte[] decoded = Base64.getDecoder().decode(envelope.getEncrypted());
         byte[] iv = Hex.decodeHex(envelope.getIv());
         Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -57,8 +62,11 @@ public abstract class JpaEncryptedBaseConverter {
     }
 
     protected EncryptionEnvelope encrypt(final byte[] data, final byte[] iv)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-                    IllegalBlockSizeException, BadPaddingException,
+            throws NoSuchPaddingException,
+                    NoSuchAlgorithmException,
+                    InvalidKeyException,
+                    IllegalBlockSizeException,
+                    BadPaddingException,
                     InvalidAlgorithmParameterException {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));

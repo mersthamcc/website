@@ -24,6 +24,7 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_ITE
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_SUMMARY_TOTAL_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.NEWS_TOP_X_CACHE;
+import static java.util.Objects.isNull;
 
 @Component
 public class NewsService {
@@ -88,13 +89,19 @@ public class NewsService {
     @Caching(
             evict = {
                 @CacheEvict(value = NEWS_SUMMARY_TOTAL_CACHE, key = "'totals'"),
-                @CacheEvict(value = NEWS_ITEM_BY_ID_CACHE, key = "#news.id"),
+                @CacheEvict(
+                        value = NEWS_ITEM_BY_ID_CACHE,
+                        key = "#news.id",
+                        condition = "#news.id != null"),
                 @CacheEvict(value = NEWS_ITEM_BY_PATH_CACHE, key = "#news.path"),
                 @CacheEvict(value = NEWS_SUMMARY_CACHE, allEntries = true),
                 @CacheEvict(value = NEWS_TOP_X_CACHE, allEntries = true)
             })
     public News save(News news) {
-        var entity = repository.findById(news.getId()).orElseGet(NewsEntity::new);
+        var entity =
+                isNull(news.getId())
+                        ? new NewsEntity()
+                        : repository.findById(news.getId()).orElseThrow();
         mapper.map(news, entity);
 
         processors.forEach(p -> p.preSave(news, entity));

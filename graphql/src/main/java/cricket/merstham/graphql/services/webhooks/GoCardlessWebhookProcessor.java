@@ -90,9 +90,17 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
     @Override
     public boolean isValid(HttpHeaders httpHeaders, String body) {
         var header = httpHeaders.getFirst(WEBHOOK_SIGNATURE_HEADER);
-        if (isNull(header)) return true;
-        if (Webhook.isValidSignature(body, header, secret)) {
-            LOG.warn("Signature validation failed on GoCardless webhook: {}", body);
+        if (isNull(header)) {
+            LOG.warn(
+                    "Signature validation failed on GoCardless webhook, header not found: {}",
+                    body);
+            return false;
+        }
+        if (!Webhook.isValidSignature(body, header, secret)) {
+            LOG.warn(
+                    "Signature validation failed on GoCardless webhook. Header = {}, body = {}",
+                    header,
+                    body);
         }
         return true;
     }

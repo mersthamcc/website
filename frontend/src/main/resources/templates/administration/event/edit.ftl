@@ -70,7 +70,7 @@
         <div class="col-lg-12">
             <@admin.form  action="/administration/event/save">
                 <@admin.card title="menu.admin-event-new">
-                    <input type="hidden" name="id" value="${event.id?long?c}" />
+                    <input type="hidden" name="id" value="${event.id!}" />
                     <input type="hidden" name="uuid" value="${event.uuid}" />
                     <@admin.formErrors errors=errors![] errorKey="event.errorSaving"/>
                     <@admin.adminDateTimeField name="eventDate" data=event.eventDate localeCategory="event" />

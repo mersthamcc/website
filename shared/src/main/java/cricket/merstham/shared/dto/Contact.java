@@ -29,7 +29,7 @@ import static java.util.Objects.nonNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ExtensionMethod(StringExtensions.class)
 public class Contact implements Serializable {
-    @JsonProperty private int id;
+    @JsonProperty private Integer id;
     @JsonProperty private ContactCategory category;
     @JsonProperty private String position;
     @JsonProperty private String slug;

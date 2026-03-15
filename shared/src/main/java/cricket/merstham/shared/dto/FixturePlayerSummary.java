@@ -23,8 +23,8 @@ import java.io.Serializable;
 public class FixturePlayerSummary implements Serializable {
     @Serial private static final long serialVersionUID = -8693924517085721355L;
 
-    @JsonProperty private int fixtureId;
-    @JsonProperty private int playerId;
+    @JsonProperty private Integer fixtureId;
+    @JsonProperty private Integer playerId;
     @JsonProperty private Fixture fixture;
     @JsonProperty private Player player;
     @JsonProperty private Integer runs;

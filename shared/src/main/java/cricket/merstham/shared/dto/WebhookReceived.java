@@ -18,7 +18,7 @@ import java.time.Instant;
 @Accessors(chain = true)
 @JsonSerialize
 public class WebhookReceived {
-    @JsonProperty private int id;
+    @JsonProperty private Integer id;
     @JsonProperty private Instant receivedDate;
     @JsonProperty private String type;
     @JsonProperty private String reference;

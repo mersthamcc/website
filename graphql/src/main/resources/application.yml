@@ -32,10 +32,8 @@ spring:
     username: ${DATABASE_USER:}
     password: ${DATABASE_PASSWORD:}
     hikari:
-      maximum-pool-size: 5
-      max-lifetime: 600000
-      minimum-idle: 2
-      idle-timeout: 300000
+      maximum-pool-size: 2
+      minimum-idle: 1
 
   graphql:
     graphiql:
@@ -80,14 +78,11 @@ spring:
 logging:
   structured:
     format:
-      console: ecs
+      console: ${LOG_FORMAT:}
     ecs:
       service:
-        environment: "${ENVIRONMENT:unknown}"
-        node-name: "${AWS_EXECUTION_ENV:unknown}"
-    json:
-      add:
-        xray-trace-id: "${_X_AMZN_TRACE_ID:none}"
+        environment: "${ENVIRONMENT:local}"
+        node-name: "${AWS_EXECUTION_ENV:local}"
 
 management:
   server:

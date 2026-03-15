@@ -34,6 +34,9 @@ spring:
       region: eu-west-2
       endpoint: ${DYNAMO_ENDPOINT:}
       create-table: ${DYNAMO_SESSION_CREATE_TABLE:true}
+    redis:
+      namespace: "${REDIS_SESSION_PREFIX:spring:session}"
+
   mvc:
     log-request-details: ${DEBUG_LOG_REQUESTS:false}
   devtools:
@@ -74,14 +77,11 @@ spring:
 logging:
   structured:
     format:
-      console: ecs
+      console: ${LOG_FORMAT:}
     ecs:
       service:
-        environment: "${ENVIRONMENT:unknown}"
-        node-name: "${AWS_EXECUTION_ENV:unknown}"
-    json:
-      add:
-        xray-trace-id: "${_X_AMZN_TRACE_ID:none}"
+        environment: "${ENVIRONMENT:local}"
+        node-name: "${AWS_EXECUTION_ENV:local}"
 
 debug: ${DEBUG:false}
 server:

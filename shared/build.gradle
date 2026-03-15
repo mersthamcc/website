@@ -1,13 +1,19 @@
 plugins {
     id "java"
     id "jacoco"
-    id "io.freefair.lombok" version "8.2.2"
+    id "io.freefair.lombok" version "8.14.4"
 }
 
 group "cricket.merstham"
 
 repositories {
     mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
