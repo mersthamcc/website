@@ -22,6 +22,7 @@ import static cricket.merstham.graphql.configuration.CacheConfiguration.EVENT_IT
 import static cricket.merstham.graphql.configuration.CacheConfiguration.EVENT_ITEM_BY_PATH_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.EVENT_SUMMARY_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.EVENT_SUMMARY_TOTAL_CACHE;
+import static java.util.Objects.isNull;
 
 @Component
 public class EventsService {
@@ -72,7 +73,10 @@ public class EventsService {
     @Caching(
             evict = {
                 @CacheEvict(value = EVENT_SUMMARY_TOTAL_CACHE, key = "'totals'"),
-                @CacheEvict(value = EVENT_ITEM_BY_ID_CACHE, key = "#event.id"),
+                @CacheEvict(
+                        value = EVENT_ITEM_BY_ID_CACHE,
+                        key = "#event.id",
+                        condition = "#event.id != null"),
                 @CacheEvict(
                         value = EVENT_ITEM_BY_PATH_CACHE,
                         key = "#event.path",
@@ -80,7 +84,10 @@ public class EventsService {
                 @CacheEvict(value = EVENT_SUMMARY_CACHE, allEntries = true)
             })
     public Event save(Event event) {
-        var entity = repository.findById(event.getId()).orElseGet(EventEntity::new);
+        var entity =
+                isNull(event.getId())
+                        ? new EventEntity()
+                        : repository.findById(event.getId()).orElseThrow();
         mapper.map(event, entity);
         return convertToDto(repository.saveAndFlush(entity));
     }

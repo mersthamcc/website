@@ -16,7 +16,7 @@ import java.util.List;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.STATIC_DATA_ITEM_BY_PATH_CACHE;
 import static cricket.merstham.graphql.configuration.CacheConfiguration.STATIC_DATA_SUMMARY_TOTAL_CACHE;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 @Service
 public class StaticDataService {
@@ -59,12 +59,10 @@ public class StaticDataService {
                 @CacheEvict(value = STATIC_DATA_ITEM_BY_PATH_CACHE, key = "#data.path")
             })
     public StaticData save(StaticData data) {
-        StaticDataEntity entity;
-        if (nonNull(data.getId())) {
-            entity = repository.findById(data.getId()).orElseThrow();
-        } else {
-            entity = new StaticDataEntity();
-        }
+        StaticDataEntity entity =
+                isNull(data.getId())
+                        ? new StaticDataEntity()
+                        : repository.findById(data.getId()).orElseThrow();
         mapper.map(data, entity);
         return convertToDto(repository.saveAndFlush(entity));
     }

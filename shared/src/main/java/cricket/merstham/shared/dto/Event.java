@@ -31,7 +31,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class Event implements Serializable {
 
     @JsonProperty("id")
-    private int id;
+    private Integer id;
 
     @JsonProperty("event_date")
     private Instant eventDate;

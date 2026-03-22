@@ -13,15 +13,18 @@ ext {
     cucumber_version = '7.18.0'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 dependencies {
     testImplementation "io.cucumber:cucumber-java:${cucumber_version}",
-                       "org.assertj:assertj-core:3.19.0",
+                       "org.assertj:assertj-core:3.27.7",
                        "org.hamcrest:hamcrest:2.2",
                        "org.slf4j:slf4j-simple:1.7.30",
-                       "com.github.javafaker:javafaker:1.0.2",
+                       "net.datafaker:datafaker:2.5.4",
                        "com.microsoft.playwright:playwright:1.41.0"
 }
 

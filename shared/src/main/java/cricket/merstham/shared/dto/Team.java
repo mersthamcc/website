@@ -27,7 +27,7 @@ public class Team implements Serializable {
     private static final String ACTIVE = "active";
 
     @JsonProperty("id")
-    private int id;
+    private Integer id;
 
     @JsonProperty("sort_order")
     private long sortOrder;

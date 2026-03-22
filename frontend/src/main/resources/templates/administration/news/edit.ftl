@@ -77,7 +77,7 @@
         <div class="col-lg-12">
             <@admin.form  action="/administration/news/save">
                 <@admin.card title="menu.admin-news-new">
-                    <input type="hidden" name="id" value="${news.id?long?c}" />
+                    <input type="hidden" name="id" value="${news.id!}" />
                     <input type="hidden" name="uuid" value="${news.uuid}" />
                     <input type="hidden" name="createdDate" value="${news.createdDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")}" />
                     <input type="hidden" name="publishDate" value="${news.publishDate.format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")}" />

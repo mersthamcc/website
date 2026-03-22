@@ -23,7 +23,7 @@ import java.util.List;
 public class PriceListItem implements Serializable {
     @Serial private static final long serialVersionUID = -2679152375424526991L;
 
-    @JsonProperty private int id;
+    @JsonProperty private Integer id;
     @JsonProperty private MemberCategory memberCategory;
     @JsonProperty private Integer minAge;
     @JsonProperty private Integer maxAge;

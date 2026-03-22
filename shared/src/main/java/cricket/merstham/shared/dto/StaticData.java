@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /** DTO for {@link cricket.merstham.graphql.entity.StaticDataEntity} */
@@ -22,6 +23,8 @@ import java.io.Serializable;
 @JsonSerialize
 @Builder
 public class StaticData implements Serializable {
+    @Serial private static final long serialVersionUID = -1699601099918171612L;
+
     @JsonProperty private Integer id;
     @JsonProperty private String path;
     @JsonProperty private String contentType;

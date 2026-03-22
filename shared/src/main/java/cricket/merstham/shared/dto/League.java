@@ -31,7 +31,7 @@ public class League implements Serializable {
     @Serial private static final long serialVersionUID = -6241106754547406721L;
 
     @JsonProperty("id")
-    private int id;
+    private Integer id;
 
     @JsonProperty("name")
     private String name;

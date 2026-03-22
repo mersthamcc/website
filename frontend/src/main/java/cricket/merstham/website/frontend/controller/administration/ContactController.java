@@ -192,8 +192,9 @@ public class ContactController extends SspController<Contact> {
                                                                         data.getFirst("category"))))
                         .findFirst();
         var builder = Contact.builder();
-        builder.id(Integer.parseInt((String) data.getFirst("id")))
-                .name((String) data.getFirst("name"))
+        var id = (String) data.getFirst("id");
+        if (!id.isBlank()) builder.id(Integer.parseInt(id));
+        builder.name((String) data.getFirst("name"))
                 .position((String) data.getFirst("position"))
                 .sortOrder(Integer.parseInt((String) data.getFirst("sortOrder")))
                 .category(category.orElseThrow());

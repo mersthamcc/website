@@ -1,10 +1,10 @@
-ARG JAVA_VERSION=17
-FROM eclipse-temurin:${JAVA_VERSION}-jre-focal
+ARG JAVA_VERSION=21
+FROM amazoncorretto:${JAVA_VERSION}-alpine
 ARG COMPONENT
 LABEL org.opencontainers.image.source=https://github.com/mersthamcc/website
 LABEL org.opencontainers.image.description="Club website ${COMPONENT} component"
+RUN apk add --no-cache bash curl
 
-EXPOSE 8090
 RUN addgroup --system spring
 RUN adduser --system spring --ingroup spring
 USER spring:spring

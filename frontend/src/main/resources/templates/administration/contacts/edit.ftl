@@ -12,7 +12,7 @@
         <div class="col-lg-12">
             <@admin.form  action="/administration/contacts/save">
                 <@admin.card title="menu.admin-contact-details">
-                    <input type="hidden" name="id" value="${contact.id?long?c}" />
+                    <input type="hidden" name="id" value="${contact.id!}" />
                     <@admin.formErrors errors=errors![] errorKey="contact.errorSaving"/>
                     <@admin.adminFormField name="name" data=contact.name!"" required=true type="text" localeCategory="contact" />
                     <@admin.adminFormField name="position" data=contact.position!"" required=true type="text" localeCategory="contact" />

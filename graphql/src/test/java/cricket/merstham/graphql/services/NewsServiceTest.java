@@ -312,7 +312,6 @@ class NewsServiceTest {
         var news =
                 News.builder()
                         .title(title)
-                        .id(-1)
                         .body(LOREM.getHtmlParagraphs(2, 8))
                         .author(LOREM.getNameMale())
                         .uuid(UUID.randomUUID().toString())

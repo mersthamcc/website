@@ -32,7 +32,7 @@ public class Fixture implements Serializable {
     @Serial private static final long serialVersionUID = -5910536573668698659L;
 
     @JsonProperty("id")
-    private int id;
+    private Integer id;
 
     @JsonProperty("team")
     private Team team;
