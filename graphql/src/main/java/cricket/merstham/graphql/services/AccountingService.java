@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.InvocationType;
@@ -96,6 +98,7 @@ public class AccountingService {
     @Timed(
             value = "accounting.sales-order.sync",
             description = "Time taken to sync sales orders with accounts")
+    @Transactional(propagation = Propagation.REQUIRED)
     @Lazy
     public void accountingSalesOrderSync() {
         LOG.info("Starting accounting sync...");
@@ -110,10 +113,12 @@ public class AccountingService {
                                         sendOrderToAccounting(
                                                 orderJson(modelMapper.map(order, Order.class))));
                             } catch (Exception ex) {
-                                LOG.error(
-                                        "Error processing order {}: ",
-                                        order.getId(),
-                                        ex.getMessage());
+                                LOG.atError()
+                                        .withThrowable(ex)
+                                        .log(
+                                                "Error processing order {}: {}",
+                                                order.getId(),
+                                                ex.getMessage());
                                 order.setAccountingError(
                                         isNull(ex.getCause())
                                                 ? ex.getMessage()
