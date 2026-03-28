@@ -121,4 +121,10 @@ public class MemberSummaryEntity {
     @Column(name = "owner_email_address")
     @CollectionTable(name = "member_summary_owner", joinColumns = @JoinColumn(name = "member_id"))
     private List<String> ownerEmailAddresses = new ArrayList<>();
+
+    @Column(name = "order_total", precision = 10, scale = 2)
+    private BigDecimal orderTotal;
+
+    @Column(name = "order_id")
+    private Integer orderId;
 }

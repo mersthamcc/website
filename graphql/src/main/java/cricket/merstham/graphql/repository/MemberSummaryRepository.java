@@ -94,6 +94,7 @@ public interface MemberSummaryRepository
 
             switch (reportFilter) {
                 case UNPAID -> {
+                    predicates.add(criteriaBuilder.greaterThan(root.get("orderTotal"), 0.00));
                     predicates.add(
                             criteriaBuilder.or(
                                     criteriaBuilder.equal(root.get("received"), 0.00),

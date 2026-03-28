@@ -1,3 +1,5 @@
+DROP VIEW IF EXISTS member_summary_owner;
+DROP VIEW IF EXISTS member_summary_attribute;
 DROP VIEW IF EXISTS member_summary;
 CREATE OR REPLACE VIEW member_summary AS
 SELECT m.id,
@@ -55,6 +57,8 @@ SELECT m.id,
        subs.added_date                        AS last_subs_date,
        subs.price                             AS last_subs_price,
        cat.key                                AS last_subs_category,
+       ord.total                              AS order_total,
+       ord.id                                 AS order_id,
        payments.received                      AS received,
        payments.types                         AS payment_types,
        pl.description,
@@ -71,6 +75,8 @@ FROM "member" m
     sub.member_id = m.id
          INNER JOIN member_subscription subs ON
     subs.member_id = sub.member_id
+         INNER JOIN "order" ord ON
+    subs.order_id = ord.id
         AND subs.year = sub.year
          INNER JOIN pricelist_item pl ON
     pl.id = subs.pricelist_item_id
@@ -133,7 +139,6 @@ WHERE m.cancelled IS NULL
 ORDER BY familyname,
          givenname;
 
-DROP VIEW IF EXISTS member_summary_attribute;
 CREATE OR REPLACE VIEW member_summary_attribute AS
 SELECT
     a.member_id,
@@ -146,7 +151,6 @@ SELECT
 FROM member_attribute a
          INNER JOIN attribute_definition d ON a.attribute_id = d.id;
 
-DROP VIEW IF EXISTS member_summary_owner;
 CREATE OR REPLACE VIEW member_summary_owner AS
 SELECT
     a.member_id,

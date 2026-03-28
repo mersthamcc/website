@@ -43,6 +43,8 @@ public class MemberSummary implements Serializable {
     @JsonProperty private List<String> declarations;
     @JsonProperty private List<String> identifiers;
     @JsonProperty private Map<String, String> attributes;
+    @JsonProperty private BigDecimal orderTotal;
+    @JsonProperty private Integer orderId;
 
     @JsonProperty
     @Transient
