@@ -97,6 +97,7 @@ public class EmailService {
     private HtmlTextEmail buildEmail(MailTemplate template, Map<String, Object> model) {
         return switch (template) {
             case MANDATE_CANCEL -> mandateCancellationEmail(model);
+            case MANDATE_FAILED -> mandateFailedEmail(model);
             case MEMBERSHIP_CONFIRM -> membershipConfirmationEmail(model);
             case INCLUSIVE_KIT_ORDER -> inclusiveKitConfirmationEmail(model);
         };
@@ -270,6 +271,37 @@ public class EmailService {
                 .text(translation("email.MANDATE_CANCEL.paragraph3"))
                 .and()
                 .text(translation("email.MANDATE_CANCEL.sign-off"))
+                .and()
+                .text(configuration.getClubName())
+                .bold()
+                .and()
+                .build();
+    }
+
+    private HtmlTextEmail mandateFailedEmail(Map<String, Object> model) {
+        var user = (User) model.get(USER);
+        var order = (Order) model.get(ORDER);
+        var payments = order.getPayment().stream().filter(p -> !p.getCollected()).toList();
+        var builder = configuration.getEmailBuilder();
+        return builder.text(translation("email.MANDATE_FAILED.title"))
+                .h2()
+                .and()
+                .text(translation("email.salutation", user.getGivenName()))
+                .and()
+                .text(translation("email.MANDATE_FAILED.paragraph1", model.get("mandate")))
+                .and()
+                .text(
+                        translation(
+                                "email.MANDATE_FAILED.paragraph2",
+                                model.get("reason"),
+                                model.get("reason_code")))
+                .and()
+                .text(translation("email.MANDATE_FAILED.paragraph3", order.getWebReference()))
+                .and()
+                .table(getPaymentsTable(builder, payments))
+                .text(translation("email.MANDATE_FAILED.paragraph4"))
+                .and()
+                .text(translation("email.MANDATE_FAILED.sign-off"))
                 .and()
                 .text(configuration.getClubName())
                 .bold()
@@ -541,7 +573,8 @@ public class EmailService {
 
     private List<String> getBccAddresses(MailTemplate template) {
         return switch (template) {
-            case MANDATE_CANCEL, MEMBERSHIP_CONFIRM -> configuration.getMembershipBcc();
+            case MANDATE_CANCEL, MANDATE_FAILED, MEMBERSHIP_CONFIRM -> configuration
+                    .getMembershipBcc();
             case INCLUSIVE_KIT_ORDER -> List.of();
         };
     }
@@ -555,6 +588,7 @@ public class EmailService {
     public enum MailTemplate {
         MEMBERSHIP_CONFIRM,
         MANDATE_CANCEL,
+        MANDATE_FAILED,
         INCLUSIVE_KIT_ORDER
     }
 }
