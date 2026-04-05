@@ -48,6 +48,7 @@ public class Member implements Serializable {
     @JsonProperty private String uuid;
     @JsonProperty private List<MemberAttribute> attributes = new ArrayList<>();
     @JsonProperty private List<MemberSubscription> subscription = new ArrayList<>();
+    @JsonProperty private List<MemberAttendance> attendance = new ArrayList<>();
     @JsonProperty private List<KeyValuePair> identifiers = new ArrayList<>();
 
     @Transient

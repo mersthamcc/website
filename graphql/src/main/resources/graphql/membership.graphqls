@@ -197,6 +197,14 @@ type MemberSummary {
     googlePassSerial: String
 }
 
+type MemberAttendance {
+    id: Int!
+    member: Member!
+    date: DateTime!
+    reference: String!
+    event: String!
+}
+
 type Coupon {
     id: Int!
     code: String!

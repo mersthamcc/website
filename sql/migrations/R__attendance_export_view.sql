@@ -1,0 +1,18 @@
+-- DROP VIEW IF EXISTS attendance_export_view;
+-- CREATE VIEW attendance_export_view AS
+-- SELECT
+--     givenname || ' ' || familyname AS "Name",
+--     '' AS Email,
+--     '' AS Mobile,
+--     CASE last_subs_category
+--         WHEN 'junior' THEN agegroup || ' (' || most_recent_subscription || ')'
+--         WHEN 'adult' THEN 'Adult Member (' || most_recent_subscription || ')'
+--         WHEN 'disability' THEN 'Magics (' || most_recent_subscription || ')'
+--         END AS "Role",
+--     COALESCE(agegroup,'') AS "Age Group",
+--     INITCAP(COALESCE(last_subs_category,'')) AS "Category",
+--     '%LOYALTY' || LPAD(id::TEXT, 5, '0') || '?' AS "QR Code",
+--     id AS "Membership Number"
+-- FROM member_summary
+-- WHERE last_subs_date > '2025-01-01'
+--   AND last_subs_category IN ('junior', 'adult', 'disability');

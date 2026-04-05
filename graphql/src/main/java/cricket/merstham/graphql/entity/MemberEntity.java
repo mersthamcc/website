@@ -79,6 +79,13 @@ public class MemberEntity {
             cascade = CascadeType.ALL)
     private List<MemberSubscriptionEntity> subscription;
 
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            mappedBy = "member",
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    private List<MemberAttendanceEntity> attendance;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "name")
     @Column(name = "value")

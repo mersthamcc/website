@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -82,7 +80,6 @@ public class WebhookService {
     @Timed(
             value = "webhooks.processor.time_taken",
             description = "Time taken to process received payment webhooks")
-    @Transactional(propagation = Propagation.REQUIRED)
     @Lazy
     public void processWebhooks() {
         LOG.info("Processing received webhooks...");
