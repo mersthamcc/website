@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.controller;
 
+import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Pass;
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.website.frontend.model.ChangePassword;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,16 +53,63 @@ public class AccountController {
         this.membershipService = membershipService;
     }
 
-    @GetMapping(value = "/account", name = "account-home")
-    public ModelAndView home(HttpServletRequest request) {
+    @GetMapping(value = "/account", name = "account-members")
+    public ModelAndView home(
+            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) {
         var model = baseModel(request);
+        model.put(
+                "members",
+                membershipService.getMyMembers(cognitoAuthentication.getOAuth2AccessToken()));
         return new ModelAndView(
-                "account/home",
+                "account/member-list",
                 model,
                 model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
     }
 
-    @PostMapping(value = "/account", name = "account-home-update-user")
+    @GetMapping(value = "/account/billing", name = "account-members-billing")
+    public ModelAndView billingHome(
+            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) {
+        var model = baseModel(request);
+        model.put(
+                "orders",
+                membershipService.getOrders(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .sorted(Comparator.comparing(Order::getCreateDate).reversed())
+                        .toList());
+        return new ModelAndView(
+                "account/billing",
+                model,
+                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/account/billing/{uuid}", name = "account-members-billing-order")
+    public ModelAndView billingHome(
+            @PathVariable String uuid,
+            HttpServletRequest request,
+            CognitoAuthentication cognitoAuthentication) {
+        var model = baseModel(request);
+        var order =
+                membershipService.getOrders(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .filter(o -> o.getUuid().equals(uuid))
+                        .findFirst()
+                        .orElseThrow();
+
+        model.put("order", order);
+        return new ModelAndView(
+                "account/order",
+                model,
+                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/account/info", name = "account-user")
+    public ModelAndView userinfo(HttpServletRequest request) {
+        var model = baseModel(request);
+        return new ModelAndView(
+                "account/userinfo",
+                model,
+                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/account/info", name = "account-user-update-details")
     public RedirectView updateUser(User user, RedirectAttributes redirectAttributes) {
         var errors = service.updateUser(user);
         if (!errors.isEmpty()) {
@@ -68,10 +117,10 @@ public class AccountController {
         } else {
             redirectAttributes.addFlashAttribute(INFO, List.of("account.success.update-details"));
         }
-        return redirectTo("/account");
+        return redirectTo("/account/info");
     }
 
-    @GetMapping(value = "/account/security", name = "account-home-security")
+    @GetMapping(value = "/account/security", name = "account-user-security")
     public ModelAndView securityHome(HttpServletRequest request) {
         var model = baseModel(request);
 
@@ -90,7 +139,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping(value = "/account/change-password", name = "account-home-change-password")
+    @PostMapping(value = "/account/change-password", name = "account-user-change-password")
     public RedirectView changePassword(
             @Valid ChangePassword changePassword,
             Errors errors,
@@ -112,24 +161,6 @@ public class AccountController {
             }
         }
         return redirectTo("/account/security");
-    }
-
-    @GetMapping(value = "/account/members", name = "account-members")
-    public ModelAndView membersHome(
-            HttpServletRequest request, CognitoAuthentication cognitoAuthentication) {
-        var model = baseModel(request);
-        model.put(
-                "members",
-                membershipService.getMyMembers(cognitoAuthentication.getOAuth2AccessToken()));
-        return new ModelAndView(
-                "account/member-list",
-                model,
-                model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/account/billing", name = "account-members-billing")
-    public ModelAndView billingHome(HttpServletRequest request) {
-        return home(request);
     }
 
     @GetMapping(value = "/account/pass/{uuid}/apple", name = "apple-wallet-membership-card")

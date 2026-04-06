@@ -1,0 +1,46 @@
+query myOrders {
+    myOrders {
+        id
+        confirmed
+        createDate
+        discount
+        memberSubscription {
+            addedDate
+            price
+            priceListItem {
+                id
+                description
+                includesMatchFees
+                memberCategory {
+                    key
+                }
+            }
+            member {
+                id
+                attributes {
+                    definition {
+                        key
+                        type
+                    }
+                    value
+                }
+                ownerUserId
+                registrationDate
+                uuid
+            }
+        }
+        ownerUserId
+        payment {
+            id
+            amount
+            collected
+            date
+            reconciled
+            reference
+            status
+            type
+        }
+        total
+        uuid
+    }
+}

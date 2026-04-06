@@ -35,6 +35,7 @@ import static com.gocardless.resources.Event.ResourceType.MANDATES;
 import static com.gocardless.resources.Event.ResourceType.PAYMENTS;
 import static com.gocardless.resources.Event.ResourceType.PAYOUTS;
 import static cricket.merstham.graphql.services.EmailService.MailTemplate.MANDATE_CANCEL;
+import static cricket.merstham.graphql.services.EmailService.MailTemplate.MANDATE_FAILED;
 import static java.util.Objects.isNull;
 
 @Service
@@ -141,6 +142,9 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
         if ("cancelled".equals(event.getAction())) {
             processCancellation(event);
         }
+        if ("failed".equals(event.getAction())) {
+            processFailure(event);
+        }
     }
 
     private void processPayment(Event event) {
@@ -243,6 +247,43 @@ public class GoCardlessWebhookProcessor implements WebhookProcessor {
                                         "user", user,
                                         "mandate", event.getLinks().getMandate(),
                                         "order", modelMapper.map(order, Order.class)));
+                    });
+        }
+    }
+
+    public void processFailure(Event event) {
+        LOG.info("Processing GoCardless failure for {}", event.getLinks().getMandate());
+
+        var payments = thisYearsPaymentsForMandate(event.getLinks().getMandate());
+
+        var outstandingPayments =
+                payments.getItems().stream()
+                        .filter(p -> !SUCCESSFUL_PAYMENT_STATUSES.contains(p.getStatus()))
+                        .map(Payment::getId)
+                        .toList();
+
+        if (!outstandingPayments.isEmpty()) {
+            var orders =
+                    paymentEntityRepository
+                            .findByTypeAndReferenceIn(NAME, outstandingPayments)
+                            .stream()
+                            .map(PaymentEntity::getOrder)
+                            .distinct()
+                            .toList();
+
+            orders.forEach(
+                    order -> {
+                        var user = cognitoService.getUserBySubjectId(order.getOwnerUserId());
+                        emailService.sendEmail(
+                                user.getEmail(),
+                                MANDATE_FAILED,
+                                Map.of(
+                                        "user", user,
+                                        "mandate", event.getLinks().getMandate(),
+                                        "order", modelMapper.map(order, Order.class),
+                                        "reason", event.getDetails().getDescription(),
+                                        "reason_code", event.getDetails().getReasonCode(),
+                                        "origin", event.getDetails().getOrigin()));
                     });
         }
     }

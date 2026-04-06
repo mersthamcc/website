@@ -31,6 +31,7 @@ import cricket.merstham.website.graph.OrderQuery;
 import cricket.merstham.website.graph.UpdateMemberMutation;
 import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
+import cricket.merstham.website.graph.account.MyOrdersQuery;
 import cricket.merstham.website.graph.account.PassQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
@@ -475,5 +476,13 @@ public class MembershipService {
                 requireGraphData(
                         response, ExportMembershipSummaryQuery.Data::getExportFilteredMembers),
                 ReportExport.class);
+    }
+
+    public List<Order> getOrders(OAuth2AccessToken oAuth2AccessToken) {
+        var query = MyOrdersQuery.builder().build();
+        Response<MyOrdersQuery.Data> response = graphService.executeQuery(query, oAuth2AccessToken);
+        return requireGraphData(response, MyOrdersQuery.Data::getMyOrders).stream()
+                .map(c -> modelMapper.map(c, Order.class))
+                .toList();
     }
 }
