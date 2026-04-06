@@ -5,13 +5,13 @@
 
 <@layout.mainLayout formName="menu.account" withButtonResponsiveButton=true>
     <@home.homeLayout userDetails=userDetails>
-        <form method="post" name="user-details-form" action="/account">
+        <form method="post" name="user-details-form" action="/account/info">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
             <input type="hidden" name="subjectId" value="${userDetails.subjectId}">
             <div class="card mb-3 mb-lg-5">
                 <div class="card-header">
                     <h5 class="card-title">
-                        <@spring.message code="account.menu.account-home" />
+                        <@spring.message code="account.menu.account-user" />
                     </h5>
                 </div>
                 <div class="card-body">

@@ -37,4 +37,38 @@ public class Order implements Serializable {
     public String getWebReference() {
         return format("WEB-%1$6s", id).replace(' ', '0');
     }
+
+    public boolean isFullyPaid() {
+        BigDecimal paymentTotal = getCollected();
+        return total.equals(paymentTotal);
+    }
+
+    public BigDecimal getCollected() {
+        return payment.stream()
+                .filter(p -> "complete".equals(p.getStatus()))
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public boolean isPartPaid() {
+        BigDecimal paymentTotal = getCollected();
+        return total.compareTo(paymentTotal) > 0 && paymentTotal.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    public boolean isOutstanding() {
+        BigDecimal paymentTotal = getCollected();
+        return (!isScheduled())
+                && total.compareTo(BigDecimal.ZERO) > 0
+                && paymentTotal.compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    public boolean isScheduled() {
+        var count = payment.stream().filter(p -> "scheduled".equals(p.getStatus())).count();
+        return total.compareTo(BigDecimal.ZERO) > 0 && count > 0;
+    }
+
+    public boolean isCancelled() {
+        var count = payment.stream().filter(p -> "cancelled".equals(p.getStatus())).count();
+        return total.compareTo(BigDecimal.ZERO) > 0 && count > 0;
+    }
 }

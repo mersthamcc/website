@@ -365,27 +365,6 @@ public class MenuBuilder {
     private final List<Menu> accountMenu =
             List.of(
                     new Menu(
-                            "account-home-top",
-                            null,
-                            SCRIPT_LINK,
-                            List.of(),
-                            () ->
-                                    List.of(
-                                            new Menu(
-                                                    "account-home",
-                                                    null,
-                                                    null,
-                                                    List.of(),
-                                                    null,
-                                                    "fa-id-card"),
-                                            new Menu(
-                                                    "account-home-security",
-                                                    null,
-                                                    null,
-                                                    List.of(),
-                                                    null,
-                                                    "fa-shield-alt"))),
-                    new Menu(
                             "account-members-top",
                             null,
                             SCRIPT_LINK,
@@ -398,14 +377,35 @@ public class MenuBuilder {
                                                     null,
                                                     List.of(),
                                                     null,
-                                                    "fa-users"))));
-    //                                            new Menu(
-    //                                                    "account-members-billing",
-    //                                                    null,
-    //                                                    null,
-    //                                                    List.of(),
-    //                                                    null,
-    //                                                    "fa-credit-card"))));
+                                                    "fa-users"),
+                                            new Menu(
+                                                    "account-members-billing",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-credit-card"))),
+                    new Menu(
+                            "account-user-top",
+                            null,
+                            SCRIPT_LINK,
+                            List.of(),
+                            () ->
+                                    List.of(
+                                            new Menu(
+                                                    "account-user",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-id-card"),
+                                            new Menu(
+                                                    "account-user-security",
+                                                    null,
+                                                    null,
+                                                    List.of(),
+                                                    null,
+                                                    "fa-shield-alt"))));
     private final MenuService menuService;
     private final PageService pageService;
     private final ClubConfiguration clubConfiguration;
