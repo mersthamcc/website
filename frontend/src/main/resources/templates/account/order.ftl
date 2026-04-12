@@ -14,50 +14,32 @@
 
             <div class="card-body">
                 <div class="row">
-                    <div class="col-6 col-md mb-3 mb-md-0">
-                        <small class="text-cap"><@spring.message code="account.order.total" /></small>
-                        <small class="text-dark font-weight-bold">&pound;${order.total}</small>
-                    </div>
-                    <div class="col-6 col-md mb-3 mb-md-0">
-                        <small class="text-cap"><@spring.message code="account.order.status" /></small>
-                        <small class="text-dark font-weight-bold">
-                            <#if order.fullyPaid>
-                                <div class="text-body font-size-1 mb-1">
-                                                    <span class="badge badge-success">
-                                                        <@spring.message code="account.order.fully-paid" />
-                                                    </span>
-                                </div>
-                            </#if>
-                            <#if order.partPaid>
-                                <div class="text-body font-size-1 mb-1">
-                                                    <span class="badge badge-info">
-                                                        <@spring.message code="account.order.part-paid" />
-                                                    </span>
-                                </div>
-                            </#if>
-                            <#if order.outstanding>
-                                <div class="text-body font-size-1 mb-1">
-                                                    <span class="badge badge-warning">
-                                                        <@spring.message code="account.order.outstanding" />
-                                                    </span>
-                                </div>
-                            </#if>
-                            <#if order.cancelled>
-                                <div class="text-body font-size-1 mb-1">
-                                                    <span class="badge badge-danger">
-                                                        <@spring.message code="account.order.cancelled" />
-                                                    </span>
-                                </div>
-                            </#if>
-                        </small>
+                    <div class="col-6 col-md">
+                        <small class="text-cap"><@spring.message code="account.order.placed" /></small>
+                        <small class="text-dark font-weight-bold">${(order.createDate).format("dd/MM/yyyy")}</small>
                     </div>
                     <div class="col-6 col-md">
                         <small class="text-cap"><@spring.message code="account.order.order-reference" /></small>
                         <small class="text-dark font-weight-bold">${order.webReference}</small>
                     </div>
-                    <div class="col-6 col-md">
-                        <small class="text-cap"><@spring.message code="account.order.placed" /></small>
-                        <small class="text-dark font-weight-bold">${(order.createDate).format("dd/MM/yyyy")}</small>
+                    <div class="col-6 col-md mb-3 mb-md-0">
+                        <small class="text-cap"><@spring.message code="account.order.status" /></small>
+                        <@components.orderStatus order=order />
+                    </div>
+                    <div class="col-6 col-md mb-3 mb-md-0">
+                        <#if order.actionRequired && !order.scheduled>
+                            <a class="btn btn-sm btn-block btn-primary" href="${order.uuid}/new-mandate">
+                                <small class="text-cap"><i class="fas fa-plus-circle fa-sm mr-2"></i> New Direct Debit</small>
+                            </a>
+<#--                            <a class="btn btn-sm btn-block btn-soft-primary" href="${order.uuid}/settlement">-->
+<#--                                <small class="text-cap"><i class="fas fa-money-check fa-sm mr-2"></i> Settle in full</small>-->
+<#--                            </a>-->
+                        </#if>
+<#--                        <#if order.scheduled>-->
+<#--                            <a class="btn btn-sm btn-block btn-danger" href="${order.uuid}/cancel-payments">-->
+<#--                                <small class="text-cap"><i class="fas fa-cross fa-sm mr-2"></i> Cancel Direct Debit</small>-->
+<#--                            </a>-->
+<#--                        </#if>-->
                     </div>
                 </div>
                 <hr>
@@ -68,7 +50,6 @@
                             <table class="table">
                                 <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Category</th>
                                     <th scope="col">Price</th>
@@ -77,25 +58,24 @@
                                 <tbody>
                                     <#list order.memberSubscription as subscription>
                                         <tr>
-                                            <th scope="row">${subscription?counter}</th>
-                                            <td>${subscription.member.fullName}</td>
-                                            <td>${subscription.priceListItem.description}</td>
-                                            <td>&pound;${subscription.price}</td>
+                                            <td><small>${subscription.member.fullName}</small></td>
+                                            <td><small>${subscription.priceListItem.description}</small></td>
+                                            <td><small>&pound;${subscription.price}</small></td>
                                         </tr>
                                     </#list>
                                 </tbody>
                                 <tfoot class="thead-light">
+                                    <#if (order.discount > 0)>
+                                        <tr>
+                                            <th scope="row"></th>
+                                            <th scope="row"><small><b>Discounts</b></small></th>
+                                            <th scope="row"><small>&pound;${order.discount}</small></th>
+                                        </tr>
+                                    </#if>
                                     <tr>
                                         <th scope="row"></th>
-                                        <th></th>
-                                        <th><b>Discounts</b></th>
-                                        <th>&pound;${order.discount}</th>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <th></th>
-                                        <th><b>Total</b></th>
-                                        <th>&pound;${order.total}</th>
+                                        <th scope="row"><small><b>Total</b></small></th>
+                                        <th scope="row"><small>&pound;${order.total}</small></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -119,24 +99,32 @@
                                 <tbody>
                                     <#list order.payment as payment>
                                         <tr>
-                                            <td>${(payment.date).format("dd/MM/yyyy")}</td>
+                                            <td><small>${(payment.date).format("dd/MM/yyyy")}</small></td>
                                             <td>
-                                                <@spring.messageText code="payments.status.${payment.status}" text=payment.status />
+                                                <small><@spring.messageText code="payments.status.${payment.status}" text=payment.status /></small>
                                             </td>
                                             <td>
-                                                <@spring.messageText code="payments.${payment.type}-short" text=payment.type />
+                                                <small><@spring.messageText code="payments.${payment.type}-user" text=payment.type /></small>
                                             </td>
-                                            <td>&pound;${payment.amount}</td>
+                                            <td><small>&pound;${payment.amount}</small></td>
                                         </tr>
                                     </#list>
                                 </tbody>
                                 <tfoot class="thead-light">
                                     <tr>
                                         <th scope="row"></th>
-                                        <th></th>
-                                        <th><b>Collected</b></th>
-                                        <th>&pound;${order.collected}</th>
+                                        <th scope="row"></th>
+                                        <th scope="row"><small class="text-cap"><b>Collected</b></small></th>
+                                        <th scope="row"><small>&pound;${order.collected}</small></th>
                                     </tr>
+                                    <#if (order.collected < order.total)>
+                                        <tr>
+                                            <th scope="row"></th>
+                                            <th scope="row"></th>
+                                            <th scope="row"><small class="text-cap"><b>Outstanding</b></small></th>
+                                            <th scope="row"><small>&pound;${order.total - order.collected}</small></th>
+                                        </tr>
+                                    </#if>
                                 </tfoot>
                             </table>
                         </div>

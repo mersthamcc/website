@@ -1047,3 +1047,43 @@
         <span class="avatar-initials">${givenName?cap_first[0]}${familyName?cap_first[0]}</span>
     </div>
 </#macro>
+
+<#macro orderStatus order>
+    <small class="text-dark font-weight-bold">
+        <#if order.fullyPaid>
+            <div class="text-body font-size-1 mb-1">
+                <span class="badge badge-pill badge-success">
+                    <@spring.message code="account.order.fully-paid" />
+                </span>
+            </div>
+        </#if>
+        <#if order.partPaid>
+            <div class="text-body font-size-1 mb-1">
+                <span class="badge badge-pill badge-soft-info">
+                    <@spring.message code="account.order.part-paid" />
+                </span>
+            </div>
+        </#if>
+        <#if order.outstanding>
+            <div class="text-body font-size-1 mb-1">
+                <span class="badge badge-pill badge-warning">
+                    <@spring.message code="account.order.outstanding" />
+                </span>
+            </div>
+        </#if>
+        <#if order.cancelled>
+            <div class="text-body font-size-1 mb-1">
+                <span class="badge badge-pill badge-soft-danger">
+                    <@spring.message code="account.order.cancelled" />
+                </span>
+            </div>
+        </#if>
+        <#if order.actionRequired>
+            <div class="text-body font-size-1 mb-1">
+                <span class="badge badge-pill badge-danger badge-important">
+                    <@spring.message code="account.order.action-required" />
+                </span>
+            </div>
+        </#if>
+    </small>
+</#macro>
