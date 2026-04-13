@@ -49,11 +49,11 @@ public class GoCardlessService implements PaymentService {
 
     private static final String SERVICE_NAME = "gocardless";
     private static final String REDIRECT_FORMAT = "redirect:{0}";
-    private static final String SESSION_NUMBER_OF_PAYMENTS = "gc-number-of-payments";
-    private static final String SESSION_DAY_OF_MONTH = "gc-day-of-month";
+    public static final String SESSION_NUMBER_OF_PAYMENTS = "gc-number-of-payments";
+    public static final String SESSION_DAY_OF_MONTH = "gc-day-of-month";
     private static final String SESSION_MANDATE = "gc-mandate";
-    private static final String SESSION_SCHEDULES = "gc-schedules";
-    private static final String SESSION_FLOW_ID = "gc-flow-id";
+    public static final String SESSION_SCHEDULES = "gc-schedules";
+    public static final String SESSION_FLOW_ID = "gc-flow-id";
     public static final String MANDATE = "mandate";
     public static final String NEW = "new";
 
@@ -102,20 +102,23 @@ public class GoCardlessService implements PaymentService {
     @Override
     public ModelAndView checkout(
             HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
+        var model = newDirectDebitViewModel(request, basket.getBasketTotal(), accessToken);
+        return new ModelAndView("payments/gocardless/checkout", model);
+    }
+
+    public Map<String, Object> newDirectDebitViewModel(
+            HttpServletRequest request, BigDecimal total, OAuth2AccessToken accessToken) {
         var model = new HashMap<String, Object>();
         List<PaymentSchedule> schedules = new ArrayList<>();
         for (var i = 1; i <= 10; i++) {
-            BigDecimal monthly =
-                    basket.getBasketTotal().divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
+            BigDecimal monthly = total.divide(BigDecimal.valueOf(i), 2, RoundingMode.UP);
             schedules.add(
                     new PaymentSchedule()
                             .setNumberOfPayments(i)
                             .setAmount(monthly)
                             .setFinalAmount(
-                                    basket.getBasketTotal()
-                                            .subtract(
-                                                    monthly.multiply(
-                                                            BigDecimal.valueOf((long) i - 1)))));
+                                    total.subtract(
+                                            monthly.multiply(BigDecimal.valueOf((long) i - 1)))));
         }
 
         request.getSession().setAttribute(SESSION_SCHEDULES, schedules);
@@ -165,8 +168,7 @@ public class GoCardlessService implements PaymentService {
         } catch (IOException e) {
             throw new RuntimeException("Error fetching active mandates", e);
         }
-
-        return new ModelAndView("payments/gocardless/checkout", model);
+        return model;
     }
 
     @Override
@@ -183,28 +185,8 @@ public class GoCardlessService implements PaymentService {
 
         var mandate = request.getParameter(MANDATE);
         if (isNull(mandate) || mandate.equals(NEW)) {
-            var requestUri = URI.create(request.getRequestURL().toString());
-            String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
-
-            var principal = ((CognitoAuthentication) request.getUserPrincipal()).getOidcUser();
-
-            var redirectFlow =
-                    client.redirectFlows()
-                            .create()
-                            .withDescription(mandateDescription)
-                            .withIdempotencyKey(UUID.randomUUID().toString())
-                            .withSessionToken(basket.getId())
-                            .withSuccessRedirectUrl(
-                                    format("{0}/payments/{1}/execute", baseUri, SERVICE_NAME))
-                            .withPrefilledCustomerEmail(request.getUserPrincipal().getName())
-                            .withPrefilledCustomerGivenName(principal.getGivenName())
-                            .withPrefilledCustomerFamilyName(principal.getFamilyName())
-                            .withScheme(RedirectFlowService.RedirectFlowCreateRequest.Scheme.BACS)
-                            .execute();
-
-            request.getSession().setAttribute(SESSION_FLOW_ID, redirectFlow.getId());
-
-            return new ModelAndView(format(REDIRECT_FORMAT, redirectFlow.getRedirectUrl()));
+            return startRedirectFlow(
+                    request, format("/payments/{0}/execute", SERVICE_NAME), basket.getId());
         }
         request.getSession().setAttribute(SESSION_MANDATE, mandate);
 
@@ -229,52 +211,114 @@ public class GoCardlessService implements PaymentService {
                         .filter(ps -> ps.getNumberOfPayments() == numberOfPayments)
                         .findFirst()
                         .orElseThrow();
-        String mandateId;
-        Mandate mandate;
-        if (nonNull(flowId)) {
-            var redirectFlow =
-                    client.redirectFlows()
-                            .complete(flowId)
-                            .withSessionToken(basket.getId())
-                            .execute();
 
-            mandateId = redirectFlow.getLinks().getMandate();
-            mandate = client.mandates().get(mandateId).execute();
-            LOG.info("Saving mandate {}", mandate.getId());
-            try {
-                membershipService.createUserPaymentMethod(
-                        SERVICE_NAME,
-                        MANDATE,
-                        mandate.getId(),
-                        mandate.getLinks().getCustomer(),
-                        "pending",
-                        accessToken);
-            } catch (GraphException e) {
-                LOG.atError()
-                        .setCause(e)
-                        .log(
-                                "Error saving mandate {} - '{}'",
-                                mandate.getId(),
-                                String.join(
-                                        ", ",
-                                        e.getErrors().stream().map(Error::getMessage).toList()),
-                                e);
-            } catch (Exception e) {
-                LOG.atError()
-                        .setCause(e)
-                        .log("Unable to save payment method for mandate {}", mandate.getId());
-            }
+        Mandate mandate;
+
+        if (nonNull(flowId)) {
+            mandate = getMandateFromFlowId(flowId, basket.getId(), accessToken);
         } else {
-            mandateId = (String) request.getSession().getAttribute(SESSION_MANDATE);
+            String mandateId = (String) request.getSession().getAttribute(SESSION_MANDATE);
             mandate = client.mandates().get(mandateId).execute();
         }
 
+        createPayments(
+                mandate,
+                accessToken,
+                dayOfMonth,
+                numberOfPayments,
+                paymentSchedule,
+                order,
+                order.getTotal());
+
+        clearSession(request);
+
+        return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
+    }
+
+    @Override
+    public ModelAndView confirm(
+            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
+        return new ModelAndView("payments/gocardless/confirmation", Map.of("order", order));
+    }
+
+    @Override
+    public ModelAndView cancel(
+            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
+        return null;
+    }
+
+    public ModelAndView startRedirectFlow(
+            HttpServletRequest request, String redirectUrlPath, String sessionToken) {
+        var requestUri = URI.create(request.getRequestURL().toString());
+        String baseUri = format("{0}://{1}", requestUri.getScheme(), requestUri.getAuthority());
+
+        var principal = ((CognitoAuthentication) request.getUserPrincipal()).getOidcUser();
+
+        var redirectFlow =
+                client.redirectFlows()
+                        .create()
+                        .withDescription(mandateDescription)
+                        .withIdempotencyKey(UUID.randomUUID().toString())
+                        .withSessionToken(sessionToken)
+                        .withSuccessRedirectUrl(format("{0}{1}", baseUri, redirectUrlPath))
+                        .withPrefilledCustomerEmail(request.getUserPrincipal().getName())
+                        .withPrefilledCustomerGivenName(principal.getGivenName())
+                        .withPrefilledCustomerFamilyName(principal.getFamilyName())
+                        .withScheme(RedirectFlowService.RedirectFlowCreateRequest.Scheme.BACS)
+                        .execute();
+
+        request.getSession().setAttribute(SESSION_FLOW_ID, redirectFlow.getId());
+
+        return new ModelAndView(format(REDIRECT_FORMAT, redirectFlow.getRedirectUrl()));
+    }
+
+    public Mandate getMandateFromFlowId(
+            String flowId, String sessionToken, OAuth2AccessToken accessToken) {
+        var redirectFlow =
+                client.redirectFlows().complete(flowId).withSessionToken(sessionToken).execute();
+
+        var mandateId = redirectFlow.getLinks().getMandate();
+        var mandate = client.mandates().get(mandateId).execute();
+        LOG.info("Saving mandate {}", mandate.getId());
+        try {
+            membershipService.createUserPaymentMethod(
+                    SERVICE_NAME,
+                    MANDATE,
+                    mandate.getId(),
+                    mandate.getLinks().getCustomer(),
+                    "pending",
+                    accessToken);
+        } catch (GraphException e) {
+            LOG.atError()
+                    .setCause(e)
+                    .log(
+                            "Error saving mandate {} - '{}'",
+                            mandate.getId(),
+                            String.join(
+                                    ", ", e.getErrors().stream().map(Error::getMessage).toList()),
+                            e);
+        } catch (Exception e) {
+            LOG.atError()
+                    .setCause(e)
+                    .log("Unable to save payment method for mandate {}", mandate.getId());
+        }
+        return mandate;
+    }
+
+    public void createPayments(
+            Mandate mandate,
+            OAuth2AccessToken accessToken,
+            int dayOfMonth,
+            int numberOfPayments,
+            PaymentSchedule paymentSchedule,
+            Order order,
+            BigDecimal total) {
         List<LocalDate> chargeDates = calculateDates(mandate, dayOfMonth, numberOfPayments);
         LOG.info(
                 "Payment dates = {}",
                 chargeDates.stream().map(LocalDate::toString).collect(Collectors.joining(", ")));
 
-        BigDecimal remaining = basket.getBasketTotal();
+        BigDecimal remaining = total;
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
         for (LocalDate chargeDate : chargeDates) {
             BigDecimal chargeAmount = paymentSchedule.getAmount();
@@ -306,20 +350,14 @@ public class GoCardlessService implements PaymentService {
                     accessToken);
             remaining = remaining.subtract(chargeAmount);
         }
-
-        return new ModelAndView(format("redirect:/payments/{0}/confirmation", SERVICE_NAME));
     }
 
-    @Override
-    public ModelAndView confirm(
-            HttpServletRequest request, Order order, OAuth2AccessToken accessToken) {
-        return new ModelAndView("payments/gocardless/confirmation", Map.of("order", order));
-    }
-
-    @Override
-    public ModelAndView cancel(
-            HttpServletRequest request, RegistrationBasket basket, OAuth2AccessToken accessToken) {
-        return null;
+    public void clearSession(HttpServletRequest request) {
+        request.getSession().removeAttribute(SESSION_FLOW_ID);
+        request.getSession().removeAttribute(SESSION_DAY_OF_MONTH);
+        request.getSession().removeAttribute(SESSION_NUMBER_OF_PAYMENTS);
+        request.getSession().removeAttribute(SESSION_SCHEDULES);
+        request.getSession().removeAttribute(SESSION_MANDATE);
     }
 
     private List<LocalDate> calculateDates(Mandate mandate, int dayOfMonth, int numberOfPayments) {

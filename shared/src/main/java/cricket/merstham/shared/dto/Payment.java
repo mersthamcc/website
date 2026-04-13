@@ -1,6 +1,7 @@
 package cricket.merstham.shared.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Payment implements Serializable {
     @Serial private static final long serialVersionUID = -6204067832877516899L;
 

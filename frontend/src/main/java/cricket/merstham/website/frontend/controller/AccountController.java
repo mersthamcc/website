@@ -1,12 +1,15 @@
 package cricket.merstham.website.frontend.controller;
 
+import com.gocardless.resources.Mandate;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Pass;
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.website.frontend.model.ChangePassword;
+import cricket.merstham.website.frontend.model.payment.PaymentSchedule;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.CognitoService;
 import cricket.merstham.website.frontend.service.MembershipService;
+import cricket.merstham.website.frontend.service.payment.GoCardlessService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
+import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectToPage;
+import static cricket.merstham.website.frontend.service.payment.GoCardlessService.SESSION_DAY_OF_MONTH;
+import static cricket.merstham.website.frontend.service.payment.GoCardlessService.SESSION_FLOW_ID;
+import static cricket.merstham.website.frontend.service.payment.GoCardlessService.SESSION_NUMBER_OF_PAYMENTS;
+import static cricket.merstham.website.frontend.service.payment.GoCardlessService.SESSION_SCHEDULES;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
 
@@ -46,11 +54,16 @@ public class AccountController {
 
     private final CognitoService service;
     private final MembershipService membershipService;
+    private final GoCardlessService goCardlessService;
 
     @Autowired
-    public AccountController(CognitoService service, MembershipService membershipService) {
+    public AccountController(
+            CognitoService service,
+            MembershipService membershipService,
+            GoCardlessService goCardlessService) {
         this.service = service;
         this.membershipService = membershipService;
+        this.goCardlessService = goCardlessService;
     }
 
     @GetMapping(value = "/account", name = "account-members")
@@ -98,6 +111,88 @@ public class AccountController {
                 "account/order",
                 model,
                 model.containsKey(ERROR_KEY) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/account/billing/{uuid}/new-mandate", name = "account-members-new-mandate")
+    public ModelAndView newMandate(
+            @PathVariable String uuid,
+            HttpServletRequest request,
+            CognitoAuthentication cognitoAuthentication) {
+        var order =
+                membershipService.getOrders(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .filter(o -> o.getUuid().equals(uuid))
+                        .findFirst()
+                        .orElseThrow();
+
+        var model =
+                goCardlessService.newDirectDebitViewModel(
+                        request,
+                        order.getOutstanding(),
+                        cognitoAuthentication.getOAuth2AccessToken());
+        model.putAll(baseModel(request));
+        model.put("order", order);
+        model.put("existingMandates", List.of());
+
+        return new ModelAndView("account/new-mandate", model);
+    }
+
+    @PostMapping(
+            value = "/account/billing/{uuid}/new-mandate/authorise",
+            name = "account-members-new-mandate")
+    public ModelAndView newMandateProcess(
+            @PathVariable String uuid,
+            HttpServletRequest request,
+            CognitoAuthentication cognitoAuthentication) {
+        request.getSession()
+                .setAttribute(
+                        SESSION_NUMBER_OF_PAYMENTS,
+                        Integer.parseInt(request.getParameter("number_payments")));
+        request.getSession()
+                .setAttribute(
+                        SESSION_DAY_OF_MONTH,
+                        Integer.parseInt(request.getParameter("payment_day")));
+        return goCardlessService.startRedirectFlow(
+                request, format("/account/billing/{0}/new-mandate/confirm", uuid), uuid);
+    }
+
+    @GetMapping(value = "/account/billing/{uuid}/new-mandate/confirm")
+    public ModelAndView newMandateConfirm(
+            @PathVariable String uuid,
+            HttpServletRequest request,
+            CognitoAuthentication cognitoAuthentication) {
+
+        var order =
+                membershipService.getOrders(cognitoAuthentication.getOAuth2AccessToken()).stream()
+                        .filter(o -> o.getUuid().equals(uuid))
+                        .findFirst()
+                        .orElseThrow();
+
+        int dayOfMonth = (int) request.getSession().getAttribute(SESSION_DAY_OF_MONTH);
+        int numberOfPayments = (int) request.getSession().getAttribute(SESSION_NUMBER_OF_PAYMENTS);
+        String flowId = (String) request.getSession().getAttribute(SESSION_FLOW_ID);
+        List<PaymentSchedule> schedules =
+                (List<PaymentSchedule>) request.getSession().getAttribute(SESSION_SCHEDULES);
+
+        var paymentSchedule =
+                schedules.stream()
+                        .filter(ps -> ps.getNumberOfPayments() == numberOfPayments)
+                        .findFirst()
+                        .orElseThrow();
+
+        Mandate mandate =
+                goCardlessService.getMandateFromFlowId(
+                        flowId, uuid, cognitoAuthentication.getOAuth2AccessToken());
+
+        goCardlessService.createPayments(
+                mandate,
+                cognitoAuthentication.getOAuth2AccessToken(),
+                dayOfMonth,
+                numberOfPayments,
+                paymentSchedule,
+                order,
+                order.getOutstanding());
+        goCardlessService.clearSession(request);
+        return redirectToPage("/account/billing/" + uuid);
     }
 
     @GetMapping(value = "/account/info", name = "account-user")
