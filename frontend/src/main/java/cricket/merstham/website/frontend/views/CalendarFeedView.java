@@ -3,6 +3,8 @@ package cricket.merstham.website.frontend.views;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
+import biweekly.io.TimezoneAssignment;
+import biweekly.io.TimezoneInfo;
 import biweekly.property.CalendarScale;
 import biweekly.property.Method;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.web.servlet.view.AbstractView;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public abstract class CalendarFeedView<T> extends AbstractView {
     @Override
@@ -21,16 +24,20 @@ public abstract class CalendarFeedView<T> extends AbstractView {
         List<T> events = getEvents(model);
         response.addHeader("Content-Type", "text/calendar");
 
+        var timezone = new TimezoneInfo();
+        timezone.setDefaultTimezone(
+                new TimezoneAssignment(
+                        TimeZone.getTimeZone(getTimeZone(model)), getTimeZone(model)));
         ICalendar calendar = new ICalendar();
         calendar.setMethod(Method.publish());
         calendar.setCalendarScale(CalendarScale.gregorian());
         calendar.setName(getCalendarName(model));
         calendar.setProductId(getProductId(model));
         calendar.setDescription(getCalendarDescription(model));
+        calendar.setTimezoneInfo(timezone);
         calendar.setExperimentalProperty("X-PUBLISHED-TTL", getTTL(model));
         calendar.setExperimentalProperty("X-WR-CALNAME", getCalendarName(model));
         calendar.setExperimentalProperty("X-WR-CALDESC", getCalendarDescription(model));
-        calendar.setExperimentalProperty("X-WR-TIMEZONE", getTimeZone(model));
 
         events.stream().map(t -> mapEvent(t, model)).forEach(calendar::addEvent);
 
