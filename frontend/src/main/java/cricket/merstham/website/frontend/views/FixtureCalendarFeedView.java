@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -28,7 +29,16 @@ public class FixtureCalendarFeedView extends CalendarFeedView<Fixture> {
     @Override
     protected List<Fixture> getEvents(Map<String, Object> model) {
         try {
-            var results = service.allFixturesForTeam((int) model.get("teamId"));
+            var now = LocalDate.now();
+            var results =
+                    service.allFixturesForTeam((int) model.get("teamId")).stream()
+                            .filter(
+                                    fixture ->
+                                            fixture.getDate()
+                                                    .isAfter(
+                                                            now.minusYears(1)
+                                                                    .minusDays(now.getDayOfYear())))
+                            .toList();
             var team = service.getTeam((int) model.get("teamId"));
             model.put("teamName", team.getName());
             return results;
@@ -44,13 +54,8 @@ public class FixtureCalendarFeedView extends CalendarFeedView<Fixture> {
                 new Date(entry.getDate().toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC) * 1000),
                 false);
         event.setDescription(
-                format(
-                        "{0} vs {1}\nVenue: {2}\nStart: {3}",
-                        entry.getTeam().getName(),
-                        entry.getOpposition(),
-                        entry.getVenue(),
-                        entry.getStartTime()));
-        event.setLocation(entry.getHomeAway());
+                format("Start: {0}\nVenue: {1}", entry.getStartTime(), entry.getVenue()));
+        event.setLocation(entry.getVenue());
         event.setSummary(
                 format(
                         "[{0}] {1} vs {2}",
@@ -58,7 +63,7 @@ public class FixtureCalendarFeedView extends CalendarFeedView<Fixture> {
         event.addCategories(
                 List.of(
                         entry.getTeam().getName(),
-                        entry.getVenue(),
+                        entry.getHomeAway(),
                         entry.isFriendly() ? "Friendly" : "League"));
         event.setUid(Integer.toHexString(entry.getId()));
         return event;
