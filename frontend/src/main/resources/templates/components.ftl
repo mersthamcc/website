@@ -272,31 +272,33 @@
                                         <#assign classes></#assign>
                                     </#if>
                                     <#if subitem.children??>
-                                        <div class="hs-has-sub-menu">
-                                            <a id="menu-${subitem.name}"
-                                               class="hs-mega-menu-invoker dropdown-item dropdown-item-toggle ${classes}"
-                                               href="javascript:;"
-                                               aria-haspopup="true"
-                                               aria-expanded="false"
-                                               aria-controls="submenu-${subitem.name}">
-                                                <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />
-                                            </a>
-                                            <div id="submenu-${subitem.name}"
-                                                 class="hs-sub-menu dropdown-menu"
-                                                 aria-labelledby="menu-${subitem.name}"
-                                                 style="min-width: 230px;">
-                                                <#list subitem.children as leafItem>
-                                                    <#if leafItem.onActivePath(currentRoute)>
-                                                        <#assign classes>active</#assign>
-                                                    <#else>
-                                                        <#assign classes></#assign>
-                                                    </#if>
-                                                    <a class="dropdown-item ${classes}" href="${leafItem.destinationUrl}" <#if (leafItem.externalLink)>target="_blank" rel="noopener"</#if>>
-                                                        <@spring.messageArgsText code="menu.${leafItem.name}" args=leafItem.argumentValues text=leafItem.displayName />
-                                                    </a>
-                                                </#list>
+                                        <#if subitem.children?has_content>
+                                            <div class="hs-has-sub-menu">
+                                                <a id="menu-${subitem.name}"
+                                                   class="hs-mega-menu-invoker dropdown-item dropdown-item-toggle ${classes}"
+                                                   href="javascript:;"
+                                                   aria-haspopup="true"
+                                                   aria-expanded="false"
+                                                   aria-controls="submenu-${subitem.name}">
+                                                    <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />
+                                                </a>
+                                                <div id="submenu-${subitem.name}"
+                                                     class="hs-sub-menu dropdown-menu"
+                                                     aria-labelledby="menu-${subitem.name}"
+                                                     style="min-width: 230px;">
+                                                    <#list subitem.children as leafItem>
+                                                        <#if leafItem.onActivePath(currentRoute)>
+                                                            <#assign classes>active</#assign>
+                                                        <#else>
+                                                            <#assign classes></#assign>
+                                                        </#if>
+                                                        <a class="dropdown-item ${classes}" href="${leafItem.destinationUrl}" <#if (leafItem.externalLink)>target="_blank" rel="noopener"</#if>>
+                                                            <@spring.messageArgsText code="menu.${leafItem.name}" args=leafItem.argumentValues text=leafItem.displayName />
+                                                        </a>
+                                                    </#list>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </#if>
                                     <#else>
                                         <a class="dropdown-item ${classes}" href="${subitem.destinationUrl}" <#if (subitem.externalLink)>target="_blank" rel="noopener"</#if>>
                                             <@spring.messageArgsText code="menu.${subitem.name}" args=subitem.argumentValues text=subitem.displayName />

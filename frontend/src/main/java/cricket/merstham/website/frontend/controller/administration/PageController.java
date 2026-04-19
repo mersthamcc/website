@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static cricket.merstham.website.frontend.helpers.RedirectHelper.redirectTo;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_AJAX_ROUTE;
@@ -39,6 +40,7 @@ import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_NEW_ROUTE;
 import static cricket.merstham.website.frontend.helpers.RoutesHelper.ADMIN_PAGE_SAVE_ROUTE;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller("adminPageController")
@@ -155,7 +157,13 @@ public class PageController extends SspController<StaticPage> {
         var menus = new LinkedHashMap<String, String>();
         menus.put("", "menu.none");
         menuBuilder.getFrontEndMenu().stream()
-                .filter(m -> m.getChildren() != null)
+                .flatMap(
+                        menu ->
+                                isNull(menu.getChildren())
+                                        ? Stream.of(menu)
+                                        : Stream.concat(
+                                                Stream.of(menu), menu.getChildren().stream()))
+                .filter(m -> nonNull(m.getChildren()))
                 .forEach(menu -> menus.put(menu.getName(), "menu." + menu.getDisplayName()));
         return menus;
     }
