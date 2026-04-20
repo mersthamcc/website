@@ -15,7 +15,7 @@ group 'cricket.merstham'
 ext {
     dependencyVersions = [
             apollo         : "2.5.14",
-            aws            : "2.41.29",
+            aws            : "2.42.36",
             jackson        : "2.13.4.1",
             lombok         : "1.18.42",
             model_mapper   : "3.2.0",
