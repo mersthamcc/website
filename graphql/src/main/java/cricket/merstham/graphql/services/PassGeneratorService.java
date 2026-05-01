@@ -233,6 +233,9 @@ public class PassGeneratorService {
         var template = getTemplate();
 
         try {
+            LOG.info(
+                    "Signing with certificate {}",
+                    signingInformation.getSigningCert().getSubjectX500Principal());
             return signingUtil.createSignedAndZippedPkPassArchive(
                     pass, template, signingInformation);
         } catch (PKSigningException e) {
