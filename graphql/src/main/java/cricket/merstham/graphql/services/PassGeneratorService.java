@@ -234,8 +234,10 @@ public class PassGeneratorService {
 
         try {
             LOG.info(
-                    "Signing with certificate {}",
-                    signingInformation.getSigningCert().getSubjectX500Principal());
+                    "Signing with certificate {}, with expiry {}, serial {}",
+                    signingInformation.getSigningCert().getSubjectX500Principal(),
+                    signingInformation.getSigningCert().getNotAfter(),
+                    signingInformation.getSigningCert().getSerialNumber());
             return signingUtil.createSignedAndZippedPkPassArchive(
                     pass, template, signingInformation);
         } catch (PKSigningException e) {
