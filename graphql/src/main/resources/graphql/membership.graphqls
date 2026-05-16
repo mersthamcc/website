@@ -195,6 +195,7 @@ type MemberSummary {
     uuid: String!
     applePassSerial: String
     googlePassSerial: String
+    medicalConditions: String
 }
 
 type Coupon {

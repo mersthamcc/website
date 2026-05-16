@@ -133,6 +133,10 @@ public interface MemberSummaryRepository
                             criteriaBuilder.lessThan(
                                     root.get("mostRecentSubscription"), LocalDate.now().getYear()));
                 }
+                case HAS_MEDICAL_CONDITIONS -> {
+                    predicates.add(criteriaBuilder.isNotNull(root.get("medicalConditions")));
+                    predicates.add(criteriaBuilder.notEqual(root.get("medicalConditions"), ""));
+                }
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

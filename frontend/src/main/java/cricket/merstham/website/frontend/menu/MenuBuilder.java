@@ -310,6 +310,12 @@ public class MenuBuilder {
                                                     buildParams("report", "not-this-year"),
                                                     null,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-membership-report",
+                                                    buildParams("report", "has-medical-conditions"),
+                                                    null,
+                                                    List.of(),
                                                     null)),
                             "tio-chart-bar-4"));
 

@@ -18,5 +18,7 @@ query filteredMembers($filter: String!) {
         identifiers
         uuid
         applePassSerial
+        googlePassSerial
+        medicalConditions
     }
 }

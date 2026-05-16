@@ -127,4 +127,7 @@ public class MemberSummaryEntity {
 
     @Column(name = "order_id")
     private Integer orderId;
+
+    @Column(name = "medical_conditions", length = Integer.MAX_VALUE)
+    private String medicalConditions;
 }
