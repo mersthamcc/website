@@ -66,7 +66,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -101,7 +102,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "ENUM",
@@ -166,7 +168,8 @@
               "deprecationReason": null
             }
           ],
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -209,7 +212,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -264,7 +268,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -274,7 +279,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -317,7 +323,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -404,7 +411,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -555,7 +563,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -694,7 +703,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -737,7 +747,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -824,7 +835,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -883,7 +895,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -1002,7 +1015,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -1093,7 +1107,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -1172,7 +1187,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -1283,7 +1299,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -1398,7 +1415,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -1509,7 +1527,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -1519,7 +1538,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -1529,7 +1549,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -1696,7 +1717,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -1863,7 +1885,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2002,7 +2025,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -2012,7 +2036,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -2022,7 +2047,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -2145,7 +2171,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -2155,7 +2182,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2198,7 +2226,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -2237,7 +2266,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2304,7 +2334,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2363,7 +2394,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -2398,7 +2430,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2533,7 +2566,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2620,7 +2654,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2731,7 +2766,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2790,7 +2826,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -2897,7 +2934,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -2948,7 +2986,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -3023,7 +3062,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -3086,7 +3126,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -3185,7 +3226,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -3256,7 +3298,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -3518,12 +3561,25 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "medicalConditions",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -3614,7 +3670,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -3705,7 +3762,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -5022,7 +5080,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -5245,7 +5304,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -5452,7 +5512,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -5615,7 +5676,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -5702,7 +5764,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -5789,7 +5852,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -5848,7 +5912,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6043,7 +6108,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -6162,7 +6228,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -6185,7 +6252,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6281,7 +6349,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6360,7 +6429,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6427,7 +6497,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6646,7 +6717,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -6713,7 +6785,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -8665,7 +8738,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -8708,7 +8782,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -8795,7 +8870,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -8882,7 +8958,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9037,7 +9114,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "SCALAR",
@@ -9047,7 +9125,8 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -9146,7 +9225,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9287,7 +9367,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9330,7 +9411,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9437,7 +9519,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9500,7 +9583,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9623,7 +9707,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -9718,7 +9803,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -9901,7 +9987,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -10080,7 +10167,8 @@
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10196,7 +10284,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "ENUM",
@@ -10321,7 +10410,8 @@
               "deprecationReason": null
             }
           ],
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10388,7 +10478,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10508,7 +10599,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10599,7 +10691,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10710,7 +10803,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "OBJECT",
@@ -10948,7 +11042,8 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         },
         {
           "kind": "ENUM",
@@ -11007,7 +11102,8 @@
               "deprecationReason": null
             }
           ],
-          "possibleTypes": null
+          "possibleTypes": null,
+          "specifiedByURL": null
         }
       ],
       "directives": [
@@ -11081,9 +11177,13 @@
               "name": "reason",
               "description": "The reason for the deprecation",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "defaultValue": "\"No longer supported\"",
               "isDeprecated": false,
@@ -11123,6 +11223,56 @@
           "description": "Indicates an Input Object is a OneOf Input Object.",
           "locations": [
             "INPUT_OBJECT"
+          ],
+          "args": [],
+          "isRepeatable": false
+        },
+        {
+          "name": "defer",
+          "description": "This directive allows results to be deferred during execution",
+          "locations": [
+            "FRAGMENT_SPREAD",
+            "INLINE_FRAGMENT"
+          ],
+          "args": [
+            {
+              "name": "if",
+              "description": "Deferred behaviour is controlled by this argument",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "defaultValue": "true",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "label",
+              "description": "A unique label that represents the fragment being deferred",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "isRepeatable": false
+        },
+        {
+          "name": "experimental_disableErrorPropagation",
+          "description": "This directive disables error propagation when a non nullable field returns null for the given operation.",
+          "locations": [
+            "QUERY",
+            "MUTATION",
+            "SUBSCRIPTION"
           ],
           "args": [],
           "isRepeatable": false

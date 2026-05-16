@@ -1037,6 +1037,7 @@ class MembershipServiceTest {
                                         List.of(),
                                         UUID.randomUUID().toString(),
                                         null,
+                                        null,
                                         null))
                 .sorted(Comparator.comparing(MembersQuery.Member::getId))
                 .toList();

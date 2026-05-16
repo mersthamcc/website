@@ -24,6 +24,9 @@
             if (row.data.declarations && !row.data.declarations.includes("PHOTOS-COACHING")) {
                 tags.push(`<span class="badge badge-secondary"><@spring.message code="membership.no-coaching-photo" /></span>`);
             }
+            if (row.data.medicalConditions && !row.data.declarations!== "") {
+                tags.push(`<span class="badge badge-danger"><@spring.message code="membership.has-medical-condition" /></span>`);
+            }
             return tags.join("<br/>");
         }
 
