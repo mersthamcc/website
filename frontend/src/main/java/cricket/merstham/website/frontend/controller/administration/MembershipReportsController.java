@@ -163,6 +163,7 @@ public class MembershipReportsController {
             case "no-photos-coaching" -> ReportFilter.NO_PHOTOS_COACHING;
             case "no-photos-media" -> ReportFilter.NO_PHOTOS_MEDIA;
             case "not-this-year" -> ReportFilter.NOT_THIS_YEAR;
+            case "has-medical-conditions" -> ReportFilter.HAS_MEDICAL_CONDITIONS;
             default -> throw new IllegalStateException("Unexpected value: " + report);
         };
     }
