@@ -7,3 +7,7 @@ type Pass {
 extend type Query {
     pass(memberUuid: String!, type: String!): Pass!
 }
+
+extend type Mutation {
+    distributePasses(memberId: Int!): [String!]
+}

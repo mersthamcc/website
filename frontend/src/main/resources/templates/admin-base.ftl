@@ -38,6 +38,8 @@
 			<!-- Font -->
 			<link href="//fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 			<link href="${resourcePrefix}/front/assets/vendor/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet" >
+			<link href="${resourcePrefix}/front/assets/vendor/fontawesome/css/svg-with-js.min.css" rel="stylesheet" >
+			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css" rel="stylesheet">
 			<!-- CSS Implementing Plugins -->
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/icon-set/style.css">
 			<link rel="stylesheet" href="${resourcePrefix}/front/admin/assets/vendor/select2/dist/css/select2.min.css">

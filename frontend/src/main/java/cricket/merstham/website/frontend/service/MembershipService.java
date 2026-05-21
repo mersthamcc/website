@@ -35,6 +35,7 @@ import cricket.merstham.website.graph.account.MyOrdersQuery;
 import cricket.merstham.website.graph.account.PassQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
+import cricket.merstham.website.graph.membership.DistributePassesMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
@@ -484,5 +485,15 @@ public class MembershipService {
         return requireGraphData(response, MyOrdersQuery.Data::getMyOrders).stream()
                 .map(c -> modelMapper.map(c, Order.class))
                 .toList();
+    }
+
+    public List<String> updatePasses(int id, OAuth2AccessToken accessToken) {
+        var mutation = DistributePassesMutation.builder().id(id).build();
+        Response<DistributePassesMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+        return requireGraphData(
+                response,
+                DistributePassesMutation.Data::getDistributePasses,
+                () -> "Error updating passes");
     }
 }
