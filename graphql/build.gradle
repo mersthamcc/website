@@ -89,7 +89,7 @@ dependencies {
     testImplementation 'com.thedeanda:lorem:2.1'
     testImplementation "org.springframework.boot:spring-boot-starter-test:${dependencyVersions.spring_boot}"
     testImplementation "org.testcontainers:junit-jupiter"
-    testImplementation 'org.assertj:assertj-core:3.25.1'
+    testImplementation "org.assertj:assertj-core:${dependencyVersions.assertj}"
     testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
