@@ -115,6 +115,9 @@ configuration:
     footer-text: ${CLUB_ADDRESS:}
     inclusive-kit-url: ${INCLUSIVE_KIT_ORDER_URL:}
     inclusive-kit-partner: ${INCLUSIVE_KIT_PARTNER:}
+    inclusive-kit-email-enabled: ${INCLUSIVE_KIT_ENABLED:false}
+    inclusive-kit-cc: ${INCLUSIVE_KIT_CC_ADDRESS:}
+    inclusive-kit-size-guide-url: ${INCLUSIVE_KIT_SIZE_GUIDE_URL:}
   bank-details:
     account-name: ${BANK_ACCOUNT_NAME:Merstham Cricket Club}
     account-number: ${BANK_ACCOUNT_NUMBER:49244507}

@@ -4,8 +4,8 @@ import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.services.EmailService;
 import cricket.merstham.graphql.services.hooks.Hook;
 import cricket.merstham.shared.dto.User;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -16,25 +16,29 @@ import static cricket.merstham.graphql.services.EmailService.MailTemplate.INCLUS
 public class InclusiveJuniorKitHook implements Hook<OrderEntity> {
 
     private final EmailService emailService;
-    private final ModelMapper modelMapper;
+    private final boolean enabled;
 
     @Autowired
-    public InclusiveJuniorKitHook(EmailService emailService, ModelMapper modelMapper) {
+    public InclusiveJuniorKitHook(
+            EmailService emailService,
+            @Value("${configuration.mail.inclusive-kit-email-enabled}") boolean enabled) {
         this.emailService = emailService;
-        this.modelMapper = modelMapper;
+        this.enabled = enabled;
     }
 
     @Override
     public void onConfirm(OrderEntity order, String paymentType, User user) {
-        var inclusiveKitSubscriptions =
-                order.getMemberSubscription().stream()
-                        .filter(s -> s.getPricelistItem().getInclusiveKit())
-                        .toList();
-        if (!inclusiveKitSubscriptions.isEmpty()) {
-            emailService.sendEmail(
-                    user.getEmail(),
-                    INCLUSIVE_KIT_ORDER,
-                    Map.of("user", user, "subscriptions", inclusiveKitSubscriptions));
+        if (enabled) {
+            var inclusiveKitSubscriptions =
+                    order.getMemberSubscription().stream()
+                            .filter(s -> s.getPricelistItem().getInclusiveKit())
+                            .toList();
+            if (!inclusiveKitSubscriptions.isEmpty()) {
+                emailService.sendEmail(
+                        user.getEmail(),
+                        INCLUSIVE_KIT_ORDER,
+                        Map.of("user", user, "subscriptions", inclusiveKitSubscriptions));
+            }
         }
     }
 }

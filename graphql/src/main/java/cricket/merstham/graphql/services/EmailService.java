@@ -117,10 +117,11 @@ public class EmailService {
                 .text(translation("email.INCLUSIVE_KIT_ORDER.paragraph1"))
                 .and()
                 .table(buildKitEligibleMemberTable(builder, members))
-                .text(
+                .html(
                         translation(
                                 "email.INCLUSIVE_KIT_ORDER.paragraph2",
-                                configuration.getInclusiveKitPartner()))
+                                configuration.getInclusiveKitPartner(),
+                                configuration.getInclusiveKitSizeGuideUrl()))
                 .and()
                 .button(
                         translation("email.INCLUSIVE_KIT_ORDER.button"),
@@ -581,6 +582,7 @@ public class EmailService {
 
     private List<String> getCCAddresses(MailTemplate template) {
         return switch (template) {
+            case INCLUSIVE_KIT_ORDER -> configuration.getInclusiveKitCc();
             default -> List.of();
         };
     }
