@@ -15,6 +15,7 @@ import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.frontend.service.MembershipService;
 import cricket.merstham.website.frontend.service.PlayerService;
 import cricket.merstham.website.frontend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
@@ -127,15 +129,19 @@ public class MembershipController extends SspController<MemberSummary> {
     @GetMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-edit")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
     public ModelAndView edit(
-            CognitoAuthentication cognitoAuthentication, Locale locale, @PathVariable int id)
+            CognitoAuthentication cognitoAuthentication,
+            Locale locale,
+            HttpServletRequest request,
+            @PathVariable int id)
             throws IOException {
         var member =
                 membershipService
                         .get(id, cognitoAuthentication.getOAuth2AccessToken())
                         .orElseThrow();
-        return new ModelAndView(
-                "administration/membership/edit",
-                buildModelData(member, locale, cognitoAuthentication.getOAuth2AccessToken()));
+        var model = buildModelData(member, locale, cognitoAuthentication.getOAuth2AccessToken());
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey("info")) model.put("info", flash.get("info"));
+        return new ModelAndView("administration/membership/edit", model);
     }
 
     @PostMapping(value = "/administration/membership/edit/{id}", name = "admin-membership-update")
@@ -169,6 +175,26 @@ public class MembershipController extends SspController<MemberSummary> {
             var playCricketId = Integer.parseInt((String) data.getFirst("play-cricket-id"));
             membershipService.linkToPlayCricketPlayer(
                     id, cognitoAuthentication.getOAuth2AccessToken(), playCricketId);
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
+    @PostMapping(
+            value = "/administration/membership/edit/{id}/update-passes",
+            name = "admin-membership-update-passes")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public RedirectView updatePasses(
+            CognitoAuthentication cognitoAuthentication,
+            RedirectAttributes redirectAttributes,
+            @PathVariable int id) {
+        try {
+            var result =
+                    membershipService.updatePasses(
+                            id, cognitoAuthentication.getOAuth2AccessToken());
+            redirectAttributes.addFlashAttribute("info", result);
         } catch (GraphException ex) {
             LOG.error("Error performing update!", ex);
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -314,9 +340,10 @@ public class MembershipController extends SspController<MemberSummary> {
                 .orElse(Comparator.comparing(MemberSummary::getFamilyName));
     }
 
-    private Map<String, ?> buildModelData(
+    private Map<String, Object> buildModelData(
             Member member, Locale locale, OAuth2AccessToken accessToken) throws IOException {
         var model = new HashMap<String, Object>();
+
         var subscription =
                 member.getSubscription().stream()
                         .sorted(Comparator.comparing(MemberSubscription::getYear).reversed())

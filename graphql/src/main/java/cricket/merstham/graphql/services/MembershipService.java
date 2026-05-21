@@ -35,6 +35,8 @@ import cricket.merstham.shared.dto.Payment;
 import cricket.merstham.shared.dto.User;
 import cricket.merstham.shared.types.ReportFilter;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -50,6 +52,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,13 +60,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
+import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static cricket.merstham.shared.types.ReportFilter.ALL;
+import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Component
 public class MembershipService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MembershipService.class);
 
     private final AttributeDefinitionEntityRepository attributeRepository;
     private final MemberEntityRepository memberRepository;
@@ -79,6 +86,8 @@ public class MembershipService {
     private final CognitoService cognitoService;
     private final CouponEntityRepository couponEntityRepository;
     private final List<Hook<OrderEntity>> hooks;
+    private final PasskitUpdateService passkitUpdateService;
+    private final PassGeneratorService passGeneratorService;
 
     @Autowired
     public MembershipService(
@@ -95,7 +104,9 @@ public class MembershipService {
             EmailService emailService,
             CognitoService cognitoService,
             CouponEntityRepository couponEntityRepository,
-            List<Hook<OrderEntity>> hooks) {
+            List<Hook<OrderEntity>> hooks,
+            PasskitUpdateService passkitUpdateService,
+            PassGeneratorService passGeneratorService) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -110,6 +121,8 @@ public class MembershipService {
         this.cognitoService = cognitoService;
         this.couponEntityRepository = couponEntityRepository;
         this.hooks = hooks;
+        this.passkitUpdateService = passkitUpdateService;
+        this.passGeneratorService = passGeneratorService;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -456,5 +469,30 @@ public class MembershipService {
         return couponEntityRepository.findAllByOwnerUserId(getSubject(principal)).stream()
                 .map((element) -> modelMapper.map(element, Coupon.class))
                 .toList();
+    }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public List<String> sendPasses(int memberId) {
+        LOG.info("Begin Membership Pass updates for member {}", memberId);
+        var result = new LinkedList<String>();
+        var member = memberRepository.findById(memberId).orElseThrow();
+        var appleUpdates = passkitUpdateService.sendUpdatesForMember(member);
+        if (appleUpdates < 0) {
+            result.add("Error while updating Apple Devices");
+        } else {
+            result.add(format("{0} Apple devices updated", appleUpdates));
+        }
+        if (member.getIdentifiers().containsKey(GOOGLE_PASS_SERIAL)) {
+            try {
+                passGeneratorService.createOrUpdateGooglePassObject(
+                        member, member.getIdentifiers().get(GOOGLE_PASS_SERIAL));
+                result.add("Google Wallet successfully updated");
+            } catch (Exception e) {
+                LOG.error("Error while updating Google Wallet", e);
+                result.add("Error while updating Google Wallet");
+            }
+        }
+        LOG.info("End Membership pass updates for member {}", memberId);
+        return result;
     }
 }

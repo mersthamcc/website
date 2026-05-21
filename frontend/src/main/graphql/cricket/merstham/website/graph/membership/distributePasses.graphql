@@ -1,0 +1,3 @@
+mutation distributePasses($id: Int!){
+    distributePasses(memberId: $id)
+}

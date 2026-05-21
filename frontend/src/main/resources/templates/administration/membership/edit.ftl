@@ -17,9 +17,19 @@
         <i class="fa fa-check-circle"></i>
     </button>
 </#macro>
+
+<#macro passFormButtons>
+    <button type="submit" class="btn btn-primary transition-3d-hover" name="action">
+        <@spring.message code="membership.passes.update" />
+        <i class="fa fa-send-o"></i>
+    </button>
+</#macro>
+
 <@layout.mainLayout script=dataScript>
     <div class="row">
         <div class="col-lg-8">
+            <@admin.formInfo info=info![] />
+
             <#list subscription.priceListItem.memberCategory.form as section>
                 <@admin.section title="membership.${section.section.key}" action="" footer=detailsFormButtons>
                     <#list section.section.attribute as attribute>
@@ -196,6 +206,53 @@
                         </div>
                     </div>
                     <!-- End List Item -->
+                </div>
+            </@admin.section>
+
+            <@admin.section title="membership.passes.title" action="${member.id}/update-passes" footer=passFormButtons>
+                <div class="list-group list-group-lg list-group-flush list-group-no-gutters">
+                    <div class="list-group-item">
+                        <div class="media">
+                            <div class="media-body">
+                                <div class="row align-items-center">
+                                    <div class="col-sm mb-1 mb-sm-0">
+                                        <h6 class="mb-0">
+                                            <i class="tio-apple"></i> <@spring.message code="membership.passes.apple" />
+                                        </h6>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <#if member.hasApplePass()>
+                                            <span class="badge badge-soft-success ml-2">
+                                                <@spring.message code="membership.passes.downloaded" />
+                                            </span>
+                                        <#else>
+                                            <span class="badge badge-soft-dark ml-2">
+                                                <@spring.message code="membership.passes.not-downloaded" />
+                                            </span>
+                                        </#if>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center">
+                                    <div class="col-sm mb-1 mb-sm-0">
+                                        <h6 class="mb-0">
+                                            <i class="tio-google"></i> <@spring.message code="membership.passes.google" />
+                                        </h6>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <#if member.hasGooglePass()>
+                                            <span class="badge badge-soft-success ml-2">
+                                                <@spring.message code="membership.passes.downloaded" />
+                                            </span>
+                                        <#else>
+                                            <span class="badge badge-soft-dark ml-2">
+                                                <@spring.message code="membership.passes.not-downloaded" />
+                                            </span>
+                                        </#if>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </@admin.section>
 

@@ -805,3 +805,15 @@
         </div>
     </#if>
 </#macro>
+
+<#macro formInfo info>
+    <#if (info?size > 0)>
+        <div class="alert alert-info" role="alert">
+            <h5 class="alert-info">Results</h5>
+            <hr />
+            <#list info as i>
+                <p class="text-inherit">${i}</p>
+            </#list>
+        </div>
+    </#if>
+</#macro>

@@ -14,7 +14,7 @@ import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 @Service
 public class GooglePassHook implements Hook<OrderEntity> {
 
-    private static Logger LOG = LoggerFactory.getLogger(GooglePassHook.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GooglePassHook.class);
 
     private final PassGeneratorService passGeneratorService;
 

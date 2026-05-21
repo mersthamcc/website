@@ -25,7 +25,9 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static cricket.merstham.shared.IdentifierConstants.APPLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.EPOS_CUSTOMER_ID;
+import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
@@ -165,5 +167,15 @@ public class Member implements Serializable {
         if (nonNull(this.attributes)) attributeSet.addAll(this.attributes);
         this.attributes = new ArrayList<>(attributeSet);
         return this;
+    }
+
+    public boolean hasApplePass() {
+        return nonNull(identifiers)
+                && identifiers.stream().anyMatch(id -> id.getKey().equals(APPLE_PASS_SERIAL));
+    }
+
+    public boolean hasGooglePass() {
+        return nonNull(identifiers)
+                && identifiers.stream().anyMatch(id -> id.getKey().equals(GOOGLE_PASS_SERIAL));
     }
 }
