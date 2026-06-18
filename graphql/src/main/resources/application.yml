@@ -153,6 +153,8 @@ configuration:
       client-secret: ${PAYPAL_CLIENT_SECRET:}
       sandbox: ${PAYPAL_SANDBOX:true}
       webhook-id: ${PAYPAL_WEBHOOK_ID:}
+    signinapp:
+      secret: ${SIGNINAPP_WEBHOOK_SECRET:}
   facebook:
     application-id: ${FACEBOOK_APP_ID}
     application-secret: ${FACEBOOK_APP_SECRET}
