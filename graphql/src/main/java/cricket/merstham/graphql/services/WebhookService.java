@@ -88,14 +88,14 @@ public class WebhookService {
         LOG.info("Processing received webhooks...");
         var webhooks =
                 repository.findAllByProcessedFalseAndTypeIn(
-                        List.of("stripe", "gocardless", "paypal"));
+                        List.of("stripe", "gocardless", "paypal", "signinapp"));
 
         webhooks.forEach(
                 webhook -> {
                     var processor = getProcessor(webhook.getType());
                     if (processor.processWebhook(webhook.getBody())) {
                         LOG.info(
-                                "Webhook successfully process - Type: {}, Reference: {}",
+                                "Webhook successfully processed - Type: {}, Reference: {}",
                                 webhook.getType(),
                                 webhook.getId());
                     } else {
