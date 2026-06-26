@@ -24,6 +24,7 @@ type Member {
     attributes: [MemberAttribute!]!
     subscription: [MemberSubscription!]!
     identifiers: [KeyValuePair]
+    attendance: [MemberAttendance]
 }
 
 type MemberAttribute {
@@ -89,6 +90,12 @@ type MemberSubscription {
     addedDate: Date
     priceListItem: PriceListItem!
     order: Order
+}
+
+type MemberAttendance {
+    id: String!
+    time: DateTime!
+    event: String!
 }
 
 input MemberSubscriptionInput {

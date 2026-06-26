@@ -1,6 +1,7 @@
 package cricket.merstham.website.frontend.controller.administration;
 
 import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberAttendance;
 import cricket.merstham.shared.dto.MemberSubscription;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Payment;
@@ -38,6 +39,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.io.IOException;
 import java.net.URI;
 import java.text.NumberFormat;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
@@ -452,6 +454,53 @@ public class MembershipController extends SspController<MemberSummary> {
                         new DataTableColumn().setKey("payments.type").setSortable(false),
                         new DataTableColumn().setKey("payments.reference").setSortable(false),
                         new DataTableColumn().setKey("payments.amount").setSortable(false)));
+
+        model.put(
+                "attendance",
+                member.getAttendance().stream()
+                        .sorted(Comparator.comparing(MemberAttendance::getTime).reversed())
+                        .map(
+                                a ->
+                                        Map.of(
+                                                "membership.attendance-date",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                a.getTime()
+                                                                        .atZone(
+                                                                                ZoneId
+                                                                                        .systemDefault())
+                                                                        .format(
+                                                                                DateTimeFormatter
+                                                                                        .ofLocalizedDate(
+                                                                                                FormatStyle
+                                                                                                        .SHORT))),
+                                                "membership.attendance-time",
+                                                new DataTableValue()
+                                                        .setValue(
+                                                                a.getTime()
+                                                                        .atZone(
+                                                                                ZoneId
+                                                                                        .systemDefault())
+                                                                        .format(
+                                                                                DateTimeFormatter
+                                                                                        .ofLocalizedTime(
+                                                                                                FormatStyle
+                                                                                                        .SHORT))),
+                                                "membership.attendance-event",
+                                                new DataTableValue().setValue(a.getEvent())))
+                        .toList());
+        model.put(
+                "attendanceColumns",
+                List.of(
+                        new DataTableColumn()
+                                .setKey("membership.attendance-date")
+                                .setSortable(false),
+                        new DataTableColumn()
+                                .setKey("membership.attendance-time")
+                                .setSortable(false),
+                        new DataTableColumn()
+                                .setKey("membership.attendance-event")
+                                .setSortable(false)));
 
         User owner = null;
         try {
