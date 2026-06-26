@@ -5,7 +5,11 @@
 <#macro dataScript>
     <script>
         function onPageLoad() {
-        };
+            $('#member-tabs a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+        }
     </script>
 </#macro>
 <#macro detailsFormButtons>
@@ -28,39 +32,77 @@
 <@layout.mainLayout script=dataScript>
     <div class="row">
         <div class="col-lg-8">
-            <@admin.formInfo info=info![] />
+            <div class="bg-dark mb-4">
+                <ul class="nav nav-white nav-pills nav-tabs-light" id="member-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#personal">
+                            <@spring.message code="membership.personal" />
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#registrations">
+                            <@spring.message code="membership.registrations" />
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#attendance">
+                            <@spring.message code="membership.attendance" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            <#list subscription.priceListItem.memberCategory.form as section>
-                <@admin.section title="membership.${section.section.key}" action="" footer=detailsFormButtons>
-                    <#list section.section.attribute as attribute>
-                        <@admin.memberAdminField attribute=attribute data=data />
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal">
+                    <@admin.formInfo info=info![] />
+
+                    <#list subscription.priceListItem.memberCategory.form as section>
+                        <@admin.section title="membership.${section.section.key}" action="" footer=detailsFormButtons>
+                            <#list section.section.attribute as attribute>
+                                <@admin.memberAdminField attribute=attribute data=data />
+                            </#list>
+                        </@admin.section>
                     </#list>
-                </@admin.section>
-            </#list>
+                </div>
 
-            <@admin.adminTableCard
-                id="subscriptionHistoryTable"
-                selectable=false
-                searchable=false
-                defaultPageLength=10
-                pageLengths=[10,25,50]
-                title="membership.history"
-                columns=subscriptionHistoryColumns
-                data=subscriptionHistory
-            />
+                <div class="tab-pane fade" id="registrations" role="tabpanel" aria-labelledby="registrations">
+                    <@admin.adminTableCard
+                        id="subscriptionHistoryTable"
+                        selectable=false
+                        searchable=false
+                        defaultPageLength=10
+                        pageLengths=[10,25,50]
+                        title="membership.history"
+                        columns=subscriptionHistoryColumns
+                        data=subscriptionHistory
+                    />
 
-            <@admin.adminTableCard
-                id="paymentsTable"
-                selectable=false
-                searchable=false
-                defaultPageLength=10
-                pageLengths=[10,25,50]
-                title="membership.payments"
-                columns=paymentsColumns
-                data=payments
-                rightHeader=orderLabel
-            />
+                    <@admin.adminTableCard
+                        id="paymentsTable"
+                        selectable=false
+                        searchable=false
+                        defaultPageLength=10
+                        pageLengths=[10,25,50]
+                        title="membership.payments"
+                        columns=paymentsColumns
+                        data=payments
+                        rightHeader=orderLabel
+                    />
+                </div>
 
+                <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance">
+                    <@admin.adminTableCard
+                        id="attendanceTable"
+                        selectable=false
+                        searchable=false
+                        defaultPageLength=50
+                        pageLengths=[10,25,50,100]
+                        title="membership.attendance"
+                        columns=attendanceColumns
+                        data=attendance
+                    />
+                </div>
+            </div>
             <@components.buttonGroup>
                 <a href="/administration/membership" class="btn btn-bg-success transition-3d-hover">
                     <@spring.message code="membership.complete" />

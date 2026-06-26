@@ -686,7 +686,8 @@ class MembershipServiceTest {
                                                                                 "adult",
                                                                                 List.of()),
                                                                         List.of()),
-                                                                2022))))
+                                                                2022)),
+                                                List.of()))
                         .toList();
 
         mockQuery(

@@ -79,5 +79,10 @@ query member($id: Int!) {
             }
             year
         }
+        attendance {
+            id
+            time
+            event
+        }
     }
 }
