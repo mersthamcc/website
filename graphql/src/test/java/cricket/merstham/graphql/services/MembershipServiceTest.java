@@ -25,6 +25,7 @@ import cricket.merstham.graphql.inputs.filters.StringFilter;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
 import cricket.merstham.graphql.repository.CouponEntityRepository;
+import cricket.merstham.graphql.repository.MemberAttendanceSummaryRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
@@ -379,7 +380,8 @@ class MembershipServiceTest {
                     mock(CouponEntityRepository.class),
                     List.of(),
                     mock(PasskitUpdateService.class),
-                    mock(PassGeneratorService.class));
+                    mock(PassGeneratorService.class),
+                    mock(MemberAttendanceSummaryRepository.class));
 
     @BeforeEach
     void setup() {
