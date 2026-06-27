@@ -53,39 +53,49 @@ public class MembershipReportsController {
             @PathVariable String report, CognitoAuthentication cognitoAuthentication) {
         return new ModelAndView(
                 "administration/membership-report/report",
-                Map.of(
-                        "report",
-                        report,
-                        "memberColumns",
-                        List.of(
-                                new DataTableColumn()
-                                        .setKey("membership.family-name")
-                                        .setFieldName("familyName"),
-                                new DataTableColumn()
-                                        .setKey("membership.given-name")
-                                        .setFieldName("givenName"),
-                                new DataTableColumn()
-                                        .setKey("membership.category")
-                                        .setFieldName("lastSubsCategory"),
-                                new DataTableColumn()
-                                        .setKey("membership.age-group")
-                                        .setFieldName("ageGroup"),
-                                new DataTableColumn()
-                                        .setKey("membership.gender")
-                                        .setFieldName("gender"),
-                                new DataTableColumn()
-                                        .setKey("membership.last-subscription")
-                                        .setFieldName("mostRecentSubscription"),
-                                new DataTableColumn()
-                                        .setKey("membership.status")
-                                        .setFunction(true)
-                                        .setFunctionName("unpaid")
-                                        .setSortable(false),
-                                new DataTableColumn()
-                                        .setKey("membership.tags")
-                                        .setFunction(true)
-                                        .setFunctionName("tags")
-                                        .setSortable(false))));
+                Map.of("report", report, "memberColumns", columnDefinitions(report)));
+    }
+
+    private List<DataTableColumn> columnDefinitions(String report) {
+        return switch (report) {
+            case "has-medical-conditions" -> List.of(
+                    new DataTableColumn()
+                            .setKey("membership.family-name")
+                            .setFieldName("familyName"),
+                    new DataTableColumn().setKey("membership.given-name").setFieldName("givenName"),
+                    new DataTableColumn()
+                            .setKey("membership.category")
+                            .setFieldName("lastSubsCategory"),
+                    new DataTableColumn().setKey("membership.age-group").setFieldName("ageGroup"),
+                    new DataTableColumn().setKey("membership.gender").setFieldName("gender"),
+                    new DataTableColumn()
+                            .setKey("membership.medical-conditions")
+                            .setFieldName("medicalConditions")
+                            .setSortable(false));
+            default -> List.of(
+                    new DataTableColumn()
+                            .setKey("membership.family-name")
+                            .setFieldName("familyName"),
+                    new DataTableColumn().setKey("membership.given-name").setFieldName("givenName"),
+                    new DataTableColumn()
+                            .setKey("membership.category")
+                            .setFieldName("lastSubsCategory"),
+                    new DataTableColumn().setKey("membership.age-group").setFieldName("ageGroup"),
+                    new DataTableColumn().setKey("membership.gender").setFieldName("gender"),
+                    new DataTableColumn()
+                            .setKey("membership.last-subscription")
+                            .setFieldName("mostRecentSubscription"),
+                    new DataTableColumn()
+                            .setKey("membership.status")
+                            .setFunction(true)
+                            .setFunctionName("unpaid")
+                            .setSortable(false),
+                    new DataTableColumn()
+                            .setKey("membership.tags")
+                            .setFunction(true)
+                            .setFunctionName("tags")
+                            .setSortable(false));
+        };
     }
 
     @GetMapping(
@@ -175,6 +185,7 @@ public class MembershipReportsController {
                                 member.getFamilyName().toLowerCase().contains(s)
                                         || member.getGivenName().toLowerCase().contains(s)
                                         || member.getLastSubsCategory().toLowerCase().contains(s)
+                                        || member.getMedicalConditions().toLowerCase().contains(s)
                                         || member.getLastSubsYear().contains(s)
                                         || (nonNull(member.getAgeGroup())
                                                 && member.getAgeGroup().equalsIgnoreCase(s))
