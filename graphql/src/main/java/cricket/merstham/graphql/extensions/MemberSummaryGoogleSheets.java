@@ -170,6 +170,11 @@ public class MemberSummaryGoogleSheets {
                                                     new ExtendedValue()
                                                             .setStringValue(
                                                                     "Emergency Contact Number"))
+                                            .setUserEnteredFormat(HEADER_FORMAT),
+                                    new CellData()
+                                            .setUserEnteredValue(
+                                                    new ExtendedValue()
+                                                            .setStringValue("Medical Conditions"))
                                             .setUserEnteredFormat(HEADER_FORMAT)));
 
     public static RowData getSheetsRowData(MemberSummary member) {
@@ -344,7 +349,11 @@ public class MemberSummaryGoogleSheets {
                                                                 ? null
                                                                 : member.getAttributes()
                                                                         .get(
-                                                                                "emergency-contact-phone")))));
+                                                                                "emergency-contact-phone"))),
+                        new CellData()
+                                .setUserEnteredValue(
+                                        new ExtendedValue()
+                                                .setStringValue(member.getMedicalConditions()))));
 
         return rowData;
     }
