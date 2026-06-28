@@ -205,6 +205,16 @@ type MemberSummary {
     medicalConditions: String
 }
 
+type MemberAttendanceSummary {
+    id: String!
+    time: DateTime!
+    memberId: Int
+    fullName: String!
+    ageGroup: String
+    event: String!
+    registrationYear: Int
+}
+
 type Coupon {
     id: Int!
     code: String!
@@ -225,6 +235,14 @@ input CouponInput {
     appliedToOrderId: Int
 }
 
+input AttendanceFilter {
+    from: Date!
+    to: Date!
+    ageGroup: [String!]
+    includeUnregistered: Boolean
+    memberId: Int
+}
+
 extend type Query {
     attributes: [AttributeDefinition]
     member(id: Int!): Member
@@ -239,6 +257,7 @@ extend type Query {
     order(id: Int!): Order
     memberCount: Int!
     myCoupons: [Coupon]
+    attendances(filter: AttendanceFilter): [MemberAttendanceSummary]!
 }
 
 extend type Mutation {

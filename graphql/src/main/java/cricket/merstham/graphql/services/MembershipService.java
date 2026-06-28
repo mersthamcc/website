@@ -10,12 +10,14 @@ import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
 import cricket.merstham.graphql.entity.MemberSummaryEntity;
 import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
+import cricket.merstham.graphql.inputs.AttendanceFilterInput;
 import cricket.merstham.graphql.inputs.AttributeInput;
 import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
 import cricket.merstham.graphql.repository.AttributeDefinitionEntityRepository;
 import cricket.merstham.graphql.repository.CouponEntityRepository;
+import cricket.merstham.graphql.repository.MemberAttendanceSummaryRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
@@ -27,6 +29,7 @@ import cricket.merstham.graphql.services.hooks.Hook;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberFilter;
 import cricket.merstham.shared.dto.MemberSummary;
@@ -88,6 +91,7 @@ public class MembershipService {
     private final List<Hook<OrderEntity>> hooks;
     private final PasskitUpdateService passkitUpdateService;
     private final PassGeneratorService passGeneratorService;
+    private final MemberAttendanceSummaryRepository memberAttendanceSummaryRepository;
 
     @Autowired
     public MembershipService(
@@ -106,7 +110,8 @@ public class MembershipService {
             CouponEntityRepository couponEntityRepository,
             List<Hook<OrderEntity>> hooks,
             PasskitUpdateService passkitUpdateService,
-            PassGeneratorService passGeneratorService) {
+            PassGeneratorService passGeneratorService,
+            MemberAttendanceSummaryRepository memberAttendanceSummaryRepository) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -123,6 +128,7 @@ public class MembershipService {
         this.hooks = hooks;
         this.passkitUpdateService = passkitUpdateService;
         this.passGeneratorService = passGeneratorService;
+        this.memberAttendanceSummaryRepository = memberAttendanceSummaryRepository;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -494,5 +500,15 @@ public class MembershipService {
         }
         LOG.info("End Membership pass updates for member {}", memberId);
         return result;
+    }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public List<MemberAttendanceSummary> getMemberAttedance(
+            Principal principal, AttendanceFilterInput filter) {
+        return memberAttendanceSummaryRepository
+                .findAll(memberAttendanceSummaryRepository.getMemberSpecification(filter))
+                .stream()
+                .map(entity -> modelMapper.map(entity, MemberAttendanceSummary.class))
+                .toList();
     }
 }
