@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,13 +16,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +33,21 @@ public class SecurityConfiguration {
             Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor,
             ApiKeyAuthenticationFilter apiKeyAuthenticationFilter)
             throws Exception {
-        http.cors(withDefaults())
+        http.headers(
+                        headers ->
+                                headers.frameOptions(Customizer.withDefaults())
+                                        .crossOriginOpenerPolicy(
+                                                cors ->
+                                                        cors.policy(
+                                                                CrossOriginOpenerPolicyHeaderWriter
+                                                                        .CrossOriginOpenerPolicy
+                                                                        .SAME_ORIGIN))
+                                        .httpStrictTransportSecurity(
+                                                hsts ->
+                                                        hsts.includeSubDomains(true)
+                                                                .preload(true)
+                                                                .maxAgeInSeconds(31536000)))
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(
                         oauth2 ->
