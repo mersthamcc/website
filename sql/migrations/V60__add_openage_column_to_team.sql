@@ -1,0 +1,3 @@
+ALTER TABLE team
+  ADD COLUMN is_openage BOOLEAN DEFAULT FALSE
+;
