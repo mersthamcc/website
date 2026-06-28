@@ -15,10 +15,51 @@ SELECT
     COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) > 99 ) AS hundreds,
     COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) AS ducks,
     COUNT(fp.player_id) FILTER (WHERE fp.out = FALSE) AS not_out
+ FROM fixture_player_summary fp
+INNER JOIN fixture f ON fp.fixture_id = f.id
+INNER JOIN player p ON fp.player_id = p.id
+INNER JOIN team t ON f.team_id = t.id
+WHERE t.include_in_selection = TRUE
+  AND f.include_in_fantasy = TRUE
+GROUP BY 1, 2, 3;
+
+DROP VIEW IF EXISTS league_duck_statistics;
+CREATE OR REPLACE VIEW league_duck_statistics AS
+SELECT
+    DATE_PART('year', f.date) AS year,
+    p.id,
+    p.detail ->> 'name' AS name,
+    COUNT(fp.fixture_id) AS matches,
+    SUM(COALESCE(fp.runs, 0)) AS runs,
+    COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) AS ducks,
+    ROUND((COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) / COUNT(fp.fixture_id)::NUMERIC) * 100, 2) AS percentage_ducks,
+    COUNT(fp.player_id) FILTER (WHERE fp.out = FALSE) AS not_out
 FROM fixture_player_summary fp
          INNER JOIN fixture f ON fp.fixture_id = f.id
          INNER JOIN player p ON fp.player_id = p.id
          INNER JOIN team t ON f.team_id = t.id
-WHERE t.include_in_selection = TRUE
-  AND f.include_in_fantasy = TRUE
-GROUP BY 1, 2, 3;
+WHERE t.is_openage = TRUE
+  AND f.detail ->> 'competition_type' = 'League'
+GROUP BY 1, 2, 3
+ORDER BY ducks DESC, percentage_ducks DESC, runs ASC
+;
+
+DROP VIEW IF EXISTS all_duck_statistics;
+CREATE OR REPLACE VIEW all_duck_statistics AS
+SELECT
+    DATE_PART('year', f.date) AS year,
+    p.id,
+    p.detail ->> 'name' AS name,
+    COUNT(fp.fixture_id) AS matches,
+    SUM(COALESCE(fp.runs, 0)) AS runs,
+    COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) AS ducks,
+    ROUND((COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) / COUNT(fp.fixture_id)::NUMERIC) * 100, 2) AS percentage_ducks,
+    COUNT(fp.player_id) FILTER (WHERE fp.out = FALSE) AS not_out
+FROM fixture_player_summary fp
+         INNER JOIN fixture f ON fp.fixture_id = f.id
+         INNER JOIN player p ON fp.player_id = p.id
+         INNER JOIN team t ON f.team_id = t.id
+WHERE t.is_openage = TRUE
+GROUP BY 1, 2, 3
+ORDER BY ducks DESC, percentage_ducks DESC, runs ASC
+;

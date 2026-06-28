@@ -44,7 +44,9 @@ public class SecurityConfiguration {
                 .addFilterAfter(apiKeyAuthenticationFilter, BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(
                         requests ->
-                                requests.requestMatchers("/webhooks/**")
+                                requests.requestMatchers("/api/**")
+                                        .authenticated()
+                                        .requestMatchers("/webhooks/**")
                                         .permitAll()
                                         .requestMatchers("/passkit/**")
                                         .permitAll()
