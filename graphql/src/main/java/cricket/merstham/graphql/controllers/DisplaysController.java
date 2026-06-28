@@ -6,13 +6,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.Objects.isNull;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class DisplaysController {
     private final DisplayService displayService;
 
@@ -33,5 +37,10 @@ public class DisplaysController {
                         .build(),
                 headers,
                 HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/**", method = RequestMethod.OPTIONS)
+    public ResponseEntity options() {
+        return ResponseEntity.ok().build();
     }
 }
