@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,21 +32,7 @@ public class SecurityConfiguration {
             Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor,
             ApiKeyAuthenticationFilter apiKeyAuthenticationFilter)
             throws Exception {
-        http.headers(
-                        headers ->
-                                headers.frameOptions(Customizer.withDefaults())
-                                        .crossOriginOpenerPolicy(
-                                                cors ->
-                                                        cors.policy(
-                                                                CrossOriginOpenerPolicyHeaderWriter
-                                                                        .CrossOriginOpenerPolicy
-                                                                        .SAME_ORIGIN))
-                                        .httpStrictTransportSecurity(
-                                                hsts ->
-                                                        hsts.includeSubDomains(true)
-                                                                .preload(true)
-                                                                .maxAgeInSeconds(31536000)))
-                .cors(Customizer.withDefaults())
+        http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(
                         oauth2 ->
