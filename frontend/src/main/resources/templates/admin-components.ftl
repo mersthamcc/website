@@ -312,8 +312,8 @@
                            <#if checked>checked="checked"</#if>
                     />
                     <span class="toggle-switch-label">
-                    <span class="toggle-switch-indicator"></span>
-                </span>
+                        <span class="toggle-switch-indicator"></span>
+                    </span>
                 </label>
             </div>
         </div>
@@ -551,7 +551,27 @@
     });
 </#macro>
 
-<#macro adminSspTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" columns=[] defaultPageLength=50 pageLengths=[10, 50, 100] buttons="">
+<#macro adminSspDefaultSearchForm id searchPrompt>
+    <form onsubmit="return false;">
+        <!-- Search -->
+        <div class="input-group input-group-merge input-group-flush">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <i class="tio-search"></i>
+                </div>
+            </div>
+            <input
+                    id="${id}Search"
+                    type="search"
+                    class="form-control"
+                    placeholder="<@spring.messageText code=searchPrompt text=searchPrompt />..."
+                    aria-label="<@spring.messageText code=searchPrompt text=searchPrompt />">
+        </div>
+        <!-- End Search -->
+    </form>
+</#macro>
+
+<#macro adminSspTableCard id title selectable=false searchable=true searchPrompt="search" idField="id" cardClass="mb-3 mb-lg-5" columns=[] defaultPageLength=50 pageLengths=[10, 50, 100] buttons="" searchForm=adminSspDefaultSearchForm>
     <div class="card ${cardClass}">
         <!-- Header -->
         <div class="card-header">
@@ -577,23 +597,11 @@
             <#if searchable>
                 <div class="row justify-content-between align-items-center flex-grow-1">
                     <div class="col-10 col-md">
-                        <form onsubmit="return false;">
-                            <!-- Search -->
-                            <div class="input-group input-group-merge input-group-flush">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <i class="tio-search"></i>
-                                    </div>
-                                </div>
-                                <input
-                                        id="${id}Search"
-                                        type="search"
-                                        class="form-control"
-                                        placeholder="<@spring.messageText code=searchPrompt text=searchPrompt />..."
-                                        aria-label="<@spring.messageText code=searchPrompt text=searchPrompt />">
-                            </div>
-                            <!-- End Search -->
-                        </form>
+                        <#if searchForm?is_directive>
+                            <@searchForm id=id searchPrompt=searchPrompt />
+                        <#else>
+                            ${searchForm}
+                        </#if>
                     </div>
                     <div class="col-auto">
                         <#if buttons?is_directive>
@@ -701,7 +709,13 @@
     </div>
 </#macro>
 
-<#macro adminSspTableScript id ajaxSrc selectable=false columns=[]>
+<#macro defaultDataFunction id>
+    function (data) {
+        return JSON.stringify(data);
+    }
+</#macro>
+
+<#macro adminSspTableScript id ajaxSrc selectable=false columns=[] dataFunction=defaultDataFunction>
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
 
@@ -712,9 +726,7 @@
             url: "${ajaxSrc}",
             type: "POST",
             "contentType": "application/json",
-            data: function (data) {
-                return JSON.stringify(data);
-            },
+            data: <#if dataFunction?is_directive><@dataFunction id=id /><#else>${dataFunction}</#if>,
             beforeSend: function (request) {
                 request.setRequestHeader(header, token);
             }
