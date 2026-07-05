@@ -179,23 +179,29 @@ public class MembershipReportsController {
                         new DataTableColumn()
                                 .setKey("membership.attendance-date")
                                 .setFunction(true)
-                                .setFunctionName("displayDate"),
+                                .setFunctionName("displayDate")
+                                .setSortable(false),
                         new DataTableColumn()
                                 .setKey("membership.attendance-time")
                                 .setFunction(true)
-                                .setFunctionName("displayTime"),
+                                .setFunctionName("displayTime")
+                                .setSortable(false),
                         new DataTableColumn()
                                 .setKey("membership.full-name")
-                                .setFieldName("fullName"),
+                                .setFieldName("fullName")
+                                .setSortable(false),
                         new DataTableColumn()
                                 .setKey("membership.age-group")
-                                .setFieldName("ageGroup"),
+                                .setFieldName("ageGroup")
+                                .setSortable(false),
                         new DataTableColumn()
                                 .setKey("membership.registration-year")
-                                .setFieldName("registrationYear"),
+                                .setFieldName("registrationYear")
+                                .setSortable(false),
                         new DataTableColumn()
                                 .setKey("membership.attendance-event")
-                                .setFieldName("event")));
+                                .setFieldName("event")
+                                .setSortable(false)));
         return new ModelAndView("administration/attendance-report/report", model);
     }
 
@@ -216,11 +222,7 @@ public class MembershipReportsController {
                         .stream()
                         .toList();
         var filtered =
-                attendance
-                        .subList(
-                                request.getStart(),
-                                min(request.getStart() + request.getLength(), attendance.size()))
-                        .stream()
+                attendance.stream()
                         .filter(m -> matchesCriteria(m, search))
                         .sorted(comparator)
                         .map(
@@ -233,9 +235,12 @@ public class MembershipReportsController {
                         .toList();
         return SspResponse.<SspResponseDataWrapper<MemberAttendanceSummary>>builder()
                 .draw(request.getDraw())
-                .data(filtered)
+                .data(
+                        filtered.subList(
+                                request.getStart(),
+                                min(request.getStart() + request.getLength(), attendance.size())))
                 .recordsTotal(attendance.size())
-                .recordsFiltered(attendance.size())
+                .recordsFiltered(filtered.size())
                 .build();
     }
 
@@ -379,6 +384,6 @@ public class MembershipReportsController {
                             }
                             return comparator;
                         })
-                .orElse(Comparator.comparing(MemberAttendanceSummary::getFullName));
+                .orElse(Comparator.comparing(MemberAttendanceSummary::getTime));
     }
 }
