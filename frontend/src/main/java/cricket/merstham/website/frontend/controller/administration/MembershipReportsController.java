@@ -235,7 +235,7 @@ public class MembershipReportsController {
                 .draw(request.getDraw())
                 .data(filtered)
                 .recordsTotal(attendance.size())
-                .recordsFiltered(filtered.size())
+                .recordsFiltered(attendance.size())
                 .build();
     }
 

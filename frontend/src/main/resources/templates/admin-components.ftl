@@ -685,7 +685,7 @@
                                 "width": true
                               }'>
                             <#list pageLengths as pageLength>
-                                <option value="${pageLength}" <#if pageLength==defaultPageLength>selected</#if>>${pageLength}</option>
+                                <option value="${pageLength}" <#if pageLength==defaultPageLength>selected="selected"</#if>>${pageLength}</option>
                             </#list>
                         </select>
                         <!-- End Select -->
