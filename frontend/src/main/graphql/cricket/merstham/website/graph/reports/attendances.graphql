@@ -1,0 +1,11 @@
+query attendances($filter: AttendanceFilter) {
+    attendances(filter: $filter) {
+        id
+        time
+        memberId
+        fullName
+        ageGroup
+        registrationYear
+        event
+    }
+}

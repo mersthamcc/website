@@ -1,11 +1,14 @@
 package cricket.merstham.website.frontend.controller.administration;
 
+import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.ReportExport;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.DataTableColumn;
+import cricket.merstham.website.frontend.model.datatables.AttendanceReportFilter;
 import cricket.merstham.website.frontend.model.datatables.SspRequest;
+import cricket.merstham.website.frontend.model.datatables.SspRequestWithFilter;
 import cricket.merstham.website.frontend.model.datatables.SspResponse;
 import cricket.merstham.website.frontend.model.datatables.SspResponseDataWrapper;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
@@ -25,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -165,6 +169,76 @@ public class MembershipReportsController {
                 .build();
     }
 
+    @GetMapping(value = "/administration/attendance-report", name = "admin-attendance-report")
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public ModelAndView attendance() {
+        var model = new HashMap<String, Object>();
+        model.put(
+                "columns",
+                List.of(
+                        new DataTableColumn()
+                                .setKey("membership.attendance-date")
+                                .setFunction(true)
+                                .setFunctionName("displayDate"),
+                        new DataTableColumn()
+                                .setKey("membership.attendance-time")
+                                .setFunction(true)
+                                .setFunctionName("displayTime"),
+                        new DataTableColumn()
+                                .setKey("membership.full-name")
+                                .setFieldName("fullName"),
+                        new DataTableColumn()
+                                .setKey("membership.age-group")
+                                .setFieldName("ageGroup"),
+                        new DataTableColumn()
+                                .setKey("membership.registration-year")
+                                .setFieldName("registrationYear"),
+                        new DataTableColumn()
+                                .setKey("membership.attendance-event")
+                                .setFieldName("event")));
+        return new ModelAndView("administration/attendance-report/report", model);
+    }
+
+    @PostMapping(
+            consumes = "application/json",
+            produces = "application/json",
+            path = "/administration/attendance-report/get-data")
+    public @ResponseBody SspResponse<SspResponseDataWrapper<MemberAttendanceSummary>>
+            getAttendanceData(
+                    CognitoAuthentication cognitoAuthentication,
+                    @RequestBody SspRequestWithFilter<AttendanceReportFilter> request) {
+        Comparator<MemberAttendanceSummary> comparator = createAttendanceComparator(request);
+        String search = request.getSearch().getValue().toLowerCase();
+        List<MemberAttendanceSummary> attendance =
+                service
+                        .getMemberAttendance(
+                                request.getFilter(), cognitoAuthentication.getOAuth2AccessToken())
+                        .stream()
+                        .toList();
+        var filtered =
+                attendance
+                        .subList(
+                                request.getStart(),
+                                min(request.getStart() + request.getLength(), attendance.size()))
+                        .stream()
+                        .filter(m -> matchesCriteria(m, search))
+                        .sorted(comparator)
+                        .map(
+                                m ->
+                                        SspResponseDataWrapper.<MemberAttendanceSummary>builder()
+                                                .data(m)
+                                                .editRouteTemplate(Optional.empty())
+                                                .deleteRouteTemplate(Optional.empty())
+                                                .build())
+                        .toList();
+        return SspResponse.<SspResponseDataWrapper<MemberAttendanceSummary>>builder()
+                .draw(request.getDraw())
+                .data(filtered)
+                .recordsTotal(attendance.size())
+                .recordsFiltered(filtered.size())
+                .build();
+    }
+
     private ReportFilter reportFilter(String report) {
         return switch (report) {
             case "all" -> ReportFilter.ALL;
@@ -252,5 +326,59 @@ public class MembershipReportsController {
                             return comparator;
                         })
                 .orElse(Comparator.comparing(MemberSummary::getFamilyName));
+    }
+
+    private boolean matchesCriteria(MemberAttendanceSummary attendanceSummary, String search) {
+        return Arrays.stream(search.split(" "))
+                .map(
+                        s ->
+                                attendanceSummary.getFullName().toLowerCase().contains(s)
+                                        || attendanceSummary.getAgeGroup().toLowerCase().contains(s)
+                                        || (nonNull(attendanceSummary.getRegistrationYear())
+                                                && attendanceSummary
+                                                        .getRegistrationYear()
+                                                        .toString()
+                                                        .contains(s))
+                                        || attendanceSummary.getEvent().toLowerCase().contains(s))
+                .allMatch(Boolean::booleanValue);
+    }
+
+    private Comparator<MemberAttendanceSummary> createAttendanceComparator(SspRequest request) {
+        return request.getOrder().stream()
+                .findFirst()
+                .filter(f -> !request.getColumns().get(f.getColumn()).getData().equals("function"))
+                .map(
+                        c -> {
+                            String column = request.getColumns().get(c.getColumn()).getData();
+                            Comparator<MemberAttendanceSummary> comparator = null;
+                            switch (column) {
+                                case "data.fullName":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberAttendanceSummary::getFullName,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
+                                    break;
+                                case "data.time":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberAttendanceSummary::getTime,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
+                                    break;
+                                case "data.ageGroup":
+                                    comparator =
+                                            Comparator.comparing(
+                                                    MemberAttendanceSummary::getAgeGroup,
+                                                    Comparator.nullsFirst(
+                                                            Comparator.naturalOrder()));
+                                    break;
+                            }
+                            if ("desc".equals(c.getDir())) {
+                                comparator = comparator.reversed();
+                            }
+                            return comparator;
+                        })
+                .orElse(Comparator.comparing(MemberAttendanceSummary::getFullName));
     }
 }

@@ -6,6 +6,7 @@ import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
 import cricket.merstham.shared.dto.Member;
+import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
@@ -17,6 +18,7 @@ import cricket.merstham.shared.types.AttributeType;
 import cricket.merstham.shared.types.ReportFilter;
 import cricket.merstham.website.frontend.exception.GraphException;
 import cricket.merstham.website.frontend.model.RegistrationBasket;
+import cricket.merstham.website.frontend.model.datatables.AttendanceReportFilter;
 import cricket.merstham.website.frontend.security.CognitoAuthentication;
 import cricket.merstham.website.graph.AddPaymentToOrderMutation;
 import cricket.merstham.website.graph.AttributesQuery;
@@ -41,7 +43,9 @@ import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
 import cricket.merstham.website.graph.player.PlayCricketLinkMutation;
 import cricket.merstham.website.graph.registration.MyCouponsQuery;
 import cricket.merstham.website.graph.registration.MyMemberDetailsQuery;
+import cricket.merstham.website.graph.reports.AttendancesQuery;
 import cricket.merstham.website.graph.reports.ExportMembershipSummaryQuery;
+import cricket.merstham.website.graph.type.AttendanceFilter;
 import cricket.merstham.website.graph.type.AttributeInput;
 import cricket.merstham.website.graph.type.MemberInput;
 import cricket.merstham.website.graph.type.MemberSubscriptionInput;
@@ -495,5 +499,26 @@ public class MembershipService {
                 response,
                 DistributePassesMutation.Data::getDistributePasses,
                 () -> "Error updating passes");
+    }
+
+    public List<MemberAttendanceSummary> getMemberAttendance(
+            AttendanceReportFilter filter, OAuth2AccessToken authentication) {
+        var query =
+                AttendancesQuery.builder()
+                        .filter(
+                                AttendanceFilter.builder()
+                                        .from(filter.getFrom())
+                                        .to(filter.getTo())
+                                        .includeUnregistered(filter.isIncludeUnregistered())
+                                        .build())
+                        .build();
+        Response<AttendancesQuery.Data> response = graphService.executeQuery(query, authentication);
+        return requireGraphData(
+                        response,
+                        AttendancesQuery.Data::getAttendances,
+                        () -> "Error getting attendance data")
+                .stream()
+                .map(m -> modelMapper.map(m, MemberAttendanceSummary.class))
+                .toList();
     }
 }

@@ -316,6 +316,12 @@ public class MenuBuilder {
                                                     buildParams("report", "has-medical-conditions"),
                                                     null,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-attendance-report",
+                                                    null,
+                                                    null,
+                                                    List.of(),
                                                     null)),
                             "tio-chart-bar-4"));
 
