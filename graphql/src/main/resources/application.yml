@@ -179,6 +179,13 @@ configuration:
         server: twitter
         scopes: offline.access,tweet.write,tweet.read,users.read
         pkce: true
+      youtube:
+        server: youtube
+        scopes: https://www.googleapis.com/auth/youtube
+        pkce: false
+        extra-auth-params:
+          access_type: offline
+          prompt: consent
   mailchimp:
     api-key: ${MAILCHIMP_API_KEY:}
     dc: ${MAILCHIMP_DC:}

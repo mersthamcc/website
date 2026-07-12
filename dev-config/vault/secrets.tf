@@ -14,6 +14,15 @@ resource "vault_kv_secret_v2" "twitter-credentials" {
   })
 }
 
+resource "vault_kv_secret_v2" "youtube-credentials" {
+  mount = "secret"
+  name  = "youtube-credentials"
+  data_json = jsonencode({
+    client_id     = var.youtube_client_id
+    client_secret = var.youtube_client_secret
+  })
+}
+
 resource "vault_kv_secret_v2" "cloud-creds" {
   mount     = vault_mount.secrets.path
   name      = "test"

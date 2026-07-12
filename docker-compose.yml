@@ -563,6 +563,8 @@ services:
       TF_VAR_vault_address: http://vault:8200
       TF_VAR_twitter_client_id: ${TWITTER_CLIENT_ID}
       TF_VAR_twitter_client_secret: ${TWITTER_CLIENT_SECRET}
+      TF_VAR_youtube_client_id: ${YOUTUBE_CLIENT_ID}
+      TF_VAR_youtube_client_secret: ${YOUTUBE_CLIENT_SECRET}
     volumes:
       - ./dev-config/vault:/src
       - ./infrastructure/Dockerfiles/vault/plugins:/vault/plugins

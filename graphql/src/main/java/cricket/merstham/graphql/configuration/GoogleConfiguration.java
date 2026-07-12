@@ -3,6 +3,7 @@ package cricket.merstham.graphql.configuration;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.walletobjects.WalletobjectsScopes;
+import com.google.api.services.youtube.YouTubeScopes;
 import com.google.auth.oauth2.GoogleCredentials;
 import cricket.merstham.graphql.services.VaultService;
 import jakarta.inject.Named;
@@ -48,6 +49,17 @@ public class GoogleConfiguration {
         var credentials =
                 GoogleCredentials.fromStream(new StringInputStream(secret))
                         .createScoped(List.of(CalendarScopes.CALENDAR_EVENTS));
+        credentials.refresh();
+        return credentials;
+    }
+
+    @Bean
+    @Named("YoutubeCredentials")
+    public GoogleCredentials getYoutubeCredentials(VaultService vaultService) throws IOException {
+        var secret = vaultService.getEnvironmentSecret("google_credentials");
+        var credentials =
+                GoogleCredentials.fromStream(new StringInputStream(secret))
+                        .createScoped(List.of(YouTubeScopes.YOUTUBE_READONLY));
         credentials.refresh();
         return credentials;
     }

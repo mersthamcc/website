@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Component
 public class TokenService {
@@ -86,6 +87,9 @@ public class TokenService {
 
             url.queryParam(CODE_CHALLENGE, helper.getPkceCodeChallenge(verifier));
             url.queryParam(CODE_CHALLENGE_METHOD, PKCE_SHA_256);
+        }
+        if (nonNull(config.getExtraAuthParams())) {
+            config.getExtraAuthParams().forEach((key, value) -> url.queryParam(key, value));
         }
         return AuthRequest.builder().name(name).url(url.build()).build();
     }

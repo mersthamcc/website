@@ -20,5 +20,6 @@ public class TokenConfiguration {
         private String server;
         private boolean pkce;
         private String scopes;
+        private Map<String, String> extraAuthParams;
     }
 }
