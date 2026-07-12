@@ -219,3 +219,6 @@ configuration:
   safeguarding:
     export-url: ${SAFEGUARDING_EXPORT_URL:}
     export-cron: ${SAFEGUARDING_EXPORT_CRON:-}
+  live-stream:
+    sync-cron: "${LIVE_STREAM_SYNC_CRON:-}"
+    youtube-channel-id: "${YOUTUBE_CHANNEL_ID:-}"
