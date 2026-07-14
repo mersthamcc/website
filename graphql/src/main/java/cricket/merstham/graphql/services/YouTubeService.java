@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.startup.StartupTimeMetricsListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,8 @@ public class YouTubeService {
     private final LiveStreamRepository liveStreamRepository;
     private final String channelId;
     private final FixtureRepository fixtureRepository;
+    private final SignageService signageService;
+    private final StartupTimeMetricsListener startupTimeMetrics;
 
     @Autowired
     public YouTubeService(
@@ -47,12 +50,16 @@ public class YouTubeService {
             TokenService tokenService,
             LiveStreamRepository liveStreamRepository,
             @Value("${configuration.live-stream.youtube-channel-id}") String channelId,
-            FixtureRepository fixtureRepository) {
+            FixtureRepository fixtureRepository,
+            SignageService signageService,
+            StartupTimeMetricsListener startupTimeMetrics) {
         this.tokenService = tokenService;
         this.applicationName = applicationName;
         this.liveStreamRepository = liveStreamRepository;
         this.channelId = channelId;
         this.fixtureRepository = fixtureRepository;
+        this.signageService = signageService;
+        this.startupTimeMetrics = startupTimeMetrics;
     }
 
     @Scheduled(
@@ -114,24 +121,49 @@ public class YouTubeService {
                                                                             .youtubeId(
                                                                                     video.getId())
                                                                             .build());
+                                    var fixture = matchFixture(video);
+                                    var startTime =
+                                            convertToInstant(
+                                                    video.getLiveStreamingDetails()
+                                                            .getScheduledStartTime());
+                                    var originalStartTime = entity.getStartTime();
                                     entity.setTitle(video.getSnippet().getTitle())
                                             .setDescription(video.getSnippet().getDescription())
-                                            .setStartTime(
-                                                    convertToInstant(
-                                                            video.getLiveStreamingDetails()
-                                                                    .getScheduledStartTime()))
+                                            .setStartTime(startTime)
                                             .setEndTime(
                                                     convertToInstant(
                                                             video.getLiveStreamingDetails()
                                                                     .getScheduledEndTime()))
                                             .setFrogboxId(frogboxId.get())
-                                            .setFixture(matchFixture(video))
+                                            .setFixture(fixture)
                                             .setThumbnailUrl(
                                                     video.getSnippet()
                                                             .getThumbnails()
                                                             .getMedium()
                                                             .getUrl())
                                             .setWidget(video.getPlayer().getEmbedHtml());
+
+                                    if (isNull(entity.getSignageId())) {
+                                        entity.setSignageId(signageService.createVideo(video));
+                                    }
+                                    if (isNull(entity.getSignageScheduleId())) {
+                                        LOG.info("Creating Signage schedule event");
+                                        entity.setSignageScheduleId(
+                                                signageService.createSchedule(
+                                                        video, entity.getSignageId(), fixture));
+                                        signageService.push();
+                                    } else if (!startTime.equals(originalStartTime)) {
+                                        LOG.info("Updating signage schedule event");
+                                        entity.setSignageScheduleId(
+                                                signageService.updateSchedule(
+                                                        video,
+                                                        entity.getSignageId(),
+                                                        fixture,
+                                                        entity.getSignageScheduleId()));
+                                        signageService.push();
+                                    } else {
+                                        LOG.info("Signage schedule event does not require update.");
+                                    }
 
                                     liveStreamRepository.save(entity);
                                 } else {

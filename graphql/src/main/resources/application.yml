@@ -222,3 +222,8 @@ configuration:
   live-stream:
     sync-cron: "${LIVE_STREAM_SYNC_CRON:-}"
     youtube-channel-id: "${YOUTUBE_CHANNEL_ID:-}"
+    yodeck-api-url: "${YODECK_BASE_URL:-}"
+    yodeck-api-token: "${YODECK_API_TOKEN:-}"
+    yodeck-workspace-id: "${YODECK_WORKSPACE_ID:-}"
+    yodeck-folder-id: "${YODECK_STREAMS_FOLDER_ID:-}"
+    yodeck-schedule-id: "${YODECK_SCHEDULE_ID:-}"
