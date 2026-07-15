@@ -345,6 +345,12 @@ public class MenuBuilder {
                                                     buildParams("name", "twitter"),
                                                     null,
                                                     List.of(),
+                                                    null),
+                                            new Menu(
+                                                    "admin-system-oauth-connect",
+                                                    buildParams("name", "youtube"),
+                                                    null,
+                                                    List.of(),
                                                     null)),
                             "tio-tune"),
                     new Menu(

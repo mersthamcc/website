@@ -179,6 +179,13 @@ configuration:
         server: twitter
         scopes: offline.access,tweet.write,tweet.read,users.read
         pkce: true
+      youtube:
+        server: youtube
+        scopes: https://www.googleapis.com/auth/youtube
+        pkce: false
+        extra-auth-params:
+          access_type: offline
+          prompt: consent
   mailchimp:
     api-key: ${MAILCHIMP_API_KEY:}
     dc: ${MAILCHIMP_DC:}
@@ -212,3 +219,11 @@ configuration:
   safeguarding:
     export-url: ${SAFEGUARDING_EXPORT_URL:}
     export-cron: ${SAFEGUARDING_EXPORT_CRON:-}
+  live-stream:
+    sync-cron: "${LIVE_STREAM_SYNC_CRON:-}"
+    youtube-channel-id: "${YOUTUBE_CHANNEL_ID:-}"
+    yodeck-api-url: "${YODECK_BASE_URL:-}"
+    yodeck-api-token: "${YODECK_API_TOKEN:-}"
+    yodeck-workspace-id: "${YODECK_WORKSPACE_ID:-}"
+    yodeck-folder-id: "${YODECK_STREAMS_FOLDER_ID:-}"
+    yodeck-schedule-id: "${YODECK_SCHEDULE_ID:-}"
