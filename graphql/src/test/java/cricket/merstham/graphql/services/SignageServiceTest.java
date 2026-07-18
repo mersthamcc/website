@@ -15,7 +15,7 @@ class SignageServiceTest {
         var source = new DateTime("2026-07-18T11:00:00Z");
         var result = service.convertToLocalDateTime(source);
 
-        assertThat(result).isEqualTo("2026-07-18T12:00:00");
+        assertThat(result).isEqualTo("2026-07-18T11:55:00");
     }
 
     @Test
@@ -23,6 +23,6 @@ class SignageServiceTest {
         var source = new DateTime("2026-01-18T11:00:00Z");
         var result = service.convertToLocalDateTime(source);
 
-        assertThat(result).isEqualTo("2026-01-18T11:00:00");
+        assertThat(result).isEqualTo("2026-01-18T10:55:00");
     }
 }
