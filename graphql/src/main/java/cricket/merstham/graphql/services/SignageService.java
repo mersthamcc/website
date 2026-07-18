@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static java.text.MessageFormat.format;
@@ -201,7 +202,7 @@ public class SignageService {
     }
 
     public String convertToLocalDateTime(DateTime scheduledStartTime) {
-        var dt = Instant.parse(scheduledStartTime.toStringRfc3339());
+        var dt = Instant.parse(scheduledStartTime.toStringRfc3339()).minus(5, ChronoUnit.MINUTES);
 
         return dt.atZone(ZoneId.of("Europe/London")).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
