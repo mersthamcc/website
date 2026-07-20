@@ -16,7 +16,7 @@ ext {
     dependencyVersions = [
             apollo         : "2.5.14",
             assertj        : "3.23.1",
-            aws            : "2.41.29",
+            aws            : "2.48.3",
             jackson        : "2.13.4.1",
             lombok         : "1.18.42",
             model_mapper   : "3.2.0",
