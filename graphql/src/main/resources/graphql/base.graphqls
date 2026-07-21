@@ -4,6 +4,8 @@ scalar Date
 
 scalar Json
 
+scalar Bytes
+
 type KeyValuePair {
     key: String!,
     value: String!

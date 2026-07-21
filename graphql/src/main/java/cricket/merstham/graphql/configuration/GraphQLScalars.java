@@ -1,5 +1,6 @@
 package cricket.merstham.graphql.configuration;
 
+import cricket.merstham.graphql.scalars.BytesCoercing;
 import cricket.merstham.graphql.scalars.DateCoercing;
 import cricket.merstham.graphql.scalars.DateTimeCoercing;
 import cricket.merstham.graphql.scalars.JsonCoercing;
@@ -16,6 +17,7 @@ public class GraphQLScalars implements RuntimeWiringConfigurer {
         builder.scalar(dateTimeScalar());
         builder.scalar(dateScalar());
         builder.scalar(jsonScalar());
+        builder.scalar(bytesScalar());
     }
 
     private GraphQLScalarType jsonScalar() {
@@ -39,6 +41,14 @@ public class GraphQLScalars implements RuntimeWiringConfigurer {
                 .name("Date")
                 .description("Java Instant as date only scalar.")
                 .coercing(new DateCoercing())
+                .build();
+    }
+
+    private GraphQLScalarType bytesScalar() {
+        return GraphQLScalarType.newScalar()
+                .name("Bytes")
+                .description("Base64 encoded scalar.")
+                .coercing(new BytesCoercing())
                 .build();
     }
 }

@@ -3,6 +3,13 @@ type CalendarSyncResult {
     calendarId: String!
 }
 
+type DataUploadResult {
+    rowsProcessed: Int!
+    success: Boolean
+    error: String
+}
+
 extend type Mutation {
     calendarSync(start: Date!): [CalendarSyncResult!]!
+    dataUpload(data: Bytes!): DataUploadResult!
 }

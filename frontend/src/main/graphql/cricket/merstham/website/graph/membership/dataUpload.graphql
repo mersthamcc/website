@@ -1,0 +1,7 @@
+mutation dataUpload($data: Bytes!) {
+    dataUpload(data: $data) {
+        success
+        rowsProcessed
+        error
+    }
+}
