@@ -381,7 +381,9 @@ class MembershipServiceTest {
                     List.of(),
                     mock(PasskitUpdateService.class),
                     mock(PassGeneratorService.class),
-                    mock(MemberAttendanceSummaryRepository.class));
+                    mock(MemberAttendanceSummaryRepository.class),
+                    mock(SpondUploadService.class),
+                    mock(SqsService.class));
 
     @BeforeEach
     void setup() {

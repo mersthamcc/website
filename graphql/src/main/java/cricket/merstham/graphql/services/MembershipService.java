@@ -28,6 +28,7 @@ import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.graphql.services.hooks.Hook;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
+import cricket.merstham.shared.dto.DataUploadResult;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
@@ -48,6 +49,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.Instant;
@@ -92,6 +95,8 @@ public class MembershipService {
     private final PasskitUpdateService passkitUpdateService;
     private final PassGeneratorService passGeneratorService;
     private final MemberAttendanceSummaryRepository memberAttendanceSummaryRepository;
+    private final SpondUploadService spondUploadService;
+    private final SqsService sqsService;
 
     @Autowired
     public MembershipService(
@@ -111,7 +116,9 @@ public class MembershipService {
             List<Hook<OrderEntity>> hooks,
             PasskitUpdateService passkitUpdateService,
             PassGeneratorService passGeneratorService,
-            MemberAttendanceSummaryRepository memberAttendanceSummaryRepository) {
+            MemberAttendanceSummaryRepository memberAttendanceSummaryRepository,
+            SpondUploadService spondUploadService,
+            SqsService sqsService) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -129,6 +136,8 @@ public class MembershipService {
         this.passkitUpdateService = passkitUpdateService;
         this.passGeneratorService = passGeneratorService;
         this.memberAttendanceSummaryRepository = memberAttendanceSummaryRepository;
+        this.spondUploadService = spondUploadService;
+        this.sqsService = sqsService;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -510,5 +519,22 @@ public class MembershipService {
                 .stream()
                 .map(entity -> modelMapper.map(entity, MemberAttendanceSummary.class))
                 .toList();
+    }
+
+    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    public DataUploadResult uploadMatchFees(InputStream data) {
+        try {
+            var result = spondUploadService.uploadExcelFile(data);
+            sqsService.sendMatchFees(result);
+
+            return DataUploadResult.builder().success(true).rowsProcessed(result.size()).build();
+        } catch (IOException e) {
+            LOG.error("Error while uploading Match Fees", e);
+            return DataUploadResult.builder()
+                    .success(false)
+                    .rowsProcessed(0)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 }
