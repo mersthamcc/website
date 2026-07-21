@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -220,6 +222,43 @@ public class MembershipController extends SspController<MemberSummary> {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
+    @GetMapping(
+            value = {
+                "/administration/membership/spond-upload",
+                "/administration/membership/spond-upload/{step}"
+            },
+            name = "admin-membership-spond-upload")
+    public ModelAndView spondUpload(@PathVariable(required = false) Optional<String> step) {
+        if (step.isEmpty()) return new ModelAndView("administration/membership/spond-upload");
+
+        switch (step.get()) {
+            case "results":
+                {
+                    return new ModelAndView();
+                }
+            default:
+                {
+                    return new ModelAndView("administration/membership/spond-upload");
+                }
+        }
+    }
+
+    @PostMapping(
+            value = "/administration/membership/spond-upload",
+            name = "admin-membership-spond-upload-post")
+    public RedirectView spondUpload(
+            @RequestParam("spond-data") MultipartFile file,
+            CognitoAuthentication cognitoAuthentication) {
+        try {
+            var result =
+                    membershipService.uploadSpondData(
+                            file.getInputStream(), cognitoAuthentication.getOAuth2AccessToken());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return redirectTo(format("/administration/membership/spond-upload"));
     }
 
     @PostMapping(

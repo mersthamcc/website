@@ -4,12 +4,14 @@ import com.apollographql.apollo.api.ScalarType;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.ByteBuffer;
 import java.time.Instant;
 
 public enum CustomGraphQLScalars implements ScalarType {
     DATETIME,
     DATE,
-    JSON;
+    JSON,
+    BYTES;
 
     @NotNull
     @Override
@@ -20,6 +22,8 @@ public enum CustomGraphQLScalars implements ScalarType {
                 return Instant.class.getCanonicalName();
             case JSON:
                 return JsonNode.class.getCanonicalName();
+            case BYTES:
+                return ByteBuffer.class.getCanonicalName();
             default:
                 throw new IllegalArgumentException();
         }
@@ -35,6 +39,8 @@ public enum CustomGraphQLScalars implements ScalarType {
                 return "DateTime";
             case JSON:
                 return "Json";
+            case BYTES:
+                return "Bytes";
             default:
                 throw new IllegalArgumentException();
         }

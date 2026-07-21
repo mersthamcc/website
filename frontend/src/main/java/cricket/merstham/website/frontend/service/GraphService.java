@@ -8,6 +8,7 @@ import com.apollographql.apollo.api.ScalarTypeAdapters;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.website.frontend.configuration.GraphConfiguration;
+import cricket.merstham.website.frontend.mappers.BytesCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.CustomGraphQLScalars;
 import cricket.merstham.website.frontend.mappers.InstantCustomTypeAdapter;
 import cricket.merstham.website.frontend.mappers.JsonNodeCustomTypeAdapter;
@@ -42,7 +43,8 @@ public class GraphService {
                     Map.of(
                             CustomGraphQLScalars.DATE, new LocalDateCustomTypeAdapter(),
                             CustomGraphQLScalars.DATETIME, new InstantCustomTypeAdapter(),
-                            CustomGraphQLScalars.JSON, new JsonNodeCustomTypeAdapter()));
+                            CustomGraphQLScalars.JSON, new JsonNodeCustomTypeAdapter(),
+                            CustomGraphQLScalars.BYTES, new BytesCustomTypeAdapter()));
 
     @Autowired
     public GraphService(
