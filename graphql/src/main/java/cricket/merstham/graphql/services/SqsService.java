@@ -1,7 +1,7 @@
 package cricket.merstham.graphql.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cricket.merstham.graphql.dto.spond.MatchFeePayment;
+import cricket.merstham.shared.dto.MemberMatchFeePayment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class SqsService {
         sendToQueue(CUSTOMER_SYNC_TRANSACTION, data);
     }
 
-    public void sendMatchFees(List<MatchFeePayment> payments) {
+    public void sendMatchFees(List<MemberMatchFeePayment> payments) {
         payments.forEach(
                 payment -> {
                     var id = sendToQueue(MATCH_FEE_TRANSACTION, payment);

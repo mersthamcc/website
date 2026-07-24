@@ -1,6 +1,6 @@
 package cricket.merstham.graphql.services;
 
-import cricket.merstham.graphql.dto.spond.MatchFeePayment;
+import cricket.merstham.shared.dto.MemberMatchFeePayment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -24,8 +24,8 @@ public class SpondUploadService {
 
     private static final Logger LOG = LogManager.getLogger(SpondUploadService.class);
 
-    public List<MatchFeePayment> uploadExcelFile(InputStream inputStream) throws IOException {
-        var payments = new ArrayList<MatchFeePayment>();
+    public List<MemberMatchFeePayment> uploadExcelFile(InputStream inputStream) throws IOException {
+        var payments = new ArrayList<MemberMatchFeePayment>();
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
 
         payments.addAll(readSheet(workbook, "Club payments"));
@@ -34,9 +34,9 @@ public class SpondUploadService {
         return payments;
     }
 
-    private Collection<? extends MatchFeePayment> readSheet(
+    private Collection<? extends MemberMatchFeePayment> readSheet(
             XSSFWorkbook workbook, String sheetName) {
-        var payments = new ArrayList<MatchFeePayment>();
+        var payments = new ArrayList<MemberMatchFeePayment>();
 
         XSSFSheet sheet = workbook.getSheet(sheetName);
 
@@ -48,8 +48,8 @@ public class SpondUploadService {
         return payments;
     }
 
-    private MatchFeePayment rowToPayment(Row row) {
-        return MatchFeePayment.builder()
+    private MemberMatchFeePayment rowToPayment(Row row) {
+        return MemberMatchFeePayment.builder()
                 .id(row.getCell(0).getStringCellValue())
                 .paymentDate(cellToDate(row.getCell(1)))
                 .price(getPrice(row, 3))

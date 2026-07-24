@@ -1,4 +1,4 @@
-package cricket.merstham.graphql.dto.spond;
+package cricket.merstham.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,13 +12,14 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
 
+/** A DTO for the {@link cricket.merstham.graphql.entity.MemberMatchFeePaymentEntity} entity */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MatchFeePayment {
+public class MemberMatchFeePayment {
     @JsonProperty private String id;
     @JsonProperty private LocalDate paymentDate;
     @JsonProperty private BigDecimal price;
@@ -32,6 +33,11 @@ public class MatchFeePayment {
     @JsonProperty private String payerName;
     @JsonProperty private LocalDate payoutDate;
     @JsonProperty private URI link;
-    @JsonProperty private String sageId;
-    @JsonProperty private String feesSageId;
+    @JsonProperty private String accountingId;
+    @JsonProperty private String accountingPaymentId;
+    @JsonProperty private String accountingFeesId;
+    @javax.validation.constraints.NotNull
+    private String memberReference;
+    private String link;
+    private String accountingError;
 }
