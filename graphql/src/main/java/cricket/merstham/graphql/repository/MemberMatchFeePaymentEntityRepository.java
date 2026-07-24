@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MemberMatchFeeEntityRepository
-        extends JpaRepository<MemberMatchFeePaymentEntity, Integer>,
-                PagingAndSortingRepository<MemberMatchFeePaymentEntity, Integer>,
+public interface MemberMatchFeePaymentEntityRepository
+        extends JpaRepository<MemberMatchFeePaymentEntity, String>,
+                PagingAndSortingRepository<MemberMatchFeePaymentEntity, String>,
                 JpaSpecificationExecutor<MemberMatchFeePaymentEntity> {}

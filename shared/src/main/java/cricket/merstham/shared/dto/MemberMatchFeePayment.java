@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 
 /** A DTO for the {@link cricket.merstham.graphql.entity.MemberMatchFeePaymentEntity} entity */
@@ -32,12 +31,10 @@ public class MemberMatchFeePayment {
     @JsonProperty private String memberName;
     @JsonProperty private String payerName;
     @JsonProperty private LocalDate payoutDate;
-    @JsonProperty private URI link;
+    @JsonProperty private String link;
     @JsonProperty private String accountingId;
     @JsonProperty private String accountingPaymentId;
     @JsonProperty private String accountingFeesId;
-    @javax.validation.constraints.NotNull
-    private String memberReference;
-    private String link;
-    private String accountingError;
+    @JsonProperty private String memberReference;
+    @JsonProperty private String accountingError;
 }

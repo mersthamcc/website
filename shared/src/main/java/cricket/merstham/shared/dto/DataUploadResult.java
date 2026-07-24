@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,7 +24,8 @@ public class DataUploadResult implements Serializable {
 
     @Serial private static final long serialVersionUID = 6926015041231107770L;
 
-    @JsonProperty private Integer rowsProcessed;
     @JsonProperty private boolean success;
     @JsonProperty private String error;
+    @JsonProperty private List<MemberMatchFeePayment> processed;
+    @JsonProperty private List<MemberMatchFeePayment> skipped;
 }

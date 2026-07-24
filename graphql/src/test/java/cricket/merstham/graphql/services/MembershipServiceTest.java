@@ -29,6 +29,7 @@ import cricket.merstham.graphql.repository.MemberAttendanceSummaryRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
+import cricket.merstham.graphql.repository.MemberMatchFeePaymentEntityRepository;
 import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
@@ -383,7 +384,8 @@ class MembershipServiceTest {
                     mock(PassGeneratorService.class),
                     mock(MemberAttendanceSummaryRepository.class),
                     mock(SpondUploadService.class),
-                    mock(SqsService.class));
+                    mock(SqsService.class),
+                    mock(MemberMatchFeePaymentEntityRepository.class));
 
     @BeforeEach
     void setup() {

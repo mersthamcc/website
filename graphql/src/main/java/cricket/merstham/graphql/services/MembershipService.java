@@ -5,6 +5,7 @@ import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
 import cricket.merstham.graphql.entity.MemberCategoryEntity;
 import cricket.merstham.graphql.entity.MemberEntity;
+import cricket.merstham.graphql.entity.MemberMatchFeePaymentEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
 import cricket.merstham.graphql.entity.MemberSummaryEntity;
@@ -21,6 +22,7 @@ import cricket.merstham.graphql.repository.MemberAttendanceSummaryRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
+import cricket.merstham.graphql.repository.MemberMatchFeePaymentEntityRepository;
 import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
@@ -33,6 +35,7 @@ import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberFilter;
+import cricket.merstham.shared.dto.MemberMatchFeePayment;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
@@ -97,6 +100,7 @@ public class MembershipService {
     private final MemberAttendanceSummaryRepository memberAttendanceSummaryRepository;
     private final SpondUploadService spondUploadService;
     private final SqsService sqsService;
+    private final MemberMatchFeePaymentEntityRepository memberMatchFeePaymentEntityRepository;
 
     @Autowired
     public MembershipService(
@@ -118,7 +122,8 @@ public class MembershipService {
             PassGeneratorService passGeneratorService,
             MemberAttendanceSummaryRepository memberAttendanceSummaryRepository,
             SpondUploadService spondUploadService,
-            SqsService sqsService) {
+            SqsService sqsService,
+            MemberMatchFeePaymentEntityRepository memberMatchFeePaymentEntityRepository) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -138,6 +143,7 @@ public class MembershipService {
         this.memberAttendanceSummaryRepository = memberAttendanceSummaryRepository;
         this.spondUploadService = spondUploadService;
         this.sqsService = sqsService;
+        this.memberMatchFeePaymentEntityRepository = memberMatchFeePaymentEntityRepository;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -525,16 +531,38 @@ public class MembershipService {
     public DataUploadResult uploadMatchFees(InputStream data) {
         try {
             var result = spondUploadService.uploadExcelFile(data);
-            sqsService.sendMatchFees(result);
+            var process = new ArrayList<MemberMatchFeePayment>();
+            var skip = new ArrayList<MemberMatchFeePayment>();
+            result.forEach(
+                    matchFee -> {
+                        var entity =
+                                memberMatchFeePaymentEntityRepository.findById(matchFee.getId());
+                        if (entity.isPresent() && isNull(entity.get().getAccountingError())) {
+                            LOG.warn(
+                                    "Skipping match fee payment {} as previously uploaded",
+                                    matchFee.getId());
+                            skip.add(modelMapper.map(entity.get(), MemberMatchFeePayment.class));
+                        } else {
+                            process.add(matchFee);
+                        }
+                    });
+            memberMatchFeePaymentEntityRepository.saveAllAndFlush(
+                    process.stream()
+                            .map(
+                                    (matchFee) ->
+                                            modelMapper.map(
+                                                    matchFee, MemberMatchFeePaymentEntity.class))
+                            .toList());
+            sqsService.sendMatchFees(process);
 
-            return DataUploadResult.builder().success(true).rowsProcessed(result.size()).build();
+            return DataUploadResult.builder()
+                    .success(true)
+                    .processed(process)
+                    .skipped(skip)
+                    .build();
         } catch (IOException e) {
             LOG.error("Error while uploading Match Fees", e);
-            return DataUploadResult.builder()
-                    .success(false)
-                    .rowsProcessed(0)
-                    .error(e.getMessage())
-                    .build();
+            return DataUploadResult.builder().success(false).error(e.getMessage()).build();
         }
     }
 }

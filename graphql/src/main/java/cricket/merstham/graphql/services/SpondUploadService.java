@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,9 +70,8 @@ public class SpondUploadService {
                                 .getStringCellValue())
                 .payoutDate(cellToDate(row.getCell(12)))
                 .link(
-                        URI.create(
-                                row.getCell(13, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
-                                        .getStringCellValue()))
+                        row.getCell(13, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+                                .getStringCellValue())
                 .build();
     }
 
