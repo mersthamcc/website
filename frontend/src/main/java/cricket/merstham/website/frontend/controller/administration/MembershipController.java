@@ -230,6 +230,7 @@ public class MembershipController extends SspController<MemberSummary> {
                 "/administration/membership/spond-upload/{step}"
             },
             name = "admin-membership-spond-upload")
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
     public ModelAndView spondUpload(@PathVariable(required = false) Optional<String> step) {
         if (step.isEmpty()) return new ModelAndView("administration/membership/spond-upload");
 
@@ -248,6 +249,7 @@ public class MembershipController extends SspController<MemberSummary> {
     @PostMapping(
             value = "/administration/membership/spond-upload",
             name = "admin-membership-spond-upload-post")
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
     public RedirectView spondUpload(
             @RequestParam("spond-data") MultipartFile file,
             CognitoAuthentication cognitoAuthentication) {

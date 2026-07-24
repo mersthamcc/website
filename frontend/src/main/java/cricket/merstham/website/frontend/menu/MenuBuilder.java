@@ -277,7 +277,7 @@ public class MenuBuilder {
                                                     "admin-membership-spond-upload",
                                                     null,
                                                     null,
-                                                    List.of(),
+                                                    List.of("ROLE_MEMBERSHIP"),
                                                     null)),
                             "tio-group-senior"),
                     new Menu(

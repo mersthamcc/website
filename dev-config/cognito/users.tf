@@ -48,6 +48,17 @@ resource "aws_cognito_user_in_group" "developer_in_membership" {
   username     = aws_cognito_user.developer.username
 }
 
+resource "aws_cognito_user_group" "treasury" {
+  name         = "TREASURY"
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+}
+
+resource "aws_cognito_user_in_group" "developer_in_treasury" {
+  user_pool_id = aws_cognito_user_pool.dev_pool.id
+  group_name   = aws_cognito_user_group.treasury.name
+  username     = aws_cognito_user.developer.username
+}
+
 resource "aws_cognito_user_group" "news" {
   name         = "NEWS"
   user_pool_id = aws_cognito_user_pool.dev_pool.id

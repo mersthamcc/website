@@ -68,6 +68,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
+import static cricket.merstham.graphql.helpers.HashHelper.generateHashOf;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
@@ -527,7 +528,7 @@ public class MembershipService {
                 .toList();
     }
 
-    @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
     public DataUploadResult uploadMatchFees(InputStream data) {
         try {
             var result = spondUploadService.uploadExcelFile(data);
@@ -537,12 +538,15 @@ public class MembershipService {
                     matchFee -> {
                         var entity =
                                 memberMatchFeePaymentEntityRepository.findById(matchFee.getId());
-                        if (entity.isPresent() && isNull(entity.get().getAccountingError())) {
+                        if (entity.isPresent() && nonNull(entity.get().getAccountingId())) {
                             LOG.warn(
                                     "Skipping match fee payment {} as previously uploaded",
                                     matchFee.getId());
                             skip.add(modelMapper.map(entity.get(), MemberMatchFeePayment.class));
                         } else {
+                            matchFee.setMemberReference(
+                                    generateHashOf(
+                                            matchFee.getMemberName(), matchFee.getPayerName()));
                             process.add(matchFee);
                         }
                     });
@@ -564,5 +568,22 @@ public class MembershipService {
             LOG.error("Error while uploading Match Fees", e);
             return DataUploadResult.builder().success(false).error(e.getMessage()).build();
         }
+    }
+
+    public void updateMatchFeePayment(MemberMatchFeePayment message) {
+        var entity =
+                memberMatchFeePaymentEntityRepository
+                        .findById(message.getId())
+                        .orElseGet(
+                                () -> {
+                                    LOG.warn(
+                                            "No matching match fee payment found for payment {}, creating new record.",
+                                            message.getId());
+                                    return MemberMatchFeePaymentEntity.builder().build();
+                                });
+
+        modelMapper.map(message, entity);
+        memberMatchFeePaymentEntityRepository.save(entity);
+        LOG.info("Match fee payment {} updated successfully!");
     }
 }
