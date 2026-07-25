@@ -5,6 +5,7 @@ import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
+import cricket.merstham.shared.dto.DataUploadResult;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
@@ -37,6 +38,7 @@ import cricket.merstham.website.graph.account.MyOrdersQuery;
 import cricket.merstham.website.graph.account.PassQuery;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
+import cricket.merstham.website.graph.membership.DataUploadMutation;
 import cricket.merstham.website.graph.membership.DistributePassesMutation;
 import cricket.merstham.website.graph.membership.GetPaymentMethodsQuery;
 import cricket.merstham.website.graph.player.DeletePlayCricketLinkMutation;
@@ -63,7 +65,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -520,5 +524,22 @@ public class MembershipService {
                 .stream()
                 .map(m -> modelMapper.map(m, MemberAttendanceSummary.class))
                 .toList();
+    }
+
+    public DataUploadResult uploadSpondData(InputStream inputStream, OAuth2AccessToken accessToken)
+            throws IOException {
+        var mutation =
+                DataUploadMutation.builder()
+                        .data(ByteBuffer.wrap(inputStream.readAllBytes()))
+                        .build();
+
+        Response<DataUploadMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+        return modelMapper.map(
+                requireGraphData(
+                        response,
+                        DataUploadMutation.Data::getDataUpload,
+                        () -> "Error uploading data"),
+                DataUploadResult.class);
     }
 }

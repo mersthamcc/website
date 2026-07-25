@@ -259,6 +259,7 @@ public class AccountController {
     }
 
     @GetMapping(value = "/account/pass/{uuid}/apple", name = "apple-wallet-membership-card")
+    @PreAuthorize("isAnonymous() || isAuthenticated()")
     public ResponseEntity<Resource> appleWalletMemberShipCard(
             @PathVariable String uuid, CognitoAuthentication cognitoAuthentication) {
         Pass pass = membershipService.getMemberPass(uuid, "apple", cognitoAuthentication);
@@ -271,6 +272,7 @@ public class AccountController {
     }
 
     @GetMapping(value = "/account/pass/{uuid}/google", name = "google-wallet-membership-card")
+    @PreAuthorize("isAnonymous() || isAuthenticated()")
     public RedirectView googleWalletMemberShipCard(
             @PathVariable String uuid, CognitoAuthentication cognitoAuthentication) {
         Pass pass = membershipService.getMemberPass(uuid, "google", cognitoAuthentication);

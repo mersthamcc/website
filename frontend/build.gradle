@@ -90,6 +90,7 @@ apollo {
             "Date" : "java.time.LocalDate",
             "DateTime" : "java.time.Instant",
             "Json": "com.fasterxml.jackson.databind.JsonNode",
+            "Bytes": "java.nio.ByteBuffer",
         ]
     }
 }

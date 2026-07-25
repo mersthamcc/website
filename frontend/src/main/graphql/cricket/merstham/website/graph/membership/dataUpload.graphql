@@ -1,0 +1,22 @@
+mutation dataUpload($data: Bytes!) {
+    dataUpload(data: $data) {
+        success
+        error
+        processed {
+            id
+            paymentDate
+            memberName
+            price
+            product
+            paymentDescription
+        }
+        skipped {
+            id
+            paymentDate
+            memberName
+            price
+            product
+            paymentDescription
+        }
+    }
+}

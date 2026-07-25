@@ -1,0 +1,21 @@
+CREATE TABLE member_match_fee_payment (
+    id VARCHAR(128) NOT NULL,
+    payment_date DATE NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    family_discount DECIMAL(10, 2) NOT NULL,
+    gross DECIMAL(10, 2) NOT NULL,
+    fees DECIMAL(10, 2) NOT NULL,
+    net DECIMAL(10, 2) NOT NULL,
+    payment_description TEXT NOT NULL,
+    product TEXT NOT NULL,
+    member_name TEXT NOT NULL,
+    payer_name TEXT NOT NULL,
+    member_reference TEXT NOT NULL,
+    payout_date DATE NOT NULL,
+    link TEXT,
+    accounting_id VARCHAR(128),
+    accounting_payment_id VARCHAR(128),
+    accounting_fees_id VARCHAR(128),
+    accounting_error TEXT,
+    PRIMARY KEY (id)
+);

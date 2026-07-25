@@ -1,0 +1,31 @@
+type MemberMatchFeePayment {
+    id: String
+    paymentDate: Date
+    price: Float
+    familyDiscount: Float
+    gross: Float
+    fees: Float
+    net: Float
+    paymentDescription: String
+    product: String
+    memberName: String
+    payerName: String
+    payoutDate: Date
+    link: String
+    accountingId: String
+    accountingPaymentId: String
+    accountingFeesId: String
+    memberReference: String
+    accountingError: String
+}
+
+type DataUploadResult {
+    success: Boolean
+    error: String
+    processed: [MemberMatchFeePayment]
+    skipped: [MemberMatchFeePayment]
+}
+
+extend type Mutation {
+    dataUpload(data: Bytes!): DataUploadResult!
+}

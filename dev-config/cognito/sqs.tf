@@ -91,6 +91,7 @@ data "aws_iam_policy_document" "process_transactions_response_queue_policy_docum
     actions = [
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",
+      "sqs:ChangeMessageVisibility",
       "sqs:GetQueueAttributes",
     ]
 

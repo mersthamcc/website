@@ -5,6 +5,7 @@ import cricket.merstham.graphql.entity.MemberAttributeEntity;
 import cricket.merstham.graphql.entity.MemberAttributeEntityId;
 import cricket.merstham.graphql.entity.MemberCategoryEntity;
 import cricket.merstham.graphql.entity.MemberEntity;
+import cricket.merstham.graphql.entity.MemberMatchFeePaymentEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntity;
 import cricket.merstham.graphql.entity.MemberSubscriptionEntityId;
 import cricket.merstham.graphql.entity.MemberSummaryEntity;
@@ -21,6 +22,7 @@ import cricket.merstham.graphql.repository.MemberAttendanceSummaryRepository;
 import cricket.merstham.graphql.repository.MemberCategoryEntityRepository;
 import cricket.merstham.graphql.repository.MemberEntityRepository;
 import cricket.merstham.graphql.repository.MemberFilterEntityRepository;
+import cricket.merstham.graphql.repository.MemberMatchFeePaymentEntityRepository;
 import cricket.merstham.graphql.repository.MemberSummaryRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
 import cricket.merstham.graphql.repository.PaymentEntityRepository;
@@ -28,10 +30,12 @@ import cricket.merstham.graphql.repository.PriceListItemEntityRepository;
 import cricket.merstham.graphql.services.hooks.Hook;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
+import cricket.merstham.shared.dto.DataUploadResult;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttendanceSummary;
 import cricket.merstham.shared.dto.MemberCategory;
 import cricket.merstham.shared.dto.MemberFilter;
+import cricket.merstham.shared.dto.MemberMatchFeePayment;
 import cricket.merstham.shared.dto.MemberSummary;
 import cricket.merstham.shared.dto.Order;
 import cricket.merstham.shared.dto.Payment;
@@ -48,6 +52,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.Instant;
@@ -62,6 +67,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cricket.merstham.graphql.configuration.CacheConfiguration.MEMBER_COUNT_CACHE;
+import static cricket.merstham.graphql.helpers.HashHelper.generateHashOf;
 import static cricket.merstham.graphql.helpers.UserHelper.getSubject;
 import static cricket.merstham.shared.IdentifierConstants.GOOGLE_PASS_SERIAL;
 import static cricket.merstham.shared.IdentifierConstants.PLAYER_ID;
@@ -92,6 +98,9 @@ public class MembershipService {
     private final PasskitUpdateService passkitUpdateService;
     private final PassGeneratorService passGeneratorService;
     private final MemberAttendanceSummaryRepository memberAttendanceSummaryRepository;
+    private final SpondUploadService spondUploadService;
+    private final SqsService sqsService;
+    private final MemberMatchFeePaymentEntityRepository memberMatchFeePaymentEntityRepository;
 
     @Autowired
     public MembershipService(
@@ -111,7 +120,10 @@ public class MembershipService {
             List<Hook<OrderEntity>> hooks,
             PasskitUpdateService passkitUpdateService,
             PassGeneratorService passGeneratorService,
-            MemberAttendanceSummaryRepository memberAttendanceSummaryRepository) {
+            MemberAttendanceSummaryRepository memberAttendanceSummaryRepository,
+            SpondUploadService spondUploadService,
+            SqsService sqsService,
+            MemberMatchFeePaymentEntityRepository memberMatchFeePaymentEntityRepository) {
         this.attributeRepository = attributeRepository;
         this.memberRepository = memberRepository;
         this.summaryRepository = summaryRepository;
@@ -129,6 +141,9 @@ public class MembershipService {
         this.passkitUpdateService = passkitUpdateService;
         this.passGeneratorService = passGeneratorService;
         this.memberAttendanceSummaryRepository = memberAttendanceSummaryRepository;
+        this.spondUploadService = spondUploadService;
+        this.sqsService = sqsService;
+        this.memberMatchFeePaymentEntityRepository = memberMatchFeePaymentEntityRepository;
     }
 
     public List<AttributeDefinition> getAttributes() {
@@ -510,5 +525,64 @@ public class MembershipService {
                 .stream()
                 .map(entity -> modelMapper.map(entity, MemberAttendanceSummary.class))
                 .toList();
+    }
+
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
+    public DataUploadResult uploadMatchFees(InputStream data) {
+        try {
+            var result = spondUploadService.uploadExcelFile(data);
+            var process = new ArrayList<MemberMatchFeePayment>();
+            var skip = new ArrayList<MemberMatchFeePayment>();
+            result.forEach(
+                    matchFee -> {
+                        var entity =
+                                memberMatchFeePaymentEntityRepository.findById(matchFee.getId());
+                        if (entity.isPresent() && nonNull(entity.get().getAccountingId())) {
+                            LOG.warn(
+                                    "Skipping match fee payment {} as previously uploaded",
+                                    matchFee.getId());
+                            skip.add(modelMapper.map(entity.get(), MemberMatchFeePayment.class));
+                        } else {
+                            matchFee.setMemberReference(
+                                    generateHashOf(
+                                            matchFee.getMemberName(), matchFee.getPayerName()));
+                            process.add(matchFee);
+                        }
+                    });
+            memberMatchFeePaymentEntityRepository.saveAllAndFlush(
+                    process.stream()
+                            .map(
+                                    (matchFee) ->
+                                            modelMapper.map(
+                                                    matchFee, MemberMatchFeePaymentEntity.class))
+                            .toList());
+            sqsService.sendMatchFees(process);
+
+            return DataUploadResult.builder()
+                    .success(true)
+                    .processed(process)
+                    .skipped(skip)
+                    .build();
+        } catch (Exception e) {
+            LOG.error("Error while uploading Match Fees", e);
+            return DataUploadResult.builder().success(false).error(e.getMessage()).build();
+        }
+    }
+
+    public void updateMatchFeePayment(MemberMatchFeePayment message) {
+        var entity =
+                memberMatchFeePaymentEntityRepository
+                        .findById(message.getId())
+                        .orElseGet(
+                                () -> {
+                                    LOG.warn(
+                                            "No matching match fee payment found for payment {}, creating new record.",
+                                            message.getId());
+                                    return MemberMatchFeePaymentEntity.builder().build();
+                                });
+
+        modelMapper.map(message, entity);
+        memberMatchFeePaymentEntityRepository.save(entity);
+        LOG.info("Match fee payment {} updated successfully!");
     }
 }
