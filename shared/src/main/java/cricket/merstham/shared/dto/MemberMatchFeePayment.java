@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -18,7 +20,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MemberMatchFeePayment {
+public class MemberMatchFeePayment implements Serializable {
+    @Serial private static final long serialVersionUID = 8553632481511595490L;
+
     @JsonProperty private String id;
     @JsonProperty private LocalDate paymentDate;
     @JsonProperty private BigDecimal price;

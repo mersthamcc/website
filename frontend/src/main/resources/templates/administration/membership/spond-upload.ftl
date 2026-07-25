@@ -27,6 +27,7 @@
         <div class="col-lg-12">
             <@admin.form action="/administration/membership/spond-upload" enctype="multipart/form-data">
                 <@admin.card title="menu.admin-membership-spond-upload">
+                    <@admin.formErrors errors=errors![] errorKey="match-fee.error"/>
                     <div class="custom-file">
                         <input type="file" class="js-file-attach custom-file-input" id="spond-data" name="spond-data"
                                data-hs-file-attach-options='{
@@ -34,20 +35,19 @@
                                }'>
                         <label class="custom-file-label" for="spond-data">Choose file</label>
                     </div>
+                    <@components.buttonGroup>
+                        <a href="/administration/news" class="btn btn-bg-success transition-3d-hover">
+                            <@spring.message code="match-fee.cancel" />
+                        </a>
+                        <button type="reset" class="btn btn-light transition-3d-hover" name="reset">
+                            <@spring.messageText code="match-fee.reset" text="Reset" />
+                        </button>&nbsp;&nbsp;
+                        <button type="submit" class="btn btn-primary transition-3d-hover" name="action" value="save">
+                            <@spring.message code="match-fee.save" />
+                            <i class="fa fa-check-circle"></i>
+                        </button>
+                    </@components.buttonGroup>
                 </@admin.card>
-
-                <@components.buttonGroup>
-                    <a href="/administration/news" class="btn btn-bg-success transition-3d-hover">
-                        <@spring.message code="news.cancel" />
-                    </a>
-                    <button type="reset" class="btn btn-light transition-3d-hover" name="reset">
-                        <@spring.messageText code="news.reset" text="Reset" />
-                    </button>&nbsp;&nbsp;
-                    <button type="submit" class="btn btn-primary transition-3d-hover" name="action" value="save">
-                        <@spring.message code="news.save" />
-                        <i class="fa fa-check-circle"></i>
-                    </button>
-                </@components.buttonGroup>
             </@admin.form>
         </div>
     </div>

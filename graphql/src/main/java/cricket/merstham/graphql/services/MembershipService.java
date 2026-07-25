@@ -52,7 +52,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -564,7 +563,7 @@ public class MembershipService {
                     .processed(process)
                     .skipped(skip)
                     .build();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("Error while uploading Match Fees", e);
             return DataUploadResult.builder().success(false).error(e.getMessage()).build();
         }

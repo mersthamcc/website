@@ -1,5 +1,6 @@
 package cricket.merstham.website.frontend.controller.administration;
 
+import cricket.merstham.shared.dto.DataUploadResult;
 import cricket.merstham.shared.dto.Member;
 import cricket.merstham.shared.dto.MemberAttendance;
 import cricket.merstham.shared.dto.MemberSubscription;
@@ -66,6 +67,7 @@ import static java.util.Objects.nonNull;
 public class MembershipController extends SspController<MemberSummary> {
 
     private static final Logger LOG = LogManager.getLogger(MembershipController.class);
+    public static final String UPLOAD_RESULT = "upload-result";
     private final MessageSource messageSource;
 
     private final MembershipService membershipService;
@@ -225,25 +227,93 @@ public class MembershipController extends SspController<MemberSummary> {
     }
 
     @GetMapping(
-            value = {
-                "/administration/membership/spond-upload",
-                "/administration/membership/spond-upload/{step}"
-            },
+            value = "/administration/membership/spond-upload",
             name = "admin-membership-spond-upload")
     @PreAuthorize("hasRole('ROLE_TREASURY')")
-    public ModelAndView spondUpload(@PathVariable(required = false) Optional<String> step) {
-        if (step.isEmpty()) return new ModelAndView("administration/membership/spond-upload");
-
-        switch (step.get()) {
-            case "results":
-                {
-                    return new ModelAndView();
-                }
-            default:
-                {
-                    return new ModelAndView("administration/membership/spond-upload");
-                }
+    public ModelAndView spondUpload(HttpServletRequest request) {
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(UPLOAD_RESULT)) {
+            var result = (DataUploadResult) flash.get(UPLOAD_RESULT);
+            if (!result.isSuccess()) model.put("errors", List.of(result.getError()));
         }
+        return new ModelAndView("administration/membership/spond-upload", model);
+    }
+
+    @GetMapping(value = "/administration/membership/spond-upload/success")
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
+    public ModelAndView spondUploadSuccess(HttpServletRequest request) {
+        var model = new HashMap<String, Object>();
+        var flash = RequestContextUtils.getInputFlashMap(request);
+        if (nonNull(flash) && flash.containsKey(UPLOAD_RESULT)) {
+            var result = (DataUploadResult) flash.get(UPLOAD_RESULT);
+            model.put(UPLOAD_RESULT, result);
+            if (result.isSuccess()) {
+                model.put(
+                        "processed",
+                        result.getProcessed().stream()
+                                .map(
+                                        p ->
+                                                Map.of(
+                                                        "match-fee.id",
+                                                                new DataTableValue()
+                                                                        .setValue(p.getId()),
+                                                        "match-fee.member-name",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                p.getMemberName()),
+                                                        "match-fee.description",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                p
+                                                                                        .getPaymentDescription()),
+                                                        "match-fee.price",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                NumberFormat
+                                                                                        .getCurrencyInstance()
+                                                                                        .format(
+                                                                                                p
+                                                                                                        .getPrice()))))
+                                .toList());
+                model.put(
+                        "skipped",
+                        result.getSkipped().stream()
+                                .map(
+                                        p ->
+                                                Map.of(
+                                                        "match-fee.id",
+                                                                new DataTableValue()
+                                                                        .setValue(p.getId()),
+                                                        "match-fee.member-name",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                p.getMemberName()),
+                                                        "match-fee.description",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                p
+                                                                                        .getPaymentDescription()),
+                                                        "match-fee.price",
+                                                                new DataTableValue()
+                                                                        .setValue(
+                                                                                NumberFormat
+                                                                                        .getCurrencyInstance()
+                                                                                        .format(
+                                                                                                p
+                                                                                                        .getPrice()))))
+                                .toList());
+                model.put(
+                        "columns",
+                        List.of(
+                                new DataTableColumn().setKey("match-fee.id").setKey("match-fee.id"),
+                                new DataTableColumn().setKey("match-fee.member-name"),
+                                new DataTableColumn().setKey("match-fee.description"),
+                                new DataTableColumn().setKey("match-fee.price")));
+                return new ModelAndView("administration/membership/spond-upload-success", model);
+            }
+        }
+        return new ModelAndView("redirect:/administration/membership/spond-upload");
     }
 
     @PostMapping(
@@ -252,11 +322,17 @@ public class MembershipController extends SspController<MemberSummary> {
     @PreAuthorize("hasRole('ROLE_TREASURY')")
     public RedirectView spondUpload(
             @RequestParam("spond-data") MultipartFile file,
+            RedirectAttributes redirectAttributes,
             CognitoAuthentication cognitoAuthentication) {
         try {
             var result =
                     membershipService.uploadSpondData(
                             file.getInputStream(), cognitoAuthentication.getOAuth2AccessToken());
+
+            redirectAttributes.addFlashAttribute(UPLOAD_RESULT, result);
+            if (result.isSuccess()) {
+                return redirectTo("/administration/membership/spond-upload/success");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
