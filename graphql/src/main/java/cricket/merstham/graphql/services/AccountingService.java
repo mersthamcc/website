@@ -3,6 +3,7 @@ package cricket.merstham.graphql.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cricket.merstham.graphql.entity.LastUpdateEntity;
+import cricket.merstham.graphql.entity.OrderEntity;
 import cricket.merstham.graphql.entity.PaymentEntity;
 import cricket.merstham.graphql.repository.LastUpdateRepository;
 import cricket.merstham.graphql.repository.OrderEntityRepository;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,7 @@ public class AccountingService {
     public static final String LINES = "lines";
     public static final String DISCOUNT = "discount";
     public static final String TOTAL = "total";
+    public static final String ACCOUNTING_ID = "accountingId";
 
     private final OrderEntityRepository repository;
     private final PaymentEntityRepository paymentRepository;
@@ -105,27 +108,7 @@ public class AccountingService {
         try {
             LOG.info("Send new orders...");
             var orders = repository.findOrderEntitiesByAccountingIdIsNullAndAccountingErrorIsNull();
-            orders.forEach(
-                    order -> {
-                        if (!order.getMemberSubscription().isEmpty()) {
-                            try {
-                                order.setAccountingId(
-                                        sendOrderToAccounting(
-                                                orderJson(modelMapper.map(order, Order.class))));
-                            } catch (Exception ex) {
-                                LOG.atError()
-                                        .withThrowable(ex)
-                                        .log(
-                                                "Error processing order {}: {}",
-                                                order.getId(),
-                                                ex.getMessage());
-                                order.setAccountingError(
-                                        isNull(ex.getCause())
-                                                ? ex.getMessage()
-                                                : ex.getCause().getMessage());
-                            }
-                        }
-                    });
+            orders.forEach(this::syncOrderEntity);
             repository.saveAllAndFlush(orders);
             LOG.info("Order sync complete!");
         } catch (Exception ex) {
@@ -445,6 +428,9 @@ public class AccountingService {
         root.put(REFERENCE, order.getWebReference());
         root.put(DATE, order.getCreateDate().format(DateTimeFormatter.ISO_DATE));
         root.put(OWNER, order.getOwnerUserId());
+        if (nonNull(order.getAccountingId())) {
+            root.put(ACCOUNTING_ID, order.getAccountingId());
+        }
         var lines = objectMapper.createArrayNode();
         order.getMemberSubscription()
                 .forEach(
@@ -469,5 +455,27 @@ public class AccountingService {
 
         root.put(TOTAL, order.getTotal());
         return root;
+    }
+
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
+    public Order resendToAccounting(int id) {
+        var entity = repository.findById(id).orElseThrow();
+        syncOrderEntity(entity);
+        return modelMapper.map(repository.save(entity), Order.class);
+    }
+
+    private void syncOrderEntity(OrderEntity entity) {
+        if (!entity.getMemberSubscription().isEmpty()) {
+            try {
+                entity.setAccountingId(
+                        sendOrderToAccounting(orderJson(modelMapper.map(entity, Order.class))));
+            } catch (Exception ex) {
+                LOG.atError()
+                        .withThrowable(ex)
+                        .log("Error processing order {}: {}", entity.getId(), ex.getMessage());
+                entity.setAccountingError(
+                        isNull(ex.getCause()) ? ex.getMessage() : ex.getCause().getMessage());
+            }
+        }
     }
 }
