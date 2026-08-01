@@ -4,6 +4,7 @@ import cricket.merstham.graphql.inputs.AttributeInput;
 import cricket.merstham.graphql.inputs.MemberInput;
 import cricket.merstham.graphql.inputs.PaymentInput;
 import cricket.merstham.graphql.inputs.where.MemberCategoryWhereInput;
+import cricket.merstham.graphql.services.AccountingService;
 import cricket.merstham.graphql.services.MembershipService;
 import cricket.merstham.shared.dto.AttributeDefinition;
 import cricket.merstham.shared.dto.Coupon;
@@ -26,9 +27,12 @@ import java.util.List;
 public class MembershipController {
 
     private final MembershipService membershipService;
+    private final AccountingService accountingService;
 
-    public MembershipController(MembershipService membershipService) {
+    public MembershipController(
+            MembershipService membershipService, AccountingService accountingService) {
         this.membershipService = membershipService;
+        this.accountingService = accountingService;
     }
 
     @QueryMapping
@@ -148,5 +152,10 @@ public class MembershipController {
     @MutationMapping
     public Coupon saveCoupon(@Argument Coupon coupon, Principal principal) {
         return membershipService.saveCoupon(coupon, principal);
+    }
+
+    @MutationMapping
+    public Order accountingResync(@Argument int id) {
+        return accountingService.resendToAccounting(id);
     }
 }

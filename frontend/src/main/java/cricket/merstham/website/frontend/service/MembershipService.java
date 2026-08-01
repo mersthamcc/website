@@ -36,6 +36,7 @@ import cricket.merstham.website.graph.account.AddMemberIdentifierMutation;
 import cricket.merstham.website.graph.account.MyMembersQuery;
 import cricket.merstham.website.graph.account.MyOrdersQuery;
 import cricket.merstham.website.graph.account.PassQuery;
+import cricket.merstham.website.graph.membership.AccountingResyncMutation;
 import cricket.merstham.website.graph.membership.AddPaymentMethodMutation;
 import cricket.merstham.website.graph.membership.ConfirmOrderMutation;
 import cricket.merstham.website.graph.membership.DataUploadMutation;
@@ -541,5 +542,18 @@ public class MembershipService {
                         DataUploadMutation.Data::getDataUpload,
                         () -> "Error uploading data"),
                 DataUploadResult.class);
+    }
+
+    public Order resyncOrder(int orderId, OAuth2AccessToken accessToken) {
+        var mutation = AccountingResyncMutation.builder().id(orderId).build();
+        Response<AccountingResyncMutation.Data> response =
+                graphService.executeMutation(mutation, accessToken);
+
+        return modelMapper.map(
+                requireGraphData(
+                        response,
+                        AccountingResyncMutation.Data::getAccountingResync,
+                        () -> "Error syncing with accounts"),
+                Order.class);
     }
 }

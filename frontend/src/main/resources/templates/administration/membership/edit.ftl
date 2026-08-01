@@ -462,6 +462,15 @@
 
 <#macro orderLabel>
     <div class="h2">
+        <#if user.hasRole("ROLE_TREASURY")>
+            <form action="${member.id}/resync-order" method="post">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                <input type="hidden" name="order-id" value="${subscription.order.id}" />
+                <button type="submit" class="btn btn-sm btn-white">
+                    Resend to accounts
+                </button>
+            </form>
+        </#if>
         <span class="badge badge-pill badge-soft-primary">
             ${subscription.order.webReference}
         </span>

@@ -189,6 +189,33 @@ public class MembershipController extends SspController<MemberSummary> {
     }
 
     @PostMapping(
+            value = "/administration/membership/edit/{id}/resync-order",
+            name = "admin-membership-resync-order")
+    @PreAuthorize("hasRole('ROLE_TREASURY')")
+    public RedirectView resyncOrder(
+            CognitoAuthentication cognitoAuthentication,
+            RedirectAttributes redirectAttributes,
+            @PathVariable int id,
+            @RequestBody MultiValueMap<String, Object> data) {
+        try {
+            var orderId = Integer.parseInt((String) data.getFirst("order-id"));
+            var result =
+                    membershipService.resyncOrder(
+                            orderId, cognitoAuthentication.getOAuth2AccessToken());
+            redirectAttributes.addFlashAttribute(
+                    "info",
+                    List.of(
+                            format(
+                                    "Recreated order with id {0} in accounts with accounting id {1}",
+                                    id, result.getAccountingId())));
+        } catch (GraphException ex) {
+            LOG.error("Error performing update!", ex);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return redirectTo(format("/administration/membership/edit/{0}", id));
+    }
+
+    @PostMapping(
             value = "/administration/membership/edit/{id}/update-passes",
             name = "admin-membership-update-passes")
     @PreAuthorize("hasRole('ROLE_MEMBERSHIP')")

@@ -1,0 +1,6 @@
+mutation accountingResync($id: Int!) {
+    accountingResync(id: $id) {
+        id
+        accountingId
+    }
+}
