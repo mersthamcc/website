@@ -35,6 +35,7 @@ import static java.util.Objects.isNull;
 public class YouTubeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(YouTubeService.class);
+    private static final List<String> LIVE_BROADCAST_TYPES = List.of("upcoming", "live");
 
     private final String applicationName;
     private final TokenService tokenService;
@@ -82,14 +83,20 @@ public class YouTubeService {
             var request = service.search().list(List.of("snippet"));
             var response =
                     request.setChannelId(channelId)
-                            .setEventType("upcoming")
                             .setMaxResults(50L)
                             .setOrder("date")
                             .setType(List.of("video"))
                             .execute();
 
             LOG.info("Found {} upcoming live streams", response.getItems().size());
-            var ids = response.getItems().stream().map(item -> item.getId().getVideoId()).toList();
+            var ids =
+                    response.getItems().stream()
+                            .filter(
+                                    item ->
+                                            LIVE_BROADCAST_TYPES.contains(
+                                                    item.getSnippet().getLiveBroadcastContent()))
+                            .map(item -> item.getId().getVideoId())
+                            .toList();
             var detailRequest =
                     service.videos()
                             .list(
