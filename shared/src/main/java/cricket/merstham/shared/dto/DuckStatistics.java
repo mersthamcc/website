@@ -10,4 +10,6 @@ import java.util.List;
 public class DuckStatistics {
     private final List<AllDuckStatistic> allDuckStatistics;
     private final List<LeagueDuckStatistic> leagueDuckStatistics;
+    private final List<AllDuckTakersStatistic> allDuckTakerStatistics;
+    private final List<LeagueDuckTakersStatistic> leagueDuckTakerStatistics;
 }

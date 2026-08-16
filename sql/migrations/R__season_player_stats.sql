@@ -55,11 +55,58 @@ SELECT
     COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) AS ducks,
     ROUND((COUNT(fp.player_id) FILTER (WHERE COALESCE(fp.runs, 0) = 0 AND "out" = TRUE) / COUNT(fp.fixture_id)::NUMERIC) * 100, 2) AS percentage_ducks,
     COUNT(fp.player_id) FILTER (WHERE fp.out = FALSE) AS not_out
+ FROM fixture_player_summary fp
+INNER JOIN fixture f ON fp.fixture_id = f.id
+INNER JOIN player p ON fp.player_id = p.id
+INNER JOIN team t ON f.team_id = t.id
+WHERE t.is_openage = TRUE
+GROUP BY 1, 2, 3
+ORDER BY ducks DESC, percentage_ducks DESC, runs ASC
+;
+
+DROP VIEW IF EXISTS league_duck_takers_statistics;
+CREATE OR REPLACE VIEW league_duck_takers_statistics AS
+SELECT
+    DATE_PART('year', f.date) AS year,
+    p.id,
+    p.detail ->> 'name' AS name,
+    COUNT(fp.fixture_id) AS matches,
+    SUM(COALESCE(fp.wickets, 0)) AS wickets,
+    SUM(COALESCE(fp.bowler_ducks, 0)) AS ducks,
+    SUM(COALESCE(fp.bowler_golden_ducks, 0)) AS golden_ducks,
+    CASE
+        WHEN SUM(COALESCE(fp.wickets, 0)) = 0 THEN 0
+        ELSE ROUND((SUM(COALESCE(fp.bowler_ducks, 0))::NUMERIC / SUM(COALESCE(fp.wickets, 0))::NUMERIC) * 100, 2)
+    END AS percentage_ducks
 FROM fixture_player_summary fp
          INNER JOIN fixture f ON fp.fixture_id = f.id
          INNER JOIN player p ON fp.player_id = p.id
          INNER JOIN team t ON f.team_id = t.id
 WHERE t.is_openage = TRUE
+  AND f.detail ->> 'competition_type' = 'League'
 GROUP BY 1, 2, 3
-ORDER BY ducks DESC, percentage_ducks DESC, runs ASC
+ORDER BY ducks DESC, percentage_ducks DESC, wickets ASC
+;
+
+DROP VIEW IF EXISTS all_duck_takers_statistics;
+CREATE OR REPLACE VIEW all_duck_takers_statistics AS
+SELECT
+    DATE_PART('year', f.date) AS year,
+    p.id,
+    p.detail ->> 'name' AS name,
+    COUNT(fp.fixture_id) AS matches,
+    SUM(COALESCE(fp.wickets, 0)) AS wickets,
+    SUM(COALESCE(fp.bowler_ducks, 0)) AS ducks,
+    SUM(COALESCE(fp.bowler_golden_ducks, 0)) AS golden_ducks,
+    CASE
+        WHEN SUM(COALESCE(fp.wickets, 0)) = 0 THEN 0
+        ELSE ROUND((SUM(COALESCE(fp.bowler_ducks, 0))::NUMERIC / SUM(COALESCE(fp.wickets, 0))::NUMERIC) * 100, 2)
+    END AS percentage_ducks
+ FROM fixture_player_summary fp
+INNER JOIN fixture f ON fp.fixture_id = f.id
+INNER JOIN player p ON fp.player_id = p.id
+INNER JOIN team t ON f.team_id = t.id
+WHERE t.is_openage = TRUE
+GROUP BY 1, 2, 3
+ORDER BY ducks DESC, percentage_ducks DESC, wickets ASC
 ;

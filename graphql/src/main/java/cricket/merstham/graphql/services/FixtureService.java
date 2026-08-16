@@ -543,7 +543,8 @@ public class FixtureService {
                     var batting = playCricketService.getBatting(fixture, playerId);
                     var bowling = playCricketService.getBowling(fixture, playerId);
                     var bowlerDucks = playCricketService.getBowlerDucks(fixture, playerId);
-                    var bowlerGoldenDucks = playCricketService.getBowlerGoldenDucks(fixture, playerId);
+                    var bowlerGoldenDucks =
+                            playCricketService.getBowlerGoldenDucks(fixture, playerId);
 
                     var id =
                             FixturePlayerSummaryEntityId.builder()

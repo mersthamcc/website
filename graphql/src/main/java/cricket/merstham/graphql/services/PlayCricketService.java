@@ -250,7 +250,6 @@ public class PlayCricketService {
         return result;
     }
 
-
     public Integer getCatches(FixtureEntity fixture, Integer playerId) {
         int result = 0;
         for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
