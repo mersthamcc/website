@@ -66,6 +66,7 @@ public class PlayCricketService {
     public static final String FIELDER_ID = "fielder_id";
     public static final String BAT = "bat";
     public static final String BOWL = "bowl";
+    public static final List<String> BOWLER_CREDITS = List.of("b", "ct", "lbw", "st");
     private final Client client;
     private final String apiToken;
     private final int siteId;
@@ -214,6 +215,39 @@ public class PlayCricketService {
             }
         }
         return null;
+    }
+
+    public Integer getBowlerDucks(FixtureEntity fixture, Integer playerId) {
+        int result = 0;
+        for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
+            if (innings.get(TEAM_BATTING_ID).asInt() != fixture.getTeam().getId()) {
+                for (JsonNode batting : innings.withArray(BAT)) {
+                    if (BOWLER_CREDITS.contains(batting.get(HOW_OUT).asText())
+                            && batting.get(BOWLER_ID).asText().equals(playerId.toString())
+                            && batting.get("runs").asInt() == 0) {
+                        result++;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public Integer getBowlerGoldenDucks(FixtureEntity fixture, Integer playerId) {
+        int result = 0;
+        for (JsonNode innings : fixture.getDetail().withArray(INNINGS)) {
+            if (innings.get(TEAM_BATTING_ID).asInt() != fixture.getTeam().getId()) {
+                for (JsonNode batting : innings.withArray(BAT)) {
+                    if (BOWLER_CREDITS.contains(batting.get(HOW_OUT).asText())
+                            && batting.get(BOWLER_ID).asText().equals(playerId.toString())
+                            && batting.get("runs").asInt() == 0
+                            && batting.get("balls").asInt() == 1) {
+                        result++;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     public Integer getCatches(FixtureEntity fixture, Integer playerId) {

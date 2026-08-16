@@ -31,6 +31,10 @@ public class DisplaysController {
                 DuckStatistics.builder()
                         .allDuckStatistics(displayService.getAllDuckStatistics(year, limit))
                         .leagueDuckStatistics(displayService.getLeagueDuckStatistics(year, limit))
+                        .allDuckTakerStatistics(
+                                displayService.getAllDuckTakersStatistics(year, limit))
+                        .leagueDuckTakerStatistics(
+                                displayService.getLeagueDuckTakersStatistics(year, limit))
                         .build(),
                 HttpStatus.OK);
     }

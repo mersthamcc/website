@@ -542,6 +542,9 @@ public class FixtureService {
                     var playerId = p.get(PLAYER_ID).asInt();
                     var batting = playCricketService.getBatting(fixture, playerId);
                     var bowling = playCricketService.getBowling(fixture, playerId);
+                    var bowlerDucks = playCricketService.getBowlerDucks(fixture, playerId);
+                    var bowlerGoldenDucks =
+                            playCricketService.getBowlerGoldenDucks(fixture, playerId);
 
                     var id =
                             FixturePlayerSummaryEntityId.builder()
@@ -592,6 +595,8 @@ public class FixtureService {
                         entity.setOvers(BigDecimal.valueOf(bowling.get("overs").asDouble()));
                         entity.setMaidens(bowling.get("maidens").asInt(0));
                         entity.setConcededRuns(bowling.get("runs").asInt(0));
+                        entity.setBowlerDucks(bowlerDucks);
+                        entity.setBowlerGoldenDucks(bowlerGoldenDucks);
                     }
                     entity.setCatches(playCricketService.getCatches(fixture, playerId));
 
