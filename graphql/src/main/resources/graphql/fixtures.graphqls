@@ -20,6 +20,8 @@ type Statistics {
     concededRuns: Int
     notOut: Int
     overs: Float
+    bowlerDucks: Int
+    bowlerGoldenDucks: Int
 }
 
 type Team {

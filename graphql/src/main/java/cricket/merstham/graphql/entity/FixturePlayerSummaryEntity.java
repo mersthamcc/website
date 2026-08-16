@@ -73,4 +73,10 @@ public class FixturePlayerSummaryEntity {
 
     @Column(name = "how_out")
     private String howOut;
+
+    @Column(name = "bowler_ducks")
+    private Integer bowlerDucks;
+
+    @Column(name = "bowler_golden_ducks")
+    private Integer bowlerGoldenDucks;
 }
